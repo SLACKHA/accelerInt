@@ -26,18 +26,16 @@ Real complex res[N_RA];
 
 #define IGN
 
-/** Number of independent systems */
-#define NUM 1
-
 // load same initial conditions for all threads
 #define SAME_IC
 
 // shuffle initial conditions randomly
 //#define SHUFFLE
 
-/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-void intDriver (const Real t, const Real t_end, const Real* pr_global, Real* y_global) {
+void intDriver (const int NUM, const Real t, const Real t_end, 
+                const Real* pr_global, Real* y_global) {
 
 	int tid;
 	#pragma omp parallel for shared(y_global, pr_global) private(tid)
@@ -86,7 +84,7 @@ void intDriver (const Real t, const Real t_end, const Real* pr_global, Real* y_g
 
 } // end intDriver
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
 /** Main function
  * 
@@ -116,9 +114,8 @@ int main (int argc, char *argv[]) {
 	free (res_r);
 	free (res_i);
   
-  
-	// print number of independent ODEs
-	printf ("# ODEs: %d\n", NUM);
+  /** Number of independent systems */
+  int NUM = 1;
   
   /////////////////////////////////////////////////////////////////////
   // OpenMP
@@ -133,23 +130,35 @@ int main (int argc, char *argv[]) {
   	if (argc > 1) {
   		int num_threads = max_threads;
   		// first check if is number
-  		num_threads = *(argv[1]) - '0';
-
-  		if ((num_threads <= 0) || (num_threads > max_threads)) {
-  			// not a digit, error
+		  if (sscanf(argv[1], "%i", &num_threads) !=1 || (num_threads <= 0) || (num_threads > max_threads)) {
   			printf("Error: Number of threads not in correct range\n");
-  			printf("Provide number between 1 and %i\n", max_threads);
-  			exit(1);
-  		}
+    			printf("Provide number between 1 and %i\n", max_threads);
+    			exit(1);
+		  }
   		omp_set_num_threads (num_threads);
   	}
+  
+  	if (argc > 2) { //check for problem size
+  		int problemsize = NUM;
+  		if (sscanf(argv[2], "%i", &problemsize) !=1 || (problemsize <= 0))
+  		{
+  			printf("Error: Problem size not in correct range\n");
+    			printf("Provide number greater than 0\n");
+    			exit(1);
+  		}
+  		NUM = problemsize;
+  	}
   }
+  
+  // print number of independent ODEs
+  printf ("# ODEs: %d\n", NUM);
   // print number of threads
   int num_threads = 0;
-    #pragma omp parallel reduction(+:num_threads)
-    num_threads += 1;
-
+  
+  #pragma omp parallel reduction(+:num_threads)
+  num_threads += 1;
   printf ("# threads: %d\n", num_threads);
+  
   #endif
   /////////////////////////////////////////////////////////////////////
 	
@@ -194,7 +203,7 @@ int main (int argc, char *argv[]) {
 	// 11 CO
 	// 12 CO2
 
-///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
   
 	#ifdef SAME_IC
 	// load same ICs for all threads

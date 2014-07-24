@@ -3,6 +3,6 @@
 
 #include "head.h"
 
-void exp4_int (Real t_start, Real t_end, Real pr, Real* y);
+void exp4_int (const Real, const Real, const Real, Real*);
 
 #endif

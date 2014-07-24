@@ -103,20 +103,15 @@ typedef unsigned int uint;
 /** Unsigned short int typedef. */
 typedef unsigned short int usint;
 
-/** Struct holding information for exp4 integrator. */
-typedef struct {
-	double h_old; /** Previous timestep */
-	double err_old[NN]; /** Error from previous step */
-} exp4_info;
 
-#define A(I,J)	A[(I) + (J) * (NN)]
-#define invA(I,J)		invA[(I) + (J) * (NN)]
+//#define A(I,J)	A[(I) + (J) * (NN)]
+//#define invA(I,J)		invA[(I) + (J) * (NN)]
 
 /** Max macro (type safe, from GNU) */
-#define MAX(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
+//#define MAX(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
 
 /** Min macro (type safe) */
-#define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
+//#define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
 
 // OpenMP
 #ifdef _OPENMP

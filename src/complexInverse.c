@@ -62,12 +62,14 @@ void complexGERU (int n, double complex alpha, double complex* arrX,
 	
 	for (int j = 0; j < n; ++j) {
 		//if (arrY[j * incY] != 0.0) {
-    if (cabs(arrY[j * incY]) > 0.0) {
+    
+    if (cabs(arrY[j * incY]) > 0.0) {      
 			double complex temp = alpha * arrY[j * incY];
 			for (int i = 0; i < n; ++i) {
 				A[i + (lda * j)] += arrX[i] * temp;
 			}
 		}
+    
 	}
 	
 }
@@ -118,6 +120,7 @@ void multiplyComplexUpperMV (int n, double complex* x, int lda, double complex* 
 	for (int j = 0; j < n; ++j) {
 		//if (x[j] != 0.0) {
     if (cabs(x[j]) > 0.0) {
+      
 			double complex temp = x[j];
 			for (int i = 0; i < j; ++i) {
 				x[i] += temp * A[i + (lda * j)];
@@ -167,11 +170,6 @@ int getComplexInverseLU (int n, double complex* A, int* indPivot, double complex
 		
 		// scale
 		scaleComplex (j, Ajj, &A[n * j]);
-		/*
-		for (int k = 0; k < j; ++k) {
-			A[k + (n * j)] *= Ajj;
-		}
-		*/
 	}
 	
 	// solve equation inv(A)*L = inv(U) for inv(A)
@@ -193,7 +191,7 @@ int getComplexInverseLU (int n, double complex* A, int* indPivot, double complex
 	// apply column interchanges
 	
 	for (int j = n - 2; j >= 0; --j) {
-		//int jp = indPivot[j];
+    
 		if (indPivot[j] != j)
 			swapComplex (n, &A[n * j], 1, &A[n * indPivot[j]], 1);
 	}
@@ -222,7 +220,7 @@ void getComplexInverse (int n, double complex* A) {
 	
 	// work array
 	double complex* work = (double complex*) calloc (n, sizeof(double complex));
-  memset (work, 0.0, n * sizeof(double complex));
+  // memset (work, 0.0, n * sizeof(double complex));
 	
 	// now get inverse
 	getComplexInverseLU (n, A, ipiv, work);

@@ -15,7 +15,7 @@
 #include "linear-algebra.h"
 
 /** Defined for pi */
-#define _USE_MATH_DEFINES
+#define M_PI  4 * atan(1)
 
 /** Complex math */
 #include <complex.h>

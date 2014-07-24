@@ -1,11 +1,11 @@
-#include "head.h"
+#include "header.h"
 
 /** Function converting species mole fractions to mass fractions.
  *
  * \param[in]  X  array of species mole fractions
  * \param[out] Y  array of species mass fractions
  */
-void mole2mass ( Real * X, Real * Y ) {
+void mole2mass (const Real * X, Real * Y) {
 
   // average molecular weight
   Real mw_avg = 0.0;
@@ -45,7 +45,7 @@ void mole2mass ( Real * X, Real * Y ) {
  * \param[in]  Y  array of species mass fractions
  * \param[out] X  array of species mole fractions
  */
-void mass2mole ( Real * Y, Real * X ) {
+void mass2mole (const Real * Y, Real * X) {
 
   // average molecular weight
   Real mw_avg = 0.0;
@@ -81,31 +81,33 @@ void mass2mole ( Real * Y, Real * X ) {
 
 } // end mass2mole
 
-/** Function converting species mole fractions to mass fractions.
+/** Function calculating density from mole fractions.
  *
- * \param[in]  X  array of species mole fractions
- * \param[out] Y  array of species mass fractions
+ * \param[in]  temp  temperature
+ * \param[in]  pres  pressure
+ * \param[in]  X     array of species mole fractions
+ * \return     rho  mixture mass density
  */
-Real getDensity ( Real temp, Real pres, Real * X ) {
+Real getDensity (const Real temp, const real pres, const Real * X) {
 
   // average molecular weight
-	Real rho = 0.0;
-	rho += X[0] * 1.00797;
-	rho += X[1] * 2.01594;
-	rho += X[2] * 15.9994;
-	rho += X[3] * 17.00737;
-	rho += X[4] * 18.01534;
-	rho += X[5] * 31.9988;
-	rho += X[6] * 33.00677;
-	rho += X[7] * 34.01474;
-	rho += X[8] * 28.0134;
-	rho += X[9] * 39.948;
-	rho += X[10] * 4.0026;
-	rho += X[11] * 28.01055;
-	rho += X[12] * 44.00995;
-  
-	rho = pres * rho / (83145100.0 * temp);
-  
+  Real mw_avg = 0.0;
+  mw_avg += X[0] * 1.00797;
+  mw_avg += X[1] * 2.01594;
+  mw_avg += X[2] * 15.9994;
+  mw_avg += X[3] * 17.00737;
+  mw_avg += X[4] * 18.01534;
+  mw_avg += X[5] * 31.9988;
+  mw_avg += X[6] * 33.00677;
+  mw_avg += X[7] * 34.01474;
+  mw_avg += X[8] * 28.0134;
+  mw_avg += X[9] * 39.948;
+  mw_avg += X[10] * 4.0026;
+  mw_avg += X[11] * 28.01055;
+  mw_avg += X[12] * 44.00995;
+
+  rho = pres * mw_avg / (8.31451000e+07 * temp);
   return rho;
 
-} // end mole2mass
+} // end getDensity
+

@@ -43,7 +43,7 @@ void matvec (const Real * A, const Real * v, Real * Av) {
 		
 		#pragma unroll
 		for (uint j = 0; j < NN; ++j) {
-			Av[i] += A(i,j) * v[j];
+			Av[i] += A[i + (j * NN)] * v[j];
 		}
 	}
 }
@@ -60,7 +60,7 @@ static inline
 void scale (const Real * y0, const Real * y1, Real * sc) {
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
-		sc[i] = ATOL + MAX(fabs(y0[i]), fabs(y1[i])) * RTOL;
+		sc[i] = ATOL + fmax(fabs(y0[i]), fabs(y1[i])) * RTOL;
 	}
 }
 
@@ -92,7 +92,7 @@ Real sc_norm (const Real * nums, const Real * sc) {
  * 
  * 
  */
-void exp4_int (Real t_start, Real t_end, Real pr, Real* y) {
+void exp4_int (const Real t_start, const Real t_end, const Real pr, Real* y) {
 	
 	Real h = 1.0e-8;
 	Real h_max, h_new;
@@ -105,8 +105,6 @@ void exp4_int (Real t_start, Real t_end, Real pr, Real* y) {
 	Real t = t_start;
 	
 	while ((t < t_end) && (t + h > t)) {
-    
-    //printf("%18.15e\n", t);
     
 		// temporary arrays
 		Real temp[NN];
@@ -240,7 +238,7 @@ void exp4_int (Real t_start, Real t_end, Real pr, Real* y) {
 			temp[i] = -k1[i] + 2.0 * k2[i] - k4[i] + k7[i] - (y1[i] - y[i]) / h;
 		}
 		//Real err_W = h * sc_norm(temp, sc);
-		err = MAX(EPS, MIN(err, h * sc_norm(temp, sc)));
+		err = fmax(EPS, fmin(err, h * sc_norm(temp, sc)));
 		
 		// classical step size calculation
 		h_new = pow(err, -1.0 / ORD);	
@@ -248,11 +246,11 @@ void exp4_int (Real t_start, Real t_end, Real pr, Real* y) {
 		if (err <= ONE) {
 			
 			// minimum of classical and Gustafsson step size prediction
-			h_new = MIN(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
+			h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
 			
 			// limit to 0.2 <= (h_new/8) <= 8.0
-			h_new = h * MAX(MIN(0.9 * h_new, 8.0), 0.2);
-			h_new = MIN(h_new, h_max);
+			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
+			h_new = fmin(h_new, h_max);
 			
 			// update y and t
 			#pragma unroll
@@ -273,23 +271,23 @@ void exp4_int (Real t_start, Real t_end, Real pr, Real* y) {
       */
 			
 			// store time step and error
-			err_old = MAX(1.0e-2, err);
+			err_old = fmax(1.0e-2, err);
 			h_old = h;
 			
 			// check if last step rejected
 			if (reject) {
 				reject = false;
-				h_new = MIN(h, h_new);
+				h_new = fmin(h, h_new);
 			}
-			h = MIN(h_new, fabs(t_end - t));
+			h = fmin(h_new, fabs(t_end - t));
 						
 		} else {
 			// limit to 0.2 <= (h_new/8) <= 8.0
-			h_new = h * MAX(MIN(0.9 * h_new, 8.0), 0.2);
-			h_new = MIN(h_new, h_max);
+			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
+			h_new = fmin(h_new, h_max);
 			
 			reject = true;
-			h = MIN(h, h_new);
+			h = fmin(h, h_new);
 		}
 		
 	} // end while
