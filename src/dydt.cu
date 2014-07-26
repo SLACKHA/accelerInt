@@ -39,7 +39,7 @@ __device__ void dydt (const Real t, const Real pres, const Real * y, Real * dy) 
   get_rxn_pres_mod (y[0], pres, conc, pres_mod);
 
   // evaluate rate of change of species molar concentration
-  eval_spec_rates (rates, &dy[1] );
+  eval_spec_rates (rates, pres_mod, &dy[1] );
 
   // local array holding constant pressure specific heat
   Real cp[13];
