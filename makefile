@@ -54,10 +54,10 @@ endif
 
 NVCCFLAGS = -O3 -arch=sm_20 -m64
 
-$(ODIR)/%.cu.o : $(SDIR)/%.c $(DEPS)
+$(ODIR)/%.o : $(SDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(FLAGS) $(INCLUDES)
 
-$(ODIR)/%.o : $(SDIR)/%.cu $(DEPS)
+$(ODIR)/%.cu.o : $(SDIR)/%.cu $(DEPS)
 	$(NVCC) -dc -o $@ $< $(NVCCFLAGS) $(INCLUDES)
 
 default: $(ODIR) all
