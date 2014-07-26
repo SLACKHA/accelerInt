@@ -106,7 +106,7 @@ Real getDensity (const Real temp, const Real pres, const Real * X) {
   mw_avg += X[11] * 28.01055;
   mw_avg += X[12] * 44.00995;
 
-  rho = pres * mw_avg / (8.31451000e+07 * temp);
+  Real rho = pres * mw_avg / (8.31451000e+07 * temp);
   return rho;
 
 } // end getDensity
