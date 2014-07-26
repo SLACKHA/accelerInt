@@ -83,6 +83,7 @@ __device__
 void getComplexLU (const int n, cuDoubleComplex* A, int* indPivot) {
 	
 	//int info = 0;
+	cuDoubleComplex alpha = {-1.0, 0};
 	
 	for (int j = 0; j < n; ++j) {
 		
@@ -103,13 +104,13 @@ void getComplexLU (const int n, cuDoubleComplex* A, int* indPivot) {
 			if (j < n - 1)
 				scaleComplex (n - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (n * j)]), &A[j + 1 + (n * j)]);
 			
-		} else if (info == 0) {
+		} //else if (info == 0) {
 			//info = j + 1;
-		}
+		//}
 		
 		// update trailing submatrix
 		if (j < n - 1)
-			complexGERU (n - j - 1, -1.0, &A[j + 1 + (n * j)], &A[j + n * (j + 1)], n, &A[j + 1 + n * (j + 1)], n);
+			complexGERU (n - j - 1, alpha, &A[j + 1 + (n * j)], &A[j + n * (j + 1)], n, &A[j + 1 + n * (j + 1)], n);
 		
 	}
 	
