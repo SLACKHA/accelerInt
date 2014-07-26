@@ -3694,15 +3694,16 @@ __device__ void eval_jacob (const Real t, const Real pres, const Real * y, Real 
       + (y[9] * cp[8]) + (y[10] * cp[9]) + (y[11] * cp[10]) + (y[12] * cp[11])
       + (y[13] * cp[12]);
   // sum of enthalpy * species rate * molecular weight for all species
-  register Real sum_hwW;
+  //register Real sum_hwW;
 
-  sum_hwW = (h[0] * sp_rates[0] * 1.00797) + (h[1] * sp_rates[1] * 2.01594)
+  /*sum_hwW = (h[0] * sp_rates[0] * 1.00797) + (h[1] * sp_rates[1] * 2.01594)
       + (h[2] * sp_rates[2] * 15.9994) + (h[3] * sp_rates[3] * 17.0074)
       + (h[4] * sp_rates[4] * 18.0153) + (h[5] * sp_rates[5] * 31.9988)
       + (h[6] * sp_rates[6] * 33.0068) + (h[7] * sp_rates[7] * 34.0147)
       + (h[8] * sp_rates[8] * 28.0134) + (h[9] * sp_rates[9] * 39.948) + (h[10] * sp_rates[10] * 4.0026)
       + (h[11] * sp_rates[11] * 28.0106) + (h[12] * sp_rates[12] * 44.01);
-
+	*/
+	
   //partial of dT wrt T;
   jac[0] = 0.0;
   if (T <= 1000.0) {
