@@ -383,10 +383,10 @@ int main (int argc, char *argv[]) {
 
 		#if defined(CONP)
 			// constant pressure case
-			intDriver (t, t_next, pres_host, y_host);
+			intDriver (NUM, t, t_next, pres_host, y_host);
 		#elif defined(CONV)
 			// constant volume case
-			intDriver (t, t_next, rho_host, y_host);
+			intDriver (NUM, t, t_next, rho_host, y_host);
 		#endif
 
 		t = t_next;

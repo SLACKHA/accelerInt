@@ -435,10 +435,10 @@ int main (int argc, char *argv[]) {
 
 		#if defined(CONP)
 			// constant pressure case
-			intDriver <<<dimGrid, dimBlock>>> (t, t_next, pr_device, y_device);
+			intDriver <<<dimGrid, dimBlock>>> (NUM, t, t_next, pr_device, y_device);
 		#elif defined(CONV)
 			// constant volume case
-			intDriver <<<dimGrid, dimBlock>>> (t, t_next, pr_device, y_device);
+			intDriver <<<dimGrid, dimBlock>>> (NUM, t, t_next, pr_device, y_device);
 		#endif
 
 		t = t_next;
