@@ -1,4 +1,4 @@
-#include "header.h"
+#include "head.h"
 
 __device__ void eval_spec_rates (const Real * fwd_rates, const Real * pres_mod, Real * sp_rates) {
   sp_rates[0] = -fwd_rates[0] + fwd_rates[1] + fwd_rates[2] - fwd_rates[3] + fwd_rates[4]

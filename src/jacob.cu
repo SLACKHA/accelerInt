@@ -1,5 +1,5 @@
 #include <math.h>
-#include "header.h"
+#include "head.h"
 #include "chem_utils.cuh"
 #include "rates.cuh"
 

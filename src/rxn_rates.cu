@@ -1,5 +1,5 @@
 #include <math.h>
-#include "header.h"
+#include "head.h"
 
 __device__ void eval_rxn_rates (const Real T, const Real * C, Real * fwd_rxn_rates) {
   register Real logT = log(T);

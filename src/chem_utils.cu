@@ -1,4 +1,4 @@
-#include "header.h"
+#include "head.h"
 
 __device__ void eval_h (const Real T, Real * h) {
 
