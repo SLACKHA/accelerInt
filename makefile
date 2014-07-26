@@ -7,7 +7,8 @@ CUDA_PATH = /usr/local/cuda
 SDK_PATH = /usr/local/cuda/samples/common/inc/
 
 # Compilers
-CC    = gcc-4.8
+#CC    = gcc-4.8
+CC = gcc
 NVCC = $(CUDA_PATH)/bin/nvcc
 LINK   = $(CC) -fPIC -Xlinker -rpath $(CUDA_PATH)/lib64
 
