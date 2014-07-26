@@ -23,7 +23,7 @@ endif
 
 # Paths
 INCLUDES    = -I.
-LIBS        = -llapack -lm -lfftw3
+ALLLIBS        = -llapack -lm -lfftw3
 
 _DEPS = head.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
@@ -40,7 +40,7 @@ OBJ_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU))
 
 # Paths
 INCLUDES = -I. -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
-LIBS = -lm -L$(CUDA_PATH)/lib64 -lcuda -lcudart
+LIBS = -lm $(ALLLIBS) -L$(CUDA_PATH)/lib64 -lcuda -lcudart
 
 #flags
 #ifeq ("$(CC)", "gcc")
