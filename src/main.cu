@@ -143,7 +143,7 @@ int main (int argc, char *argv[]) {
   // check for problem size given as command line option
   if (argc > 1) {
     int problemsize = NUM;
-    if (sscanf(argv[1], "%i", &problemsize) ! = 1 || (problemsize <= 0)) {
+    if (sscanf(argv[1], "%i", &problemsize) != 1 || (problemsize <= 0)) {
       printf("Error: Problem size not in correct range\n");
       printf("Provide number greater than 0\n");
       exit(1);
