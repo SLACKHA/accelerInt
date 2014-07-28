@@ -33,7 +33,7 @@ _OBJ = main.o phiA.o cf.o exp4.o linear-algebra.o complexInverse.o \
        rxn_rates_pres_mod.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_OBJ_GPU = main.cu.o phiA.cu.o cf.o exp4.cu.o complexInverse.cu.o \
+_OBJ_GPU = main.cu.o phiA.cu.o cf.o linear-algebra.o exp4.cu.o complexInverse.cu.o \
            dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o \
 					 spec_rates.cu.o rxn_rates_pres_mod.cu.o
 OBJ_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU))
