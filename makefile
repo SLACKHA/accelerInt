@@ -47,7 +47,7 @@ LIBS = -lm $(ALLLIBS) -L$(CUDA_PATH)/lib64 -lcuda -lcudart
   
 ifeq ("$(L)", "0")
   FLAGS = -O0 -g3 -fbounds-check -Wunused-variable -Wunused-parameter \
-	        -Wall -ftree-vrp -std=c99 \
+	        -Wall -ftree-vrp -std=c99 -fopenmp
 else ifeq ("$(L)", "4")
   FLAGS = -O3 -std=c99 -fopenmp
 endif
