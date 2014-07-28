@@ -394,7 +394,10 @@ int main (int argc, char *argv[]) {
 	#ifdef QUEUE
 	dim3 dimGrid ( numSM, 1 );
 	#else
-	dim3 dimGrid ( NUM / BLOCK_SIZE, 1 );
+	int g_num = NUM / BLOCK_SIZE;
+	if (g_num == 0)
+		g_num = 1;
+	dim3 dimGrid ( g_num, 1 );
 	#endif
   
   cudaError_t status = cudaSuccess;
