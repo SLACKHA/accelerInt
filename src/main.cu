@@ -418,10 +418,10 @@ int main (int argc, char *argv[]) {
   errorCheck (status);
   
   // copy poles and residuals
-  status = cudaMemcpyToSymbol (poles, &polesHost, N_RA * sizeof(cuDoubleComplex), cudaMemcpyHostToDevice);
+  status = cudaMemcpyToSymbol (poles, &polesHost, N_RA * sizeof(cuDoubleComplex), 0, cudaMemcpyHostToDevice);
   errorCheck (status);
   
-  status = cudaMemcpyToSymbol (res, &resHost, N_RA * sizeof(cuDoubleComplex), cudaMemcpyHostToDevice);
+  status = cudaMemcpyToSymbol (res, &resHost, N_RA * sizeof(cuDoubleComplex), 0, cudaMemcpyHostToDevice);
   errorCheck (status);
   
 	// set initial time
