@@ -22,7 +22,9 @@
 #include <cuComplex.h>
 
 #include "head.h"
+extern "C" {
 #include "cf.h"
+}
 #include "exp4.cuh"
 #include "mass_mole.h"
 #include "timer.h"
