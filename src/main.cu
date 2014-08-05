@@ -47,7 +47,7 @@ __device__ __constant__ cuFloatComplex res[N_RA];
 
 bool errorCheck (cudaError_t status) {
     if (status != cudaSuccess) {
-        printf (cudaGetErrorString(status));
+        printf ("%s\n", cudaGetErrorString(status));
         return false;
     }
     return true;
