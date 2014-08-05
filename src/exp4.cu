@@ -14,7 +14,6 @@
 #include <stdbool.h>
 
 #include "head.h"
-#include "exp4.cuh"
 #include "derivs.cuh"
 #include "phiA.cuh"
 
