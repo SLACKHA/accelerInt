@@ -356,7 +356,7 @@ int main (int argc, char *argv[]) {
   
 	// set & initialize device using command line argument (if any)
 	cudaDeviceProp devProp;
-	if (argc == 1) {
+	if (argc <= 2) {
 		// default device id is 0
 		checkCudaErrors (cudaSetDevice (0) );
 		checkCudaErrors (cudaGetDeviceProperties(&devProp, 0));
@@ -367,10 +367,8 @@ int main (int argc, char *argv[]) {
 		int num_devices;
 		cudaGetDeviceCount(&num_devices);
 
-		// first check if is number
-		int id = *(argv[1]) - '0';
-
-		if ((id >= 0) && (id < num_devices)) {
+		int id = 0;
+		if (sscanf(argv[1], "%i", &id) == 1 && (id >= 0) && (id < num_devices)) {
 			checkCudaErrors (cudaSetDevice (id) );
 		} else {
 			// not in range, error
