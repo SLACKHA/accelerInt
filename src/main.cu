@@ -125,8 +125,8 @@ int main (int argc, char *argv[]) {
 	
 	cf (N_RA, poles_r, poles_i, res_r, res_i);
   
-  cuDoubleComplex *polesHost = (cuDoubleComplex*) calloc (N_RA, sizeof(cuDoubleComplex));
-  cuDoubleComplex *resHost = (cuDoubleComplex*) calloc (N_RA, sizeof(cuDoubleComplex));
+ 	cuDoubleComplex polesHost[N_RA];
+ 	cuDoubleComplex resHost[N_RA];
 	
 	for (int i = 0; i < N_RA; ++i) {
 		polesHost[i] = make_cuDoubleComplex(poles_r[i], poles_i[i]);
@@ -416,10 +416,10 @@ int main (int argc, char *argv[]) {
   errorCheck (status);
   
   // copy poles and residuals
-  status = cudaMemcpyToSymbol (poles, &polesHost, N_RA * sizeof(cuDoubleComplex), 0, cudaMemcpyHostToDevice);
+  status = cudaMemcpyToSymbol (poles, polesHost, N_RA * sizeof(cuDoubleComplex), 0, cudaMemcpyHostToDevice);
   errorCheck (status);
   
-  status = cudaMemcpyToSymbol (res, &resHost, N_RA * sizeof(cuDoubleComplex), 0, cudaMemcpyHostToDevice);
+  status = cudaMemcpyToSymbol (res, resHost, N_RA * sizeof(cuDoubleComplex), 0, cudaMemcpyHostToDevice);
   errorCheck (status);
   
 	// set initial time
@@ -497,8 +497,8 @@ int main (int argc, char *argv[]) {
   fclose (pFile);
   #endif
   
-  free (polesHost);
-  free (resHost);
+  //free (polesHost);
+  //free (resHost);
   free (y_host);
   free (pres_host);
   #ifdef CONV
