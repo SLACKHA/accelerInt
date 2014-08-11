@@ -5,5 +5,6 @@
 
 __device__ void dydt (const Real, const Real, const Real*, Real*);
 __device__ void eval_jacob (const Real, const Real, const Real*, Real*);
+__device__ void eval_fd_jacob (const Real, const Real, Real *, Real *);
 
 #endif

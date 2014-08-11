@@ -32,12 +32,12 @@ _DEPS = head.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
 
 _OBJ = main.o phiA.o cf.o exp4.o linear-algebra.o complexInverse.o \
-       dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
+       dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
        rxn_rates_pres_mod.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _OBJ_GPU = main.cu.o phiA.cu.o cf.o linear-algebra.o exp4.cu.o complexInverse.cu.o \
-           dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o \
+           dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o \
 					 spec_rates.cu.o rxn_rates_pres_mod.cu.o
 OBJ_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU))
 
