@@ -21,6 +21,11 @@
 #include "mass_mole.h"
 #include "timer.h"
 
+#ifdef DEBUG
+//NAN check
+#include <fenv.h> 
+#endif
+
 Real complex poles[N_RA];
 Real complex res[N_RA];
 
@@ -95,6 +100,10 @@ void intDriver (const int NUM, const Real t, const Real t_end,
  */
 int main (int argc, char *argv[]) {
 	
+	#ifdef DEBUG
+		feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
+	#endif
+
 	// get poles and residues for rational approximant to matrix exponential
 	double *poles_r = (double*) calloc (N_RA, sizeof(double));
 	double *poles_i = (double*) calloc (N_RA, sizeof(double));
