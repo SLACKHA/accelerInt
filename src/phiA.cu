@@ -21,7 +21,7 @@ void phiAc (const Real * A, const Real c, Real * phiA) {
   #ifdef DOUBLE
 	cuDoubleComplex invA[NN * NN];
   #else
-  cuFloatComplex invA[NN * NN];
+  	cuFloatComplex invA[NN * NN];
   #endif
 	
 	#pragma unroll
@@ -64,7 +64,7 @@ void phiAc (const Real * A, const Real c, Real * phiA) {
       #ifdef DOUBLE
 			phiA[i] += 2.0 * cuCreal( cuCmul( cuCdiv(res[q], poles[q]), invA[i] ) );
       #else
-      phiA[i] += 2.0 * cuCrealf( cuCmulf( cuCdivf(res[q], poles[q]), invA[i] ) );
+      		phiA[i] += 2.0 * cuCrealf( cuCmulf( cuCdivf(res[q], poles[q]), invA[i] ) );
       #endif
 		}
 		
