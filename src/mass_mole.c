@@ -88,7 +88,7 @@ void mass2mole (const Real * Y, Real * X) {
  * \param[in]  X     array of species mole fractions
  * \return     rho  mixture mass density
  */
-Real getDensity (const Real temp, const real pres, const Real * X) {
+Real getDensity (const Real temp, const Real pres, const Real * X) {
 
   // average molecular weight
   Real mw_avg = 0.0;
@@ -106,8 +106,7 @@ Real getDensity (const Real temp, const real pres, const Real * X) {
   mw_avg += X[11] * 28.01055;
   mw_avg += X[12] * 44.00995;
 
-  rho = pres * mw_avg / (8.31451000e+07 * temp);
-  return rho;
+  return pres * mw_avg / (8.31451000e+07 * temp);
 
 } // end getDensity
 
