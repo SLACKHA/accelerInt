@@ -22,7 +22,7 @@ for line in lines:
 	T3.append(float(vals[-1]))
 	
 with open("cantera_h2.txt") as file:
-	lines = file.readlines()[2:]
+	lines = file.readlines()
 t2 = []
 T2 = []
 for line in lines:
@@ -54,5 +54,21 @@ plot = fig.add_subplot(1,1,1)
 T_diff = [100.0 * abs(a - b) / a for a, b in zip(T1, T3)]
 plot.plot(t1, T_diff)
 plot.set_ylabel("% Diff in Temperature (CPU:GPU)")
+plot.set_xlabel("Time (s)")
+plt.show()
+
+fig = plt.figure()
+plot = fig.add_subplot(1,1,1)
+T_diff = [100.0 * abs(a - b) / a for a, b in zip(T2, T1)]
+plot.plot(t1, T_diff)
+plot.set_ylabel("% Diff in Temperature (CVODE:CPU)")
+plot.set_xlabel("Time (s)")
+plt.show()
+
+fig = plt.figure()
+plot = fig.add_subplot(1,1,1)
+T_diff = [100.0 * abs(a - b) / a for a, b in zip(T2, T3)]
+plot.plot(t1, T_diff)
+plot.set_ylabel("% Diff in Temperature (CVODE:GPU)")
 plot.set_xlabel("Time (s)")
 plt.show()
