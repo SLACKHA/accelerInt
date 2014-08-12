@@ -29,6 +29,12 @@ extern "C" {
 #include "mass_mole.h"
 #include "timer.h"
 
+#ifdef DEBUG
+//NAN check
+#include <fenv.h> 
+#endif
+
+
 #ifdef DOUBLE
 __device__ __constant__ cuDoubleComplex poles[N_RA];
 __device__ __constant__ cuDoubleComplex res[N_RA];
@@ -116,6 +122,10 @@ void intDriver (const int NUM, const Real t, const Real t_end,
  * \param[in]		argv	command line argument vector
  */
 int main (int argc, char *argv[]) {
+
+	#ifdef DEBUG
+		feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
+	#endif
 	
 	// get poles and residues for rational approximant to matrix exponential
 	double *poles_r = (double*) calloc (N_RA, sizeof(double));
