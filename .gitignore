@@ -1,0 +1,6 @@
+.dropbox
+*.ini
+exp-int
+*.obj
+rober/
+rober-testinv/
