@@ -30,16 +30,17 @@ __device__ void dydt (const Real t, const Real pres, const Real * y, Real * dy) 
   conc[11] = rho * y[12] / 28.01055;
   conc[12] = rho * y[13] / 44.00995;
 
-  // local array holding reaction rates
-  Real rates[54];
-  eval_rxn_rates (y[0], conc, rates);
+  // local arrays holding reaction rates
+  Real fwd_rates[27];
+  Real rev_rates[27];
+  eval_rxn_rates (y[0], conc, fwd_rates, rev_rates);
 
   // get pressure modifications to reaction rates
-  Real pres_mod[12];
+  Real pres_mod[6];
   get_rxn_pres_mod (y[0], pres, conc, pres_mod);
 
   // evaluate rate of change of species molar concentration
-  eval_spec_rates (rates, pres_mod, &dy[1] );
+  eval_spec_rates (fwd_rates, rev_rates, pres_mod, &dy[1]);
 
   // local array holding constant pressure specific heat
   Real cp[13];
@@ -108,7 +109,7 @@ __device__ void dydt (const Real t, const Real rho, const Real * y, Real * dy) {
   conc[12] = rho * y[13] / 44.00995;
 
   // local array holding reaction rates
-  Real rates[54];
+  Real rates[27];
   eval_rxn_rates (y[0], pres, conc, rates);
 
   // evaluate rate of change of species molar concentration
