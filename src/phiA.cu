@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <cuComplex.h>
 
-#include "head.h"
+#include "header.h"
 //#include "linear-algebra.h"
 #include "complexInverse.cuh"
 

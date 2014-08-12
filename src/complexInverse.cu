@@ -3,7 +3,7 @@
 #include <float.h>
 #include <string.h>
 
-#include "head.h"
+#include "header.h"
 #include <cuComplex.h>
 
 ///////////////////////////////////////////////////////////

@@ -1,4 +1,4 @@
-#include "head.h"
+#include "header.h"
 
 /** Function converting species mole fractions to mass fractions.
  *
@@ -107,6 +107,5 @@ Real getDensity (const Real temp, const Real pres, const Real * X) {
   mw_avg += X[12] * 44.00995;
 
   return pres * mw_avg / (8.31451000e+07 * temp);
-
 } // end getDensity
 

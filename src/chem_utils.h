@@ -1,7 +1,7 @@
 #ifndef CHEM_UTILS_HEAD
 #define CHEM_UTILS_HEAD
 
-#include "head.h"
+#include "header.h"
 
 void eval_h (const Real, Real*);
 void eval_u (const Real, Real*);

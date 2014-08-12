@@ -3,14 +3,14 @@
  *
  * @author <a href="mailto:niemeyer@case.edu">Kyle E. Niemeyer</a> and Jerry C. Lee
  *
- * Change stiffness using stiffness factor eps, in head.h.
+ * Change stiffness using stiffness factor eps, in header.h.
  */
 
 #ifndef HEAD
 #define HEAD
 
 /** Header file for CSP model problem project.
- * \file head.h
+ * \file header.h
  *
  * \author Kyle E. Niemeyer
  * \date 07/17/2012

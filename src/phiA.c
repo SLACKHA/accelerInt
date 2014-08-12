@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <complex.h>
 
-#include "head.h"
+#include "header.h"
 //#include "linear-algebra.h"
 #include "complexInverse.h"
 

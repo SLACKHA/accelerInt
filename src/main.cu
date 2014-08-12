@@ -21,7 +21,7 @@
 #include <helper_cuda.h>
 #include <cuComplex.h>
 
-#include "head.h"
+#include "header.h"
 extern "C" {
 #include "cf.h"
 }

@@ -11,7 +11,7 @@
 #include <math.h>
 #include <string.h>
 
-#include "head.h"
+#include "header.h"
 #include "linear-algebra.h"
 
 /** Defined for pi */

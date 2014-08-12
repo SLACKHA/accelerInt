@@ -1,5 +1,5 @@
 #include <math.h>
-#include "head.h"
+#include "header.h"
 
 void eval_rxn_rates (const Real T, const Real * C, Real * fwd_rxn_rates, Real * rev_rxn_rates) {
   Real logT = log(T);

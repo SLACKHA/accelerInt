@@ -25,7 +25,7 @@ endif
 INCLUDES    = -I.
 ALLLIBS        = -llapack -lm -lfftw3
 
-_DEPS = head.h
+_DEPS = header.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
 
 _OBJ = main.o phiA.o cf.o exp4.o linear-algebra.o complexInverse.o \

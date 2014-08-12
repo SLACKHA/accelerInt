@@ -15,7 +15,7 @@
 #include <stdbool.h>
 #include <complex.h>
 
-#include "head.h"
+#include "header.h"
 #include "cf.h"
 #include "exp4.h"
 #include "mass_mole.h"

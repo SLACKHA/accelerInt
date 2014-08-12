@@ -1,5 +1,5 @@
 #include <math.h>
-#include "head.h"
+#include "header.h"
 
 __device__ void get_rxn_pres_mod (const Real T, const Real pres, const Real * C, Real * pres_mod) {
   // third body variable declaration

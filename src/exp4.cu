@@ -13,7 +13,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "head.h"
+#include "header.h"
 #include "derivs.cuh"
 #include "phiA.cuh"
 

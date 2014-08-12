@@ -13,7 +13,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "head.h"
+#include "header.h"
 #include "exp4.h"
 #include "derivs.h"
 #include "phiA.h"

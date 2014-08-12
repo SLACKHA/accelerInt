@@ -1,4 +1,4 @@
-#include "head.h"
+#include "header.h"
 #include "chem_utils.cuh"
 #include "rates.cuh"
 
