@@ -38,7 +38,7 @@ void get_rxn_pres_mod (const Real T, const Real pres, const Real * C, Real * pre
   logFcent = log10( fmax(5.00000000e-01 * exp(-T / 1.00000000e-30) + 5.00000000e-01 * exp(-T / 1.00000000e+30), 1.0e-300));
   A = log10(fmax(Pr, 1.0e-300)) - 0.67 * logFcent - 0.4;
   B = 0.806 - 1.1762 * logFcent - 0.14 * log10(fmax(Pr, 1.0e-300));
-  pres_mod[4] = exp10(logFcent / (1.0 + A * A / (B * B))) * Pr / (1.0 + Pr);
+  pres_mod[4] = pow(10.0, logFcent / (1.0 + A * A / (B * B))) * Pr / (1.0 + Pr);
 
   // reaction 21;
   thd = m + 6.5 * C[4] + 0.6 * C[12] + 0.5 * C[8] + 0.2 * C[5] - 0.35 * C[10] + 6.7 * C[7] + 2.7 * C[1] + 1.8 * C[11];
@@ -48,7 +48,7 @@ void get_rxn_pres_mod (const Real T, const Real pres, const Real * C, Real * pre
   logFcent = log10( fmax(5.70000000e-01 * exp(-T / 1.00000000e-30) + 4.30000000e-01 * exp(-T / 1.00000000e+30), 1.0e-300));
   A = log10(fmax(Pr, 1.0e-300)) - 0.67 * logFcent - 0.4;
   B = 0.806 - 1.1762 * logFcent - 0.14 * log10(fmax(Pr, 1.0e-300));
-  pres_mod[5] = exp10(logFcent / (1.0 + A * A / (B * B))) * Pr / (1.0 + Pr);
+  pres_mod[5] = pow(10.0, logFcent / (1.0 + A * A / (B * B))) * Pr / (1.0 + Pr);
 
 } // end get_rxn_pres_mod
 
