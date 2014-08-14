@@ -378,7 +378,7 @@ int main (int argc, char *argv[]) {
 		cudaGetDeviceCount(&num_devices);
 
 		int id = 0;
-		if (sscanf(argv[1], "%i", &id) == 1 && (id >= 0) && (id < num_devices)) {
+		if (sscanf(argv[2], "%i", &id) == 1 && (id >= 0) && (id < num_devices)) {
 			checkCudaErrors (cudaSetDevice (id) );
 		} else {
 			// not in range, error
