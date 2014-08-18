@@ -121,4 +121,12 @@ typedef unsigned short int usint;
  	#define omp_get_num_threads() 1
 #endif
 
+/* CVodes Parameters */
+//#define CV_MAX_ORD 5 //maximum order for method, default for BDF is 5
+#define CV_MAX_STEPS 20000 // maximum steps the solver will take in one timestep
+//#define CV_HMAX 0  //upper bound on step size (integrator step, not global timestep)
+//#define CV_HMIN 0 //lower bound on step size (integrator step, not global timestep)
+#define CV_MAX_HNIL 0 //maximum number of t + h = t warnings
+#define CV_MAX_ERRTEST_FAILS 5 //maximum number of error test fails before an error is thrown
+
 #endif
