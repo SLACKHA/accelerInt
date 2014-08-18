@@ -50,7 +50,7 @@ void eval_fd_jacob (const Real t, const Real pres, Real * y, Real * jac) {
   Real ewt[NN];
   #pragma unroll
   for (uint i = 0; i < NN; ++i) {
-    ewt[i] = 1.0e-16 + (1.0e-8 * fabs(y[i]));
+    ewt[i] = ATOL + (RTOL * fabs(y[i]));
   }
   
   // unit roundoff of machine
@@ -62,7 +62,7 @@ void eval_fd_jacob (const Real t, const Real pres, Real * y, Real * jac) {
     sum += (ewt[i] * ydot[i]) * (ewt[i] * ydot[i]);
   }
   Real fac = sqrt(sum / ((Real)(NN)));
-  Real r0 = 1000.0 * 1.0e-8 * DBL_EPSILON * ((Real)(NN)) * fac;
+  Real r0 = 1000.0 * RTOL * DBL_EPSILON * ((Real)(NN)) * fac;
   
   Real ftemp[NN];
   
