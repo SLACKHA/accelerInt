@@ -21,12 +21,14 @@ for line in lines:
 	t3.append(float(vals[0]))
 	T3.append(float(vals[-1]))
 	
-with open("cantera_h2.txt") as file:
-	lines = file.readlines()
+with open("cv_out.txt") as file:
+	lines = file.readlines()[2:]
 t2 = []
 T2 = []
 for line in lines:
 	vals = line.strip().split("\t")
+	if vals[0].startswith("Time:"):
+		break
 	t2.append(float(vals[0]))
 	T2.append(float(vals[-1]))
 	
@@ -42,7 +44,7 @@ t3_p = t3[2:len(t3):step]
 T3_p = T3[2:len(T3):step]
 
 plot.plot(t1_p, T1_p, marker = ">", linestyle = "", label = "exp4(cpu)")
-plot.plot(t2, T2, label = "cantera")
+plot.plot(t2, T2, label = "CVodes")
 plot.plot(t3_p, T3_p, marker = "v", linestyle = "", label = "exp4(gpu)")
 plot.legend(loc = 0)
 plot.set_ylabel("Temperature(K)")
