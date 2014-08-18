@@ -500,7 +500,7 @@ int main (int argc, char *argv[]) {
 		t = t_next;
 		t_next += h;
 
-		printf("%.10f\t%.10f\n", t, y_host[0]);
+		printf("%f\t%f\n", t, y_host[0]);
 
 		
 		// check if within bounds
