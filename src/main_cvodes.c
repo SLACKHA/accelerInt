@@ -566,7 +566,7 @@ int main (int argc, char *argv[]) {
 	#endif
 
 	//free the integrators and nvectors
-	for (int i = 0; i < NUM; i++)
+	for (int i = 0; i < num_threads; i++)
 	{
 		CVodeFree(&integrators[i]);
 		N_VDestroy(y_locals[i]);
