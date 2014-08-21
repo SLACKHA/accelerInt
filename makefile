@@ -21,7 +21,7 @@ SDIR = ./src
 
 #FLAGS, L=0 for testing, L=4 for optimization
 ifndef L
-  L = 0
+  L = 4
 endif
 #FLAGS, USE_LAPACK, 4 for use MKL in CVODEs, 2 for use the system libraries, 0 for use the serial CVodes version 
 ifndef USE_LAPACK
@@ -50,7 +50,7 @@ OBJ_CVODES = $(patsubst %,$(ODIR)/%,$(_OBJ_CVODES))
 
 # Paths
 INCLUDES = -I. -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
-LIBS = -lm -lfftw3 -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lsundials_cvodes -lsundials_nvecserial
+LIBS = -lm -lfftw3 -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++ -lsundials_cvodes -lsundials_nvecserial
 
 #flags
 #ifeq ("$(CC)", "gcc")
