@@ -47,7 +47,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-void intDriver (const int NUM, const int num_threads, const Real t, const Real t_end, 
+void intDriver (const int NUM, const Real t, const Real t_end, 
                 const Real* pr_global, Real* y_global, void** integrators, N_Vector* y_locals) {
 
 	int tid;
@@ -491,10 +491,10 @@ int main (int argc, char *argv[]) {
 
 		#if defined(CONP)
 			// constant pressure case
-			intDriver (NUM, num_threads, t, t_next, pres_host, y_host, integrators, y_locals);
+			intDriver (NUM, t, t_next, pres_host, y_host, integrators, y_locals);
 		#elif defined(CONV)
 			// constant volume case
-			intDriver (NUM, num_threads, t, t_next, rho_host, y_host, integrators, y_locals);
+			intDriver (NUM, t, t_next, rho_host, y_host, integrators, y_locals);
 		#endif
 
 		t = t_next;
