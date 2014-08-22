@@ -45,7 +45,6 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 	int tid;
 	#pragma omp parallel for shared(y_global, pr_global) private(tid)
 	for (tid = 0; tid < NUM; ++tid) {
-
 		// local array with initial values
 		Real y_local[NN];
 		Real pr_local = pr_global[tid];
@@ -295,11 +294,11 @@ int main (int argc, char *argv[]) {
 			rewind (fp);
 			fgets (buffer, 1024, fp);
 		}
-		sscanf (buffer, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le", \
+		sscanf (buffer, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", \
 		&y_host[i], &pres_host[i], &y_host[i + NUM], &y_host[i + NUM*2], &y_host[i + NUM*3], \
 		&y_host[i + NUM*4], &y_host[i + NUM*5], &y_host[i + NUM*6], &y_host[i + NUM*7], \
-		&y_host[i + NUM*8], &y_host[i + NUM*9], &y_host[i + NUM*10], &y_host[i + NUM*12], \
-		&y_host[i + NUM*13]);
+		&y_host[i + NUM*8], &y_host[i + NUM*9], &y_host[i + NUM*10], &y_host[i + NUM*11], \
+		&y_host[i + NUM*12], &y_host[i + NUM*13]);
 
 		// if constant volume, calculate density
 		#ifdef CONV
