@@ -104,7 +104,7 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 			{
 				printf("%d\t%d\n", index, NUM);
 				for (int i = 0; i < NN; i++)
-					printf("%f\t%f\n", y_local[i], y_global[tid + NUM * i]);
+					printf("%le\t%le\n", y_local[i], y_global[tid + NUM * i]);
 				printf("Error on integration step: %d", flag);
 				exit(-1);
 			}
@@ -500,7 +500,7 @@ int main (int argc, char *argv[]) {
 		t = t_next;
 		t_next += h;
 
-		printf("%f\t%f\n", t, y_host[0]);
+		printf("%le\t%le\n", t, y_host[0]);
 
 		
 		// check if within bounds
