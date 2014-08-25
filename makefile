@@ -36,7 +36,7 @@ DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
 
 _OBJ = main.o phiA.o cf.o exp4.o linear-algebra.o complexInverse.o \
        dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
-       rxn_rates_pres_mod.o
+       rxn_rates_pres_mod.o mechanism.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _OBJ_GPU = main.cu.o phiA.cu.o cf.o linear-algebra.o exp4.cu.o complexInverse.cu.o \
@@ -60,7 +60,7 @@ ifeq ("$(L)", "0")
 	        -Wall -ftree-vrp -std=c99 -fopenmp -DDEBUG
   NVCCFLAGS = -g -G -arch=sm_20 -m64 -DDEBUG
 else ifeq ("$(L)", "4")
-  FLAGS = -O3 -std=c99 -fopenmp
+  FLAGS = -O3 -std=c99 -fopenmp -funroll-loops
   NVCCFLAGS = -O3 -arch=sm_20 -m64
 endif
 
