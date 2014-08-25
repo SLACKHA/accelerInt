@@ -51,7 +51,7 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 		Real pr_local = pr_global[tid];
 
 		// load local array with initial values from global array
-		#pragma unroll(NN)
+		#pragma unroll
 		for (int i = 0; i < NN; i++)
 		{
 			y_local[i] = y_global[tid + i * NUM];
@@ -61,7 +61,7 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 		exp4_int (t, t_end, pr_local, y_local);
 
 		// update global array with integrated values
-		#pragma unroll(NN)
+		#pragma unroll
 		for (int i = 0; i < NN; i++)
 		{
 			y_global[tid + i * NUM] = y_local[i];
@@ -234,11 +234,11 @@ int main (int argc, char *argv[]) {
 		    Real Xi[NSP];
 		    
 		    for (int j = 0; j < NSP; ++j) {
-		      Yi[j] = y_host[i + NUM];
+		      Yi[j] = y_host[i + j * NUM];
 		    }
 		    
 		    mass2mole (Yi, Xi);
-		    rho_host[i] = getDensity (T0, pres, Xi);
+		    rho_host[i] = getDensity (y_host[i], pres, Xi);
 			#endif
 		}
 		fclose (fp);

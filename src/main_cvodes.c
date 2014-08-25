@@ -19,6 +19,7 @@
 #include "mass_mole.h"
 #include "timer.h"
 #include "dydt_cvodes.h"
+#include "mechanism.h"
 
 /* CVODES INCLUDES */
 #include "sundials/sundials_types.h"
@@ -62,20 +63,11 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 
 		// load local array with initial values from global array
 		double* y_local = NV_DATA_S(fill);
-		y_local[0] = y_global[tid];
-		y_local[1] = y_global[tid + NUM];
-		y_local[2] = y_global[tid + NUM * 2];
-		y_local[3] = y_global[tid + NUM * 3];
-		y_local[4] = y_global[tid + NUM * 4];
-		y_local[5] = y_global[tid + NUM * 5];
-		y_local[6] = y_global[tid + NUM * 6];
-		y_local[7] = y_global[tid + NUM * 7];
-		y_local[8] = y_global[tid + NUM * 8];
-		y_local[9] = y_global[tid + NUM * 9];
-		y_local[10] = y_global[tid + NUM * 10];
-		y_local[11] = y_global[tid + NUM * 11];
-		y_local[12] = y_global[tid + NUM * 12];
-		y_local[13] = y_global[tid + NUM * 13];
+		#pragma unroll
+		for (int i = 0; i < NN; i++)
+		{
+			y_local[i] = y_global[tid + i * NUM];
+		}
 
 		//reinit this integrator for time t, w/ updated state
 		int flag = CVodeReInit(integrators[index], t, fill);
@@ -116,20 +108,11 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 		#endif
 
 		// update global array with integrated values
-		y_global[tid] = y_local[0];
-		y_global[tid + NUM] = y_local[1];
-		y_global[tid + NUM * 2] = y_local[2];
-		y_global[tid + NUM * 3] = y_local[3];
-		y_global[tid + NUM * 4] = y_local[4];
-		y_global[tid + NUM * 5] = y_local[5];
-		y_global[tid + NUM * 6] = y_local[6];
-		y_global[tid + NUM * 7] = y_local[7];
-		y_global[tid + NUM * 8] = y_local[8];
-		y_global[tid + NUM * 9] = y_local[9];
-		y_global[tid + NUM * 10] = y_local[10];
-		y_global[tid + NUM * 11] = y_local[11];
-		y_global[tid + NUM * 12] = y_local[12];
-		y_global[tid + NUM * 13] = y_local[13];
+		#pragma unroll
+		for (int i = 0; i < NN; i++)
+		{
+			y_global[tid + i * NUM] = y_local[i];
+		}
 
 	} // end tid loop
 
@@ -218,8 +201,8 @@ int main (int argc, char *argv[]) {
 	Real* pres_host;
 	pres_host = (Real *) malloc (NUM * sizeof(Real));
 
+	Real* rho_host = NULL;
 	#ifdef CONV
-	Real* rho_host;
 	rho_host = (Real *) malloc (NUM * sizeof(Real));
 	#endif
 	//////////////////////////////////////////////////
@@ -243,134 +226,98 @@ int main (int argc, char *argv[]) {
 /////////////////////////////////////////////////////////////////////////////
   
 	#ifdef SAME_IC
-	// load same ICs for all threads
-
-	// initial mole fractions
-	Real Xi[NSP];
-	for (int j = 0; j < NSP; ++ j) {
-		Xi[j] = 0.0;
-	}
-
-	//
-	// set initial mole fractions here
-	//
-	
-	// h2
-	Xi[1] = 2.0;
-	// o2
-	Xi[5] = 1.0;
-	// n2
-	Xi[8] = 3.76;
-	
-	// normalize mole fractions to sum to 1
-	Real Xsum = 0.0;
-	for (int j = 0; j < NSP; ++ j) {
-		Xsum += Xi[j];
-	}
-	for (int j = 0; j < NSP; ++ j) {
-		Xi[j] /= Xsum;
-	}
-
-	// initial mass fractions
-	Real Yi[NSP];
-	mole2mass ( Xi, Yi );
-
-	// set initial pressure, units [dyn/cm^2]
-	// 1 atm = 1.01325e6 dyn/cm^2
-	Real pres = 1.01325e6;
-
-	// set initial temperature, units [K]
-	Real T0 = 1600.0;
-
-	// load temperature and mass fractions for all threads (cells)
-	for (int i = 0; i < NUM; ++i) {
-		y_host[i] = T0;
-
-		// loop through species
-		for (int j = 1; j < NN; ++j) {
-			y_host[i + NUM * j] = Yi[j - 1];
-		}
-	}
-
-	#ifdef CONV
-	// if constant volume, calculate density
-	Real rho;
-  	rho = getDensity (T0, pres, Xi);
-	#endif
-
-	for (int i = 0; i < NUM; ++i) {
-		#ifdef CONV
-		// density
-		rho_host[i] = rho;
-		#else
-		// pressure
-		pres_host[i] = pres;
-		#endif
-	}
-/////////////////////////////////////////////////////////
+		set_same_initial_conditions(NUM, y_host, pres_host, rho_host);
 	#else
-/////////////////////////////////////////////////////////
-	// load different ICs for all threads
-
-	// load ICs from file
-	FILE* fp = fopen ("ign_data.txt", "r");
-	char buffer[1024];
-
-	// load temperature and mass fractions for all threads (cells)
-	for (int i = 0; i < NUM; ++i) {
-		// read line from data file
-		if (fgets (buffer, 1024, fp) == NULL) {
+		FILE* fp = fopen ("ign_data.txt", "r");
+		int buff_size = 1024;
+		int retries = 0;
+		//all lines should be the same size, so make sure the buffer is large enough
+		for (retries = 0; retries < 5; retries++)
+		{
+			char buffer [buff_size];
+			if (fgets (buffer, buff_size, fp) != NULL) {
+				break;
+			}
 			rewind (fp);
-			fgets (buffer, 1024, fp);
+			buff_size *= 2;
 		}
-		sscanf (buffer, "%le %le %le %le %le %le %le %le %le %le %le %le %le %le %le", \
-		&y_host[i], &pres_host[i], &y_host[i + NUM], &y_host[i + NUM*2], &y_host[i + NUM*3], \
-		&y_host[i + NUM*4], &y_host[i + NUM*5], &y_host[i + NUM*6], &y_host[i + NUM*7], \
-		&y_host[i + NUM*8], &y_host[i + NUM*9], &y_host[i + NUM*10], &y_host[i + NUM*11], \
-		&y_host[i + NUM*12], &y_host[i + NUM*13]);
+		if (retries == 5)
+		{
+			printf("Could not parse ign_data.txt line with maximum buffer size of %d", buff_size);
+			exit(-1);
+		}
 
-		// if constant volume, calculate density
-		#ifdef CONV
-    Real Yi[NSP];
-    Real Xi[NSP];
-    
-    for (int j = 0; j < NSP; ++j) {
-      Yi[j] = y_host[i + NUM];
-    }
-    
-    mass2mole (Yi, Xi);
-    rho_host[i] = getDensity (T0, pres, Xi);
-		#endif
-	}
-	fclose (fp);
+		//rewind and read
+		rewind (fp);
 
-	#ifdef SHUFFLE
-	// now need to shuffle order
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	int usec = tv.tv_usec;
-	srand48(usec);
+		char buffer [buff_size];
+		char* ptr, *eptr;
+		Real res[NN + 1];
+		// load temperature and mass fractions for all threads (cells)
+		for (int i = 0; i < NUM; ++i) {
+			// read line from data file
+			if (fgets (buffer, buff_size, fp) == NULL) {
+				printf("Error reading ign_data.txt, exiting...");
+				exit(-1);
+			}
+			//read doubles from buffer
+			ptr = buffer;
+			for (int j = 0 ; j <= NN; j++) {
+				#ifdef DOUBLE
+					res[j] = strtod(ptr, &eptr);
+				#else
+					res[j] = strtof(ptr, &eptr);
+				#endif
+				ptr = eptr;
+			}
+			//put into y_host
+			y_host[i] = res[0];
+			pres_host[i] = res[1];
+			for (int j = 2; j <= NN; j++)
+				y_host[i + (j - 1) * NUM] = res[j];
 
-	for (size_t i = NUM - 1; i > 0; i--) {
-		size_t j = (unsigned int) (drand48() * (i + 1));
-
-		for (size_t ind = 0; ind < NN; ++ind) {
-			Real t = y_host[j + NUM * ind];
-			y_host[j + NUM * ind] = y_host[i + NUM * ind];
-			y_host[i + NUM * ind] = t;
-
-			#ifdef CONP
-			t = pres_host[j];
-			pres_host[j] = pres_host[i];
-			pres_host[i] = t;
-			#else
-			t = rho_host[j];
-			rho_host[j] = rho_host[i];
-			rho_host[i] = t;
+			// if constant volume, calculate density
+			#ifdef CONV
+		    Real Yi[NSP];
+		    Real Xi[NSP];
+		    
+		    for (int j = 0; j < NSP; ++j) {
+		      Yi[j] = y_host[i + j * NUM];
+		    }
+		    
+		    mass2mole (Yi, Xi);
+		    rho_host[i] = getDensity (y_host[i], pres, Xi);
 			#endif
 		}
-	}
-	#endif
+		fclose (fp);
+
+		#ifdef SHUFFLE
+		// now need to shuffle order
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		int usec = tv.tv_usec;
+		srand48(usec);
+
+		for (size_t i = NUM - 1; i > 0; i--) {
+			size_t j = (unsigned int) (drand48() * (i + 1));
+
+			for (size_t ind = 0; ind < NN; ++ind) {
+				Real t = y_host[j + NUM * ind];
+				y_host[j + NUM * ind] = y_host[i + NUM * ind];
+				y_host[i + NUM * ind] = t;
+
+				#ifdef CONP
+				t = pres_host[j];
+				pres_host[j] = pres_host[i];
+				pres_host[i] = t;
+				#else
+				t = rho_host[j];
+				rho_host[j] = rho_host[i];
+				rho_host[i] = t;
+				#endif
+			}
+		}
+		#endif
 	#endif
 /////////////////////////////////////////////////////////////////////////////
 
@@ -451,6 +398,7 @@ int main (int argc, char *argv[]) {
 	bool ign_flag = false;
 	// ignition delay time, units [s]
 	Real t_ign = ZERO;
+	Real T0 = y_host[0];
 	#endif
 
 	#ifdef PRINT
