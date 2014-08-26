@@ -408,7 +408,7 @@ int main (int argc, char *argv[]) {
 		status = cudaMemcpy (y_host, y_device, size, cudaMemcpyDeviceToHost);
     errorCheck (status);
 
-		printf("%le\t%le\n", t, y_host[0]);
+		printf("%.15le\t%.15le\n", t, y_host[0]);
 
 		
 		// check if within bounds

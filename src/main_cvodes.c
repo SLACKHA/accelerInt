@@ -448,7 +448,7 @@ int main (int argc, char *argv[]) {
 		t = t_next;
 		t_next += h;
 
-		printf("%le\t%le\n", t, y_host[0]);
+		printf("%.15le\t%.15le\n", t, y_host[0]);
 
 		
 		// check if within bounds
