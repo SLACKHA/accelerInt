@@ -28,7 +28,6 @@ extern "C" {
 #include "exp4.cuh"
 #include "mass_mole.h"
 #include "timer.h"
-#include "mechanism.h"
 
 #ifdef DEBUG
 //NAN check

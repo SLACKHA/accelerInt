@@ -7,7 +7,9 @@
  * Contains get_same_initial_conditions, customized for the mechanism at hand
  */
 
- #include "mechanism.h"
+ //need to include this here to avoid circular dependencies
+ #include "header.h"
+ #include "mass_mole.h"
 
  void set_same_initial_conditions(int NUM, double* y_host, double* pres_host, double* rho_host)
  {

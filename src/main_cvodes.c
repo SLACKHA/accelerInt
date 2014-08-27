@@ -19,7 +19,6 @@
 #include "mass_mole.h"
 #include "timer.h"
 #include "dydt_cvodes.h"
-#include "mechanism.h"
 
 /* CVODES INCLUDES */
 #include "sundials/sundials_types.h"
