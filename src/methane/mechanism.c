@@ -60,7 +60,7 @@
 	Real pres = 1.01325e6;
 
 	// set initial temperature, units [K]
-	Real T0 = 1200.0;
+	Real T0 = 1600.0;
 
 	// load temperature and mass fractions for all threads (cells)
 	for (int i = 0; i < NUM; ++i) {
