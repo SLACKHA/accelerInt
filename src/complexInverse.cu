@@ -83,7 +83,7 @@ __device__
 void getComplexLU (const int n, cuDoubleComplex* A, int* indPivot) {
 	
 	//int info = 0;
-	cuDoubleComplex alpha = {-1.0, 0};
+	register cuDoubleComplex alpha = make_cuDoubleComplex(-1.0, 0.0);
 	
 	for (int j = 0; j < n; ++j) {
 		
