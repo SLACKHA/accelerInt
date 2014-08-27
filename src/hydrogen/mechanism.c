@@ -12,17 +12,25 @@
  #include "mass_mole.h"
 
  void set_same_initial_conditions(int NUM, double* y_host, double* pres_host, double* rho_host)
- {
+{
  	// load same ICs for all threads
 
 
  	//////////////////////////////////////////////////
 	// species indices:
-	// 
-	// 13 - CH4
-	//  3 -  O2
-	// 47 -  N2
-	//
+	// 0 H
+	// 1 H2
+	// 2 O
+	// 3 OH
+	// 4 H2O
+	// 5 O2
+	// 6 HO2
+	// 7 H2O2
+	// 8 N2
+	// 9 AR
+	// 10 HE
+	// 11 CO
+	// 12 CO2
 	/////////////////////////////////////////////////
 
 	// initial mole fractions
@@ -35,12 +43,12 @@
 	// set initial mole fractions here
 	//
 	
-	// CH4
-	Xi[13] = 1.0;
+	// h2
+	Xi[1] = 2.0;
 	// o2
-	Xi[3] = 2.0;
+	Xi[5] = 1.0;
 	// n2
-	Xi[47] = 7.52;
+	Xi[8] = 3.76;
 	
 	// normalize mole fractions to sum to 1
 	Real Xsum = 0.0;
@@ -87,4 +95,4 @@
 		pres_host[i] = pres;
 		#endif
 	}
- }
+}
