@@ -60,6 +60,13 @@
 /** Number of variables. NN = NSP + 1 (temperature). */
 #define NN 54
 
+//fwd rates
+#define FWD_RATES 325
+//rev rates
+#define REV_RATES 309
+//pres mod
+#define PRES_MOD_RATES 41
+
 #ifdef __cplusplus
 extern "C" {
 #endif
