@@ -10,14 +10,17 @@
 #include "complexInverseHessenberg.h"
 #include <string.h>
 #include <stdbool.h>
-
-//NOTE: to get tests to work correctly you have to uncomment the
+#include "header.h"
 
 bool LUTests()
 {
 	bool passed = true;
 	//test hessian inverse
 	double complex* testMatrix = (double complex*)calloc(9, sizeof(double complex));
+	double complex* testMatrix2 = (double complex*)calloc(9, sizeof(double complex));
+	int * ipiv = (int*)calloc(3, sizeof(int));
+	int * ipiv2 = (int*)calloc(3, sizeof(int));
+
 	testMatrix[0] = 1;
 	testMatrix[1] = 4;
 	testMatrix[2] = 0;
@@ -27,7 +30,6 @@ bool LUTests()
 	testMatrix[6] = 3;
 	testMatrix[7] = 6;
 	testMatrix[8] = 9;
-	int * ipiv = (int*)calloc(3, sizeof(int));
 	getHessenbergLU_test (3, 3, testMatrix, ipiv);
 
 	passed &= testMatrix[0] == 4;
@@ -50,36 +52,49 @@ bool LUTests()
 	testMatrix[7] = 9 * I;
 	testMatrix[8] = 9 * I;
 
-	getHessenbergLU_test (3, 3, testMatrix, ipiv);
-	for (int i = 0; i < 9; i++)
-	{
-		if (i && i % 3 == 0)
-			printf("\n");
-		printf("%f + %f * I\t\t", creal(testMatrix[i]), cimag(testMatrix[i]));
-	}
-	printf("\n\n");
+	testMatrix2[0] = 1 + 1e3 * I;
+	testMatrix2[1] = 4 - 0.001 * I;
+	testMatrix2[2] = 0;
+	testMatrix2[3] = 16e5;
+	testMatrix2[4] = 0.0001 * I;
+	testMatrix2[5] = 80000 + 5 * I;
+	testMatrix2[6] = 3 - 5 * I;
+	testMatrix2[7] = 9 * I;
+	testMatrix2[8] = 9 * I;
 
+	getHessenbergLU_test (3, 3, testMatrix, ipiv);
+	getComplexLU_test (3, testMatrix2, ipiv2);
+	for (int i = 0; i < 9; i ++)
+	{
+		passed &= cabs(testMatrix[i] - testMatrix2[i]) < ATOL;
+	}
+
+
+	free(testMatrix);
+
+	testMatrix = (double complex*)calloc(16, sizeof(double complex));
 	testMatrix[0] = 1 + 1e3 * I;
 	testMatrix[1] = 4 - 0.001 * I;
 	testMatrix[2] = 0;
-	testMatrix[3] = 16e5;
-	testMatrix[4] = 0.0001 * I;
-	testMatrix[5] = 80000 + 5 * I;
-	testMatrix[6] = 3 - 5 * I;
-	testMatrix[7] = 9 * I;
-	testMatrix[8] = 9 * I;
-
-	getComplexLU_test (3, testMatrix, ipiv);
-	for (int i = 0; i < 9; i++)
+	testMatrix[4] = 16e5;
+	testMatrix[5] = 0.0001 * I;
+	testMatrix[6] = 80000 + 5 * I;
+	testMatrix[8] = 3 - 5 * I;
+	testMatrix[9] = 9 * I;
+	testMatrix[10] = 9 * I;
+	getHessenbergLU_test (3, 4, testMatrix, ipiv);
+	int count = 0;
+	for (int i = 0; i < 3; i++)
 	{
-		if (i && i % 3 == 0)
-			printf("\n");
-		printf("%f + %f * I\t\t", creal(testMatrix[i]), cimag(testMatrix[i]));
+		for (int j = 0; j < 3; j++)
+		{
+			passed &= cabs(testMatrix[i * 4 + j] - testMatrix2[count++]) < ATOL;
+		}
 	}
-	printf("\n\n");
 
-	free(testMatrix);
+	free(testMatrix2);
 	free(ipiv);
+	free(ipiv2);
 
 	return passed;
 }
@@ -90,43 +105,7 @@ bool InverseTests()
 	//test hessian inverse
 	double complex* testMatrix = (double complex*)calloc(9, sizeof(double complex));
 	double complex* testMatrix2 = (double complex*)calloc(9, sizeof(double complex));
-	double complex* testMatrix3 = (double complex*)calloc(9, sizeof(double complex));
-	testMatrix[0] = 1;
-	testMatrix[1] = 4;
-	testMatrix[2] = 0;
-	testMatrix[3] = 2;
-	testMatrix[4] = 5;
-	testMatrix[5] = 8;
-	testMatrix[6] = 3;
-	testMatrix[7] = 6;
-	testMatrix[8] = 9;
-	for (int i = 0; i < 9; i++)
-	{
-		testMatrix2[i] = testMatrix[i];
-	}
-	getComplexInverseHessenberg (3, 3, testMatrix);
-	//test inverse
-	for (int row = 0; row < 3; row++)
-	{
-		for (int col = 0; col < 3; col++)
-		{
-			testMatrix3[col * 3 + row] = 0;
-			for (int k = 0; k < 3; k++)
-			{
-				testMatrix3[col * 3 + row] += testMatrix2[k * 3 + row] * testMatrix[col * 3 + k];
-			}
-		}
-	}
-	passed &= testMatrix3[0] == 1;
-	passed &= testMatrix3[1] == 0;
-	passed &= testMatrix3[2] == 0;
-	passed &= testMatrix3[3] == 0;
-	passed &= testMatrix3[4] == 1;
-	passed &= testMatrix3[5] == 0;
-	passed &= testMatrix3[6] == 0;
-	passed &= testMatrix3[7] == 0;
-	passed &= testMatrix3[8] == 1;
-
+	
 	testMatrix[0] = 1 + 1e3 * I;
 	testMatrix[1] = 4 - 0.001 * I;
 	testMatrix[2] = 0;
@@ -136,33 +115,47 @@ bool InverseTests()
 	testMatrix[6] = 3 - 5 * I;
 	testMatrix[7] = 9 * I;
 	testMatrix[8] = 9 * I;
-	for (int i = 0; i < 9; i++)
-	{
-		testMatrix2[i] = testMatrix[i];
-	}
+	memcpy(testMatrix2, testMatrix, 9 * sizeof(complex double));
 	getComplexInverseHessenberg (3, 3, testMatrix);
+	getComplexInverse (3, testMatrix2);
 	//test inverse
-	for (int row = 0; row < 3; row++)
+	for (int i = 0; i < 9; i ++)
 	{
-		for (int col = 0; col < 3; col++)
+		passed &= cabs(testMatrix[i] - testMatrix2[i]) < ATOL;
+	}
+
+	free(testMatrix);
+	
+	testMatrix = (double complex*)calloc(16, sizeof(double complex));
+	testMatrix[0] = 1 + 1e3 * I;
+	testMatrix[1] = 4 - 0.001 * I;
+	testMatrix[2] = 0;
+	testMatrix[4] = 16e5;
+	testMatrix[5] = 0.0001 * I;
+	testMatrix[6] = 80000 + 5 * I;
+	testMatrix[8] = 3 - 5 * I;
+	testMatrix[9] = 9 * I;
+	testMatrix[10] = 9 * I;
+	getComplexInverseHessenberg (3, 4, testMatrix);
+	//test inverse
+	int count = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
 		{
-			testMatrix3[col * 3 + row] = 0;
-			for (int k = 0; k < 3; k++)
-			{
-				testMatrix3[col * 3 + row] += testMatrix2[k * 3 + row] * testMatrix[col * 3 + k];
-			}
+			passed &= cabs(testMatrix[i * 4 + j] - testMatrix2[count++]) < ATOL;
 		}
 	}
-	passed &= testMatrix3[0] == 1;
-	passed &= testMatrix3[1] == 0;
-	passed &= testMatrix3[2] == 0;
-	passed &= testMatrix3[3] == 0;
-	passed &= testMatrix3[4] == 1;
-	passed &= testMatrix3[5] == 0;
-	passed &= testMatrix3[6] == 0;
-	passed &= testMatrix3[7] == 0;
-	passed &= testMatrix3[8] == 1;
+	
+	free(testMatrix);
+	free(testMatrix2);
 
+	return passed;
+}
+
+bool speedTest()
+{
+	bool passed = true;
 	return passed;
 }
 
