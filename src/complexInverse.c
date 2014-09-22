@@ -201,9 +201,9 @@ int getComplexInverseLU (int n, double complex* A, int* indPivot, double complex
 	return info;
 }
 
-int getComplexLU_test(int n, double complex* A, int* indPivot, double complex* work)
+int getComplexLU_test(int n, double complex* A, int* indPivot)
 {
-	return getComplexLU(n, A, indPivot, work);
+	return getComplexLU(n, A, indPivot);
 }
 
 ///////////////////////////////////////////////////////////

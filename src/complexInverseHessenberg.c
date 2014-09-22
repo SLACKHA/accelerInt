@@ -76,7 +76,7 @@ void multiplyComplexUpperMV (int n, double complex* x, int lda, double complex* 
 ///////////////////////////////////////////////////////////
 
 static inline
-void complexGEMV (int m, int n, double complex alpha, double complex* A, 
+void complexGEMV (int m, int n, int STRIDE, double complex alpha, double complex* A, 
 									double complex* arrX, double complex* arrY) {
 	
 	// first: y = beta*y
@@ -89,7 +89,7 @@ void complexGEMV (int m, int n, double complex alpha, double complex* A,
     if (cabs(arrX[j]) > 0.0) {
 			double complex temp = alpha * arrX[j];
 			for (int i = 0; i < m; ++i) {
-				arrY[i] += temp * A[i + (m * j)];
+				arrY[i] += temp * A[i + (STRIDE * j)];
 			}
 		}
 	}
@@ -127,7 +127,7 @@ int getComplexInverseLU (int n, int STRIDE, double complex* A, int* indPivot, do
 		
 		// compute current column of inv(A)
 		if (j < n - 1)
-			complexGEMV (n, n - j, -1.0, &A[STRIDE * (j + 1)], &work[j + 1], &A[STRIDE * j]);
+			complexGEMV (n, n - j, STRIDE, -1.0, &A[STRIDE * (j + 1)], &work[j + 1], &A[STRIDE * j]);
 		
 	}
 	

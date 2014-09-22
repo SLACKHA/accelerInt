@@ -1,6 +1,6 @@
-#ifndef COMPLEX_INVERSE_H
-#define COMPLEX_INVERSE_H
+#ifndef COMPLEX_INVERSE_HESSENBERG_H
+#define COMPLEX_INVERSE_HESSENBERG_H
 
-void getComplexInverseHessenberg (const int n, const int STRIDE, double complex* A);
-int getHessenbergLU_test(const int n, const int STRIDE, double complex* A, int* indPivot);
+void getComplexInverseHessenberg (const int, const int, double complex*);
+int getHessenbergLU_test(const int, const int, double complex*, int*);
 #endif
