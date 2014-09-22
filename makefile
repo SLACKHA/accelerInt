@@ -48,6 +48,15 @@ _OBJ_CVODES = main_cvodes.o dydt.o chem_utils.o mass_mole.o rxn_rates.o spec_rat
               rxn_rates_pres_mod.o dydt_cvodes.o
 OBJ_CVODES = $(patsubst %,$(ODIR)/%,$(_OBJ_CVODES))
 
+_OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o linear-algebra.o complexInverseHessenberg.o \
+       dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
+       rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
+OBJ_KRYLOV = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV))
+
+_OBJ_TEST = unit_tests.o complexInverse.o complexInverseHessenberg.o
+OBJ_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_TEST))
+
+
 # Paths
 INCLUDES = -I. -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
 LIBS = -lm -lfftw3 -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++ -lsundials_cvodes -lsundials_nvecserial
@@ -83,10 +92,13 @@ default: $(ODIR) all
 $(ODIR):
 	mkdir $(ODIR)
 
-all: exp-int exp-int-gpu exp-int-cvodes
+all: exp-int exp-int-gpu exp-int-cvodes exp-int-krylov unit_tests
 
 exp-int : $(OBJ)
 	$(LINK) $(OBJ) $(LIBS) -llapack $(FLAGS) -o $@
+
+exp-int-krylov : $(OBJ_KRYLOV)
+	$(LINK) $(OBJ_KRYLOV) $(LIBS) -llapack $(FLAGS) -o $@
 
 exp-int-gpu : $(OBJ_GPU)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU) $(LIBS) -llapack $(NVCCFLAGS) -dlink -o dlink.o
@@ -95,9 +107,12 @@ exp-int-gpu : $(OBJ_GPU)
 exp-int-cvodes : $(OBJ_CVODES)
 	$(LINK) $(OBJ_CVODES) $(LIBS) $(CV_LIBS) $(FLAGS) -o $@
 
+tests : $(OBJ_TEST)
+	$(LINK) $(OBJ_TEST) $(LIBS) $(FLAGS) -o $@
+
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
 .PHONY : clean		
 clean :
-	rm -f $(OBJ) $(OBJ_GPU) $(OBJ_CVODES) exp-int exp-int-gpu exp-int-cvodes dlink.o
+	rm -f $(OBJ) $(OBJ_GPU) $(OBJ_CVODES) $(OBJ_KRYLOV) $(OBJ_TEST) exp-int exp-int-gpu exp-int-cvodes exp-int-krylov tests dlink.o

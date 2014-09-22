@@ -1,9 +1,9 @@
 #include <math.h>
 #include "header.h"
-#include "chem_utils.h"
-#include "rates.h"
+#include "chem_utils.cuh"
+#include "rates.cuh"
 
-void eval_jacob (const Real t, const Real pres, const Real * y, Real * jac) {
+__device__ void eval_jacob (const Real t, const Real pres, const Real * y, Real * jac) {
 
   Real T = y[0];
 
@@ -47,10 +47,10 @@ void eval_jacob (const Real t, const Real pres, const Real * y, Real * jac) {
   Real sp_rates[13];
   eval_spec_rates (fwd_rxn_rates, rev_rxn_rates, pres_mod, sp_rates);
 
-  Real m = pres / (8.314510e+07 * T);
-  Real logT = log(T);
+  register Real m = pres / (8.314510e+07 * T);
+  register Real logT = log(T);
   Real Kc;
-  Real Pr;
+  register Real Pr;
   Real Fcent, A, B, lnF_AB;
   Real dBdT_0;
   if (T <= 1000.0) {
@@ -5915,13 +5915,13 @@ void eval_jacob (const Real t, const Real pres, const Real * y, Real * jac) {
   eval_cp(T, cp);
 
   // average specific heat
-  Real cp_avg;
+  register Real cp_avg;
   cp_avg = (y[1] * cp[0]) + (y[2] * cp[1]) + (y[3] * cp[2]) + (y[4] * cp[3])
       + (y[5] * cp[4]) + (y[6] * cp[5]) + (y[7] * cp[6]) + (y[8] * cp[7])
       + (y[9] * cp[8]) + (y[10] * cp[9]) + (y[11] * cp[10]) + (y[12] * cp[11])
       + (y[13] * cp[12]);
   // sum of enthalpy * species rate * molecular weight for all species
-  Real sum_hwW;
+  register Real sum_hwW;
 
   sum_hwW = (h[0] * sp_rates[0] * 1.00797) + (h[1] * sp_rates[1] * 2.01594)
       + (h[2] * sp_rates[2] * 15.9994) + (h[3] * sp_rates[3] * 17.0074)

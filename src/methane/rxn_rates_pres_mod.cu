@@ -29,7 +29,8 @@ __device__ void get_rxn_pres_mod (const Real T, const Real pres, const Real * C,
   k0 = exp(3.40312786e+01 - (1.50965000e+03 / T));
   kinf = exp(2.36136376e+01 - (1.20017175e+03 / T));
   Pr = k0 * thd / kinf;
-  pres_mod[2] = Pr / (1.0 + Pr);
+  Pr = k0 * thd / kinf;
+* Pr / (1.0 + Pr);
 
   // reaction 32;
   pres_mod[3] = m - 1.0 * C[3] - 1.0 * C[5] - 0.25 * C[14] + 0.5 * C[15] + 0.5 * C[26] - 1.0 * C[47] - 1.0 * C[48];
@@ -248,7 +249,8 @@ __device__ void get_rxn_pres_mod (const Real T, const Real pres, const Real * C,
   k0 = exp(3.40877908e+01 - (2.85021920e+04 / T));
   kinf = exp(2.50939787e+01 - (2.81901976e+04 / T));
   Pr = k0 * thd / kinf;
-  pres_mod[27] = Pr / (1.0 + Pr);
+  Pr = k0 * thd / kinf;
+* Pr / (1.0 + Pr);
 
   // reaction 186;
   pres_mod[28] = m + 1.0 * C[0] + 5.0 * C[5] + 1.0 * C[13] + 0.5 * C[14] + 1.0 * C[15] + 2.0 * C[26] - 0.3 * C[48];
@@ -270,7 +272,8 @@ __device__ void get_rxn_pres_mod (const Real T, const Real pres, const Real * C,
   k0 = exp(6.02036847e+01 - 3.4 * logT - (9.56111665e+02 / T));
   kinf = 3.3e+13;
   Pr = k0 * thd / kinf;
-  pres_mod[33] = Pr / (1.0 + Pr);
+  Pr = k0 * thd / kinf;
+* Pr / (1.0 + Pr);
 
   // reaction 240;
   thd = m + 1.0 * C[0] + 5.0 * C[5] + 1.0 * C[13] + 0.5 * C[14] + 1.0 * C[15] + 2.0 * C[26] * C[48];
