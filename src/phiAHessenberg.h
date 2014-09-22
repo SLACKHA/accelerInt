@@ -1,5 +1,5 @@
-#ifndef PHIA_HEAD
-#define PHIA_HEAD
+#ifndef PHIA_HEAD_HESSENBERG
+#define PHIA_HEAD_HESSENBERG
 
 #include "header.h"
 
