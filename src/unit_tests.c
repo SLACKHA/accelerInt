@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "header.h"
+#include "timer.h"
 
 bool LUTests()
 {
@@ -153,9 +154,71 @@ bool InverseTests()
 	return passed;
 }
 
+static inline double getSign()
+{
+	return ((double)rand()/(double)RAND_MAX) > 0.5 ? 1.0 : -1.0;
+}
+
+static inline double getRand()
+{
+	return ((double)rand()/(double)RAND_MAX) * getSign();
+}
+
 bool speedTest()
 {
 	bool passed = true;
+	srand((unsigned) time(NULL));
+
+	double magnitude = 1e6;
+
+	double r_max = 0;
+	for (int size = 1; size <= 10; size++)
+	{
+		//create matricies
+		int dim = pow(2, size);
+		int actual_size = dim * dim;
+		double complex* mtx = (double complex*)calloc(actual_size, sizeof(double complex));
+		double complex* mtx2 = (double complex*)calloc(actual_size, sizeof(double complex));
+
+		for (int col = 0; col < dim; col++)
+		{
+			for (int row = 0; row <= col + 1; row ++)
+			{
+				if (row + col * dim == actual_size)
+					break;
+				mtx[row + col * dim] = magnitude * getRand() + magnitude * getRand() * I;
+			}
+		}
+		memcpy(mtx2, mtx, actual_size * sizeof(double complex));
+
+		//time
+		StartTimer();
+		getComplexInverseHessenberg(dim, dim, mtx);
+		double t_h = GetTimer();
+
+		StartTimer();
+		getComplexInverse(dim, mtx2);
+		double t_r = GetTimer();
+
+		printf ("%d\t%f\t%f\n", dim, t_h, t_r);
+
+		for (int i = 0; i < actual_size; i ++)
+		{
+			passed &= (cabs(mtx[i] - mtx2[i]) / cabs(mtx[i])) < 1e-10;
+			if (!passed)
+			{
+				double temp = cabs(mtx[i] - mtx2[i]) / cabs(mtx[i]);
+				if (temp > r_max)
+				{
+					r_max = temp * 100.0;
+					printf("failed\t%e\%\n",r_max);
+				}
+			}
+		}
+
+		free(mtx);
+		free(mtx2);
+	}
 	return passed;
 }
 
@@ -163,8 +226,9 @@ int main()
 {
 	//LU TESTS
 	bool passed = true;
-	passed &= LUTests(true);
-	passed &= InverseTests(true);
+	passed &= LUTests();
+	passed &= InverseTests();
+	passed &= speedTest();
 
 	printf("%s\n", passed ? "true" : "false");
 
