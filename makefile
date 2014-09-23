@@ -41,11 +41,11 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _OBJ_GPU = main.cu.o phiA.cu.o cf.o linear-algebra.o exp4.cu.o complexInverse.cu.o \
            dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o \
-					 spec_rates.cu.o rxn_rates_pres_mod.cu.o
+					 spec_rates.cu.o rxn_rates_pres_mod.cu.o mechanism.o
 OBJ_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU))
 
 _OBJ_CVODES = main_cvodes.o dydt.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
-              rxn_rates_pres_mod.o dydt_cvodes.o
+              rxn_rates_pres_mod.o dydt_cvodes.o mechanism.o
 OBJ_CVODES = $(patsubst %,$(ODIR)/%,$(_OBJ_CVODES))
 
 _OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o linear-algebra.o complexInverseHessenberg.o \
@@ -92,7 +92,7 @@ default: $(ODIR) all
 $(ODIR):
 	mkdir $(ODIR)
 
-all: exp-int exp-int-gpu exp-int-cvodes exp-int-krylov unit_tests
+all: exp-int exp-int-gpu exp-int-cvodes exp-int-krylov tests
 
 exp-int : $(OBJ)
 	$(LINK) $(OBJ) $(LIBS) -llapack $(FLAGS) -o $@
