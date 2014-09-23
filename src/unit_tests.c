@@ -12,6 +12,9 @@
 #include <stdbool.h>
 #include "header.h"
 #include "timer.h"
+#include "phiA.h"
+#include "phiAHessenberg.h"
+#include "cf.h"
 
 bool LUTests()
 {
@@ -167,12 +170,11 @@ static inline double getRand()
 bool speedTest()
 {
 	bool passed = true;
-	srand((unsigned) time(NULL));
 
 	double magnitude = 1e6;
 
 	double r_max = 0;
-	for (int size = 1; size <= 10; size++)
+	for (int size = 1; size <= 11; size++)
 	{
 		//create matricies
 		int dim = pow(2, size);
@@ -207,7 +209,7 @@ bool speedTest()
 			passed &= (cabs(mtx[i] - mtx2[i]) / cabs(mtx[i])) < 1e-10;
 			if (!passed)
 			{
-				double temp = cabs(mtx[i] - mtx2[i]) / cabs(mtx[i]);
+				double temp = cabs(mtx[i] - mtx2[i]) / cabs(mtx2[i]);
 				if (temp > r_max)
 				{
 					r_max = temp * 100.0;
@@ -222,13 +224,105 @@ bool speedTest()
 	return passed;
 }
 
+Real complex poles[N_RA];
+Real complex res[N_RA];
+
+bool PhiTests()
+{
+	// get poles and residues for rational approximant to matrix exponential
+	double *poles_r = (double*) calloc (N_RA, sizeof(double));
+	double *poles_i = (double*) calloc (N_RA, sizeof(double));
+	double *res_r = (double*) calloc (N_RA, sizeof(double));
+	double *res_i = (double*) calloc (N_RA, sizeof(double));
+	
+	cf ( N_RA, poles_r, poles_i, res_r, res_i );
+	
+	for (int i = 0; i < N_RA; ++i) {
+		poles[i] = poles_r[i] + poles_i[i] * _Complex_I;
+		res[i] = res_r[i] + res_i[i] * _Complex_I;
+	}
+	
+	// free memory
+	free (poles_r);
+	free (poles_i);
+	free (res_r);
+	free (res_i);
+
+
+	bool passed = true;
+
+	double magnitude = 1e6;
+
+	//create matricies
+	int dim = NN;
+	int actual_size = dim * dim;
+	double* mtx = (double*)calloc(actual_size, sizeof(double));
+	double* mtx2 = (double*)calloc(actual_size, sizeof(double));
+	double* mtx3 = (double*)calloc(actual_size, sizeof(double));
+
+	for (int col = 0; col < dim; col++)
+	{
+		for (int row = 0; row <= col + 1; row ++)
+		{
+			if (row + col * dim == actual_size)
+				break;
+			mtx[row + col * dim] = magnitude * getRand();
+		}
+	}
+	memcpy(mtx2, mtx, actual_size * sizeof(double));
+
+	//time
+	StartTimer();
+	phiAc_variable(dim, dim, mtx, 1e-8 / 3.0, mtx2);
+	double t_h = GetTimer();
+
+	StartTimer();
+	phiAc(mtx, 1e-8 / 3.0, mtx3);
+	double t_r = GetTimer();
+
+	printf ("%d\t%f\t%f\n", dim, t_h, t_r);
+
+	for (int i = 0; i < actual_size; i ++)
+	{
+		passed &= (cabs(mtx2[i] - mtx3[i]) / cabs(mtx3[i])) < 1e-10;
+	}
+
+	int new_dim = dim * 2;
+	double* mtx4 = (double*)calloc(new_dim * new_dim, sizeof(double));
+	//copy over
+	for (int i = 0; i < dim; i++)
+	{
+		for (int j = 0; j < dim; j++)
+		{
+			mtx4[i * new_dim + j] = mtx[i * dim + j];
+		}
+	}
+	free(mtx2);
+	mtx2 = (double*)calloc(new_dim * new_dim, sizeof(double));
+	phiAc_variable(dim, new_dim, mtx4, 1e-8 / 3.0, mtx2);
+	for (int i = 0; i < dim; i++)
+	{
+		for (int j = 0; j < dim; j++)
+		{
+			passed &= (cabs(mtx2[i * new_dim + j] - mtx3[i * dim + j]) / cabs(mtx3[i * dim + j])) < 1e-10;
+		}
+	}
+
+	free(mtx);
+	free(mtx2);
+	free(mtx3);
+	free(mtx4);
+	return passed;
+}
+
 int main()
 {
-	//LU TESTS
+	srand((unsigned) time(NULL));
 	bool passed = true;
 	passed &= LUTests();
 	passed &= InverseTests();
 	passed &= speedTest();
+	passed &= PhiTests();
 
 	printf("%s\n", passed ? "true" : "false");
 
