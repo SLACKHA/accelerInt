@@ -135,30 +135,6 @@ bool InverseTests()
 	}
 
 	free(testMatrix);
-	
-	/*
-	testMatrix = (double complex*)calloc(16, sizeof(double complex));
-	testMatrix[0] = 1 + 1e3 * I;
-	testMatrix[1] = 4 - 0.001 * I;
-	testMatrix[2] = 0;
-	testMatrix[4] = 16e5;
-	testMatrix[5] = 0.0001 * I;
-	testMatrix[6] = 80000 + 5 * I;
-	testMatrix[8] = 3 - 5 * I;
-	testMatrix[9] = 9 * I;
-	testMatrix[10] = 9 * I;
-	getComplexInverseHessenberg (3, 4, testMatrix);
-	//test inverse
-	int count = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			passed &= cabs(testMatrix[i * 4 + j] - testMatrix2[count++]) < ATOL;
-		}
-	}
-	free(testMatrix);
-	*/
 	free(testMatrix2);
 
 	return passed;
@@ -402,7 +378,24 @@ bool LinearAlgebraTests()
 		v[row] = row;
 		v2[row] = row;
 	}
-	dotproduct_test(v, v2);
+	if (dotproduct_test(v, v2) != ((1.0/6.0) * (NN - 1) * NN * (2 * NN - 1)))
+	{
+		return false;
+	}
+
+	scale_subtract_test(1.0, v, v2);
+	for (int i = 0; i < NN; i++)
+	{
+		if (v2[i] != 0)
+			return false;
+	}
+
+	scale_mult_test(1.0, v, v2);
+	for (int i = 0; i < NN; i++)
+	{
+		if (v2[i] != v[i])
+			return false;
+	}
 
 	#else
 	printf ("Please compile with COMPILE_TESTING_METHODS defined (check header.h)\n");
