@@ -6,4 +6,8 @@
 
 void sparse_multiplier (const Real *, const Real *, Real*);
 
+#ifdef COMPILE_TESTING_METHODS
+  int test_sparse_multiplier();
+#endif
+
 #endif

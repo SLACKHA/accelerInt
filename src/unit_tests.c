@@ -397,6 +397,9 @@ bool LinearAlgebraTests()
 			return false;
 	}
 
+	if (test_sparse_multiplier() != 1)
+		return false;
+
 	#else
 	printf ("Please compile with COMPILE_TESTING_METHODS defined (check header.h)\n");
 	return false;
