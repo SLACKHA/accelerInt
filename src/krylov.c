@@ -23,7 +23,7 @@
 #include "phiAHessenberg.h"
 #include "sparse_multiplier.h"
 
-static inline void matvec (const Real*, const Real*, Real*);
+
 static inline void matvec_m_by_m (const int, const Real *, const Real *, Real *);
 static inline void matvec_n_by_m (const int, const Real *, const Real *, Real *);
 static inline void scale (const Real*, const Real*, Real*);
@@ -35,37 +35,38 @@ static inline Real two_norm(const Real*);
 static inline void scale_mult(const Real, const Real*, Real*);
 static inline Real arnoldi(int*, Real*, bool, const Real, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*);
 
-//order of phi functions
-#define P 1
+#ifdef COMPILE_TESTING_METHODS
+void matvec_m_by_m_test (const int i , const Real * j, const Real * k, Real * l) {
+	matvec_m_by_m(i, j, k, l);
+}
+void matvec_n_by_m_test (const int i, const Real * j, const Real * k, Real *l){
+	matvec_n_by_m(i, j, k, l);
+}
+double dotproduct_test(const Real* i, const Real* j){
+	dotproduct(i, j);
+}
+Real normalize_test(const Real* i, Real* j){
+	return normalize(i, j);
+}
+void scale_subtract_test(const Real i, const Real* j, Real* k) {
+	scale_subtract(i, j, k);
+}
+Real two_norm_test(const Real* i){
+	return two_norm(i);
+}
+void scale_mult_test(const Real i, const Real* j, Real* k){
+	scale_mult(i, j, k);
+}
+#endif
+
+//order of phi functions + 1 (used for error estimate)
+#define P 2
 //max size of arrays
-#define STRIDE (NN + P + 1)
+#define STRIDE (NN + P)
 #define GAMMA 0.8
 //order of embedded methods
 #define ORD 3
-
-///////////////////////////////////////////////////////////////////////////////
-
-/** Matrix-vector multiplication
- * 
- * Performs inline matrix-vector multiplication (with unrolled loops).
- * 
- * \param[in]		A		matrix
- * \param[in]		v		vector
- * \param[out]	Av	vector that is A * v
- */
-static inline
-void matvec (const Real * A, const Real * v, Real * Av) {
-	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
-		Av[i] = ZERO;
-		
-		#pragma unroll
-		for (uint j = 0; j < NN; ++j) {
-			Av[i] += A[i + (j * NN)] * v[j];
-		}
-	}
-}
-
+#define TOL 1e-7
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -74,8 +75,8 @@ void matvec (const Real * A, const Real * v, Real * Av) {
  * Performs inline matrix-vector multiplication (with unrolled loops) 
  * 
  * \param[in]		m 		size of the matrix
- * \param[in]		A		matrix
- * \param[in]		V		other matrix
+ * \param[in]		A		matrix of size MxM
+ * \param[in]		V		vector of size Mx1
  * \param[out]		Av		vector that is A * v
  */
 static inline
@@ -95,7 +96,7 @@ void matvec_m_by_m (const int m, const Real * A, const Real * V, Real * Av) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/** Matrix-vector multiplication of a matrix sized NxM and a vector of size Mx1
+/** Matrix-vector multiplication of a matrix sized NNxM and a vector of size Mx1
  * 
  * Performs inline matrix-vector multiplication (with unrolled loops)
  * 
@@ -301,17 +302,10 @@ Real arnoldi(int* m, Real* h, bool h_variable, const Real t, const Real t_end, c
 		}
 
 		//2. Get phiHm
-		phiAc_variable (*m + P, STRIDE, Hm, *h / 3.0, phiHm);
+		expAc_variable (*m + P + 1, STRIDE, Hm, *h / 3.0, phiHm);
 
 		//3. Get error
-		err = ZERO;
-		offset = (*m + P - 1) * STRIDE;
-		#pragma unroll
-		for (uint i = 0; i < *m; ++i) {
-			Real temp = Hm[offset + i] / (ATOL + fabs(y[i]) * RTOL);
-			err += temp * temp;
-		}
-		err = sqrt(err / NN) * (*h) * beta * ((*h) / 3.0) * Hm[(j + 1) * STRIDE + j];
+		err = beta * Hm[(*m) * STRIDE + (*m + 1)] * phiHm[(*m) + (*m + P) * STRIDE] * (9.0 / ((*h) * (*h)));
 
 		//test error
 		if (err >= 1.2)
@@ -380,7 +374,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 	
 	while ((t < t_end) && (t + h > t)) {
 		//initial krylov subspace sizes
-		int m = 10, m1 = 5, m2 = 5;
+		int m = NN / 3, m1 = NN / 5, m2 = NN / 5;
 
 		// temporary arrays
 		Real temp[NN];
@@ -450,7 +444,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		}
 		
 		dydt (t, pr, k4, temp);
-		matvec (A, f_temp, k4);
+		sparse_multiplier (A, f_temp, k4);
 	
 		#pragma unroll
 		for (uint i = 0; i < NN; ++i) {
@@ -502,7 +496,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		}
 	
 		dydt (t, pr, k7, temp);
-		matvec (A, f_temp, k7);
+		sparse_multiplier (A, f_temp, k7);
 	
 		#pragma unroll
 		for (uint i = 0; i < NN; ++i) {

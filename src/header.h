@@ -112,4 +112,6 @@ typedef unsigned short int usint;
 #define CV_MAX_HNIL 0 //maximum number of t + h = t warnings
 #define CV_MAX_ERRTEST_FAILS 5 //maximum number of error test fails before an error is thrown
 
+#define COMPILE_TESTING_METHODS //comment out to remove unit testing stubs
+
 #endif

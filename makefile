@@ -53,7 +53,9 @@ _OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o linear-algebra.o comp
        rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
 OBJ_KRYLOV = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV))
 
-_OBJ_TEST = unit_tests.o complexInverse.o complexInverseHessenberg.o phiA.o phiAHessenberg.o cf.o linear-algebra.o
+_OBJ_TEST = unit_tests.o complexInverse.o complexInverseHessenberg.o phiA.o phiAHessenberg.o cf.o linear-algebra.o krylov.o\
+            dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o sparse_multiplier.o rxn_rates_pres_mod.o
+
 OBJ_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_TEST))
 
 

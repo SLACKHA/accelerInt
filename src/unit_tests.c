@@ -15,6 +15,7 @@
 #include "phiA.h"
 #include "phiAHessenberg.h"
 #include "cf.h"
+#include "krylov.h"
 
 bool LUTests()
 {
@@ -206,14 +207,22 @@ bool speedTest()
 
 		for (int i = 0; i < actual_size; i ++)
 		{
-			passed &= (cabs(mtx[i] - mtx2[i]) / cabs(mtx[i])) < 1e-10;
+			double temp = 0;
+			if (cabs(mtx2[i]) > 0)
+			{
+				temp = cabs(mtx[i] - mtx2[i]) / cabs(mtx2[i]);
+			}
+			else
+			{
+				temp = cabs(mtx[i] - mtx2[i]);
+			}
+			passed &= temp < 1e-08;
 			if (!passed)
 			{
-				double temp = cabs(mtx[i] - mtx2[i]) / cabs(mtx2[i]);
-				if (temp > r_max)
+				if (temp * 100.0 > r_max)
 				{
 					r_max = temp * 100.0;
-					printf("failed\t%e\%\n",r_max);
+					printf("failed\t%e%%\n", temp);
 				}
 			}
 		}
@@ -308,21 +317,95 @@ bool PhiTests()
 		}
 	}
 
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if (j <= i + 1)
+			{
+				mtx[i * 3 + j] = j * 3 + i + 1;
+			}
+			else
+				mtx[i * 3 + j] = 0;
+		}
+	}
+	expAc_variable(3, 3, mtx, 1.0, mtx2);
+
+	/* 1.365853949602854e+05     4.744010693488505e+05     5.525249852197236e+05
+	 3.124956634834923e+05     1.085387533657987e+06     1.264126589243000e+06
+	 4.242043168094727e+05     1.473399960585930e+06     1.716036434748584e+06 */
+
+	passed &= abs(mtx2[0] - 1.365853949602854e+05) < ATOL;
+	passed &= abs(mtx2[1] - 3.124956634834923e+05) < ATOL;
+	passed &= abs(mtx2[2] - 4.242043168094727e+05) < ATOL;
+	passed &= abs(mtx2[3] - 4.744010693488505e+05) < ATOL;
+	passed &= abs(mtx2[4] - 1.085387533657987e+06) < ATOL;
+	passed &= abs(mtx2[5] - 1.473399960585930e+06) < ATOL;
+	passed &= abs(mtx2[6] - 5.525249852197236e+05) < ATOL;
+	passed &= abs(mtx2[7] - 1.264126589243000e+06) < ATOL;
+	passed &= abs(mtx2[8] - 1.716036434748584e+06) < ATOL;
+
 	free(mtx);
 	free(mtx2);
 	free(mtx3);
 	free(mtx4);
 	return passed;
 }
+#define STRIDE_MIRROR (NN + 2)
+bool LinearAlgebraTests()
+{
+	#ifdef COMPILE_TESTING_METHODS
+	//create and populate some matricies
+	Real A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	Real v[STRIDE_MIRROR] = {ZERO};
+	Real out[STRIDE_MIRROR] = {ZERO};
+	int m_size = STRIDE_MIRROR / 2;
+	for (int col = 0; col < m_size; ++col)
+	{
+		for (int row = 0; row < NN; ++row)
+		{
+			A[row + col * STRIDE_MIRROR] = col + row * m_size;
+		}
+	}
+	for (int row = 0; row < m_size; ++row)
+	{
+		v[row] = row;
+	}
+
+	//MxM matrix * Mx1 vector
+	matvec_m_by_m_test(m_size, A, v, out);
+	for (int row = 0; row < m_size; row++)
+	{
+		int val = (m_size - 1) * m_size * ((3 * row + 2) * m_size - 1) / 6;
+		if (out[row] != val)
+			return false;
+	}
+
+	//NNxM matrix * Mx1 vector
+	matvec_n_by_m_test(m_size, A, v, out);
+	for (int row = 0; row < NN; row++)
+	{
+		int val = (m_size - 1) * m_size * ((3 * row + 2) * m_size - 1) / 6;
+		if (out[row] != val)
+			return false;
+	}
+
+	#else
+	printf ("Please compile with COMPILE_TESTING_METHODS defined (check header.h)\n");
+	return false;
+	#endif
+	return true;
+}
 
 int main()
 {
 	srand((unsigned) time(NULL));
 	bool passed = true;
+	passed &= LinearAlgebraTests();
 	passed &= LUTests();
 	passed &= InverseTests();
-	passed &= speedTest();
 	passed &= PhiTests();
+	passed &= speedTest();
 
 	printf("%s\n", passed ? "true" : "false");
 
