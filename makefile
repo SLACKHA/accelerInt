@@ -48,12 +48,12 @@ _OBJ_CVODES = main_cvodes.o dydt.o chem_utils.o mass_mole.o rxn_rates.o spec_rat
               rxn_rates_pres_mod.o dydt_cvodes.o mechanism.o
 OBJ_CVODES = $(patsubst %,$(ODIR)/%,$(_OBJ_CVODES))
 
-_OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o linear-algebra.o complexInverseHessenberg.o \
+_OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o linear-algebra.o complexInverse.o \
        dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
        rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
 OBJ_KRYLOV = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV))
 
-_OBJ_TEST = unit_tests.o complexInverse.o complexInverseHessenberg.o phiA.o phiAHessenberg.o cf.o linear-algebra.o krylov.o\
+_OBJ_TEST = unit_tests.o complexInverse.o phiA.o phiAHessenberg.o cf.o linear-algebra.o krylov.o\
             dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o sparse_multiplier.o rxn_rates_pres_mod.o
 
 OBJ_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_TEST))
