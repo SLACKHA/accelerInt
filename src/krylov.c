@@ -302,12 +302,13 @@ Real arnoldi(int* m, Real* h, bool h_variable, const Real tau, const Real t, con
 		//1. Construct augmented Hm (fill in identity matrix)
 		Hm[(*m) * STRIDE] = ONE;
 		Hm[((*m) + 1) * STRIDE + *m] = ONE;
+		Hm[((*m) + 2) * STRIDE + *m + 1] = ONE;
 
 		//2. Get phiHm
-		expAc_variable (*m + P, STRIDE, Hm, *h / 3.0, phiHm);
+		expAc_variable (*m + P + 1, STRIDE, Hm, *h / 3.0, phiHm);
 
 		//3. Rearrange phiHm
-		err = store * phiHm[(*m + P - 1) * STRIDE + (*m - 1)];
+		err = store * phiHm[(*m + P) * STRIDE + (*m - 1)];
 		phiHm[(*m) * STRIDE + *m] = err;
 
 		//4. Get error
@@ -320,6 +321,7 @@ Real arnoldi(int* m, Real* h, bool h_variable, const Real tau, const Real t, con
 			Hm[(*m - 1) * STRIDE + *m] = store;
 			//restore Hm(m + 1, m + 2), Hm(0, m + 1) will be cleared automatically next iteration
 			Hm[((*m) + 1) * STRIDE + *m] = ZERO;
+			Hm[((*m) + 2) * STRIDE + *m + 1] = ZERO;
 
 			int m_new = -1;
 			Real h_new = -1;
@@ -436,9 +438,9 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		Real k2[NN];
 		//computing phi(2h * A)
 		matvec_m_by_m (m, phiHm, &phiHm[m * STRIDE], temp);
-		matvec_m_by_m (m, Hm, temp, f_temp);
-		//note: f_temp contains hm * phi * phi * e1 for later use
-		matvec_n_by_m(m, Vm, f_temp, k2);
+		matvec_m_by_m (m, Hm, temp, k2);
+		//note: f_temp now contains vm * hm * phi * phi * e1 for later use
+		matvec_n_by_m(m, Vm, k2, f_temp);
 
 		#pragma unroll
 		for (uint i = 0; i < NN; ++i) {
@@ -478,7 +480,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		//do arnoldi
 		beta = arnoldi(&m1, &h, false, t_end - t_start, t, t_end, A, k4, Vm, Hm, phiHm);
 		//k4 is partially in the m'th column of phiHm
-		matvec_n_by_m(m1, Vm, &phiHm[m1 * STRIDE], k4);
+		matvec_n_by_m(m1 + 1, Vm, &phiHm[m1 * STRIDE], k4);
 		#pragma unroll
 		for (uint i = 0; i < NN; ++i) {
 			k4[i] = beta * k4[i] / (h / 3.0);
@@ -529,7 +531,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 	
 		beta = arnoldi(&m2, &h, false, t_end - t_start, t, t_end, A, k7, Vm, Hm, phiHm);
 		//k7 is partially in the m'th column of phiHm
-		matvec_n_by_m(m2, Vm, &phiHm[m2 * STRIDE], k7);
+		matvec_n_by_m(m2 + 1, Vm, &phiHm[m2 * STRIDE], k7);
 		#pragma unroll
 		for (uint i = 0; i < NN; ++i) {
 			k7[i] = beta * k7[i] / (h / 3.0);
