@@ -212,7 +212,7 @@ void getComplexInverse (int n, double complex* A) {
 	int info = 0;
 	
 	// first get LU factorization
-	getComplexLU (n, A, ipiv);
+	info = getComplexLU (n, A, ipiv);
 	
 	// check for successful exit
 	if (info != 0) {
@@ -225,7 +225,7 @@ void getComplexInverse (int n, double complex* A) {
   // memset (work, 0.0, n * sizeof(double complex));
 	
 	// now get inverse
-	getComplexInverseLU (n, A, ipiv, work);
+	info = getComplexInverseLU (n, A, ipiv, work);
 	
 	free (work);
 	free (ipiv);
@@ -292,7 +292,7 @@ void getComplexInverseHessenberg (const int n, double complex* A)
 	int info = 0;
 	
 	// first get LU factorization
-	getHessenbergLU (n, A, ipiv);
+	info = getHessenbergLU (n, A, ipiv);
 
 	if (info != 0)
 	{
@@ -305,7 +305,7 @@ void getComplexInverseHessenberg (const int n, double complex* A)
   	// memset (work, 0.0, n * sizeof(double complex));
 	
 	// now get inverse
-	getComplexInverseLU (n, A, ipiv, work);
+	info = getComplexInverseLU (n, A, ipiv, work);
 	
 	free (work);
 	free (ipiv);
