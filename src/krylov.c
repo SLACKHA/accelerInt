@@ -33,7 +33,7 @@ static inline Real normalize(const Real*, Real*);
 static inline void scale_subtract(const Real, const Real*, Real*);
 static inline Real two_norm(const Real*);
 static inline void scale_mult(const Real, const Real*, Real*);
-static inline Real arnoldi(int*, Real*, bool, const Real, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*);
+static inline Real arnoldi(int*, Real*, bool, const Real, const Real, const Real, const Real*, const Real*, Real*, Real*, Real*);
 
 #ifdef COMPILE_TESTING_METHODS
 void matvec_m_by_m_test (const int i , const Real * j, const Real * k, Real * l) {
@@ -43,7 +43,7 @@ void matvec_n_by_m_test (const int i, const Real * j, const Real * k, Real *l){
 	matvec_n_by_m(i, j, k, l);
 }
 double dotproduct_test(const Real* i, const Real* j){
-	dotproduct(i, j);
+	return dotproduct(i, j);
 }
 Real normalize_test(const Real* i, Real* j){
 	return normalize(i, j);
@@ -59,11 +59,13 @@ void scale_mult_test(const Real i, const Real* j, Real* k){
 }
 #endif
 
-//order of phi functions + 1 (used for error estimate)
+//max order of the phi functions (i.e. for error estimation)
 #define P 2
 //max size of arrays
 #define STRIDE (NN + P)
+//safety factors
 #define GAMMA 0.8
+#define DELTA 1.2
 //order of embedded methods
 #define ORD 3
 #define TOL 1e-7
@@ -249,83 +251,102 @@ static inline void scale_mult(const Real s, const Real* w, Real* Vm)
  * \param[in, out]	h 			the timestep to use (may be variable)
  * \param[in]		h_variable	if true, h may change
  * \param[in]		A   		the jacobian matrix
- * \param[in]		y 			the state vector (for tolerances / error)
- * \param[in]		fy			f(y), i.e. the total net species rates
+ * \param[in]		v			the vector for which to determine the subspace
  * \param[out]		Vm			the subspace matrix to set
  * \param[out]		Hm			the hessenberg matrix to set
  */
 static inline
-Real arnoldi(int* m, Real* h, bool h_variable, const Real t, const Real t_end, const Real* A, const Real* v, const Real* y, Real* Vm, Real* Hm, Real* phiHm)
+Real arnoldi(int* m, Real* h, bool h_variable, const Real tau, const Real t, const Real t_end, const Real* A, const Real* v, Real* Vm, Real* Hm, Real* phiHm)
 {
 	//the temporary work array
 	Real w[NN];
 	Real err = 100;
-	Real err_old = -1;
-	Real h_temp_old = -1;
+	Real err_old = 0;
+	Real h_old = -1;
 	int m_old = -1;
 	int j = 0;
+	Real t_start = t;
+	bool h_changed = false;
+	bool m_changed = false;
 
-	//first place fy in the Vm matrix
+	//first place A*fy in the Vm matrix
 	Real beta = normalize(v, Vm);
+	Real store = -1;
 
-	int offset = 0;
-	//for the most intensive arnoldi generation, we will use the niesen scheme
-	while (err >= 1.2)
+	//the niesen scheme
+	while (err >= DELTA)
 	{
 		#pragma unroll
 		for (; j < *m; j++)
 		{
 			sparse_multiplier(A, &Vm[j * STRIDE], w);
-			offset = 0;
 			for (int i = 0; i <= j; i++)
 			{
-				Hm[offset + j] = dotproduct(w, &Vm[offset]);
-				scale_subtract(Hm[i * STRIDE + j], &Vm[offset], w);
-				offset += STRIDE;
+				Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * STRIDE]);
+				scale_subtract(Hm[j * STRIDE + i], &Vm[i * STRIDE], w);
 			}
-			offset = j * STRIDE;
-			Hm[offset + j + 1] = two_norm(w);
-			if (Hm[offset + j + 1] == ZERO)
+			Hm[j * STRIDE + j + 1] = two_norm(w);
+			if (fabs(Hm[j * STRIDE + j + 1]) < ATOL)
 			{
 				//happy breakdown
 				*m = j;
 				break;
 			}
-			scale_mult(ONE / Hm[offset + j + 1], w, &Vm[offset + STRIDE]);
+			scale_mult(ONE / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * STRIDE]);
 		}
+		//resize Hm to be mxm, and store Hm(m, m + 1) for later
+		store = Hm[(*m - 1) * STRIDE + *m];
+		Hm[(*m - 1) * STRIDE + *m] = ZERO;
+
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
-		#pragma unroll
-		for (int p = 0; p < P; p++)
-		{
-			Hm[(*m + p) * STRIDE + p] = ONE;
-		}
+		Hm[(*m) * STRIDE] = ONE;
+		Hm[((*m) + 1) * STRIDE + *m] = ONE;
 
 		//2. Get phiHm
-		expAc_variable (*m + P + 1, STRIDE, Hm, *h / 3.0, phiHm);
+		expAc_variable (*m + P, STRIDE, Hm, *h / 3.0, phiHm);
 
-		//3. Get error
-		err = beta * Hm[(*m) * STRIDE + (*m + 1)] * phiHm[(*m) + (*m + P) * STRIDE] * (9.0 / ((*h) * (*h)));
+		//3. Rearrange phiHm
+		err = store * phiHm[(*m + P - 1) * STRIDE + (*m - 1)];
+		phiHm[(*m) * STRIDE + *m] = err;
+
+		//4. Get error
+		err = fabs(3.0 * beta * err / ((*h) * TOL));
 
 		//test error
-		if (err >= 1.2)
+		if (err >= DELTA)
 		{
+			//restore Hm(m, m + 1)
+			Hm[(*m - 1) * STRIDE + *m] = store;
+			//restore Hm(m + 1, m + 2), Hm(0, m + 1) will be cleared automatically next iteration
+			Hm[((*m) + 1) * STRIDE + *m] = ZERO;
+
 			int m_new = -1;
 			Real h_new = -1;
 			//calculate next h and m
-			if (err_old > 0)
+
+			//1. get k and q
+			Real q = 0;
+			Real k = 2;
+			Real omega = (tau) * err / ((*h) * TOL);
+			if (h_changed)
 			{
-				h_new = fmin(*h * pow(GAMMA / (err * t_end / *h), 1.0 / (log(*h / h_temp_old) / log(err / err_old))), fabs(t_end - t));
-				m_new = (int)round(*m + log((err * t_end / *h) / GAMMA) / log(pow(err / err_old, 1.0 / (m_old - *m))));
+				q = log(*h / h_old) / log(err / err_old) - 1.0;
 			}
 			else
 			{
-				h_new = fmin(*h * pow(GAMMA / (err * t_end / *h), 1.0 / (0.25 * (*m) + 1)), fabs(t_end - t));
-				m_new = (int)round(*m + log((err * t_end / *h) / GAMMA) / log(2.0));
+				q = 0.25 * (*m);
+			}
+			if (m_changed)
+			{
+				k = pow(err / err_old, 1.0 / (m_old - *m));
 			}
 
+			h_new = (*h) * pow(GAMMA / omega, 1.0 / (q + 1.0));
+			m_new = (*m) + log(omega / GAMMA) / log(k);
+
 			//store old
-			h_temp_old = *h;
+			h_old = *h;
 			err_old = err;
 			m_old = *m;
 
@@ -338,15 +359,18 @@ Real arnoldi(int* m, Real* h, bool h_variable, const Real t, const Real t_end, c
 				if (C_new_m > C_new_h)
 				{
 					(*h) = fmax(fmin(h_new, 5.0 * (*h)), 0.2 * (*h));
+					h_changed = true;
 				}
 				else
 				{
-					*m = fmin(m_new, 4 * (*m) / 3);
+					*m = round(fmin(m_new, 4.0 * (*m) / 3.0));
+					m_changed = true;
 				}
 			}
 			else
 			{
-				*m = fmin(m_new, 4 * (*m) / 3);
+				*m = round(fmin(m_new, 4.0 * (*m) / 3.0));
+				m_changed = true;
 			}
 		}
 	}
@@ -397,12 +421,12 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		Real phiHm[STRIDE * STRIDE] = {ZERO};
 
 		//do arnoldi
-		Real beta = arnoldi(&m, &h, true, t, t_end, A, fy, y, Vm, Hm, phiHm);
+		Real beta = arnoldi(&m, &h, true, t_end - t_start, t, t_end, A, fy, Vm, Hm, phiHm);
 
 		// k1
 		Real k1[NN];
 		//k1 is partially in the m'th column of phiHm
-		matvec_n_by_m(m, Vm, &phiHm[m * STRIDE], k1);
+		matvec_n_by_m(m + 1, Vm, &phiHm[m * STRIDE], k1);
 		#pragma unroll
 		for (int i = 0; i < NN; ++i) {
 			k1[i] = beta * k1[i] / (h / 3.0);
@@ -452,7 +476,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		}
 
 		//do arnoldi
-		beta = arnoldi(&m1, &h, false, t, t_end, A, k4, y, Vm, Hm, phiHm);
+		beta = arnoldi(&m1, &h, false, t_end - t_start, t, t_end, A, k4, Vm, Hm, phiHm);
 		//k4 is partially in the m'th column of phiHm
 		matvec_n_by_m(m1, Vm, &phiHm[m1 * STRIDE], k4);
 		#pragma unroll
@@ -503,7 +527,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			k7[i] = temp[i] - fy[i] - k7[i];
 		}
 	
-		beta = arnoldi(&m2, &h, false, t, t_end, A, k7, y, Vm, Hm, phiHm);
+		beta = arnoldi(&m2, &h, false, t_end - t_start, t, t_end, A, k7, Vm, Hm, phiHm);
 		//k7 is partially in the m'th column of phiHm
 		matvec_n_by_m(m2, Vm, &phiHm[m2 * STRIDE], k7);
 		#pragma unroll
