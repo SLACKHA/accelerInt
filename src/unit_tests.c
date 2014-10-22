@@ -15,6 +15,7 @@
 #include "phiAHessenberg.h"
 #include "cf.h"
 #include "krylov.h"
+#include "sparse_multiplier.h"
 
 bool LUTests()
 {
@@ -220,26 +221,6 @@ Real complex res[N_RA];
 
 bool PhiTests()
 {
-	// get poles and residues for rational approximant to matrix exponential
-	double *poles_r = (double*) calloc (N_RA, sizeof(double));
-	double *poles_i = (double*) calloc (N_RA, sizeof(double));
-	double *res_r = (double*) calloc (N_RA, sizeof(double));
-	double *res_i = (double*) calloc (N_RA, sizeof(double));
-	
-	cf ( N_RA, poles_r, poles_i, res_r, res_i );
-	
-	for (int i = 0; i < N_RA; ++i) {
-		poles[i] = poles_r[i] + poles_i[i] * _Complex_I;
-		res[i] = res_r[i] + res_i[i] * _Complex_I;
-	}
-	
-	// free memory
-	free (poles_r);
-	free (poles_i);
-	free (res_r);
-	free (res_i);
-
-
 	bool passed = true;
 
 	double magnitude = 1e6;
@@ -406,11 +387,90 @@ bool LinearAlgebraTests()
 	#endif
 	return true;
 }
+void matvec (const Real * A, const Real * v, Real * Av) {
+	#pragma unroll
+	for (uint i = 0; i < STRIDE_MIRROR; ++i) {
+		Av[i] = ZERO;
+		
+		#pragma unroll
+		for (uint j = 0; j < STRIDE_MIRROR; ++j) {
+			Av[i] += A[i + (j * STRIDE_MIRROR)] * v[j];
+		}
+	}
+}
+bool ArnoldiTest()
+{
+	Real A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	Real Vm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	Real Hm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	Real phiHm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	Real w[STRIDE_MIRROR] = {ZERO};
+	Vm[0] = 1;
+	A[0] = 1;
+	A[1] = 3;
+	A[STRIDE_MIRROR] = 2;
+	A[STRIDE_MIRROR + 1] = 4;
+	int m = 2;
+	int P = 2;
+	for (int j = 0; j < m; j++)
+	{
+		matvec(A, &Vm[j * STRIDE_MIRROR], w);
+		for (int i = 0; i <= j; i++)
+		{
+			Hm[j * STRIDE_MIRROR + i] = dotproduct_test(w, &Vm[i * STRIDE_MIRROR]);
+			scale_subtract_test(Hm[j * STRIDE_MIRROR + i], &Vm[i * STRIDE_MIRROR], w);
+		}
+		Hm[j * STRIDE_MIRROR + j + 1] = two_norm_test(w);
+		if (fabs(Hm[j * STRIDE_MIRROR + j + 1]) < 1e-8)
+		{
+			//happy breakdown
+			break;
+		}
+		scale_mult_test(ONE / Hm[j * STRIDE_MIRROR + j + 1], w, &Vm[(j + 1) * STRIDE_MIRROR]);
+	}
 
-int main()
+	/*Hm[m * STRIDE_MIRROR] = 3.0 / 1e-8;
+	for (int p = 1; p < P; p++)
+	{
+		Hm[(m + p) * STRIDE_MIRROR + m + p - 1] = 3.0 / 1e-8;
+	}
+
+	expAc_variable(m + P, STRIDE_MIRROR, Hm, 1e-8 / 3.0, phiHm);*/
+
+	bool passed = Hm[0] == 1 && Hm[1] == 3 && Hm[STRIDE_MIRROR] == 2 && Hm[STRIDE_MIRROR + 1] == 4 && Vm[0] == 1 && Vm[1] == 0 && Vm[STRIDE_MIRROR] == 0 && Vm[STRIDE_MIRROR + 1] == 1;
+	//passed &= abs(phiHm[(m + P - 1) * STRIDE_MIRROR + m + P - 1] - 2.718281828459045e+00) < 1e-4;
+
+	return passed;
+}
+
+void init()
 {
 	srand((unsigned) time(NULL));
+	// get poles and residues for rational approximant to matrix exponential
+	double *poles_r = (double*) calloc (N_RA, sizeof(double));
+	double *poles_i = (double*) calloc (N_RA, sizeof(double));
+	double *res_r = (double*) calloc (N_RA, sizeof(double));
+	double *res_i = (double*) calloc (N_RA, sizeof(double));
+	
+	cf ( N_RA, poles_r, poles_i, res_r, res_i );
+	
+	for (int i = 0; i < N_RA; ++i) {
+		poles[i] = poles_r[i] + poles_i[i] * _Complex_I;
+		res[i] = res_r[i] + res_i[i] * _Complex_I;
+	}
+	
+	// free memory
+	free (poles_r);
+	free (poles_i);
+	free (res_r);
+	free (res_i);
+
+}
+int main()
+{
+	init();
 	bool passed = true;
+	passed &= ArnoldiTest();
 	passed &= LinearAlgebraTests();
 	passed &= LUTests();
 	passed &= InverseTests();
