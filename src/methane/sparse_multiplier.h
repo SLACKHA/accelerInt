@@ -1,9 +1,13 @@
 #ifndef SPARSE_HEAD
 #define SPARSE_HEAD
 
-#define N_A 66312
+#define N_A 2862
 #include "header.h"
 
-void sparse_multiplier (const Real *, const Real *, const int, const int, Real*);
+void sparse_multiplier (const Real *, const Real *, Real*);
+
+#ifdef COMPILE_TESTING_METHODS
+  int test_sparse_multiplier();
+#endif
 
 #endif

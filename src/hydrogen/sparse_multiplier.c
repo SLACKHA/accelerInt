@@ -10,13 +10,19 @@ void sparse_multiplier(const Real * A, const Real * Vm, Real* w) {
   w[6] = A[6] * Vm[0] +  A[20] * Vm[1] +  A[34] * Vm[2] +  A[48] * Vm[3] +  A[62] * Vm[4] +  A[76] * Vm[5] +  A[90] * Vm[6] +  A[104] * Vm[7] +  A[118] * Vm[8] +  A[132] * Vm[9] +  A[146] * Vm[10] +  A[160] * Vm[11] +  A[174] * Vm[12] +  A[188] * Vm[13];
   w[7] = A[7] * Vm[0] +  A[21] * Vm[1] +  A[35] * Vm[2] +  A[49] * Vm[3] +  A[63] * Vm[4] +  A[77] * Vm[5] +  A[91] * Vm[6] +  A[105] * Vm[7] +  A[119] * Vm[8] +  A[133] * Vm[9] +  A[147] * Vm[10] +  A[161] * Vm[11] +  A[175] * Vm[12] +  A[189] * Vm[13];
   w[8] = A[8] * Vm[0] +  A[22] * Vm[1] +  A[36] * Vm[2] +  A[50] * Vm[3] +  A[64] * Vm[4] +  A[78] * Vm[5] +  A[92] * Vm[6] +  A[106] * Vm[7] +  A[120] * Vm[8] +  A[134] * Vm[9] +  A[148] * Vm[10] +  A[162] * Vm[11] +  A[176] * Vm[12] +  A[190] * Vm[13];
+  w[9] = 0;
+  w[10] = 0;
+  w[11] = 0;
+  w[12] = 0;
+  w[13] = 0;
 }
 
 #ifdef COMPILE_TESTING_METHODS
   int test_sparse_multiplier(){
     Real A[NN * NN] = {ZERO};
     Real v[NN] = {ZERO};
-    Real w[NN] = {ZERO};
+    //do not zero, tests sparse_multiplier's fill of non touched entries
+    Real w[NN];
     Real w2[NN] = {ZERO};
     v[0] = 0;
     A[0] = 0;
