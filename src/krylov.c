@@ -397,7 +397,7 @@ Real arnoldi(int* m, Real* h, bool h_variable, const Real tau, const Real t, con
 			{
 				q = 0.25 * (*m);
 			}
-			if (m_changed)
+			if (m_changed && (err < err_old))
 			{
 				k = pow(err / err_old, 1.0 / (m_old - *m));
 			}
