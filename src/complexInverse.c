@@ -247,8 +247,9 @@ int getHessenbergLU(const int n, double complex* A, int* indPivot)
 		if (cabs(A[i * n + i]) < cabs(A[i * n + i + 1]))
 		{
 			indPivot[i] = i + 1;
+			int use_i = i > 0 ? i - 1 : 0;
 			//swap rows
-			swapComplex(n, &A[i], n, &A[i + 1], n);
+			swapComplex(n - use_i, &A[use_i * n + i], n, &A[use_i * n + i + 1], n);
 		}
 		else
 		{

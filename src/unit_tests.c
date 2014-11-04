@@ -17,6 +17,16 @@
 #include "krylov.h"
 #include "sparse_multiplier.h"
 
+static inline double getSign()
+{
+	return ((double)rand()/(double)RAND_MAX) > 0.5 ? 1.0 : -1.0;
+}
+
+static inline double getRand()
+{
+	return ((double)rand()/(double)RAND_MAX) * getSign();
+}
+
 bool LUTests()
 {
 	bool passed = true;
@@ -77,27 +87,6 @@ bool LUTests()
 
 
 	free(testMatrix);
-
-	testMatrix = (double complex*)calloc(16, sizeof(double complex));
-	testMatrix[0] = 1 + 1e3 * I;
-	testMatrix[1] = 4 - 0.001 * I;
-	testMatrix[2] = 0;
-	testMatrix[4] = 16e5;
-	testMatrix[5] = 0.0001 * I;
-	testMatrix[6] = 80000 + 5 * I;
-	testMatrix[8] = 3 - 5 * I;
-	testMatrix[9] = 9 * I;
-	testMatrix[10] = 9 * I;
-	getHessenbergLU_test (3, testMatrix, ipiv);
-	int count = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			passed &= cabs(testMatrix[i * 4 + j] - testMatrix2[count++]) < ATOL;
-		}
-	}
-
 	free(testMatrix2);
 	free(ipiv);
 	free(ipiv2);
