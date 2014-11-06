@@ -127,17 +127,34 @@ bool InverseTests()
 	free(testMatrix);
 	free(testMatrix2);
 
+	//create matricies
+	int dim = 4;
+	int actual_size = dim * dim;
+	double complex* mtx = (double complex*)calloc(actual_size, sizeof(double complex));
+	double complex* mtx2 = (double complex*)calloc(actual_size, sizeof(double complex));
+	double magnitude = 1e6;
+
+	for (int col = 0; col < dim; col++)
+	{
+		for (int row = 0; row <= col + 1; row ++)
+		{
+			if (row + col * dim == actual_size)
+				break;
+			mtx[row + col * dim] = magnitude * getRand() + magnitude * getRand() * I;
+		}
+	}
+	memcpy(mtx2, mtx, actual_size * sizeof(double complex));
+	getComplexInverseHessenberg (dim, mtx);
+	getComplexInverse (dim, mtx2);
+	//test inverse
+	for (int i = 0; i < actual_size; i ++)
+	{
+		passed &= cabs(mtx[i] - mtx2[i]) < ATOL;
+	}
+	free(mtx);
+	free(mtx2);
+
 	return passed;
-}
-
-static inline double getSign()
-{
-	return ((double)rand()/(double)RAND_MAX) > 0.5 ? 1.0 : -1.0;
-}
-
-static inline double getRand()
-{
-	return ((double)rand()/(double)RAND_MAX) * getSign();
 }
 
 bool speedTest()
@@ -303,7 +320,7 @@ bool PhiTests()
 	free(mtx4);
 	return passed;
 }
-#define STRIDE_MIRROR (NN + 2)
+#define STRIDE_MIRROR (NN + 1)
 bool LinearAlgebraTests()
 {
 	#ifdef COMPILE_TESTING_METHODS
@@ -314,7 +331,7 @@ bool LinearAlgebraTests()
 	int m_size = STRIDE_MIRROR / 2;
 	for (int col = 0; col < m_size; ++col)
 	{
-		for (int row = 0; row < NN; ++row)
+		for (int row = 0; row < m_size; ++row)
 		{
 			A[row + col * STRIDE_MIRROR] = col + row * m_size;
 		}
@@ -329,18 +346,29 @@ bool LinearAlgebraTests()
 	for (int row = 0; row < m_size; row++)
 	{
 		int val = (m_size - 1) * m_size * ((3 * row + 2) * m_size - 1) / 6;
-		if (out[row] != val)
+		if (fabs(out[row] - val) > ATOL)
+		{
+			printf("mxm matrix multiplication failed\n");
 			return false;
+		}
 	}
 
 	//NNxM matrix * Mx1 vector
+	/*
+	for (int col = 0; col < m_size; ++col)
+	{
+		for (int row = 0; row < NN; ++row)
+		{
+			A[row + col * STRIDE_MIRROR] = col + row * m_size;
+		}
+	}
 	matvec_n_by_m_test(m_size, A, v, out);
 	for (int row = 0; row < NN; row++)
 	{
 		int val = (m_size - 1) * m_size * ((3 * row + 2) * m_size - 1) / 6;
 		if (out[row] != val)
 			return false;
-	}
+	}*/
 
 	Real v2[STRIDE_MIRROR] = {ZERO};
 	for (int row = 0; row < NN; ++row)
@@ -348,8 +376,9 @@ bool LinearAlgebraTests()
 		v[row] = row;
 		v2[row] = row;
 	}
-	if (dotproduct_test(v, v2) != ((1.0/6.0) * (NN - 1) * NN * (2 * NN - 1)))
+	if (fabs(dotproduct_test(v, v2) - ((NN - 1) * NN * (2 * NN - 1)) / 6.0) > ATOL)
 	{
+		printf("dot product failed\n");
 		return false;
 	}
 
@@ -357,18 +386,27 @@ bool LinearAlgebraTests()
 	for (int i = 0; i < NN; i++)
 	{
 		if (v2[i] != 0)
+		{
+			printf("scale subtract failed\n");
 			return false;
+		}
 	}
 
 	scale_mult_test(1.0, v, v2);
 	for (int i = 0; i < NN; i++)
 	{
 		if (v2[i] != v[i])
+		{
+			printf("scale mult failed\n");
 			return false;
+		}
 	}
 
 	if (test_sparse_multiplier() != 1)
+	{
+		printf("sparse matrix multiplication failed\n");
 		return false;
+	}
 
 	#else
 	printf ("Please compile with COMPILE_TESTING_METHODS defined (check header.h)\n");
