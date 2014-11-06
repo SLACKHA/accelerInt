@@ -242,17 +242,19 @@ void getComplexInverse (int n, double complex* A) {
 static inline
 int getHessenbergLU(const int n, double complex* A, int* indPivot)
 {
+	int last_free = 0;
 	for (int i = 0; i < n - 1; i ++)
 	{
 		if (cabs(A[i * n + i]) < cabs(A[i * n + i + 1]))
 		{
 			//swap rows
-			swapComplex(n, &A[i], n, &A[i + 1], n);
+			swapComplex(n - last_free, &A[last_free * n + i], n, &A[last_free * n + i + 1], n);
 			indPivot[i] = i + 1;
 		}
 		else
 		{
 			indPivot[i] = i;
+			last_free = i;
 		}
 		if (cabs(A[i * n + i]) > 0.0)
 		{
