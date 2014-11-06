@@ -129,7 +129,6 @@ void multiplyComplexUpperMV (int n, double complex* x, int lda, double complex* 
 			x[j] *= A[j + (lda * j)];
 		}
 	}
-	
 }
 
 ///////////////////////////////////////////////////////////
@@ -214,11 +213,13 @@ void getComplexInverse (int n, double complex* A) {
 	// first get LU factorization
 	info = getComplexLU (n, A, ipiv);
 	
+#ifndef NDEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexLU failure, info = %d.\n", info);
 		exit (1);
 	}
+#endif
 	
 	// work array
 	double complex* work = (double complex*) calloc (n, sizeof(double complex));
@@ -230,11 +231,13 @@ void getComplexInverse (int n, double complex* A) {
 	free (work);
 	free (ipiv);
 	
+#ifndef NDEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexInverseLU failure, info = %d.\n", info);
 		exit (1);
 	}
+#endif
 }
 
 //adapted from Matrix Computations
@@ -298,11 +301,13 @@ void getComplexInverseHessenberg (const int n, double complex* A)
 	// first get LU factorization
 	info = getHessenbergLU (n, A, ipiv);
 
+#ifndef NDEBUG
 	if (info != 0)
 	{
 		printf ("getHessenbergLU failure, info = %d.\n", info);
 		exit (1);
 	}
+#endif
 
 	// work array
 	double complex* work = (double complex*) calloc (n, sizeof(double complex));
@@ -314,9 +319,11 @@ void getComplexInverseHessenberg (const int n, double complex* A)
 	free (work);
 	free (ipiv);
 	
+#ifndef NDEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexInverseLU failure, info = %d.\n", info);
 		exit (1);
 	}
+#endif
 }
