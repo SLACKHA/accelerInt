@@ -114,4 +114,7 @@ typedef unsigned short int usint;
 
 #define COMPILE_TESTING_METHODS //comment out to remove unit testing stubs
 
+//turn on to log the krylov space and step sizes to log.txt
+#define LOG_KRYLOV_AND_STEPSIZES
+
 #endif

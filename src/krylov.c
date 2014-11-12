@@ -28,13 +28,14 @@ static inline void matvec_n_by_m_scale (const int, const Real, const Real *, con
 static inline void matvec_n_by_m_scale_add (const int, const Real, const Real *, const Real *, Real *, const Real *);
 static inline void matvec_n_by_m_scale_add_subtract (const int, const Real, const Real *, const Real *, Real *, const Real *, const Real *);
 static inline void scale (const Real*, const Real*, Real*);
+static inline void scale_init (const Real*, Real*);
 static inline Real sc_norm (const Real*, const Real*);
 static inline double dotproduct(const Real*, const Real*);
 static inline Real normalize(const Real*, Real*);
 static inline void scale_subtract(const Real, const Real*, Real*);
 static inline Real two_norm(const Real*);
 static inline void scale_mult(const Real, const Real*, Real*);
-static inline Real arnoldi(int*, const Real, const Real*, const Real*, Real*, Real*, Real*);
+static inline Real arnoldi(int*, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*);
 
 #ifdef COMPILE_TESTING_METHODS
 void matvec_m_by_m_test (const int i , const Real * j, const Real * k, Real * l) {
@@ -210,6 +211,21 @@ void scale (const Real * y0, const Real * y1, Real * sc) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/** Get scaling for weighted norm for the initial timestep (used in krylov process)
+ * 
+ * \param[in]		y0		values at current timestep
+ * \param[out]	sc	array of scaling values
+ */
+static inline
+void scale_init (const Real * y0, Real * sc) {
+	#pragma unroll
+	for (uint i = 0; i < NN; ++i) {
+		sc[i] = ATOL + fabs(y0[i]) * RTOL;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 /** Perform weighted norm
  * 
  * \param[in]		nums	values to be normed
@@ -321,12 +337,13 @@ static inline void scale_mult(const Real s, const Real* w, Real* Vm)
  * \param[in]		h 			the timestep to use
  * \param[in]		A   		the jacobian matrix
  * \param[in]		v			the vector for which to determine the subspace
+ * \param[in]		sc 			the scaled weighted norm vector to use for error control
  * \param[out]		Vm			the subspace matrix to set
  * \param[out]		Hm			the hessenberg matrix to set
  * \param[out]		phiHm		the resulting phi function of the hessenberg matrix
  */
 static inline
-Real arnoldi(int* m, const Real h, const Real* A, const Real* v, Real* Vm, Real* Hm, Real* phiHm)
+Real arnoldi(int* m, const Real h, const Real* A, const Real* v, const Real* sc, Real* Vm, Real* Hm, Real* phiHm)
 {
 	//the temporary work array
 	Real w[NN];
@@ -380,7 +397,7 @@ Real arnoldi(int* m, const Real h, const Real* A, const Real* v, Real* Vm, Real*
 		phiAc_variable (*m + P, STRIDE, Hm, h / 3.0, phiHm);
 
 		//3. Get error
-		err = beta * store * phiHm[(*m) * STRIDE + (*m) - 1] * two_norm(&Vm[(*m) * STRIDE]);
+		err = h * beta * store * phiHm[(*m) * STRIDE + (*m) - 1] * sc_norm(&Vm[(*m) * STRIDE], sc);
 
 		#ifdef USE_S3_ERR
 			if (*m < 5)
@@ -389,7 +406,7 @@ Real arnoldi(int* m, const Real h, const Real* A, const Real* v, Real* Vm, Real*
 				Hm[(*m + 1) * STRIDE + (*m)] = ZERO;
 				//get s3 err
 				sparse_multiplier(A, &Vm[(*m) * STRIDE], w);
-				err = fmax(beta * store * phiHm[(*m + 1) * STRIDE + (*m) - 1] * two_norm(w), err);
+				err = fmax(h * beta * store * phiHm[(*m + 1) * STRIDE + (*m) - 1] * sc_norm(w, sc), err);
 			}
 		#endif
 
@@ -420,6 +437,17 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 	bool reject = false;
 
 	Real t = t_start;
+
+	// get scaling for weighted norm
+	Real sc[NN];
+	scale_init(y, sc);
+
+	#ifdef LOG_KRYLOV_AND_STEPSIZES
+	  //file for krylov logging
+	  FILE *logFile;
+	  //open and clear
+	  logFile = fopen("log.txt", "a");
+  	#endif
 	
 	while ((t < t_end) && (t + h > t)) {
 		//initial krylov subspace sizes
@@ -449,7 +477,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		do
 		{
 			//do arnoldi
-			Real beta = arnoldi(&m, h, A, fy, Vm, Hm, phiHm);
+			Real beta = arnoldi(&m, h, A, fy, sc, Vm, Hm, phiHm);
 
 			// k1
 			Real k1[NN];
@@ -491,7 +519,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			}
 
 			//do arnoldi
-			beta = arnoldi(&m1, h, A, k4, Vm, Hm, phiHm);
+			beta = arnoldi(&m1, h, A, k4, sc, Vm, Hm, phiHm);
 			//k4 is partially in the m'th column of phiHm
 			matvec_n_by_m_scale(m1, beta, Vm, phiHm, k4);
 		
@@ -528,7 +556,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 				k7[i] = temp[i] - fy[i] - k7[i];
 			}
 		
-			beta = arnoldi(&m2, h, A, k7, Vm, Hm, phiHm);
+			beta = arnoldi(&m2, h, A, k7, sc, Vm, Hm, phiHm);
 			//k7 is partially in the m'th column of phiHm
 			matvec_n_by_m_scale(m2, beta / (h / 3.0), Vm, &phiHm[m2 * STRIDE], k7);
 					
@@ -538,8 +566,6 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 				y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
 			}
 			
-			// get scaling for weighted norm
-			Real sc[NN];
 			scale (y, y1, sc);	
 			
 			///////////////////
@@ -563,6 +589,10 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
+
+			#ifdef LOG_KRYLOV_AND_STEPSIZES
+				fprintf (logFile, "%e\t%e\t%e\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+	  		#endif
 			
 			if (err <= ONE) {
 				
@@ -603,8 +633,10 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			}
 		} while(err >= ONE);
 
-		//printf ("%e\t%e\t%d\t%d\t%d\n", h, err, m, m1, m2);
-
 	} // end while
+
+	#ifdef LOG_KRYLOV_AND_STEPSIZES
+		fclose(logFile);
+	#endif
 	
 }

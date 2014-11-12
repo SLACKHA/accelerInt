@@ -293,6 +293,14 @@ int main (int argc, char *argv[]) {
   #endif
   
   int numSteps = 0;
+
+  #ifdef LOG_KRYLOV_AND_STEPSIZES
+	  //file for krylov logging
+	  FILE *logFile;
+	  //open and clear
+	  logFile = fopen("log.txt", "w");
+	  fclose(logFile);
+  #endif
   
 	//////////////////////////////
 	// start timer
