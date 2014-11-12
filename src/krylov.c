@@ -35,7 +35,7 @@ static inline Real normalize(const Real*, Real*);
 static inline void scale_subtract(const Real, const Real*, Real*);
 static inline Real two_norm(const Real*);
 static inline void scale_mult(const Real, const Real*, Real*);
-static inline Real arnoldi(int*, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*);
+static inline Real arnoldi(int*, bool, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*, Real*);
 
 #ifdef COMPILE_TESTING_METHODS
 void matvec_m_by_m_test (const int i , const Real * j, const Real * k, Real * l) {
@@ -75,6 +75,9 @@ void scale_mult_test(const Real i, const Real* j, Real* k){
 #define ORD 3
 //indexed list
 static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
+#define M_u 2
+#define M_opt 4
+#define M_MAX 20
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -332,32 +335,41 @@ static inline void scale_mult(const Real s, const Real* w, Real* Vm)
 /** Performs the arnoldi iteration on the matrix A and the vector v using the Niesen scheme
  *
  *	Generates the subspace matrix (Vm) and Hessenberg matrix Hm 
+ *  Returns h_kry the necessary step size to maintain accuracy given a maximum Krylov subspace size of M_MAX
  *
  * \param[in, out]	m 			the size of the subspace (variable)
+ * \param[in]		h_changable	true if this is the first krylov projection, and h can be changed
  * \param[in]		h 			the timestep to use
  * \param[in]		A   		the jacobian matrix
  * \param[in]		v			the vector for which to determine the subspace
  * \param[in]		sc 			the scaled weighted norm vector to use for error control
+ * \param[out]		beta		the two norm of the v vector
  * \param[out]		Vm			the subspace matrix to set
  * \param[out]		Hm			the hessenberg matrix to set
  * \param[out]		phiHm		the resulting phi function of the hessenberg matrix
  */
 static inline
-Real arnoldi(int* m, const Real h, const Real* A, const Real* v, const Real* sc, Real* Vm, Real* Hm, Real* phiHm)
+Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* v, const Real* sc, Real* beta, Real* Vm, Real* Hm, Real* phiHm)
 {
 	//the temporary work array
 	Real w[NN];
 
 	//first place A*fy in the Vm matrix
-	Real beta = normalize(v, Vm);
+	*beta = normalize(v, Vm);
 
 	Real store = 0;
 	int index = 0;
 	int j = 0;
 	Real err = 0;
+	Real h_kry = h;
 
 	do
 	{
+		if (j >= M_MAX && h_changable) //need to modify h_kry and restart
+		{
+			h_kry /= 3.0;
+			j = 0;
+		}
 		#pragma unroll
 		for (; j < index_list[index]; j++)
 		{
@@ -397,7 +409,7 @@ Real arnoldi(int* m, const Real h, const Real* A, const Real* v, const Real* sc,
 		phiAc_variable (*m + P, STRIDE, Hm, h / 3.0, phiHm);
 
 		//3. Get error
-		err = h * beta * store * phiHm[(*m) * STRIDE + (*m) - 1] * sc_norm(&Vm[(*m) * STRIDE], sc);
+		err = h * (*beta) * store * phiHm[(*m) * STRIDE + (*m) - 1] * sc_norm(&Vm[(*m) * STRIDE], sc);
 
 		#ifdef USE_S3_ERR
 			if (*m < 5)
@@ -406,7 +418,7 @@ Real arnoldi(int* m, const Real h, const Real* A, const Real* v, const Real* sc,
 				Hm[(*m + 1) * STRIDE + (*m)] = ZERO;
 				//get s3 err
 				sparse_multiplier(A, &Vm[(*m) * STRIDE], w);
-				err = fmax(h * beta * store * phiHm[(*m + 1) * STRIDE + (*m) - 1] * sc_norm(w, sc), err);
+				err = fmax(h * (*beta) * store * phiHm[(*m + 1) * STRIDE + (*m) - 1] * sc_norm(w, sc), err);
 			}
 		#endif
 
@@ -416,7 +428,7 @@ Real arnoldi(int* m, const Real h, const Real* A, const Real* v, const Real* sc,
 		Hm[(*m) * STRIDE] = ZERO;
 	} while (err >= ONE);
 
-	return beta;
+	return h_kry;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -449,6 +461,8 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 	  logFile = fopen("log.txt", "a");
   	#endif
 	
+	int small_count = 0, mu_count = 0;
+	Real beta = 0;
 	while ((t < t_end) && (t + h > t)) {
 		//initial krylov subspace sizes
 		int m, m1, m2;
@@ -476,8 +490,12 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 
 		do
 		{
+			Real h_kry = h;
 			//do arnoldi
-			Real beta = arnoldi(&m, h, A, fy, sc, Vm, Hm, phiHm);
+			h_kry = arnoldi(&m, true, h, A, fy, sc, &beta, Vm, Hm, phiHm);
+			bool h_change = h_kry != h;
+			if (h_change)
+				h = h_kry;
 
 			// k1
 			Real k1[NN];
@@ -519,7 +537,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			}
 
 			//do arnoldi
-			beta = arnoldi(&m1, h, A, k4, sc, Vm, Hm, phiHm);
+			arnoldi(&m1, false, h, A, k4, sc, &beta, Vm, Hm, phiHm);
 			//k4 is partially in the m'th column of phiHm
 			matvec_n_by_m_scale(m1, beta, Vm, phiHm, k4);
 		
@@ -556,7 +574,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 				k7[i] = temp[i] - fy[i] - k7[i];
 			}
 		
-			beta = arnoldi(&m2, h, A, k7, sc, Vm, Hm, phiHm);
+			arnoldi(&m2, false, h, A, k7, sc, &beta, Vm, Hm, phiHm);
 			//k7 is partially in the m'th column of phiHm
 			matvec_n_by_m_scale(m2, beta / (h / 3.0), Vm, &phiHm[m2 * STRIDE], k7);
 					
@@ -590,6 +608,39 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
 
+			//take care of h_kry updating
+
+			Real temp_kry = 0;
+			//m < mu step
+			if (m < M_u)
+				mu_count++;
+			else
+				mu_count = 0;
+			if (mu_count > 1)
+			{
+				temp_kry = h * pow(((Real)M_opt) / ((Real)m), 1.0 / 3.0);
+			}
+
+			//m small step
+			if (m < 4)
+				small_count++;
+			else
+				small_count = 0;
+			if (small_count > 1)
+			{
+				temp_kry = fmax(temp_kry, (1 << (small_count - 1)) * h);
+			}
+
+			if (temp_kry == 0)
+				temp_kry = h_kry;
+
+			if (!h_change)
+				h_kry = temp_kry;
+			else
+			{
+				h_kry = fmin(h_kry, temp_kry);
+			}
+
 			#ifdef LOG_KRYLOV_AND_STEPSIZES
 				fprintf (logFile, "%e\t%e\t%e\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
 	  		#endif
@@ -620,6 +671,8 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 					reject = false;
 					h_new = fmin(h, h_new);
 				}
+				//krylov step
+				h_new = fmin(h_new, h_kry);
 				h = fmin(h_new, fabs(t_end - t));
 							
 			} else {
@@ -627,6 +680,9 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 				// limit to 0.2 <= (h_new/8) <= 8.0
 				h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 				h_new = fmin(h_new, h_max);
+
+				//krylov step
+				h_new = fmin(h_new, h_kry);
 				
 				reject = true;
 				h = fmin(h, h_new);
