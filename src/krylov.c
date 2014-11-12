@@ -18,7 +18,6 @@
 #include <stdbool.h>
 
 #include "header.h"
-#include "exp4.h"
 #include "derivs.h"
 #include "phiAHessenberg.h"
 #include "sparse_multiplier.h"
@@ -35,7 +34,7 @@ static inline Real normalize(const Real*, Real*);
 static inline void scale_subtract(const Real, const Real*, Real*);
 static inline Real two_norm(const Real*);
 static inline void scale_mult(const Real, const Real*, Real*);
-static inline Real arnoldi(int*, Real*, bool, const Real, const Real, const Real, const Real*, const Real*, Real*, Real*, Real*);
+static inline Real arnoldi(int*, const Real, const Real*, const Real*, Real*, Real*, Real*);
 
 #ifdef COMPILE_TESTING_METHODS
 void matvec_m_by_m_test (const int i , const Real * j, const Real * k, Real * l) {
@@ -61,16 +60,20 @@ void scale_mult_test(const Real i, const Real* j, Real* k){
 }
 #endif
 
+//whether to use S3 error
+//#define USE_S3_ERR
 //max order of the phi functions (i.e. for error estimation)
-#define P 2
+#ifdef USE_S3_ERR
+	#define P 2
+#else
+	#define P 1
+#endif
 //max size of arrays
 #define STRIDE (NN + P)
-//safety factors
-#define GAMMA 0.8
-#define DELTA 1.2
 //order of embedded methods
 #define ORD 3
-#define TOL 1e-7
+//indexed list
+static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -315,36 +318,31 @@ static inline void scale_mult(const Real s, const Real* w, Real* Vm)
  *	Generates the subspace matrix (Vm) and Hessenberg matrix Hm 
  *
  * \param[in, out]	m 			the size of the subspace (variable)
- * \param[in, out]	h 			the timestep to use (may be variable)
- * \param[in]		h_variable	if true, h may change
+ * \param[in]		h 			the timestep to use
  * \param[in]		A   		the jacobian matrix
  * \param[in]		v			the vector for which to determine the subspace
  * \param[out]		Vm			the subspace matrix to set
  * \param[out]		Hm			the hessenberg matrix to set
+ * \param[out]		phiHm		the resulting phi function of the hessenberg matrix
  */
 static inline
-Real arnoldi(int* m, Real* h, bool h_variable, const Real tau, const Real t, const Real t_end, const Real* A, const Real* v, Real* Vm, Real* Hm, Real* phiHm)
+Real arnoldi(int* m, const Real h, const Real* A, const Real* v, Real* Vm, Real* Hm, Real* phiHm)
 {
 	//the temporary work array
 	Real w[NN];
-	Real err = 100;
-	Real err_old = 0;
-	Real h_old = -1;
-	int m_old = -1;
-	int j = 0;
-	Real t_start = t;
-	bool h_changed = false;
-	bool m_changed = false;
 
 	//first place A*fy in the Vm matrix
 	Real beta = normalize(v, Vm);
-	Real store = -1;
 
-	//the niesen scheme
-	while (err >= DELTA)
+	Real store = 0;
+	int index = 0;
+	int j = 0;
+	Real err = 0;
+
+	do
 	{
 		#pragma unroll
-		for (; j < *m; j++)
+		for (; j < index_list[index]; j++)
 		{
 			sparse_multiplier(A, &Vm[j * STRIDE], w);
 			for (int i = 0; i <= j; i++)
@@ -361,6 +359,7 @@ Real arnoldi(int* m, Real* h, bool h_variable, const Real tau, const Real t, con
 			}
 			scale_mult(ONE / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * STRIDE]);
 		}
+		*m = index_list[index++];
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
 		store = Hm[(*m - 1) * STRIDE + *m];
 		Hm[(*m - 1) * STRIDE + *m] = ZERO;
@@ -369,71 +368,37 @@ Real arnoldi(int* m, Real* h, bool h_variable, const Real tau, const Real t, con
 		//1. Construct augmented Hm (fill in identity matrix)
 		Hm[(*m) * STRIDE] = ONE;
 
+		#ifdef USE_S3_ERR
+			if (*m < 5)
+			{
+				//construct identity matrix
+				Hm[(*m + 1) * STRIDE + (*m)] = ONE;
+			}
+		#endif
+
 		//2. Get phiHm
-		phiAc_variable (*m + 1, STRIDE, Hm, *h / 3.0, phiHm);
+		phiAc_variable (*m + P, STRIDE, Hm, h / 3.0, phiHm);
 
 		//3. Get error
 		err = beta * store * phiHm[(*m) * STRIDE + (*m) - 1] * two_norm(&Vm[(*m) * STRIDE]);
 
-		//test error
-		if (err >= DELTA)
-		{
-			//restore Hm(m, m + 1)
-			Hm[(*m - 1) * STRIDE + *m] = store;
-
-			int m_new = -1;
-			Real h_new = -1;
-			//calculate next h and m
-
-			//1. get k and q
-			Real q = 0;
-			Real k = 2;
-			Real omega = (tau) * err / ((*h) * TOL);
-			if (h_changed)
+		#ifdef USE_S3_ERR
+			if (*m < 5)
 			{
-				q = log(*h / h_old) / log(err / err_old) - 1.0;
+				//restore
+				Hm[(*m + 1) * STRIDE + (*m)] = ZERO;
+				//get s3 err
+				sparse_multiplier(A, &Vm[(*m) * STRIDE], w);
+				err = fmax(beta * store * phiHm[(*m + 1) * STRIDE + (*m) - 1] * two_norm(w), err);
 			}
-			else
-			{
-				q = 0.25 * (*m);
-			}
-			if (m_changed && (err < err_old))
-			{
-				k = pow(err / err_old, 1.0 / (m_old - *m));
-			}
+		#endif
 
-			h_new = (*h) * pow(GAMMA / omega, 1.0 / (q + 1.0));
-			m_new = (*m) + log(omega / GAMMA) / log(k);
+		//restore Hm(m, m + 1)
+		Hm[(*m - 1) * STRIDE + *m] = store;
+		//restore real Hm
+		Hm[(*m) * STRIDE] = ZERO;
+	} while (err >= ONE);
 
-			//store old
-			h_old = *h;
-			err_old = err;
-			m_old = *m;
-
-			if (h_variable)
-			{
-				//calculate cost functions
-				Real C_new_m = ((m_new + P) * N_A + (m_new * m_new + 3.0 * P + 2.0) * NN + (m_new + P + 1.0) * (m_new + P + 1.0) * (m_new + P + 1.0))  * (t_end - t) / *h;
-				Real C_new_h = (((*m) + P) * N_A + ((*m) * (*m) + 3.0 * P + 2.0) * NN + ((*m) + P + 1.0) * ((*m) + P + 1.0) * ((*m) + P + 1.0)) * (t_end - t) / h_new;
-
-				if (C_new_m > C_new_h)
-				{
-					(*h) = fmax(fmin(h_new, 5.0 * (*h)), 0.2 * (*h));
-					h_changed = true;
-				}
-				else
-				{
-					*m = round(fmin(m_new, 4.0 * (*m) / 3.0));
-					m_changed = true;
-				}
-			}
-			else
-			{
-				*m = round(fmin(m_new, 4.0 * (*m) / 3.0));
-				m_changed = true;
-			}
-		}
-	}
 	return beta;
 }
 
@@ -448,7 +413,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 	//initial time
 	Real h = 1.0e-8;
 	Real h_max, h_new;
-	
+
 	Real err_old = 1.0;
 	Real h_old = h;
 	
@@ -458,7 +423,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 	
 	while ((t < t_end) && (t + h > t)) {
 		//initial krylov subspace sizes
-		int m = NN / 3, m1 = NN / 5, m2 = NN / 5;
+		int m, m1, m2;
 
 		// temporary arrays
 		Real temp[NN];
@@ -479,160 +444,167 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 		Real Hm[STRIDE * STRIDE] = {ZERO};
 		Real Vm[NN * STRIDE] = {ZERO};
 		Real phiHm[STRIDE * STRIDE] = {ZERO};
+		Real err = ZERO;
 
-		//do arnoldi
-		Real beta = arnoldi(&m, &h, true, t_end - t_start, t, t_end, A, fy, Vm, Hm, phiHm);
+		do
+		{
+			//do arnoldi
+			Real beta = arnoldi(&m, h, A, fy, Vm, Hm, phiHm);
 
-		// k1
-		Real k1[NN];
-		//k1 is partially in the first column of phiHm
-		//k1 = beta * Vm * phiHm(:, 1)
-		matvec_n_by_m_scale(m, beta, Vm, phiHm, k1);
-	
-		// k2
-		Real k2[NN];
-		//computing phi(2h * A)
-		matvec_m_by_m (m, phiHm, phiHm, temp);
-		//note: f_temp will contain hm * phi * phi * e1 for later use
-		matvec_m_by_m (m, Hm, temp, f_temp);
-		matvec_n_by_m_scale_add(m, beta * (h / 6.0), Vm, f_temp, k2, k1);
-	
-		// k3
-		Real k3[NN];
-		//use the stored hm * phi * phi * e1 to get phi(3h * A)
-		matvec_m_by_m (m, phiHm, f_temp, temp);
-		matvec_m_by_m (m, Hm, temp, f_temp);
-		matvec_n_by_m_scale_add_subtract(m, beta * (h * h / 27.0), Vm, f_temp, k3, k2, k1);
-			
-		// d4
-		Real k4[NN];
-		#pragma unroll
-		for (uint i = 0; i < NN; ++i) {
-			// f4
-			f_temp[i] = h * ((-7.0 / 300.0) * k1[i] + (97.0 / 150.0) * k2[i] - (37.0 / 300.0) * k3[i]);
+			// k1
+			Real k1[NN];
+			//k1 is partially in the first column of phiHm
+			//k1 = beta * Vm * phiHm(:, 1)
+			matvec_n_by_m_scale(m, beta, Vm, phiHm, k1);
 		
-			k4[i] = y[i] + f_temp[i];
-		}
+			// k2
+			Real k2[NN];
+			//computing phi(2h * A)
+			matvec_m_by_m (m, phiHm, phiHm, temp);
+			//note: f_temp will contain hm * phi * phi * e1 for later use
+			matvec_m_by_m (m, Hm, temp, f_temp);
+			matvec_n_by_m_scale_add(m, beta * (h / 6.0), Vm, f_temp, k2, k1);
 		
-		dydt (t, pr, k4, temp);
-		sparse_multiplier (A, f_temp, k4);
-	
-		#pragma unroll
-		for (uint i = 0; i < NN; ++i) {
-			k4[i] = temp[i] - fy[i] - k4[i];
-		}
-
-		//do arnoldi
-		beta = arnoldi(&m1, &h, false, t_end - t_start, t, t_end, A, k4, Vm, Hm, phiHm);
-		//k4 is partially in the m'th column of phiHm
-		matvec_n_by_m_scale(m, beta, Vm, phiHm, k4);
-	
-		// k5
-		Real k5[NN];
-		//computing phi(2h * A)
-		matvec_m_by_m (m, phiHm, phiHm, temp);
-		//note: f_temp will contain hm * phi * phi * e1 for later use
-		matvec_m_by_m (m1, Hm, temp, f_temp);
-		matvec_n_by_m_scale_add(m, beta * (h / 6.0), Vm, f_temp, k5, k4);
-			
-		// k6
-		Real k6[NN];
-		//use the stored hm * phi * phi * e1 to get phi(3h * A)
-		matvec_m_by_m (m1, phiHm, f_temp, temp);
-		matvec_m_by_m (m1, Hm, temp, f_temp);
-		matvec_n_by_m_scale_add_subtract(m1, beta * (h * h / 27.0), Vm, f_temp, k6, k5, k4);
-			
-		// k7
-		Real k7[NN];
-		#pragma unroll
-		for (uint i = 0; i < NN; ++i) {
-			// f7
-			f_temp[i] = h * ((59.0 / 300.0) * k1[i] - (7.0 / 75.0) * k2[i] + (269.0 / 300.0) * k3[i] + (2.0 / 3.0) * (k4[i] + k5[i] + k6[i]));
-		
-			k7[i] = y[i] + f_temp[i];
-		}
-	
-		dydt (t, pr, k7, temp);
-		sparse_multiplier (A, f_temp, k7);
-	
-		#pragma unroll
-		for (uint i = 0; i < NN; ++i) {
-			k7[i] = temp[i] - fy[i] - k7[i];
-		}
-	
-		beta = arnoldi(&m2, &h, false, t_end - t_start, t, t_end, A, k7, Vm, Hm, phiHm);
-		//k7 is partially in the m'th column of phiHm
-		matvec_n_by_m_scale(m, beta, Vm, phiHm, k7);
+			// k3
+			Real k3[NN];
+			//use the stored hm * phi * phi * e1 to get phi(3h * A)
+			matvec_m_by_m (m, phiHm, f_temp, temp);
+			matvec_m_by_m (m, Hm, temp, f_temp);
+			matvec_n_by_m_scale_add_subtract(m, beta * (h * h / 27.0), Vm, f_temp, k3, k2, k1);
 				
-		// y_n+1
-		#pragma unroll
-		for (uint i = 0; i < NN; ++i) {
-			y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
-		}
-		
-		// get scaling for weighted norm
-		Real sc[NN];
-		scale (y, y1, sc);	
-		
-		///////////////////
-		// calculate errors
-		///////////////////
-	
-		// error of embedded order 3 method
-		#pragma unroll
-		for (uint i = 0; i < NN; ++i) {
-			temp[i] = k3[i] - (2.0 / 3.0) * k5[i] + 0.5 * (k6[i] + k7[i] - k4[i]) - (y1[i] - y[i]) / h;
-		}	
-		Real err = h * sc_norm(temp, sc);
-		
-		// error of embedded W method
-		#pragma unroll
-		for (uint i = 0; i < NN; ++i) {
-			temp[i] = -k1[i] + 2.0 * k2[i] - k4[i] + k7[i] - (y1[i] - y[i]) / h;
-		}
-		//Real err_W = h * sc_norm(temp, sc);
-		err = fmax(EPS, fmin(err, h * sc_norm(temp, sc)));
-		
-		// classical step size calculation
-		h_new = pow(err, -1.0 / ORD);	
-		
-		if (err <= ONE) {
-			
-			// minimum of classical and Gustafsson step size prediction
-			h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
-			
-			// limit to 0.2 <= (h_new/8) <= 8.0
-			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
-			h_new = fmin(h_new, h_max);
-			
-			// update y and t
+			// d4
+			Real k4[NN];
 			#pragma unroll
 			for (uint i = 0; i < NN; ++i) {
-				y[i] = y1[i];
+				// f4
+				f_temp[i] = h * ((-7.0 / 300.0) * k1[i] + (97.0 / 150.0) * k2[i] - (37.0 / 300.0) * k3[i]);
+			
+				k4[i] = y[i] + f_temp[i];
 			}
 			
-			t += h;
-			
-			// store time step and error
-			err_old = fmax(1.0e-2, err);
-			h_old = h;
-			
-			// check if last step rejected
-			if (reject) {
-				reject = false;
-				h_new = fmin(h, h_new);
+			dydt (t, pr, k4, temp);
+			sparse_multiplier (A, f_temp, k4);
+		
+			#pragma unroll
+			for (uint i = 0; i < NN; ++i) {
+				k4[i] = temp[i] - fy[i] - k4[i];
 			}
-			h = fmin(h_new, fabs(t_end - t));
-						
-		} else {
 
-			// limit to 0.2 <= (h_new/8) <= 8.0
-			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
-			h_new = fmin(h_new, h_max);
+			//do arnoldi
+			beta = arnoldi(&m1, h, A, k4, Vm, Hm, phiHm);
+			//k4 is partially in the m'th column of phiHm
+			matvec_n_by_m_scale(m1, beta, Vm, phiHm, k4);
+		
+			// k5
+			Real k5[NN];
+			//computing phi(2h * A)
+			matvec_m_by_m (m1, phiHm, phiHm, temp);
+			//note: f_temp will contain hm * phi * phi * e1 for later use
+			matvec_m_by_m (m1, Hm, temp, f_temp);
+			matvec_n_by_m_scale_add(m1, beta * (h / 6.0), Vm, f_temp, k5, k4);
+				
+			// k6
+			Real k6[NN];
+			//use the stored hm * phi * phi * e1 to get phi(3h * A)
+			matvec_m_by_m (m1, phiHm, f_temp, temp);
+			matvec_m_by_m (m1, Hm, temp, f_temp);
+			matvec_n_by_m_scale_add_subtract(m1, beta * (h * h / 27.0), Vm, f_temp, k6, k5, k4);
+				
+			// k7
+			Real k7[NN];
+			#pragma unroll
+			for (uint i = 0; i < NN; ++i) {
+				// f7
+				f_temp[i] = h * ((59.0 / 300.0) * k1[i] - (7.0 / 75.0) * k2[i] + (269.0 / 300.0) * k3[i] + (2.0 / 3.0) * (k4[i] + k5[i] + k6[i]));
 			
-			reject = true;
-			h = fmin(h, h_new);
-		}
+				k7[i] = y[i] + f_temp[i];
+			}
+		
+			dydt (t, pr, k7, temp);
+			sparse_multiplier (A, f_temp, k7);
+		
+			#pragma unroll
+			for (uint i = 0; i < NN; ++i) {
+				k7[i] = temp[i] - fy[i] - k7[i];
+			}
+		
+			beta = arnoldi(&m2, h, A, k7, Vm, Hm, phiHm);
+			//k7 is partially in the m'th column of phiHm
+			matvec_n_by_m_scale(m2, beta / (h / 3.0), Vm, &phiHm[m2 * STRIDE], k7);
+					
+			// y_n+1
+			#pragma unroll
+			for (uint i = 0; i < NN; ++i) {
+				y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
+			}
+			
+			// get scaling for weighted norm
+			Real sc[NN];
+			scale (y, y1, sc);	
+			
+			///////////////////
+			// calculate errors
+			///////////////////
+		
+			// error of embedded order 3 method
+			#pragma unroll
+			for (uint i = 0; i < NN; ++i) {
+				temp[i] = k3[i] - (2.0 / 3.0) * k5[i] + 0.5 * (k6[i] + k7[i] - k4[i]) - (y1[i] - y[i]) / h;
+			}	
+			err = h * sc_norm(temp, sc);
+			
+			// error of embedded W method
+			#pragma unroll
+			for (uint i = 0; i < NN; ++i) {
+				temp[i] = -k1[i] + 2.0 * k2[i] - k4[i] + k7[i] - (y1[i] - y[i]) / h;
+			}
+			//Real err_W = h * sc_norm(temp, sc);
+			err = fmax(EPS, fmin(err, h * sc_norm(temp, sc)));
+			
+			// classical step size calculation
+			h_new = pow(err, -1.0 / ORD);	
+			
+			if (err <= ONE) {
+				
+				// minimum of classical and Gustafsson step size prediction
+				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
+				
+				// limit to 0.2 <= (h_new/8) <= 8.0
+				h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
+				h_new = fmin(h_new, h_max);
+				
+				// update y and t
+				#pragma unroll
+				for (uint i = 0; i < NN; ++i) {
+					y[i] = y1[i];
+				}
+				
+				t += h;
+				
+				// store time step and error
+				err_old = fmax(1.0e-2, err);
+				h_old = h;
+				
+				// check if last step rejected
+				if (reject) {
+					reject = false;
+					h_new = fmin(h, h_new);
+				}
+				h = fmin(h_new, fabs(t_end - t));
+							
+			} else {
+
+				// limit to 0.2 <= (h_new/8) <= 8.0
+				h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
+				h_new = fmin(h_new, h_max);
+				
+				reject = true;
+				h = fmin(h, h_new);
+			}
+		} while(err >= ONE);
+
+		//printf ("%e\t%e\t%d\t%d\t%d\n", h, err, m, m1, m2);
+
 	} // end while
 	
 }
