@@ -30,6 +30,8 @@
 #else
 	#define P 1
 #endif
+//max size of arrays
+#define STRIDE (NN + P)
 //order of embedded methods
 #define ORD 3
 //indexed list
@@ -37,8 +39,6 @@ __device__ __const__ int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 2
 #define M_u 2
 #define M_opt 4
 #define M_MAX 10
-//max size of arrays
-#define STRIDE (M_MAX + P)
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -310,7 +310,7 @@ __device__ void scale_mult(const Real s, const Real* w, Real* Vm)
  * \param[out]		phiHm		the resulting phi function of the hessenberg matrix
  */
 __device__
-Real arnoldi(int* m, const Real h, const Real* A, const Real* v, const Real* sc, Real* beta, Real* Vm, Real* Hm, Real* phiHm)
+Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* v, const Real* sc, Real* beta, Real* Vm, Real* Hm, Real* phiHm)
 {
 	//the temporary work array
 	Real w[NN];
@@ -326,7 +326,7 @@ Real arnoldi(int* m, const Real h, const Real* A, const Real* v, const Real* sc,
 
 	do
 	{
-		if (j >= M_MAX) //need to modify h_kry and restart
+		if (j >= M_MAX && h_changable) //need to modify h_kry and restart
 		{
 			h_kry /= 3.0;
 			j = 0;
