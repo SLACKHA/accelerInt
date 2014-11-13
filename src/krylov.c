@@ -409,7 +409,7 @@ Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* 
 		phiAc_variable (*m + P, STRIDE, Hm, h / 3.0, phiHm);
 
 		//3. Get error
-		err = h * (*beta) * store * phiHm[(*m) * STRIDE + (*m) - 1] * sc_norm(&Vm[(*m) * STRIDE], sc);
+		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * STRIDE], sc);
 
 		#ifdef USE_S3_ERR
 			if (*m < 5)
@@ -418,7 +418,7 @@ Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* 
 				Hm[(*m + 1) * STRIDE + (*m)] = ZERO;
 				//get s3 err
 				sparse_multiplier(A, &Vm[(*m) * STRIDE], w);
-				err = fmax(h * (*beta) * store * phiHm[(*m + 1) * STRIDE + (*m) - 1] * sc_norm(w, sc), err);
+				err = fmax(h * (*beta) * fabs(store * phiHm[(*m + 1) * STRIDE + (*m) - 1]) * sc_norm(w, sc), err);
 			}
 		#endif
 
