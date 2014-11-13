@@ -5,8 +5,5 @@
 #include "header.h"
 
 __device__ void sparse_multiplier (const Real *, const Real *, Real*);
-#ifdef COMPILE_TESTING_METHODS
-  __device__ int test_sparse_multiplier();
-#endif
 
 #endif

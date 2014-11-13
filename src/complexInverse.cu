@@ -251,3 +251,65 @@ void getComplexInverse (cuDoubleComplex* A) {
   */
 	
 }
+
+//adapted from Matrix Computations
+//Gene H. Golub, Charles F. Van Loan
+__device__
+void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
+{
+	int last_free = 0;
+	for (int i = 0; i < n - 1; i ++)
+	{
+		if (cuCabs(A[i * n + i]) < cuCabs(A[i * n + i + 1]))
+		{
+			//swap rows
+			swapComplex(n - last_free, &A[last_free * n + i], n, &A[last_free * n + i + 1], n);
+			indPivot[i] = i + 1;
+		}
+		else
+		{
+			indPivot[i] = i;
+			last_free = i;
+		}
+		if (cuCabs(A[i * n + i]) > 0.0)
+		{
+		#ifdef DOUBLE
+			cuDoubleComplex tau = cuCdiv(A[i * n + i + 1], A[i * n + i]);
+		#else
+			cuFloatComplex tau = cuCdivf(A[i * n + i + 1], A[i * n + i]);
+		#endif
+			for (int j = i + 1; j < n; j++)
+			{
+			#ifdef DOUBLE
+				A[j * n + i + 1] = cuCsub(A[j * n + i + 1], cuCmul(tau, A[j * n + i]));
+			#else
+				A[j * n + i + 1] = cuCsubf(A[j * n + i + 1], cuCmulf(tau, A[j * n + i]));
+			#endif
+			}
+			A[i * n + i + 1] = tau;
+		}
+	}
+	//last index is not pivoted
+	indPivot[n - 1] = n - 1;
+}
+
+__device__
+void getComplexInverseHessenberg (const int n, cuDoubleComplex* A)
+{
+	// pivot indices
+	int* ipiv = (int*) malloc (n * sizeof(int));
+	memset (ipiv, 0, n * sizeof(int));
+	
+	// first get LU factorization
+	getHessenbergLU (n, A, ipiv);
+
+	// work array
+	cuDoubleComplex* work = (cuDoubleComplex*) malloc (n * sizeof(cuDoubleComplex));
+  	memset (work, 0.0, n * sizeof(cuDoubleComplex));
+	
+	// now get inverse
+	getComplexInverseLU (n, A, ipiv, work);
+
+	free(ipiv);
+	free(work);
+}
