@@ -371,11 +371,11 @@ Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* 
 		#pragma unroll
 		for (; j < index_list[index]; j++)
 		{
-			sparse_multiplier(A, &Vm[j * STRIDE], w);
+			sparse_multiplier(A, &Vm[j * NN], w);
 			for (int i = 0; i <= j; i++)
 			{
-				Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * STRIDE]);
-				scale_subtract(Hm[j * STRIDE + i], &Vm[i * STRIDE], w);
+				Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * NN]);
+				scale_subtract(Hm[j * STRIDE + i], &Vm[i * NN], w);
 			}
 			Hm[j * STRIDE + j + 1] = two_norm(w);
 			if (fabs(Hm[j * STRIDE + j + 1]) < ATOL)
@@ -384,7 +384,7 @@ Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* 
 				*m = j;
 				break;
 			}
-			scale_mult(ONE / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * STRIDE]);
+			scale_mult(ONE / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NN]);
 		}
 		*m = index_list[index++];
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
@@ -410,7 +410,7 @@ Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* 
 		phiAc_variable (*m + P, STRIDE, Hm, h / 3.0, phiHm);
 
 		//3. Get error
-		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * STRIDE], sc);
+		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NN], sc);
 
 		#ifdef USE_S3_ERR
 			if (*m < 5)
@@ -418,7 +418,7 @@ Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* 
 				//restore
 				Hm[(*m + 1) * STRIDE + (*m)] = ZERO;
 				//get s3 err
-				sparse_multiplier(A, &Vm[(*m) * STRIDE], w);
+				sparse_multiplier(A, &Vm[(*m) * NN], w);
 				err = fmax(h * (*beta) * fabs(store * phiHm[(*m + 1) * STRIDE + (*m) - 1]) * sc_norm(w, sc), err);
 			}
 		#endif
