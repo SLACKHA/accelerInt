@@ -69,8 +69,6 @@ void scale_mult_test(const Real i, const Real* j, Real* k){
 #else
 	#define P 1
 #endif
-//max size of arrays
-#define STRIDE (NN + P)
 //order of embedded methods
 #define ORD 3
 //indexed list
@@ -78,6 +76,8 @@ static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42,
 #define M_u 2
 #define M_opt 8
 #define M_MAX 20
+//max size of arrays
+#define STRIDE (M_MAX + P)
 
 ///////////////////////////////////////////////////////////////////////////////
 
