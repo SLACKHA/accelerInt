@@ -105,8 +105,6 @@ void matvec_m_by_m (const int m, const Real * A, const Real * V, Real * Av) {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 /** Matrix-vector multiplication of a matrix sized NNxM and a vector of size Mx1 scaled by a specified factor
  * 
  * Performs inline matrix-vector multiplication (with unrolled loops)
@@ -127,7 +125,7 @@ void matvec_n_by_m_scale (const int m, const Real scale, const Real * A, const R
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * STRIDE + i] * V[j];
+			Av[i] += A[j * NN + i] * V[j];
 		}
 
 		Av[i] *= scale;
@@ -157,7 +155,7 @@ void matvec_n_by_m_scale_add (const int m, const Real scale, const Real * A, con
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * STRIDE + i] * V[j];
+			Av[i] += A[j * NN + i] * V[j];
 		}
 
 		Av[i] = Av[i] * scale + add[i];
