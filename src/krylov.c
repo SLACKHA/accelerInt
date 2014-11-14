@@ -391,6 +391,9 @@ Real arnoldi(int* m, bool h_changable, const Real h, const Real* A, const Real* 
 		store = Hm[(*m - 1) * STRIDE + *m];
 		Hm[(*m - 1) * STRIDE + *m] = ZERO;
 
+		//0. fill potentially non-empty memory first
+		memset(&Hm[*m * STRIDE + 1], 0, (*m + 1) * sizeof(Real)); 
+
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
 		Hm[(*m) * STRIDE] = ONE;
