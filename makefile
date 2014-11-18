@@ -53,6 +53,11 @@ _OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o linear-algebra.o comp
        rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
 OBJ_KRYLOV = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV))
 
+_OBJ_RB43 = main_rb43.o phiAHessenberg.o cf.o exprb43.o linear-algebra.o complexInverse.o \
+       dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
+       rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
+OBJ_RB43 = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43))
+
 _OBJ_KRYLOV_GPU = main_krylov.cu.o phiAHessenberg.cu.o cf.o krylov.cu.o linear-algebra.o complexInverse.cu.o \
        dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
        rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
@@ -107,6 +112,9 @@ exp-int : $(OBJ)
 exp-int-krylov : $(OBJ_KRYLOV)
 	$(LINK) $(OBJ_KRYLOV) $(LIBS) -llapack $(FLAGS) -o $@
 
+exp-int-rb43 : $(OBJ_RB43)
+	$(LINK) $(OBJ_RB43) $(LIBS) -llapack $(FLAGS) -o $@
+
 exp-int-gpu : $(OBJ_GPU)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU) $(LIBS) -llapack $(NVCCFLAGS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_GPU) dlink.o $(LIBS) -llapack $(FLAGS) -o $@
@@ -126,4 +134,4 @@ doc : $(DEPS) $(OBJ)
 
 .PHONY : clean		
 clean :
-	rm -f $(OBJ) $(OBJ_GPU) $(OBJ_CVODES) $(OBJ_KRYLOV) $(OBJ_TEST) $(OBJ_KRYLOV_GPU) exp-int exp-int-gpu exp-int-cvodes exp-int-krylov exp-int-krylov-gpu tests dlink.o
+	rm -f $(OBJ) $(OBJ_GPU) $(OBJ_CVODES) $(OBJ_KRYLOV) $(OBJ_TEST) $(OBJ_KRYLOV_GPU) $(OBJ_RB43) exp-int exp-int-gpu exp-int-cvodes exp-int-krylov exp-int-krylov-gpu exp-int-rb43 tests dlink.o
