@@ -30,6 +30,7 @@ static inline void matvec_n_by_m_scale (const int, const Real, const Real *, con
 static inline void matvec_n_by_m_scale_add (const int, const Real, const Real *, const Real *, Real *, const Real *);
 static inline void matvec_n_by_m_scale_add_subtract (const int, const Real, const Real *, const Real *, Real *, const Real *, const Real *);
 static inline void matvec_n_by_m_scale_special (const int, const Real[], const Real*, const Real* [], Real* []);
+static inline void matvec_n_by_m_scale_special2 (const int, const Real[], const Real*, const Real* [], Real* []);
 static inline void scale (const Real*, const Real*, Real*);
 static inline void scale_init (const Real*, Real*);
 static inline Real sc_norm (const Real*, const Real*);
@@ -38,7 +39,7 @@ static inline Real normalize(const Real*, Real*);
 static inline void scale_subtract(const Real, const Real*, Real*);
 static inline Real two_norm(const Real*);
 static inline void scale_mult(const Real, const Real*, Real*);
-static inline Real arnoldi(int*, const Real, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*, Real*);
+static inline Real arnoldi(int*, const Real, const int, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*, Real*);
 
 #ifdef COMPILE_TESTING_METHODS
 void matvec_m_by_m_test (const int i , const Real * j, const Real * k, Real * l) {
@@ -164,16 +165,16 @@ void matvec_n_by_m_scale (const int m, const Real scale, const Real * A, const R
 /** Matrix-vector multiplication of a matrix sized NNxM and a vector of size Mx1 scaled by a specified factor
  *
  *  Computes the following:
- *  Av1 = A * V1
- *  Av2 = A * V2
- *  Av3 = A * V3 + V4
+ *  Av1 = A * V1 * scale[0]
+ *  Av2 = A * V2 * scale[1]
+ *  Av3 = A * V3 * scale[2] + V4 + V5
  * 
  * Performs inline matrix-vector multiplication (with unrolled loops)
  * 
  * \param[in]		m 		size of the matrix
  * \param[in]		scale 	a list of numbers to scale the multplication by
  * \param[in]		A		matrix
- * \param[in]		V		a list of 4 pointers corresponding to V1, V2, V3, V4
+ * \param[in]		V		a list of 5 pointers corresponding to V1, V2, V3, V4, V5
  * \param[out]		Av		a list of 3 pointers corresponding to Av1, Av2, Av3
  */
 static inline
@@ -203,6 +204,50 @@ void matvec_n_by_m_scale_special (const int m, const Real scale[], const Real * 
 			Av[k][i] *= scale[k];
 		}
 		Av[2][i] += V[3][i];
+		Av[2][i] += V[4][i];
+	}
+}
+
+/** Matrix-vector multiplication of a matrix sized NNxM and a vector of size Mx1 scaled by a specified factor
+ *
+ *  Computes the following:
+ *  Av1 = A * V1 * scale[0]
+ *  Av2 = A * V2 * scale[1]
+ * 
+ * Performs inline matrix-vector multiplication (with unrolled loops)
+ * 
+ * \param[in]		m 		size of the matrix
+ * \param[in]		scale 	a list of numbers to scale the multplication by
+ * \param[in]		A		matrix
+ * \param[in]		V		a list of 2 pointers corresponding to V1, V2
+ * \param[out]		Av		a list of 2 pointers corresponding to Av1, Av2
+ */
+static inline
+void matvec_n_by_m_scale_special2 (const int m, const Real scale[], const Real * A, const Real* V[], Real* Av[]) {
+	//for each row
+	#pragma unroll
+	for (int i = 0; i < NN; ++i) {
+		#pragma unroll
+		for (int k = 0; k < 2; k++)
+		{
+			Av[k][i] = ZERO;
+		}
+		
+		//go across a row of A, multiplying by a column of phiHm
+		#pragma unroll
+		for (int j = 0; j < m; ++j) {
+			#pragma unroll
+			for (int k = 0; k < 2; k++)
+			{
+				Av[k][i] += A[j * NN + i] * V[k][j];
+			}
+		}
+
+		#pragma unroll
+		for (int k = 0; k < 2; k++)
+		{
+			Av[k][i] *= scale[k];
+		}
 	}
 }
 
@@ -410,8 +455,9 @@ static inline void scale_mult(const Real s, const Real* w, Real* Vm)
  *  Returns h_kry the necessary step size to maintain accuracy given a maximum Krylov subspace size of M_MAX
  *
  * \param[in, out]	m 			the size of the subspace (variable)
- * \param[in]		h_changable	true if this is the first krylov projection, and h can be changed
+ * \param[in]		scale  		the factor to scale the timestep by
  * \param[in]		h 			the timestep to use
+ * \param[in]		p 			the maximum phi order needed (note, order 1 is used to evaluate error)
  * \param[in]		A   		the jacobian matrix
  * \param[in]		v			the vector for which to determine the subspace
  * \param[in]		sc 			the scaled weighted norm vector to use for error control
@@ -421,7 +467,7 @@ static inline void scale_mult(const Real s, const Real* w, Real* Vm)
  * \param[out]		phiHm		the resulting phi function of the hessenberg matrix
  */
 static inline
-Real arnoldi(int* m, const Real scale, const Real h, const Real* A, const Real* v, const Real* sc, Real* beta, Real* Vm, Real* Hm, Real* phiHm)
+Real arnoldi(int* m, const Real scale, const int p, const Real h, const Real* A, const Real* v, const Real* sc, Real* beta, Real* Vm, Real* Hm, Real* phiHm)
 {
 	//the temporary work array
 	Real w[NN];
@@ -434,6 +480,7 @@ Real arnoldi(int* m, const Real scale, const Real h, const Real* A, const Real* 
 	int j = 0;
 	Real err = 0;
 	Real h_kry = h;
+	int order = p < 1 ? 1 : p;
 
 	do
 	{
@@ -471,7 +518,7 @@ Real arnoldi(int* m, const Real scale, const Real h, const Real* A, const Real* 
 		//1. Construct augmented Hm (fill in identity matrix)
 		Hm[(*m) * STRIDE] = ONE;
 		#pragma unroll
-		for (int i = 1; i < P; i++)
+		for (int i = 1; i < order; i++)
 		{
 			//0. fill potentially non-empty memory first
 			memset(&Hm[(*m + i) * STRIDE], 0, (*m + i + 1) * sizeof(Real));
@@ -479,10 +526,10 @@ Real arnoldi(int* m, const Real scale, const Real h, const Real* A, const Real* 
 		}
 
 		//2. Get phiHm
-		expAc_variable (*m + P, STRIDE, Hm, h * scale, phiHm);
+		expAc_variable (*m + order, STRIDE, Hm, h * scale, phiHm);
 
 		//3. Get error
-		err = (*beta) * fabs(store * phiHm[(*m + 1) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NN], sc) / h;
+		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1] / scale) * sc_norm(&Vm[(*m) * NN], sc);
 
 		//restore Hm(m, m + 1)
 		Hm[(*m - 1) * STRIDE + *m] = store;
@@ -542,80 +589,94 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 		Real A[NN * NN] = {ZERO};
 		//eval_jacob (t, pr, y, A);
     	eval_fd_jacob (t, pr, y, A);
+    	Real gy[NN];
+    	//gy = fy - A * y
+    	sparse_multiplier(A, y, gy);
+    	#pragma unroll
+    	for (uint i = 0; i < NN; ++i) {
+    		gy[i] = fy[i] - gy[i];
+    	}
 
 		Real Hm[STRIDE * STRIDE] = {ZERO};
 		Real Vm[NN * STRIDE] = {ZERO};
 		Real phiHm[STRIDE * STRIDE] = {ZERO};
 		Real err = ZERO;
-		Real savedActions[NN * 2];
+		Real savedActions[NN * 5];
 
 		do
 		{
 			//do arnoldi
-			arnoldi(&m, 0.5, h, A, fy, sc, &beta, Vm, Hm, phiHm);
+			arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm);
 
-			// k1
-			Real k1[NN];
-			//k1 is partially in the mth column of phiHm
-			//k1 = beta * Vm * phiHm(:, m)
-			matvec_n_by_m_scale(m, beta, Vm, &phiHm[m * STRIDE], k1);
+			// Un2 to be stored in temp
+			//Un2 is partially in the mth column of phiHm
+			//Un2 = y + ** 0.5 * h * phi_1(0.5 * h * A)*fy **
+			//Un2 = y + ** beta * Vm * phiHm(:, m) **
+
+			//store h * beta * Vm * phi_1(h * Hm) * e1 in savedActions
+			matvec_m_by_m_plusequal(m, phiHm, &phiHm[m * STRIDE], temp);
+			matvec_n_by_m_scale(m, beta, Vm, temp, savedActions);
+
+			//store 0.5 * h *  beta * Vm * phi_1(0.5 * h * Hm) * fy in temp
+			matvec_n_by_m_scale_add(m, beta, Vm, &phiHm[m * STRIDE], temp, y);
+			//temp is now equal to Un2
 
 			//next compute Dn2
-			Real Dn2[NN];
-			//Dn2 = F(Un2) - fy + A (y - Un2) = F(k1 + y) - fy - A (k1)
-			#pragma unroll
-			for (uint i = 0; i < NN; ++i) {
-				f_temp[i] = k1[i] + y[i];
-			}
-			dydt(t, pr, f_temp, Dn2);
-			sparse_multiplier(A, k1, temp);
+			//Dn2 = (F(Un2) - Jn * Un2) - gy
+
+			dydt(t, pr, temp, &savedActions[NN]);
+			sparse_multiplier(A, temp, f_temp);
 
 			#pragma unroll
 			for (uint i = 0; i < NN; ++i) {
-				Dn2[i] = f_temp[i] - fy[i] - temp[i]; 
+				temp[i] = savedActions[NN + i] - f_temp[i] - gy[i]; 
 			}
+			//temp is now equal to Dn2
 
-			//partially compute k2 (from k1)
-			Real k2[NN];
-			matvec_m_by_m_plusequal(m, phiHm, k1, temp);
+			//partially compute Un3 as:
+			//Un3 = y + ** h * phi_1(hA) * fy ** + h * phi_1(hA) * Dn2
+			//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 			//now we need the action of the exponential on Dn2
-			arnoldi(&m1, 1.0, h, A, Dn2, sc, &beta, Vm, Hm, phiHm);
+			arnoldi(&m1, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
 
 			//save Phi3(h * A) * Dn2 to savedActions[0]
 			//save Phi4(h * A) * Dn2 to savedActions[NN]
-			//and add the action of phi on Dn2 to k2
-			const Real* in[4] = {&phiHm[(m1 + 2) * STRIDE], &phiHm[(m1 + 3) * STRIDE], &phiHm[m1 * STRIDE], temp};
-			Real* out[3] = {savedActions, &savedActions[NN], k2};
-			const Real scale_vec[3] = {beta / (h * h), beta / (h * h * h), beta};
+			//add the action of phi_1 on Dn2 to y and hn * phi_1(hA) * fy to get Un3
+			const Real* in[5] = {&phiHm[(m1 + 2) * STRIDE], &phiHm[(m1 + 3) * STRIDE], &phiHm[m1 * STRIDE], savedActions, y};
+			Real* out[3] = {&savedActions[NN], &savedActions[2 * NN], temp};
+			Real scale_vec[3] = {beta / (h * h), beta / (h * h * h), beta};
 			matvec_n_by_m_scale_special(m1, scale_vec, Vm, in, out);
+			//Un3 is now in temp
 
 			//next compute Dn3
-			Real Dn3[NN];
-			//Dn3 = F(Un3) - fy + A (y - Un3) = F(k2 + y) - fy - A (k2)
-			#pragma unroll
-			for (uint i = 0; i < NN; ++i) {
-				f_temp[i] = k2[i] + y[i];
-			}
-			dydt(t, pr, f_temp, Dn3);
-			sparse_multiplier(A, k2, temp);
+			//Dn3 = F(Un3) - A * Un3 - gy
+			dydt(t, pr, temp, &savedActions[3 * NN]);
+			sparse_multiplier(A, temp, f_temp);
 
 			#pragma unroll
 			for (uint i = 0; i < NN; ++i) {
-				Dn3[i] = f_temp[i] - fy[i] - temp[i]; 
+				temp[i] = savedActions[3 * NN + i] - f_temp[i] - gy[i]; 
 			}
+			//temp is now equal to Dn3
 
 			//finally we need the action of the exponential on Dn3
-			arnoldi(&m2, 1.0, h, A, Dn3, sc, &beta, Vm, Hm, phiHm);
+			arnoldi(&m2, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
+			out[0] = &savedActions[3 * NN];
+			out[1] = &savedActions[4 * NN];
+			in[0] = &phiHm[(m2 + 2) * STRIDE];
+			in[1] = &phiHm[(m2 + 3) * STRIDE];
+			scale_vec[0] = beta / (h * h);
+			scale_vec[1] = beta / (h * h * h);
+			matvec_n_by_m_scale_special2(m2, scale_vec, Vm, in, out);
 
 			//construct y1 and error vector
-			Real y1[NN];
 			#pragma unroll
 			for (uint i = 0; i < NN; ++i) {
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
-				y1[i] = y[i] + (16.0 * savedActions[i] - 48.0 * savedActions[NN + i]) + (-2.0 * phiHm[(m2 + 2) * STRIDE + i] / (h * h) + 12.0 * phiHm[(m2 + 3) * STRIDE + i] / (h * h * h));
+				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NN + i] - 48.0 * savedActions[2 * NN + i] + -2.0 * savedActions[3 * NN + i] + 12.0 * savedActions[4 * NN + i];
 				//error vec
-				temp[i] = 16.0 * savedActions[i] - 2.0 * phiHm[(m2 + 2) * STRIDE + i];
+				temp[i] = 16.0 * savedActions[NN + i] -2.0 * savedActions[3 * NN + i];
 			}
 
 
