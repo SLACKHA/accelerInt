@@ -55,7 +55,7 @@ OBJ_KRYLOV = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV))
 
 _OBJ_RB43 = main_rb43.o phiAHessenberg.o cf.o exprb43.o linear-algebra.o complexInverse.o \
        dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
-       rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
+       rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o inverse.o
 OBJ_RB43 = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43))
 
 _OBJ_KRYLOV_GPU = main_krylov.cu.o phiAHessenberg.cu.o cf.o krylov.cu.o linear-algebra.o complexInverse.cu.o \

@@ -22,6 +22,7 @@
 #include "derivs.h"
 #include "phiAHessenberg.h"
 #include "sparse_multiplier.h"
+#include "inverse.h"
 
 
 static inline void matvec_m_by_m (const int, const Real *, const Real *, Real *);
@@ -77,6 +78,8 @@ static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42,
 #define M_MAX 20
 //max size of arrays
 #define STRIDE (M_MAX + P)
+//if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
+//#define USE_SMOOTHED_ERROR
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -479,7 +482,6 @@ Real arnoldi(int* m, const Real scale, const int p, const Real h, const Real* A,
 	int index = 0;
 	int j = 0;
 	Real err = 0;
-	Real h_kry = h;
 	int order = p < 1 ? 1 : p;
 
 	do
@@ -529,7 +531,49 @@ Real arnoldi(int* m, const Real scale, const int p, const Real h, const Real* A,
 		expAc_variable (*m + order, STRIDE, Hm, h * scale, phiHm);
 
 		//3. Get error
-		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1] / scale) * sc_norm(&Vm[(*m) * NN], sc);
+
+		#ifdef USE_SMOOTHED_ERROR
+			if (*m > 4)
+			{
+				//use the modified err from Hochbruck et al. 
+
+				//setup I - h*Hm
+				Real* working = (Real*)malloc((*m) * (*m) * sizeof(Real));
+				#pragma unroll
+				for (int ind1 = 0; ind1 < *m; ind1++)
+				{
+					#pragma unroll
+					for (int ind2 = 0; ind2 < *m; ind2++)
+					{
+						if (ind1 == ind2)
+						{
+							working[ind1 * (*m) + ind2] = ONE - h * scale * Hm[ind1 * STRIDE + ind2];
+						}
+						else
+						{
+							working[ind1 * (*m) + ind2] = -h * scale * Hm[ind1 * STRIDE + ind2];
+						}
+					}
+				}
+				getInverseHessenberg(*m, working);
+				//get the value for the err (dot product of mth row of working and 1'st col of Hm)
+				Real val = 0;
+				#pragma unroll
+				for (uint ind1 = 0; ind1 < *m; ind1++)
+				{
+					val += working[(*m) * ind1 + (*m - 1)] * Hm[ind1];
+				}
+				err = h * (*beta) * fabs(store * val) * sc_norm(&Vm[(*m) * NN], sc);
+
+				free(working);
+			}
+			else
+			{
+				err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NN], sc);
+			}
+		#else
+			err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NN], sc);
+		#endif
 
 		//restore Hm(m, m + 1)
 		Hm[(*m - 1) * STRIDE + *m] = store;
@@ -606,7 +650,12 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 		do
 		{
 			//do arnoldi
-			arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm);
+			if (arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+			{
+				//need to reduce h and try again
+				h /= 3;
+				continue;
+			}
 
 			// Un2 to be stored in temp
 			//Un2 is partially in the mth column of phiHm
@@ -638,7 +687,12 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 			//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 			//now we need the action of the exponential on Dn2
-			arnoldi(&m1, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
+			if (arnoldi(&m1, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+			{
+				//need to reduce h and try again
+				h /= 3;
+				continue;
+			}
 
 			//save Phi3(h * A) * Dn2 to savedActions[0]
 			//save Phi4(h * A) * Dn2 to savedActions[NN]
@@ -661,7 +715,12 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 			//temp is now equal to Dn3
 
 			//finally we need the action of the exponential on Dn3
-			arnoldi(&m2, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
+			if (arnoldi(&m2, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+			{
+				//need to reduce h and try again
+				h /= 3;
+				continue;
+			}
 			out[0] = &savedActions[3 * NN];
 			out[1] = &savedActions[4 * NN];
 			in[0] = &phiHm[(m2 + 2) * STRIDE];
@@ -676,7 +735,7 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NN + i] - 48.0 * savedActions[2 * NN + i] + -2.0 * savedActions[3 * NN + i] + 12.0 * savedActions[4 * NN + i];
 				//error vec
-				temp[i] = 16.0 * savedActions[NN + i] -2.0 * savedActions[3 * NN + i];
+				temp[i] = y[i] + 16.0 * savedActions[NN + i] -2.0 * savedActions[3 * NN + i];
 			}
 
 
