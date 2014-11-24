@@ -666,7 +666,7 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 			matvec_m_by_m_plusequal(m, phiHm, &phiHm[m * STRIDE], temp);
 			matvec_n_by_m_scale(m, beta, Vm, temp, savedActions);
 
-			//store 0.5 * h *  beta * Vm * phi_1(0.5 * h * Hm) * fy in temp
+			//store 0.5 * h *  beta * Vm * phi_1(0.5 * h * Hm) * fy + y in temp
 			matvec_n_by_m_scale_add(m, beta, Vm, &phiHm[m * STRIDE], temp, y);
 			//temp is now equal to Un2
 
