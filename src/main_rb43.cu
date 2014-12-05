@@ -25,7 +25,7 @@
 extern "C" {
 #include "cf.h"
 }
-#include "krylov.cuh"
+#include "exprb43.cuh"
 #include "mass_mole.h"
 #include "timer.h"
 
@@ -81,7 +81,7 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 		}
 
 		// call integrator for one time step
-		exp4_krylov_int (t, t_end, pr_local, y_local);
+		exprb43_int (t, t_end, pr_local, y_local);
 
 		// update global array with integrated values
 		#pragma unroll

@@ -19,10 +19,10 @@
 #include <string.h>
 
 #include "header.h"
-#include "derivs.h"
-#include "phiAHessenberg.h"
-#include "sparse_multiplier.h"
-#include "inverse.h"
+#include "derivs.cuh"
+#include "phiAHessenberg.cuh"
+#include "sparse_multiplier.cuh"
+//#include "inverse.cuh"
 
 
 __device__ void matvec_m_by_m_plusequal (const int, const Real *, const Real *, Real *);
@@ -40,34 +40,13 @@ __device__ Real two_norm(const Real*);
 __device__ void scale_mult(const Real, const Real*, Real*);
 __device__ Real arnoldi(int*, const Real, const int, const Real, const Real*, const Real*, const Real*, Real*, Real*, Real*, Real*);
 
-#ifdef COMPILE_TESTING_METHODS
-void matvec_n_by_m_scale_test (const int i, const Real m, const Real * j, const Real * k, Real *l){
-	matvec_n_by_m_scale(i, m, j, k, l);
-}
-double dotproduct_test(const Real* i, const Real* j){
-	return dotproduct(i, j);
-}
-Real normalize_test(const Real* i, Real* j){
-	return normalize(i, j);
-}
-void scale_subtract_test(const Real i, const Real* j, Real* k) {
-	scale_subtract(i, j, k);
-}
-Real two_norm_test(const Real* i){
-	return two_norm(i);
-}
-void scale_mult_test(const Real i, const Real* j, Real* k){
-	scale_mult(i, j, k);
-}
-#endif
-
 //whether to use S3 error
 //max order of the phi functions (i.e. for error estimation)
 #define P 4
 //order of embedded methods
 #define ORD 3
 //indexed list
-static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
+__device__ const int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
 #define M_u 2
 #define M_opt 8
 #define M_MAX 20
@@ -456,7 +435,7 @@ Real arnoldi(int* m, const Real scale, const int p, const Real h, const Real* A,
 		//1. Construct augmented Hm (fill in identity matrix)
 		Hm[(*m) * STRIDE] = ONE;
 		#pragma unroll
-		for (int i = 1; i < order; i++)
+		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
 			memset(&Hm[(*m + i) * STRIDE], 0, (*m + i + 1) * sizeof(Real));
@@ -525,7 +504,7 @@ Real arnoldi(int* m, const Real scale, const int p, const Real h, const Real* A,
  * 
  * 
  */
-void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) {
+__device__ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) {
 	
 	//initial time
 	Real h = 1.0e-8;
@@ -541,13 +520,6 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 	// get scaling for weighted norm
 	Real sc[NN];
 	scale_init(y, sc);
-
-	#ifdef LOG_KRYLOV_AND_STEPSIZES
-	  //file for krylov logging
-	  FILE *logFile;
-	  //open and clear
-	  logFile = fopen("log.txt", "a");
-  	#endif
 
 	Real beta = 0;
 	while ((t < t_end) && (t + h > t)) {
@@ -681,10 +653,6 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 			
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
-
-			#ifdef LOG_KRYLOV_AND_STEPSIZES
-				fprintf (logFile, "%e\t%e\t%e\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
-	  		#endif
 			
 			if (err <= ONE) {
 				
@@ -726,9 +694,5 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 		} while(err >= ONE);
 
 	} // end while
-
-	#ifdef LOG_KRYLOV_AND_STEPSIZES
-		fclose(logFile);
-	#endif
 	
 }

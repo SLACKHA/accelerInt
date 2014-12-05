@@ -564,7 +564,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			h_new = pow(err, -1.0 / ORD);	
 
 			//take care of h_kry updating
-
+/*
 			Real temp_kry = 0;
 			//m < mu step
 			if (m < M_u)
@@ -594,7 +594,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			else
 			{
 				h_kry = fmin(h_kry, temp_kry);
-			}
+			}*/
 			
 			if (err <= ONE) {
 				
@@ -623,7 +623,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 					h_new = fmin(h, h_new);
 				}
 				//krylov step
-				h_new = fmin(h_new, h_kry);
+				//h_new = fmin(h_new, h_kry);
 				h = fmin(h_new, fabs(t_end - t));
 							
 			} else {
@@ -633,7 +633,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 				h_new = fmin(h_new, h_max);
 
 				//krylov step
-				h_new = fmin(h_new, h_kry);
+				//h_new = fmin(h_new, h_kry);
 				
 				reject = true;
 				h = fmin(h, h_new);
