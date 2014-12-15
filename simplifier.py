@@ -1,29 +1,15 @@
 from __future__ import division
 from sympy import *
 from sympy.printing import print_ccode as cprint
+from sympy.parsing.sympy_parser import parse_expr
 import re
 import sys
+from multiprocessing import Pool
 
 def get_var_power_name(Base, power):
 	if power == 1:
 		return symbols(Base)
 	return symbols(Base + ("inv" if power < 0 else "") + str(abs(power)))
-
-def get_var_power(Var, power):
-	if power == 0:
-		return 1
-	if power == 1:
-		return Var
-	if power < 0:
-		ret_var = 1 / Var
-		for i in range(1, abs(power)):
-			ret_var /= Var
-		return ret_var
-	ret_var = Var
-	for i in range(1, abs(power)):
-		ret_var *= Var
-	return ret_var
-
 
 def opposite_comparison(comparator):
 	if comparator == "<=":
@@ -121,12 +107,30 @@ class temperature_simplifier(object):
 
 		return outlines, powers
 
-class repeated_simplifier(temperature_simplifier):
-	def __init__(self, variable, array_list):
-		temperature_simplifier.__init__(self, variable)
+class jacob_simplifier(object):
+	def __init__(self, variable, array_list, collect_list):
 		self.var_match = re.compile("(" + variable + "\[(?:\w+|\d+)\])\s*([+-])?=\s*(.+);")
 		self.array_match = [re.compile("(" + arr + ")\[(\w+|\d+)\]") for arr in array_list]
 		self.back_array_match = [re.compile("(" + arr + ")\((\w+|\d+)\)") for arr in array_list]
+		self.collect_list = [symbols(x) for x in collect_list]
+		self.T = symbols("T")
+
+	def get_clean_string(self, string, powers):
+		expanded = expand(string)
+		out_expr = None
+		for i in range(-10, 11):
+			coeff = expanded.coeff(self.T, i)
+			if coeff:
+				if out_expr is None:
+					out_expr = (collect(coeff, self.collect_list)) * get_var_power_name("T", i) if i != 0 else (collect(coeff, self.collect_list))
+				else:
+					out_expr += (collect(coeff, self.collect_list)) * get_var_power_name("T", i) if i != 0 else (collect(coeff, self.collect_list))
+				if i == 0 or i == 1:
+					continue
+				if not i in powers:
+					powers.append(i)
+
+		return str(out_expr)
 
 	def construct(self, variable, expression, powers):
 		ret_expr = []
@@ -153,7 +157,8 @@ class repeated_simplifier(temperature_simplifier):
 		step = len(lines) / 10.0
 		last_perc = 0
 		for i, line in enumerate(lines):
-			perc = (i / len(lines)) * 100
+			print i
+			perc = (float(i) / float(len(lines))) * 100
 			if perc > last_perc + step:
 				last_perc = perc
 				print perc
@@ -183,19 +188,37 @@ class repeated_simplifier(temperature_simplifier):
 		return outlines, powers
 
 class if_statement_collapser(temperature_simplifier):
-	def __init__(self, regex_list, lang = 'c'):
+	def __init__(self, regex_list, array_list = None, lang = 'c'):
 		temperature_simplifier.__init__(self, None)
 		self.variables = [variable[0] for variable in regex_list]
 		self.var_matchs = [re.compile("^(\\s*)(" + variable[0] + "\\s*)([+-])(=\\s*)(.+);\\s*$") for variable in regex_list]
 		self.break_statements = [re.compile(regex[1]) for regex in regex_list] 
 		self.if_statement_match = re.compile(r"if\s*\(T\s*([<>=]+)\s*([\d\.]+)")
 		self.lang = lang
+		if array_list:
+			self.array_match = [re.compile("(" + arr + ")\[(\w+|\d+)\]") for arr in array_list]
+			self.back_array_match = [re.compile("(" + arr + ")\((\w+|\d+)\)") for arr in array_list]
+		else:
+			self.array_match = None
+			self.back_array_match = None
+
+	def __unsub(self, line):
+		if not self.array_match:
+			return line
+		for array in self.back_array_match:
+			line = re.sub(array, r"\1[\2]", line)
+		return line
 
 	def construct(self, variable, outlines, powers, stored):
 		i = 0
 		for key, value in stored.iteritems():
 			if not len(value[0]):
 				continue
+			if self.array_match:
+				for val in value:
+					for real_val in val:
+						for array in self.array_match:
+							real_val = re.sub(array, r"\1(\2)", real_val)
 			if self.lang == "c":
 				outstr = "  if (T {} {}) {{\n".format(key[1], key[0])
 				outlines.append(outstr)
@@ -208,7 +231,7 @@ class if_statement_collapser(temperature_simplifier):
 
 				outstr = self.get_clean_string(next_str, powers)
 				outstr = "    {} {}= ".format(variable, "+" if i > 0 else "") + outstr + ";\n  } else {\n"
-				outlines.append(outstr)
+				outlines.append(self.__unsub(outstr))
 
 				if "<" in key[1]:
 					next_str = " + ".join(value[0])
@@ -218,7 +241,7 @@ class if_statement_collapser(temperature_simplifier):
 				outstr = self.get_clean_string(next_str, powers)
 				outstr = "    {} {}= ".format(variable, "+" if i > 0 else "") + outstr + ";\n"
 				outstr += "  }\n"
-				outlines.append(outstr)
+				outlines.append(self.__unsub(outstr))
 				i += 1
 			elif self.lang == "cuda":
 				outstr = " (T {} {}) * ".format(key[1], key[0])
@@ -239,7 +262,7 @@ class if_statement_collapser(temperature_simplifier):
 				outstr += self.get_clean_string(next_str, powers)
 				
 				outstr += ";\n"
-				outlines.append(outstr)
+				outlines.append(self.__unsub(outstr))
 			else:
 				raise Exception("unknown lang")
 
@@ -333,14 +356,13 @@ class if_statement_collapser(temperature_simplifier):
 with open("src/methane/jacob.c") as infile:
 	lines = infile.readlines()
 
-#c = repeated_simplifier("jac", ["fwd_rxn_rates", "rev_rxn_rates", "pres_mod", "conc", "\\by", "sp_rates"])
+powers = []
+#c = jacob_simplifier("jac", ["fwd_rxn_rates", "rev_rxn_rates", "pres_mod", "conc", "\\by", "sp_rates"], ["mw_avg", "rho"])
 #outlines, powers = c.reduce(lines)
-c = if_statement_collapser([("Kc", "exp\\(Kc\\)"), ("jac[0]", "jac[0]\s*\*=")])
-outlines, powers = c.reduce(lines)
-with open("src/methane/new_jacob.c", "w+") as outfile:
-	outfile.writelines(outlines)
-sys.exit(1)
-c = if_statement_collapser("jac[0]", "jac[0]\s*\*=")
+c = if_statement_collapser([("Kc", "exp\\(Kc\\)"), ("jac\\[0\\]", "jac\\[0\\]\\s*\\*=")], ["y"])
+outlines, p1 = c.reduce(lines)
+powers = sorted(list(set(powers + p1)))
+c = temperature_simplifier("dBdT_\\d+", "(\\s*dBdT_\\d+\\s*=)(.*\\bT.*);", ";\n")
 outlines, p1 = c.reduce(outlines)
 powers = sorted(list(set(powers + p1)))
 outlines = write_powers("mw_avg", outlines, powers)
