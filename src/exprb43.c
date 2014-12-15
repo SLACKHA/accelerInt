@@ -735,7 +735,7 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NN + i] - 48.0 * savedActions[2 * NN + i] + -2.0 * savedActions[3 * NN + i] + 12.0 * savedActions[4 * NN + i];
 				//error vec
-				temp[i] = y[i] + 16.0 * savedActions[NN + i] - 2.0 * savedActions[3 * NN + i];
+				temp[i] = y[i] + savedActions[i] + 16.0 * savedActions[NN + i] - 2.0 * savedActions[3 * NN + i];
 			}
 
 
@@ -747,7 +747,7 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 			h_new = pow(err, -1.0 / ORD);	
 
 			#ifdef LOG_KRYLOV_AND_STEPSIZES
-				fprintf (logFile, "%e\t%e\t%e\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+				fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
 	  		#endif
 			
 			if (err <= ONE) {
