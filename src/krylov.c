@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "header.h"
 #include "derivs.h"
