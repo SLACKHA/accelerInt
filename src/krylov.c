@@ -461,6 +461,11 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 	  FILE *logFile;
 	  //open and clear
 	  logFile = fopen("log.txt", "a");
+
+	  //file for reject logging
+	  FILE *rFile;
+	  //open and clear
+	  rFile = fopen("reject.txt", "a");
   	#endif
 	
 	int small_count = 0, mu_count = 0;
@@ -586,7 +591,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 				y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
 			}
 			
-			scale (y, y1, sc);	
+			scale (y, y1, f_temp);	
 			
 			///////////////////
 			// calculate errors
@@ -597,7 +602,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 			for (uint i = 0; i < NN; ++i) {
 				temp[i] = k3[i] - (2.0 / 3.0) * k5[i] + 0.5 * (k6[i] + k7[i] - k4[i]) - (y1[i] - y[i]) / h;
 			}	
-			err = h * sc_norm(temp, sc);
+			err = h * sc_norm(temp, f_temp);
 			
 			// error of embedded W method
 			#pragma unroll
@@ -605,50 +610,18 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 				temp[i] = -k1[i] + 2.0 * k2[i] - k4[i] + k7[i] - (y1[i] - y[i]) / h;
 			}
 			//Real err_W = h * sc_norm(temp, sc);
-			err = fmax(EPS, fmin(err, h * sc_norm(temp, sc)));
+			err = fmax(EPS, fmin(err, h * sc_norm(temp, f_temp)));
 			
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
-
-			//take care of h_kry updating
-
-			/*
-			Real temp_kry = 0;
-			//m < mu step
-			if (m < M_u)
-				mu_count++;
-			else
-				mu_count = 0;
-			if (mu_count > 1)
-			{
-				temp_kry = h * pow(((Real)M_opt) / ((Real)m), 1.0 / 3.0);
-			}
-
-			//m small step
-			if (m < 4)
-				small_count++;
-			else
-				small_count = 0;
-			if (small_count > 1)
-			{
-				temp_kry = fmax(temp_kry, (1 << (small_count - 1)) * h);
-			}
-
-			if (temp_kry == 0)
-				temp_kry = h_kry;
-
-			if (!h_change)
-				h_kry = temp_kry;
-			else
-			{
-				h_kry = fmin(h_kry, temp_kry);
-			}*/
-
-			#ifdef LOG_KRYLOV_AND_STEPSIZES
-				fprintf (logFile, "%e\t%e\t%e\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
-	  		#endif
 			
 			if (err <= ONE) {
+
+				#ifdef LOG_KRYLOV_AND_STEPSIZES
+					fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+	  			#endif
+
+				memcpy(sc, f_temp, NN * sizeof(Real));
 				
 				// minimum of classical and Gustafsson step size prediction
 				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
@@ -680,6 +653,10 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 							
 			} else {
 
+				#ifdef LOG_KRYLOV_AND_STEPSIZES
+					fprintf (rFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+	  			#endif
+
 				// limit to 0.2 <= (h_new/8) <= 8.0
 				h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 				h_new = fmin(h_new, h_max);
@@ -696,6 +673,7 @@ void exp4_krylov_int (const Real t_start, const Real t_end, const Real pr, Real*
 
 	#ifdef LOG_KRYLOV_AND_STEPSIZES
 		fclose(logFile);
+		fclose(rFile);
 	#endif
 	
 }

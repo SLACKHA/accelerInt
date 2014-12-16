@@ -300,6 +300,11 @@ int main (int argc, char *argv[]) {
 	  //open and clear
 	  logFile = fopen("log.txt", "w");
 	  fclose(logFile);
+
+	  
+	  //file for reject logging
+	  logFile = fopen("reject.txt", "w");
+	  fclose(logFile);
   #endif
   
 	//////////////////////////////

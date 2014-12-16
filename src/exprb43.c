@@ -78,6 +78,7 @@ static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42,
 #define M_MAX 20
 //max size of arrays
 #define STRIDE (M_MAX + P)
+
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR
 
@@ -611,6 +612,11 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 	  FILE *logFile;
 	  //open and clear
 	  logFile = fopen("log.txt", "a");
+
+	  //file for krylov logging
+	  FILE *rFile;
+	  //open and clear
+	  rFile = fopen("reject.txt", "a");
   	#endif
 
 	Real beta = 0;
@@ -735,22 +741,24 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NN + i] - 48.0 * savedActions[2 * NN + i] + -2.0 * savedActions[3 * NN + i] + 12.0 * savedActions[4 * NN + i];
 				//error vec
-				temp[i] = -48.0 * savedActions[2 * NN + i] + 12.0 * savedActions[4 * NN + i];
+				temp[i] = (y[i] - y1[i]) + savedActions[i] + 16.0 * savedActions[NN + i] - 2.0 * savedActions[3 * NN + i];
 			}
 
 
 			//scale and find err
-			scale (y, y1, sc);
-			err = fmax(EPS, h * sc_norm(temp, sc));
+			scale (y, y1, f_temp);
+			err = fmax(EPS, sc_norm(temp, f_temp));
 			
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
-
-			#ifdef LOG_KRYLOV_AND_STEPSIZES
-				fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
-	  		#endif
 			
 			if (err <= ONE) {
+
+				#ifdef LOG_KRYLOV_AND_STEPSIZES
+					fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+	  			#endif
+
+				memcpy(sc, f_temp, NN * sizeof(Real));
 				
 				// minimum of classical and Gustafsson step size prediction
 				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
@@ -780,6 +788,10 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 							
 			} else {
 
+				#ifdef LOG_KRYLOV_AND_STEPSIZES
+					fprintf (rFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+	  			#endif
+
 				// limit to 0.2 <= (h_new/8) <= 8.0
 				h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 				h_new = fmin(h_new, h_max);
@@ -793,6 +805,7 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 
 	#ifdef LOG_KRYLOV_AND_STEPSIZES
 		fclose(logFile);
+		fclose(rFile);
 	#endif
 	
 }

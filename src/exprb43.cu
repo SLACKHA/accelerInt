@@ -649,12 +649,14 @@ __device__ void exprb43_int (const Real t_start, const Real t_end, const Real pr
 
 			//scale and find err
 			scale (y, y1, sc);
-			err = fmax(EPS, h * sc_norm(temp, sc));
+			err = fmax(EPS, sc_norm(temp, f_temp));
 			
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
 			
 			if (err <= ONE) {
+
+				memcpy(sc, f_temp, NN * sizeof(Real));
 				
 				// minimum of classical and Gustafsson step size prediction
 				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
