@@ -741,7 +741,7 @@ void exprb43_int (const Real t_start, const Real t_end, const Real pr, Real* y) 
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NN + i] - 48.0 * savedActions[2 * NN + i] + -2.0 * savedActions[3 * NN + i] + 12.0 * savedActions[4 * NN + i];
 				//error vec
-				temp[i] = (y[i] - y1[i]) + savedActions[i] + 16.0 * savedActions[NN + i] - 2.0 * savedActions[3 * NN + i];
+				temp[i] = 48.0 * savedActions[2 * NN + i] - 12.0 * savedActions[4 * NN + i];
 			}
 
 
