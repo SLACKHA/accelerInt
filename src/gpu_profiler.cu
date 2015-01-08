@@ -33,7 +33,7 @@
 
 // load same initial conditions for all threads
 #define SAME_IC
-#define REPEATS 1
+#define REPEATS 100
 
 // shuffle initial conditions randomly
 //#define SHUFFLE
@@ -59,6 +59,9 @@ bool errorCheck (cudaError_t status) {
     return true;
 }
 
+#define LOW_T 1000
+#define HI_T 2000
+
 void populate(int NUM, Real pres, Real* y, Real* conc_arrays)
 {
 	// mass-averaged density
@@ -77,69 +80,129 @@ void populate(int NUM, Real pres, Real* y, Real* conc_arrays)
 	  + (y[45] / 43.02522) + (y[46] / 43.02522) + (y[47] / 42.01725) + (y[48] / 28.0134)
 	  + (y[49] / 39.948) + (y[50] / 43.08924) + (y[51] / 44.09721) + (y[52] / 43.04561)
 	  + (y[53] / 44.05358);
-	rho = pres / (8.31451000e+07 * y[0] * rho);
+	rho = pres / (8.31451000e+07 * LOW_T * rho);
 
 	// species molar concentrations
-	Real conc[53];
-	conc[0] = rho * y[1] / 2.01594;
-	conc[1] = rho * y[2] / 1.00797;
-	conc[2] = rho * y[3] / 15.9994;
-	conc[3] = rho * y[4] / 31.9988;
-	conc[4] = rho * y[5] / 17.00737;
-	conc[5] = rho * y[6] / 18.01534;
-	conc[6] = rho * y[7] / 33.00677;
-	conc[7] = rho * y[8] / 34.01474;
-	conc[8] = rho * y[9] / 12.01115;
-	conc[9] = rho * y[10] / 13.01912;
-	conc[10] = rho * y[11] / 14.02709;
-	conc[11] = rho * y[12] / 14.02709;
-	conc[12] = rho * y[13] / 15.03506;
-	conc[13] = rho * y[14] / 16.04303;
-	conc[14] = rho * y[15] / 28.01055;
-	conc[15] = rho * y[16] / 44.00995;
-	conc[16] = rho * y[17] / 29.01852;
-	conc[17] = rho * y[18] / 30.02649;
-	conc[18] = rho * y[19] / 31.03446;
-	conc[19] = rho * y[20] / 31.03446;
-	conc[20] = rho * y[21] / 32.04243;
-	conc[21] = rho * y[22] / 25.03027;
-	conc[22] = rho * y[23] / 26.03824;
-	conc[23] = rho * y[24] / 27.04621;
-	conc[24] = rho * y[25] / 28.05418;
-	conc[25] = rho * y[26] / 29.06215;
-	conc[26] = rho * y[27] / 30.07012;
-	conc[27] = rho * y[28] / 41.02967;
-	conc[28] = rho * y[29] / 42.03764;
-	conc[29] = rho * y[30] / 42.03764;
-	conc[30] = rho * y[31] / 14.0067;
-	conc[31] = rho * y[32] / 15.01467;
-	conc[32] = rho * y[33] / 16.02264;
-	conc[33] = rho * y[34] / 17.03061;
-	conc[34] = rho * y[35] / 29.02137;
-	conc[35] = rho * y[36] / 30.0061;
-	conc[36] = rho * y[37] / 46.0055;
-	conc[37] = rho * y[38] / 44.0128;
-	conc[38] = rho * y[39] / 31.01407;
-	conc[39] = rho * y[40] / 26.01785;
-	conc[40] = rho * y[41] / 27.02582;
-	conc[41] = rho * y[42] / 28.03379;
-	conc[42] = rho * y[43] / 41.03252;
-	conc[43] = rho * y[44] / 43.02522;
-	conc[44] = rho * y[45] / 43.02522;
-	conc[45] = rho * y[46] / 43.02522;
-	conc[46] = rho * y[47] / 42.01725;
-	conc[47] = rho * y[48] / 28.0134;
-	conc[48] = rho * y[49] / 39.948;
-	conc[49] = rho * y[50] / 43.08924;
-	conc[50] = rho * y[51] / 44.09721;
-	conc[51] = rho * y[52] / 43.04561;
-	conc[52] = rho * y[53] / 44.05358;
+	Real conc1[53];
+	conc1[0] = rho * y[1] / 2.01594;
+	conc1[1] = rho * y[2] / 1.00797;
+	conc1[2] = rho * y[3] / 15.9994;
+	conc1[3] = rho * y[4] / 31.9988;
+	conc1[4] = rho * y[5] / 17.00737;
+	conc1[5] = rho * y[6] / 18.01534;
+	conc1[6] = rho * y[7] / 33.00677;
+	conc1[7] = rho * y[8] / 34.01474;
+	conc1[8] = rho * y[9] / 12.01115;
+	conc1[9] = rho * y[10] / 13.01912;
+	conc1[10] = rho * y[11] / 14.02709;
+	conc1[11] = rho * y[12] / 14.02709;
+	conc1[12] = rho * y[13] / 15.03506;
+	conc1[13] = rho * y[14] / 16.04303;
+	conc1[14] = rho * y[15] / 28.01055;
+	conc1[15] = rho * y[16] / 44.00995;
+	conc1[16] = rho * y[17] / 29.01852;
+	conc1[17] = rho * y[18] / 30.02649;
+	conc1[18] = rho * y[19] / 31.03446;
+	conc1[19] = rho * y[20] / 31.03446;
+	conc1[20] = rho * y[21] / 32.04243;
+	conc1[21] = rho * y[22] / 25.03027;
+	conc1[22] = rho * y[23] / 26.03824;
+	conc1[23] = rho * y[24] / 27.04621;
+	conc1[24] = rho * y[25] / 28.05418;
+	conc1[25] = rho * y[26] / 29.06215;
+	conc1[26] = rho * y[27] / 30.07012;
+	conc1[27] = rho * y[28] / 41.02967;
+	conc1[28] = rho * y[29] / 42.03764;
+	conc1[29] = rho * y[30] / 42.03764;
+	conc1[30] = rho * y[31] / 14.0067;
+	conc1[31] = rho * y[32] / 15.01467;
+	conc1[32] = rho * y[33] / 16.02264;
+	conc1[33] = rho * y[34] / 17.03061;
+	conc1[34] = rho * y[35] / 29.02137;
+	conc1[35] = rho * y[36] / 30.0061;
+	conc1[36] = rho * y[37] / 46.0055;
+	conc1[37] = rho * y[38] / 44.0128;
+	conc1[38] = rho * y[39] / 31.01407;
+	conc1[39] = rho * y[40] / 26.01785;
+	conc1[40] = rho * y[41] / 27.02582;
+	conc1[41] = rho * y[42] / 28.03379;
+	conc1[42] = rho * y[43] / 41.03252;
+	conc1[43] = rho * y[44] / 43.02522;
+	conc1[44] = rho * y[45] / 43.02522;
+	conc1[45] = rho * y[46] / 43.02522;
+	conc1[46] = rho * y[47] / 42.01725;
+	conc1[47] = rho * y[48] / 28.0134;
+	conc1[48] = rho * y[49] / 39.948;
+	conc1[49] = rho * y[50] / 43.08924;
+	conc1[50] = rho * y[51] / 44.09721;
+	conc1[51] = rho * y[52] / 43.04561;
+	conc1[52] = rho * y[53] / 44.05358;
+
+	rho = pres / (8.31451000e+07 * HI_T * rho);
+
+	Real conc2[53];
+	conc2[0] = rho * y[1] / 2.01594;
+	conc2[1] = rho * y[2] / 1.00797;
+	conc2[2] = rho * y[3] / 15.9994;
+	conc2[3] = rho * y[4] / 31.9988;
+	conc2[4] = rho * y[5] / 17.00737;
+	conc2[5] = rho * y[6] / 18.01534;
+	conc2[6] = rho * y[7] / 33.00677;
+	conc2[7] = rho * y[8] / 34.01474;
+	conc2[8] = rho * y[9] / 12.01115;
+	conc2[9] = rho * y[10] / 13.01912;
+	conc2[10] = rho * y[11] / 14.02709;
+	conc2[11] = rho * y[12] / 14.02709;
+	conc2[12] = rho * y[13] / 15.03506;
+	conc2[13] = rho * y[14] / 16.04303;
+	conc2[14] = rho * y[15] / 28.01055;
+	conc2[15] = rho * y[16] / 44.00995;
+	conc2[16] = rho * y[17] / 29.01852;
+	conc2[17] = rho * y[18] / 30.02649;
+	conc2[18] = rho * y[19] / 31.03446;
+	conc2[19] = rho * y[20] / 31.03446;
+	conc2[20] = rho * y[21] / 32.04243;
+	conc2[21] = rho * y[22] / 25.03027;
+	conc2[22] = rho * y[23] / 26.03824;
+	conc2[23] = rho * y[24] / 27.04621;
+	conc2[24] = rho * y[25] / 28.05418;
+	conc2[25] = rho * y[26] / 29.06215;
+	conc2[26] = rho * y[27] / 30.07012;
+	conc2[27] = rho * y[28] / 41.02967;
+	conc2[28] = rho * y[29] / 42.03764;
+	conc2[29] = rho * y[30] / 42.03764;
+	conc2[30] = rho * y[31] / 14.0067;
+	conc2[31] = rho * y[32] / 15.01467;
+	conc2[32] = rho * y[33] / 16.02264;
+	conc2[33] = rho * y[34] / 17.03061;
+	conc2[34] = rho * y[35] / 29.02137;
+	conc2[35] = rho * y[36] / 30.0061;
+	conc2[36] = rho * y[37] / 46.0055;
+	conc2[37] = rho * y[38] / 44.0128;
+	conc2[38] = rho * y[39] / 31.01407;
+	conc2[39] = rho * y[40] / 26.01785;
+	conc2[40] = rho * y[41] / 27.02582;
+	conc2[41] = rho * y[42] / 28.03379;
+	conc2[42] = rho * y[43] / 41.03252;
+	conc2[43] = rho * y[44] / 43.02522;
+	conc2[44] = rho * y[45] / 43.02522;
+	conc2[45] = rho * y[46] / 43.02522;
+	conc2[46] = rho * y[47] / 42.01725;
+	conc2[47] = rho * y[48] / 28.0134;
+	conc2[48] = rho * y[49] / 39.948;
+	conc2[49] = rho * y[50] / 43.08924;
+	conc2[50] = rho * y[51] / 44.09721;
+	conc2[51] = rho * y[52] / 43.04561;
+	conc2[52] = rho * y[53] / 44.05358;
 
   	for(int j = 0; j < NSP; j++)
   	{
 		for (int i = 0; i < NUM; i++)
 		{
-			conc_arrays[i + j * NUM] = conc[j];
+			if (i % 2 == 0)
+				conc_arrays[i + j * NUM] = conc1[j];
+			else
+				conc_arrays[i + j * NUM] = conc2[j];
   		}
 	}
 }
@@ -287,7 +350,7 @@ int main (int argc, char *argv[]) {
   	//come up with a random state
   	for (int i = 1; i < NN; i++)
   	{
-  		Real r = getRand();
+  		Real r = 1;
   		sum += r * r;
   		y_dummy[i] = r;
   	}
@@ -297,13 +360,15 @@ int main (int argc, char *argv[]) {
   	{
   		y_dummy[i] /= sum;
   	}
-  	Real T = 1200;
-  	y_dummy[0] = T;
+  	y_dummy[0] = LOW_T;
   	Real P = 101325;
   	for (int j = 0; j < NUM; j++)
   	{
   		pres_host[j] = P;
-  		T_host[j] = T;
+  		if (j % 2 == 0)
+  			T_host[j] = LOW_T;
+  		else
+  			T_host[j] = HI_T;
   	}
 
   	populate(NUM, P, y_dummy, conc_host);
@@ -333,6 +398,9 @@ int main (int argc, char *argv[]) {
 		}
 		checkCudaErrors (cudaGetDeviceProperties(&devProp, id));
 	}
+
+	//bump up shared mem bank size
+	errorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
   
   	// initialize GPU
 
