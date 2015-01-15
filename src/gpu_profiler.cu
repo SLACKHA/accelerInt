@@ -22,7 +22,7 @@
 #include <cuComplex.h>
 
 #include "header.h"
-#include "exprb43.cuh"
+//#include "exprb43.cuh"
 #include "mass_mole.h"
 #include "timer.h"
 
@@ -34,6 +34,10 @@
 // load same initial conditions for all threads
 #define SAME_IC
 #define REPEATS 100
+#define BLOCK_SIZE 64
+#define LOW_T 1000
+#define HI_T 2000
+#define GLOBAL_MEM
 
 // shuffle initial conditions randomly
 //#define SHUFFLE
@@ -54,15 +58,15 @@ static inline double getRand()
 bool errorCheck (cudaError_t status) {
     if (status != cudaSuccess) {
         printf ("%s\n", cudaGetErrorString(status));
+        exit(-1);
         return false;
     }
     return true;
 }
 
-#define LOW_T 1000
-#define HI_T 2000
+  /* Block size */
 
-void populate(int NUM, Real pres, Real* y, Real* conc_arrays)
+void populate(int NUM, int padded_size, Real pres, Real* y, Real* conc_arrays)
 {
 	// mass-averaged density
 	Real rho;
@@ -200,9 +204,9 @@ void populate(int NUM, Real pres, Real* y, Real* conc_arrays)
 		for (int i = 0; i < NUM; i++)
 		{
 			if (i % 2 == 0)
-				conc_arrays[i + j * NUM] = conc1[j];
+				conc_arrays[i + j * padded_size] = conc1[j];
 			else
-				conc_arrays[i + j * NUM] = conc2[j];
+				conc_arrays[i + j * padded_size] = conc2[j];
   		}
 	}
 }
@@ -210,7 +214,7 @@ void populate(int NUM, Real pres, Real* y, Real* conc_arrays)
 #define tid (threadIdx.x + (blockDim.x * blockIdx.x))
 __global__
 void rxnrates_driver (const int NUM, const Real* T_global, const Real* conc, Real* fwd_rates, Real* rev_rates) {
-
+#ifndef GLOBAL_MEM
 	Real local_fwd_rates[FWD_RATES];
 	Real local_rev_rates[REV_RATES];
 	// local array with initial values
@@ -241,11 +245,21 @@ void rxnrates_driver (const int NUM, const Real* T_global, const Real* conc, Rea
 	{
 		rev_rates[tid + i * NUM] = local_rev_rates[i];
 	}
+#else
+	#pragma unroll
+	for (int repeat = 0; repeat < REPEATS; repeat++)
+	{
+		if (tid < NUM)
+		{
+			eval_rxn_rates (T_global[tid], conc, fwd_rates, rev_rates);
+		}
+	}
+#endif
 }
 
 __global__
 void presmod_driver (const int NUM, const Real* T_global, const Real* pr_global, const Real* conc, Real* pres_mod) {
-
+#ifndef GLOBAL_MEM
 	Real local_pres_mod[PRES_MOD_RATES];
 	// local array with initial values
 	Real local_conc[NSP];
@@ -270,11 +284,21 @@ void presmod_driver (const int NUM, const Real* T_global, const Real* pr_global,
 	{
 		pres_mod[tid + i * NUM] = local_pres_mod[i];
 	}
+#else
+	#pragma unroll
+	for (int repeat = 0; repeat < REPEATS; repeat++)
+	{
+		if (tid < NUM)
+		{
+			get_rxn_pres_mod (T_global[tid], pr_global[tid], conc, pres_mod);
+		}
+	}
+#endif
 }
 
 __global__
 void specrates_driver (const int NUM, const Real* fwd_rates, const Real* rev_rates, const Real* pres_mod, Real* spec_rates) {
-
+#ifndef GLOBAL_MEM
 	Real local_fwd_rates[FWD_RATES];
 	Real local_rev_rates[REV_RATES];
 	Real local_pres_mod[PRES_MOD_RATES];
@@ -310,12 +334,22 @@ void specrates_driver (const int NUM, const Real* fwd_rates, const Real* rev_rat
 	{
 		spec_rates[tid + i * NUM] = local_spec_rates[i];
 	}
+#else
+	#pragma unroll
+	for (int repeat = 0; repeat < REPEATS; repeat++)
+	{
+		if (tid < NUM)
+		{
+			eval_spec_rates (fwd_rates, rev_rates, pres_mod, spec_rates);
+		}
+	}
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
 int main (int argc, char *argv[]) {
 
-  int NUM = 16384;
+  int NUM = 1024;
   srand(1);
 
   // check for problem size given as command line option
@@ -328,22 +362,37 @@ int main (int argc, char *argv[]) {
     }
     NUM = problemsize;
   }
-  
-  /* Block size */
-  int BLOCK_SIZE = 128;
-	
-	/////////////////////////////////////////////////
-	// arrays
+
+	// block and grid dimensions
+	dim3 dimBlock ( BLOCK_SIZE, 1 );
+	#ifdef QUEUE
+	dim3 dimGrid ( numSM, 1 );
+	#else
+	int g_num = NUM / BLOCK_SIZE;
+	if (g_num == 0)
+		g_num = 1;
+	dim3 dimGrid ( g_num, 1 );
+	#endif
+
+	int padded_size = max(NUM, g_num * BLOCK_SIZE);
 
 	// size of data array in bytes
-	size_t size = NUM * sizeof(Real);
+	size_t size = padded_size * sizeof(Real);
 
 	//temperature array
 	Real* T_host = (Real *) malloc (size);
 	// pressure/volume arrays
 	Real* pres_host = (Real *) malloc (size);
 	// conc array
-	Real* conc_host = (Real *) malloc (NUM * NSP * sizeof(Real));
+	Real* conc_host = (Real *) malloc (NSP * size);
+
+#ifdef DEBUG
+	//define print arrays
+	Real* fwd_host = (Real*)malloc(FWD_RATES * size);
+	Real* rev_host = (Real*)malloc(FWD_RATES * size);
+	Real* pres_mod_host = (Real*)malloc(FWD_RATES * size);
+	Real* spec_host = (Real*)malloc(FWD_RATES * size);
+#endif
   
   	Real sum = 0;
   	Real y_dummy[NN];
@@ -371,9 +420,13 @@ int main (int argc, char *argv[]) {
   			T_host[j] = HI_T;
   	}
 
-  	populate(NUM, P, y_dummy, conc_host);
+  	populate(NUM, padded_size, P, y_dummy, conc_host);
 
-  
+  	//bump up shared mem bank size
+	errorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
+	//and L1 size
+	errorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
+
 	// set & initialize device using command line argument (if any)
 	cudaDeviceProp devProp;
 	if (argc <= 2) {
@@ -398,106 +451,93 @@ int main (int argc, char *argv[]) {
 		}
 		checkCudaErrors (cudaGetDeviceProperties(&devProp, id));
 	}
-
-	//bump up shared mem bank size
-	errorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
   
   	// initialize GPU
-
-	// block and grid dimensions
-	dim3 dimBlock ( BLOCK_SIZE, 1 );
-	#ifdef QUEUE
-	dim3 dimGrid ( numSM, 1 );
-	#else
-	int g_num = NUM / BLOCK_SIZE;
-	if (g_num == 0)
-		g_num = 1;
-	dim3 dimGrid ( g_num, 1 );
-	#endif
-  
-  	cudaError_t status = cudaSuccess;
   
 	// Allocate device memory
 	Real* T_device;
-	cudaMalloc (&T_device, size);
+	errorCheck(cudaMalloc (&T_device, size));
 	// transfer memory to GPU
-	status = cudaMemcpy (T_device, T_host, size, cudaMemcpyHostToDevice);
-	errorCheck (status);
+	errorCheck(cudaMemcpy (T_device, T_host, size, cudaMemcpyHostToDevice));
   
 	// device array for pressure or density
 	Real* pr_device;
-	cudaMalloc (&pr_device, size);
-	status = cudaMemcpy (pr_device, pres_host, size, cudaMemcpyHostToDevice);
-	errorCheck (status);
+	errorCheck(cudaMalloc (&pr_device, size));
+	errorCheck(cudaMemcpy (pr_device, pres_host, size, cudaMemcpyHostToDevice));
 
 	Real* conc_device;
 	// device array for concentrations
-	cudaMalloc (&conc_device, NSP * size);
-	status = cudaMemcpy (conc_device, conc_host, NSP * size, cudaMemcpyHostToDevice);
-  	errorCheck (status);
+	errorCheck(cudaMalloc (&conc_device, NSP * size));
+	errorCheck(cudaMemcpy (conc_device, conc_host, NSP * size, cudaMemcpyHostToDevice));
 
   	//allocate fwd and reverse rate arrays
   	Real* fwd_rates;
-  	status = cudaMalloc (&fwd_rates, FWD_RATES * NUM * sizeof(Real));
-  	errorCheck (status);
+  	errorCheck(cudaMalloc (&fwd_rates, FWD_RATES * size));
 
   	Real* rev_rates;
-  	status = cudaMalloc (&rev_rates, REV_RATES * NUM * sizeof(Real));
-  	errorCheck (status);
+  	errorCheck(cudaMalloc (&rev_rates, REV_RATES * size));
 
   	//pres_mod
   	Real* pres_mod;
-  	status = cudaMalloc (&pres_mod, PRES_MOD_RATES * NUM * sizeof(Real));
-  	errorCheck (status);
+  	errorCheck(cudaMalloc (&pres_mod, PRES_MOD_RATES * size));
 
   	//finally species rates
   	Real* spec_rates;
-  	status = cudaMalloc (&spec_rates, NSP * NUM * sizeof(Real));
-  	errorCheck (status);
-     
-
-	//////////////////////////////
-	// start timer
-	StartTimer();
+  	errorCheck(cudaMalloc (&spec_rates, NSP * size));
 	cuProfilerStart();
 	//////////////////////////////
 	rxnrates_driver <<<dimGrid, dimBlock>>> (NUM, T_device, conc_device, fwd_rates, rev_rates);
 	cuProfilerStop();
-	/////////////////////////////////
-	// end timer
-	double runtime = GetTimer();
-	/////////////////////////////////
-	printf("rxnrates: %le ms\n", runtime);
+#ifdef DEBUG
+	//copy back and print
+	errorCheck(cudaMemcpy (fwd_host, fwd_rates, FWD_RATES * size, cudaMemcpyDeviceToHost));
+	printf("FWD_RATES:\n");
+	for (int i = 0; i < FWD_RATES; i++)
+		printf("%e\n", fwd_host[i * padded_size]);
 
-	//////////////////////////////
-	// start timer
-	StartTimer();
+	errorCheck(cudaMemcpy (rev_host, rev_rates, REV_RATES * size, cudaMemcpyDeviceToHost));
+	printf("REV_RATES:\n");
+	for (int i = 0; i < REV_RATES; i++)
+		printf("%e\n", rev_host[i * padded_size]);
+#endif
+	/////////////////////////////////
+
 	cuProfilerStart();
 	//////////////////////////////
 	presmod_driver <<<dimGrid, dimBlock>>> (NUM, T_device, pr_device, conc_device, pres_mod);
 	cuProfilerStop();
+#ifdef DEBUG
+	//copy back and print
+	errorCheck(cudaMemcpy (pres_mod_host, pres_mod, PRES_MOD_RATES * size, cudaMemcpyDeviceToHost));
+	printf("PRES_MOD:\n");
+	for (int i = 0; i < PRES_MOD_RATES; i++)
+		printf("%e\n", pres_mod_host[i * padded_size]);
+#endif
 	/////////////////////////////////
-	// end timer
-	runtime = GetTimer();
-	/////////////////////////////////
-	printf("pres_mod: %le ms\n", runtime);
 
-	//////////////////////////////
-	// start timer
-	StartTimer();
 	cuProfilerStart();
 	//////////////////////////////
 	specrates_driver <<<dimGrid, dimBlock>>> (NUM, fwd_rates, rev_rates, pres_mod, spec_rates);
 	cuProfilerStop();
+#ifdef DEBUG
+	//copy back and print
+	errorCheck(cudaMemcpy (spec_host, spec_rates, NSP * size, cudaMemcpyDeviceToHost));
+	printf("SPEC_RATES:\n");
+	for (int i = 0; i < NSP; i++)
+		printf("%e\n", spec_host[i * padded_size]);
+#endif
 	/////////////////////////////////
-	// end timer
-	runtime = GetTimer();
-	/////////////////////////////////
-	printf("spec_rates: %le ms\n", runtime);
   
   free (T_host);
   free (pres_host);
   free (conc_host);
+#ifdef DEBUG
+  //define print arrays
+  free(fwd_host);
+  free(rev_host);
+  free(pres_mod_host);
+  free(spec_host);
+#endif
   
   cudaFree (T_device);
   cudaFree (pr_device);
@@ -507,8 +547,7 @@ int main (int argc, char *argv[]) {
   cudaFree (pres_mod);
   cudaFree (spec_rates);
   
-  status = cudaDeviceReset();
-  errorCheck (status);
+  errorCheck(cudaDeviceReset());
 	
 	return 0;
 }
