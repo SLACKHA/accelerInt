@@ -19,6 +19,13 @@ NLINK = $(NCC) -Wl,--no-undefined -fPIC -Xlinker -rpath $(CUDA_PATH)/lib64
 ODIR = ./obj
 SDIR = ./src
 
+#turn on line and spilling info
+ifndef CUDA_PROFILER
+  CUDA_PROFILER = 0
+endif
+ifeq ("$(CUDA_PROFILER)", "4")
+  L = 4
+endif
 #FLAGS, L=0 for testing, L=4 for optimization
 ifndef L
   L = 4
@@ -59,7 +66,7 @@ _OBJ_RB43 = main_rb43.o phiAHessenberg.o cf.o exprb43.o linear-algebra.o complex
 OBJ_RB43 = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43))
 
 _OBJ_RB43_GPU = main_rb43.cu.o phiAHessenberg.cu.o cf.o exprb43.cu.o linear-algebra.o complexInverse.cu.o \
-       dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
+       dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
        rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
 OBJ_RB43_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43_GPU))
 
@@ -69,8 +76,8 @@ _OBJ_KRYLOV_GPU = main_krylov.cu.o phiAHessenberg.cu.o cf.o krylov.cu.o linear-a
 OBJ_KRYLOV_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV_GPU))
 
 _OBJ_GPU_PROFILER = gpu_profiler.cu.o linear-algebra.o complexInverse.cu.o \
-       dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
-       rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
+       chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
+       rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o rate_gen.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o
 OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU_PROFILER))
 
 _OBJ_TEST = unit_tests.o complexInverse.o phiA.o phiAHessenberg.o cf.o linear-algebra.o krylov.o\
@@ -86,19 +93,31 @@ LIBS = -lm -lfftw3 -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc+
 #flags
 #ifeq ("$(CC)", "gcc")
   
-ifeq ("$(L)", "0")
+ifeq ($(L), 0)
   FLAGS = -O0 -g3 -fbounds-check -Wunused-variable -Wunused-parameter \
-	        -Wall -ftree-vrp -std=c99 -fopenmp -DDEBUG
+  	  -Wall -ftree-vrp -std=c99 -fopenmp -DDEBUG
   NVCCFLAGS = -g -G -arch=sm_20 -m64 -DDEBUG
-else ifeq ("$(L)", "4")
+else ifeq ($(L), 4)
   FLAGS = -O3 -std=c99 -fopenmp -funroll-loops
   NVCCFLAGS = -O3 -arch=sm_20 -m64
 endif
+ifeq ($(L), 4)
+  ifeq ("$(CC)", "gcc")
+    FLAGS += -mtune=native
+  endif
+endif
 
-ifeq ("$(USE_LAPACK)", "4")
+NVCCFLAGS += --ftz=false --prec-div=true --prec-sqrt=true
+# --fmad=false
+
+ifeq ($(CUDA_PROFILER), 4)
+  NVCCFLAGS += -Xnvlink -v --ptxas-options=-v -lineinfo -g --keep-dir=keepfiles/
+endif
+
+ifeq ($(USE_LAPACK), 4)
   FLAGS += -DSUNDIALS_USE_LAPACK -I${MKLROOT}/include
   CV_LIBS = -L${MKLROOT}/lib/intel64/ -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_gnu_thread -ldl -lpthread -lmkl_mc -lmkl_def
-else ifeq ("$(USE_LAPACK)", "2")
+else ifeq ($(USE_LAPACK), 2)
   FLAGS += -DSUNDIALS_USE_LAPACK
   CV_LIBS = -L/usr/local/lib -llapack -lblas
 endif
@@ -116,30 +135,32 @@ $(ODIR):
 
 all: exp-int exp-int-gpu exp-int-cvodes exp-int-krylov exp-int-krylov-gpu tests
 
+print-%  : ; @echo $* = $($*)
+
 exp-int : $(OBJ)
-	$(LINK) $(OBJ) $(LIBS) -llapack $(FLAGS) -o $@
+	$(LINK) $(OBJ) $(LIBS) $(FLAGS) -o $@
 
 exp-int-krylov : $(OBJ_KRYLOV)
-	$(LINK) $(OBJ_KRYLOV) $(LIBS) -llapack $(FLAGS) -o $@
+	$(LINK) $(OBJ_KRYLOV) $(LIBS) $(FLAGS) -o $@
 
 exp-int-rb43 : $(OBJ_RB43)
-	$(LINK) $(OBJ_RB43) $(LIBS) -llapack $(FLAGS) -o $@
+	$(LINK) $(OBJ_RB43) $(LIBS) $(FLAGS) -o $@
 
 exp-int-rb43-gpu : $(OBJ_RB43_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU) $(LIBS) -llapack $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_RB43_GPU) dlink.o $(LIBS) -llapack $(FLAGS) -o $@
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_RB43_GPU) dlink.o $(LIBS) $(FLAGS) -o $@
 
 exp-int-gpu : $(OBJ_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU) $(LIBS) -llapack $(NVCCFLAGS) -dlink -o dlink.o
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_GPU) dlink.o $(LIBS) -llapack $(FLAGS) -o $@
 
 gpu-profiler : $(OBJ_GPU_PROFILER)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_PROFILER) $(LIBS) -llapack $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_GPU_PROFILER) dlink.o $(LIBS) -llapack $(FLAGS) -o $@
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_PROFILER) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_GPU_PROFILER) dlink.o $(LIBS) $(FLAGS) -o $@
 
 exp-int-krylov-gpu : $(OBJ_KRYLOV_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_KRYLOV_GPU) $(LIBS) -llapack $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_KRYLOV_GPU) dlink.o $(LIBS) -llapack $(FLAGS) -o $@
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_KRYLOV_GPU) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_KRYLOV_GPU) dlink.o $(LIBS) $(FLAGS) -o $@
 
 exp-int-cvodes : $(OBJ_CVODES)
 	$(LINK) $(OBJ_CVODES) $(LIBS) $(CV_LIBS) $(FLAGS) -o $@
