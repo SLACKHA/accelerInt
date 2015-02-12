@@ -27,6 +27,7 @@
 #include "timer.h"
 
 #include "rates.cuh"
+#include "rate_gen.h"
 
 #include "cuda_profiler_api.h"
 #include "cudaProfiler.h"
@@ -388,10 +389,11 @@ int main (int argc, char *argv[]) {
 
 #ifdef DEBUG
 	//define print arrays
-	Real* fwd_host = (Real*)malloc(FWD_RATES * size);
-	Real* rev_host = (Real*)malloc(FWD_RATES * size);
-	Real* pres_mod_host = (Real*)malloc(FWD_RATES * size);
-	Real* spec_host = (Real*)malloc(FWD_RATES * size);
+	Real* fwd_host, *rev_host, *pres_mod_host, *spec_host;
+	fwd_host = (Real*)malloc(FWD_RATES * size);
+	rev_host = (Real*)malloc(FWD_RATES * size);
+	pres_mod_host = (Real*)malloc(FWD_RATES * size);
+	spec_host = (Real*)malloc(FWD_RATES * size);
 #endif
   
   	Real sum = 0;
@@ -421,6 +423,33 @@ int main (int argc, char *argv[]) {
   	}
 
   	populate(NUM, padded_size, P, y_dummy, conc_host);
+
+#ifdef DEBUG
+  	FILE* fp = fopen("cpu_rates.txt", "w");
+  	Real* conc_temp;
+  	//fprintf(fp, "CONC\n");
+  	conc_temp = (Real *) malloc(NSP * sizeof(Real));
+  	for (int i = 0; i < NSP; i++)
+  	{
+  		conc_temp[i] = conc_host[i * padded_size];
+  		//fprintf(fp, "%.15e\n", conc_temp[i]);
+  	}
+  	get_rates(LOW_T, P, conc_temp, fwd_host, rev_host, pres_mod_host, spec_host);
+	fprintf(fp, "FWD_RATES:\n");
+	for (int i = 0; i < FWD_RATES; i++)
+		fprintf(fp, "%.15e\n", fwd_host[i]);
+	fprintf(fp, "REV_RATES:\n");
+	for (int i = 0; i < REV_RATES; i++)
+		fprintf(fp, "%.15e\n", rev_host[i]);
+	fprintf(fp, "PRES_MOD:\n");
+	for (int i = 0; i < PRES_MOD_RATES; i++)
+		fprintf(fp, "%.15e\n", pres_mod_host[i]);
+	fprintf(fp, "SPEC_RATES:\n");
+	for (int i = 0; i < NSP; i++)
+		fprintf(fp, "%.15e\n", spec_host[i]);
+	//fclose(fp);
+	free(conc_temp);
+#endif
 
   	//bump up shared mem bank size
 	errorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
@@ -456,34 +485,34 @@ int main (int argc, char *argv[]) {
   
 	// Allocate device memory
 	Real* T_device;
-	errorCheck(cudaMalloc (&T_device, size));
+	errorCheck(cudaMalloc ((void**)&T_device, size));
 	// transfer memory to GPU
-	errorCheck(cudaMemcpy (T_device, T_host, size, cudaMemcpyHostToDevice));
+	errorCheck(cudaMemcpy ((void**)T_device, T_host, size, cudaMemcpyHostToDevice));
   
 	// device array for pressure or density
 	Real* pr_device;
-	errorCheck(cudaMalloc (&pr_device, size));
-	errorCheck(cudaMemcpy (pr_device, pres_host, size, cudaMemcpyHostToDevice));
+	errorCheck(cudaMalloc ((void**)&pr_device, size));
+	errorCheck(cudaMemcpy ((void**)pr_device, pres_host, size, cudaMemcpyHostToDevice));
 
 	Real* conc_device;
 	// device array for concentrations
-	errorCheck(cudaMalloc (&conc_device, NSP * size));
-	errorCheck(cudaMemcpy (conc_device, conc_host, NSP * size, cudaMemcpyHostToDevice));
+	errorCheck(cudaMalloc ((void**)&conc_device, NSP * size));
+	errorCheck(cudaMemcpy ((void**)conc_device, conc_host, NSP * size, cudaMemcpyHostToDevice));
 
   	//allocate fwd and reverse rate arrays
   	Real* fwd_rates;
-  	errorCheck(cudaMalloc (&fwd_rates, FWD_RATES * size));
+  	errorCheck(cudaMalloc ((void**)&fwd_rates, FWD_RATES * size));
 
   	Real* rev_rates;
-  	errorCheck(cudaMalloc (&rev_rates, REV_RATES * size));
+  	errorCheck(cudaMalloc ((void**)&rev_rates, REV_RATES * size));
 
   	//pres_mod
   	Real* pres_mod;
-  	errorCheck(cudaMalloc (&pres_mod, PRES_MOD_RATES * size));
+  	errorCheck(cudaMalloc ((void**)&pres_mod, PRES_MOD_RATES * size));
 
   	//finally species rates
   	Real* spec_rates;
-  	errorCheck(cudaMalloc (&spec_rates, NSP * size));
+  	errorCheck(cudaMalloc ((void**)&spec_rates, NSP * size));
 	cuProfilerStart();
 	//////////////////////////////
 	rxnrates_driver <<<dimGrid, dimBlock>>> (NUM, T_device, conc_device, fwd_rates, rev_rates);
@@ -493,12 +522,12 @@ int main (int argc, char *argv[]) {
 	errorCheck(cudaMemcpy (fwd_host, fwd_rates, FWD_RATES * size, cudaMemcpyDeviceToHost));
 	printf("FWD_RATES:\n");
 	for (int i = 0; i < FWD_RATES; i++)
-		printf("%e\n", fwd_host[i * padded_size]);
+		printf("%.15e\n", fwd_host[i * padded_size]);
 
 	errorCheck(cudaMemcpy (rev_host, rev_rates, REV_RATES * size, cudaMemcpyDeviceToHost));
 	printf("REV_RATES:\n");
 	for (int i = 0; i < REV_RATES; i++)
-		printf("%e\n", rev_host[i * padded_size]);
+		printf("%.15e\n", rev_host[i * padded_size]);
 #endif
 	/////////////////////////////////
 
@@ -511,7 +540,7 @@ int main (int argc, char *argv[]) {
 	errorCheck(cudaMemcpy (pres_mod_host, pres_mod, PRES_MOD_RATES * size, cudaMemcpyDeviceToHost));
 	printf("PRES_MOD:\n");
 	for (int i = 0; i < PRES_MOD_RATES; i++)
-		printf("%e\n", pres_mod_host[i * padded_size]);
+		printf("%.15e\n", pres_mod_host[i * padded_size]);
 #endif
 	/////////////////////////////////
 
@@ -524,7 +553,7 @@ int main (int argc, char *argv[]) {
 	errorCheck(cudaMemcpy (spec_host, spec_rates, NSP * size, cudaMemcpyDeviceToHost));
 	printf("SPEC_RATES:\n");
 	for (int i = 0; i < NSP; i++)
-		printf("%e\n", spec_host[i * padded_size]);
+		printf("%.15e\n", spec_host[i * padded_size]);
 #endif
 	/////////////////////////////////
   

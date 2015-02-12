@@ -215,7 +215,11 @@ int main (int argc, char *argv[])
     /////////////////////////////////////////////////////////////////////////////
 
 #ifdef SAME_IC
+#ifdef CONV
     set_same_initial_conditions(NUM, y_host, pres_host, rho_host);
+#else
+    set_same_initial_conditions(NUM, y_host, pres_host);
+#endif
 #else
     FILE *fp = fopen ("ign_data.txt", "r");
     int buff_size = 1024;
