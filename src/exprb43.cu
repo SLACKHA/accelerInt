@@ -46,7 +46,7 @@ __device__ Real arnoldi(int*, const Real, const int, const Real, const Real*, co
 //order of embedded methods
 #define ORD 3
 //indexed list
-__device__ const int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
+__constant__ int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
 #define M_u 2
 #define M_opt 8
 #define M_MAX 20

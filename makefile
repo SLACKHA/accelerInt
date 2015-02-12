@@ -41,12 +41,12 @@ INCLUDES    = -I. -I/usr/local/include/
 _DEPS = header.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
 
-_OBJ = main.o phiA.o cf.o exp4.o linear-algebra.o complexInverse.o \
+_OBJ = main.o phiA.o cf.o exp4.o complexInverse.o \
        dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
        rxn_rates_pres_mod.o mechanism.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_OBJ_GPU = main.cu.o phiA.cu.o cf.o linear-algebra.o exp4.cu.o complexInverse.cu.o \
+_OBJ_GPU = main.cu.o phiA.cu.o cf.o exp4.cu.o complexInverse.cu.o \
            dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o \
 					 spec_rates.cu.o rxn_rates_pres_mod.cu.o mechanism.o
 OBJ_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU))
@@ -55,35 +55,40 @@ _OBJ_CVODES = main_cvodes.o dydt.o chem_utils.o mass_mole.o rxn_rates.o spec_rat
               rxn_rates_pres_mod.o dydt_cvodes.o mechanism.o
 OBJ_CVODES = $(patsubst %,$(ODIR)/%,$(_OBJ_CVODES))
 
-_OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o linear-algebra.o complexInverse.o \
+_OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o complexInverse.o \
        dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
        rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
 OBJ_KRYLOV = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV))
 
-_OBJ_RB43 = main_rb43.o phiAHessenberg.o cf.o exprb43.o linear-algebra.o complexInverse.o \
+_OBJ_RB43 = main_rb43.o phiAHessenberg.o cf.o exprb43.o complexInverse.o \
        dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
        rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o inverse.o
 OBJ_RB43 = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43))
 
-_OBJ_RB43_GPU = main_rb43.cu.o phiAHessenberg.cu.o cf.o exprb43.cu.o linear-algebra.o complexInverse.cu.o \
-       dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
+_OBJ_RB43_GPU = main_rb43.cu.o phiAHessenberg.cu.o linear-algebra.o cf.o exprb43.cu.o complexInverse.cu.o \
+       dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
        rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
 OBJ_RB43_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43_GPU))
 
-_OBJ_KRYLOV_GPU = main_krylov.cu.o phiAHessenberg.cu.o cf.o krylov.cu.o linear-algebra.o complexInverse.cu.o \
+_OBJ_KRYLOV_GPU = main_krylov.cu.o phiAHessenberg.cu.o cf.o krylov.cu.o complexInverse.cu.o \
        dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
        rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
 OBJ_KRYLOV_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV_GPU))
 
-_OBJ_GPU_PROFILER = gpu_profiler.cu.o linear-algebra.o complexInverse.cu.o \
+_OBJ_GPU_PROFILER = gpu_profiler.cu.o complexInverse.cu.o \
        chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
        rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o rate_gen.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o
 OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU_PROFILER))
 
-_OBJ_TEST = unit_tests.o complexInverse.o phiA.o phiAHessenberg.o cf.o linear-algebra.o krylov.o\
+_OBJ_TEST = unit_tests.o complexInverse.o phiA.o phiAHessenberg.o cf.o krylov.o\
             dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o sparse_multiplier.o rxn_rates_pres_mod.o
-
 OBJ_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_TEST))
+
+_OBJ_RATES_TEST = mechanism.o mass_mole.o jacob.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o chem_utils.o rateOutputTest.o dydt.o
+OBJ_RATES_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_RATES_TEST))
+
+_OBJ_GPU_RATES_TEST = mechanism.cu.o mass_mole.o fd_jacob.cu.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o chem_utils.cu.o rateOutputTest.cu.o dydt.cu.o gpu_memory.cu.o
+OBJ_GPU_RATES_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_GPU_RATES_TEST))
 
 
 # Paths
@@ -121,6 +126,10 @@ else ifeq ($(USE_LAPACK), 2)
   FLAGS += -DSUNDIALS_USE_LAPACK
   CV_LIBS = -L/usr/local/lib -llapack -lblas
 endif
+
+ratestest : FLAGS += -DRATES_TEST
+
+gpuratestest : NVCCFLAGS += -DRATES_TEST
 
 $(ODIR)/%.o : $(SDIR)/%.c $(DEPS)
 	$(CC) $(FLAGS) $(INCLUDES) -c -o $@ $<
@@ -171,6 +180,13 @@ tests : $(OBJ_TEST)
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
+ratestest : $(OBJ_RATES_TEST)
+	$(LINK) -DRATES_TEST $(OBJ_RATES_TEST) $(LIBS) $(FLAGS) -o $@
+
+gpuratestest : $(OBJ_GPU_RATES_TEST)
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RATES_TEST) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_GPU_RATES_TEST) dlink.o $(LIBS) $(FLAGS) -o $@
+
 .PHONY : clean		
 clean :
-	rm -f $(OBJ) $(OBJ_GPU) $(OBJ_CVODES) $(OBJ_KRYLOV) $(OBJ_TEST) $(OBJ_KRYLOV_GPU) $(OBJ_RB43) $(OBJ_RB43_GPU) $(OBJ_GPU_PROFILER) gpu-profiler exp-int exp-int-gpu exp-int-cvodes exp-int-krylov exp-int-krylov-gpu exp-int-rb43 exp-int-rb43-gpu tests dlink.o
+	rm -f $(OBJ) $(OBJ_GPU) $(OBJ_CVODES) $(OBJ_KRYLOV) $(OBJ_TEST) $(OBJ_KRYLOV_GPU) $(OBJ_RB43) $(OBJ_RB43_GPU) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) gpu-profiler exp-int exp-int-gpu exp-int-cvodes exp-int-krylov exp-int-krylov-gpu exp-int-rb43 exp-int-rb43-gpu tests ratestest gpuratestest dlink.o

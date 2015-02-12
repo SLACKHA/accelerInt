@@ -3,9 +3,9 @@
 #include <math.h>
 #include <float.h>
 
-#define FD_ORD 6
+#define FD_ORD 2
 
-void eval_fd_jacob (const Real t, const Real pres, Real * y, Real * jac) {
+void eval_jacob (const Real t, const Real pres, Real * y, Real * jac) {
   
   Real ydot[NN];
   dydt (t, pres, y, ydot);
