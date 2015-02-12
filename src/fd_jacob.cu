@@ -4,7 +4,7 @@
 #include "dydt.cuh"
 #include "gpu_macros.cuh"
 
-#define FD_ORD 6
+#define FD_ORD 2
 
 #ifdef GLOBAL_MEM
 extern __device__ Real* dy;
