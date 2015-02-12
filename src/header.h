@@ -27,7 +27,11 @@
 //#define CONV
 
 /** Include mechanism header to get NSP and NN **/
-#include "mechanism.h"
+#ifdef __cplusplus
+  #include "mechanism.cuh"
+#else
+  #include "mechanism.h"
+#endif
 
 /** Absolute tolerance */
 #define ATOL (1.0E-15)
