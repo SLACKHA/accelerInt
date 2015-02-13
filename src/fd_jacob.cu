@@ -4,7 +4,7 @@
 #include "dydt.cuh"
 #include "gpu_macros.cuh"
 
-#define FD_ORD 2
+#define FD_ORD 1
 
 #ifdef GLOBAL_MEM
 extern __device__ Real* dy;
@@ -13,7 +13,10 @@ extern __device__ Real* f_temp;
 #endif
 
 // Finite difference coefficients
-#if FD_ORD == 2
+#if FD_ORD == 1
+  __constant__ Real x_coeffs[FD_ORD] = {1.0};
+  __constant__ Real y_coeffs[FD_ORD] = {1.0};
+#elif FD_ORD == 2
   __constant__ Real x_coeffs[FD_ORD] = {-1.0, 1.0};
   __constant__ Real y_coeffs[FD_ORD] = {-0.5, 0.5};
 #elif FD_ORD == 4
@@ -62,16 +65,26 @@ void eval_jacob (const Real t, const Real pres, Real * y, Real * jac) {
       jac[INDEX(i + NN*j)] = ZERO;
     }
     
-    #pragma unroll
-    for (uint k = 0; k < FD_ORD; ++k) {
-      y[INDEX(j)] = yj_orig + x_coeffs[k] * r;
+    #if FD_ORD == 1
+      y[INDEX(j)] = yj_orig + r;
       dydt (t, pres, y, f_temp);
-      
+        
       #pragma unroll
       for (uint i = 0; i < NN; ++i) {
-        jac[INDEX(i + NN*j)] += y_coeffs[k] * f_temp[INDEX(i)];
+        jac[INDEX(i + NN*j)] += (f_temp[INDEX(i)] - dy[INDEX(i)]);
       }
-    }
+    #else
+      #pragma unroll
+      for (uint k = 0; k < FD_ORD; ++k) {
+        y[INDEX(j)] = yj_orig + x_coeffs[k] * r;
+        dydt (t, pres, y, f_temp);
+        
+        #pragma unroll
+        for (uint i = 0; i < NN; ++i) {
+          jac[INDEX(i + NN*j)] += y_coeffs[k] * f_temp[INDEX(i)];
+        }
+      }
+    #endif
     
     #pragma unroll
     for (uint i = 0; i < NN; ++i) {
