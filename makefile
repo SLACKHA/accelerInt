@@ -75,10 +75,8 @@ _OBJ_KRYLOV_GPU = main_krylov.cu.o phiAHessenberg.cu.o cf.o krylov.cu.o complexI
        rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
 OBJ_KRYLOV_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV_GPU))
 
-_OBJ_GPU_PROFILER = gpu_profiler.cu.o complexInverse.cu.o \
-       chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
-       rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o rate_gen.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o
-OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU_PROFILER))
+_OBJ_GPU_PROFILER = mechanism.cu.o mass_mole.o fd_jacob.cu.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o chem_utils.cu.o rateOutputTest.cu.o dydt.cu.o gpu_memory.cu.o
+OBJ_GPU_PROFILER =  $(patsubst %,$(ODIR)/%,$(_OBJ_GPU_PROFILER))
 
 _OBJ_TEST = unit_tests.o complexInverse.o phiA.o phiAHessenberg.o cf.o krylov.o\
             dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o sparse_multiplier.o rxn_rates_pres_mod.o
@@ -130,6 +128,8 @@ endif
 ratestest : FLAGS += -DRATES_TEST
 
 gpuratestest : NVCCFLAGS += -DRATES_TEST
+
+gpu-profiler : NVCCFLAGS += -DPROFILER
 
 $(ODIR)/%.o : $(SDIR)/%.c $(DEPS)
 	$(CC) $(FLAGS) $(INCLUDES) -c -o $@ $<
