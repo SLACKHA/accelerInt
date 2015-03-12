@@ -34,8 +34,21 @@
 //get our solver stuff
 #include "solver.cuh"
 #include "solver_init.cuh"
+#include "solver_props.h"
 #include "gpu_memory.cuh"
 #include "read_initial_conditions.h"
+
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+    //make logging array definitions
+    __device__ double err_log[MAX_STEPS];
+    __device__ double m_log[MAX_STEPS];
+    __device__ double m1_log[MAX_STEPS];
+    __device__ double m2_log[MAX_STEPS];
+    __device__ double t_log[MAX_STEPS];
+    __device__ double h_log[MAX_STEPS];
+    __device__ bool reject_log[MAX_STEPS];
+    __device__ int num_integrator_steps;
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +88,9 @@ int main (int argc, char *argv[])
     /* Block size */
     int BLOCK_SIZE = 64;
 
-    int g_num = (int)floor(((double)NUM) / ((double)BLOCK_SIZE) + 0.5);
+    int g_num = (int)round(((double)NUM) / ((double)BLOCK_SIZE) + 0.5);
+    if (g_num == 0)
+        g_num = 1;
     dim3 dimGrid (g_num, 1 );
     dim3 dimBlock(BLOCK_SIZE, 1);
 
@@ -164,6 +179,34 @@ int main (int argc, char *argv[])
         cudaErrorCheck (cudaGetDeviceProperties(&devProp, id));
     }
 
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+    //create host logging arrays
+    double* err_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
+    double* m_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
+    double* m1_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
+    double* m2_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
+    double* t_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
+    double* h_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
+    bool* reject_log_host = (bool*)malloc(MAX_STEPS * sizeof(bool));
+    int num_integrator_steps_host = 0;
+    //open files for krylov logging
+    FILE *logFile;
+    //open and clear
+    const char* f_name = solver_name();
+    int len = strlen(f_name);
+    char out_name[len + 17];
+    sprintf(out_name, "log/%s-kry-log.txt", f_name);
+    logFile = fopen(out_name, "w");
+
+    char out_reject_name[len + 23];
+    sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);    
+    //file for krylov logging
+    FILE *rFile;
+    //open and clear
+    rFile = fopen(out_reject_name, "w");
+#endif
+
+
     //////////////////////////////
     // start timer
     StartTimer();
@@ -195,6 +238,8 @@ int main (int argc, char *argv[])
         // constant volume case
         intDriver <<< dimGrid, dimBlock>>> (NUM, t, t_next, rho_device, y_device);
 #endif
+        cudaErrorCheck( cudaPeekAtLastError() );
+        cudaErrorCheck( cudaDeviceSynchronize() );
 
         t = t_next;
         t_next += h;
@@ -229,6 +274,32 @@ int main (int argc, char *argv[])
             t_ign = t;
         }
 #endif
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+        //first copy back num steps to make sure we're inbounds
+        cudaErrorCheck( cudaMemcpyFromSymbol(&num_integrator_steps_host, num_integrator_steps, sizeof(int)) );
+        if (num_integrator_steps_host == -1)
+            exit(-1);
+        //otherwise copy back
+        cudaErrorCheck( cudaMemcpyFromSymbol(err_log_host, err_log, num_integrator_steps_host * sizeof(double)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(m_log_host, m_log, num_integrator_steps_host * sizeof(double)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(m1_log_host, m1_log, num_integrator_steps_host * sizeof(double)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(m2_log_host, m2_log, num_integrator_steps_host * sizeof(double)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(t_log_host, t_log, num_integrator_steps_host * sizeof(double)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(h_log_host, h_log, num_integrator_steps_host * sizeof(double)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(reject_log_host, reject_log, num_integrator_steps_host * sizeof(bool)) );
+        //and print
+        for (int i = 0; i < num_integrator_steps_host; ++i)
+        {
+            if (reject_log_host[i])
+            {
+                fprintf(rFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t_log_host[i], h_log_host[i], err_log_host[i], m_log_host[i], m1_log_host[i], m2_log_host[i]);
+            }
+            else
+            {
+                fprintf(logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t_log_host[i], h_log_host[i], err_log_host[i], m_log_host[i], m1_log_host[i], m2_log_host[i]);
+            }
+        }
+#endif
     }
 
     /////////////////////////////////
@@ -251,6 +322,17 @@ int main (int argc, char *argv[])
     free (pres_host);
 #elif CONV
     free (rho_host);
+#endif
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+    free(err_log_host);
+    free(m_log_host);
+    free(m1_log_host);
+    free(m2_log_host);
+    free(t_log_host);
+    free(h_log_host);
+    free(reject_log_host);
+    fclose(rFile);
+    fclose(logFile);
 #endif
     cleanup_solver();
 

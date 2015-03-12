@@ -11,11 +11,7 @@
 #define EXPONENTIAL_LINEAR_ALGEBRA_H
 
 #include "header.h"
-#ifdef RB43
-#include "exprb43_props.h"
-#elif EXP4
-#include "exp4_props.h"
-#endif
+#include "solver_props.h"
 
 /** Computes and returns the two norm of a vector
  *
@@ -41,6 +37,9 @@ static inline
 double normalize (const double * v, double* v_out) {
 	
 	double norm = two_norm(v);
+
+	if (norm == 0)
+		norm = 1;
 
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {

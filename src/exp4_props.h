@@ -14,7 +14,7 @@
 #define P 1
 //order of embedded methods
 #define ORD 3
-#define M_MAX 20
+#define M_MAX NN
 #define STRIDE (M_MAX + P)
 
 #endif

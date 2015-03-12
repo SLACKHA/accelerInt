@@ -139,8 +139,8 @@ int main (int argc, char *argv[])
     FILE *pFile;
     const char* f_name = solver_name();
     int len = strlen(f_name);
-    char out_name[len + 9];
-    sprintf(out_name, "%s-log.txt", f_name);
+    char out_name[len + 13];
+    sprintf(out_name, "log/%s-log.txt", f_name);
     pFile = fopen(out_name, "w");
 
     fprintf(pFile, "%e", t_start);
@@ -150,6 +150,24 @@ int main (int argc, char *argv[])
     }
     fprintf(pFile, "\n");
 #endif
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+      //file for krylov logging
+      FILE *logFile;
+      //open and clear
+      const char* f_name = solver_name();
+      int len = strlen(f_name);
+      char out_name[len + 17];
+      sprintf(out_name, "log/%s-kry-log.txt", f_name);
+      logFile = fopen(out_name, "w");
+
+      char out_reject_name[len + 23];
+      sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);    
+      //file for krylov logging
+      FILE *rFile;
+      //open and clear
+      rFile = fopen(out_reject_name, "w");
+#endif
+
     //////////////////////////////
     // start timer
     StartTimer();

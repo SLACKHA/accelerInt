@@ -13,15 +13,11 @@
 #include <string.h>
 
 #include "header.h"
+#include "solver_props.h"
 #include "phiAHessenberg.cuh"
 #include "exponential_linear_algebra.cuh"
 #include "sparse_multiplier.cuh"
 
-#ifdef RB43
-#include "exprb43_props.h"
-#elif EXP4
-#include "exp4_props.h"
-#endif
 
 __constant__ int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
 

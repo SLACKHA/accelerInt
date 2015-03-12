@@ -11,11 +11,7 @@
 #define EXPONENTIAL_LINEAR_ALGEBRA_CUH
 
 #include "header.h"
-#ifdef RB43
-#include "exprb43_props.h"
-#elif EXP4
-#include "exp4_props.h"
-#endif
+#include "solver_props.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +25,7 @@
  * \param[out]		Av		vector that is A * v
  */
 __device__
-void matvec_m_by_m (const int m, const Real * A, const Real * V, Real * Av) {
+void matvec_m_by_m (const int m, const double * A, const double * V, double * Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < m; ++i) {
@@ -56,7 +52,7 @@ void matvec_m_by_m (const int m, const Real * A, const Real * V, Real * Av) {
  * \param[in]		V		vector of size Mx1
  * \param[out]		Av		vector that is (A + I) * v
  */
-__device__ void matvec_m_by_m_plusequal (const int m, const Real * A, const Real * V, Real * Av)
+__device__ void matvec_m_by_m_plusequal (const int m, const double * A, const double * V, double * Av)
 {
 	//for each row
 	#pragma unroll
@@ -84,7 +80,7 @@ __device__ void matvec_m_by_m_plusequal (const int m, const Real * A, const Real
  * \param[out]		Av		vector that is A * V
  */
 __device__
-void matvec_n_by_m_scale (const int m, const Real scale, const Real * A, const Real * V, Real * Av) {
+void matvec_n_by_m_scale (const int m, const double scale, const double * A, const double * V, double * Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
@@ -117,7 +113,7 @@ void matvec_n_by_m_scale (const int m, const Real scale, const Real * A, const R
  * \param[out]		Av		a list of 3 pointers corresponding to Av1, Av2, Av3
  */
 __device__
-void matvec_n_by_m_scale_special (const int m, const Real scale[], const Real * A, const Real* V[], Real* Av[]) {
+void matvec_n_by_m_scale_special (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
@@ -162,7 +158,7 @@ void matvec_n_by_m_scale_special (const int m, const Real scale[], const Real * 
  * \param[out]		Av		a list of 2 pointers corresponding to Av1, Av2
  */
 __device__
-void matvec_n_by_m_scale_special2 (const int m, const Real scale[], const Real * A, const Real* V[], Real* Av[]) {
+void matvec_n_by_m_scale_special2 (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
@@ -204,7 +200,7 @@ void matvec_n_by_m_scale_special2 (const int m, const Real scale[], const Real *
  * \param[out]		Av		vector that is A * V
  */
 __device__
-void matvec_n_by_m_scale_add (const int m, const Real scale, const Real * A, const Real * V, Real * Av, const Real* add) {
+void matvec_n_by_m_scale_add (const int m, const double scale, const double * A, const double * V, double * Av, const double* add) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
@@ -236,7 +232,7 @@ void matvec_n_by_m_scale_add (const int m, const Real scale, const Real * A, con
  * \param[out]		Av		vector that is A * V
  */
 __device__
-void matvec_n_by_m_scale_add_subtract (const int m, const Real scale, const Real * A, const Real * V, Real * Av, const Real* add, const Real * sub) {
+void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const double * A, const double * V, double * Av, const double* add, const double * sub) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
@@ -261,7 +257,7 @@ void matvec_n_by_m_scale_add_subtract (const int m, const Real scale, const Real
  * \param[out]	sc	array of scaling values
  */
 __device__
-void scale (const Real * y0, const Real * y1, Real * sc) {
+void scale (const double * y0, const double * y1, double * sc) {
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
 		sc[i] = ATOL + fmax(fabs(y0[i]), fabs(y1[i])) * RTOL;
@@ -276,7 +272,7 @@ void scale (const Real * y0, const Real * y1, Real * sc) {
  * \param[out]	sc	array of scaling values
  */
 __device__
-void scale_init (const Real * y0, Real * sc) {
+void scale_init (const double * y0, double * sc) {
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
 		sc[i] = ATOL + fabs(y0[i]) * RTOL;
@@ -292,8 +288,8 @@ void scale_init (const Real * y0, Real * sc) {
  * \return			norm	weighted norm
  */
 __device__
-Real sc_norm (const Real * nums, const Real * sc) {
-	Real norm = ZERO;
+double sc_norm (const double * nums, const double * sc) {
+	double norm = ZERO;
 	
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
@@ -310,9 +306,9 @@ Real sc_norm (const Real * nums, const Real * sc) {
  *	\param[in]		v 		the vector
  */
 __device__
-Real two_norm(const Real* v)
+double two_norm(const double* v)
 {
-	Real norm = ZERO;
+	double norm = ZERO;
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
 		norm += v[i] * v[i];
@@ -326,9 +322,12 @@ Real two_norm(const Real* v)
  * \param[out]		v_out	where to stick the normalized part of v (in a column)
  */
 __device__
-Real normalize (const Real * v, Real* v_out) {
+double normalize (const double * v, double* v_out) {
 	
-	Real norm = two_norm(v);
+	double norm = two_norm(v);
+
+	if (norm == 0)
+		norm = 1;
 
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
@@ -345,9 +344,9 @@ Real normalize (const Real * v, Real* v_out) {
  * \out						the dot product of the specified vectors
  */
 __device__
-Real dotproduct(const Real* w, const Real* Vm)
+double dotproduct(const double* w, const double* Vm)
 {
-	Real sum = 0;
+	double sum = 0;
 	#pragma unroll
 	for(int i = 0; i < NN; i++)
 	{
@@ -362,7 +361,7 @@ Real dotproduct(const Real* w, const Real* Vm)
  * \param[in]		Vm		the subspace matrix
  * \param[out]		w 		the vector to subtract from
  */
-__device__ void scale_subtract(const Real s, const Real* Vm, Real* w)
+__device__ void scale_subtract(const double s, const double* Vm, double* w)
 {
 	#pragma unroll
 	for (int i = 0; i < NN; i++)
@@ -379,7 +378,7 @@ __device__ void scale_subtract(const Real s, const Real* Vm, Real* w)
  * \param[in]		w 		the vector to use as a base
  * \param[out]		Vm		the subspace matrix to set
  */
-__device__ void scale_mult(const Real s, const Real* w, Real* Vm)
+__device__ void scale_mult(const double s, const double* w, double* Vm)
 {
 	#pragma unroll
 	for (int i = 0; i < NN; i++)
