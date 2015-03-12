@@ -83,22 +83,13 @@
   #define EPS FLT_EPSILON
 
   #define SMALL FLT_MIN
+
 #endif
 
 /** Unsigned int typedef. */
 typedef unsigned int uint;
 /** Unsigned short int typedef. */
 typedef unsigned short int usint;
-
-
-//#define A(I,J)	A[(I) + (J) * (NN)]
-//#define invA(I,J)		invA[(I) + (J) * (NN)]
-
-/** Max macro (type safe, from GNU) */
-//#define MAX(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
-
-/** Min macro (type safe) */
-//#define MIN(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
 
 // OpenMP
 #ifdef _OPENMP
@@ -119,6 +110,21 @@ typedef unsigned short int usint;
 #define COMPILE_TESTING_METHODS //comment out to remove unit testing stubs
 
 //turn on to log the krylov space and step sizes to log.txt
-#define LOG_KRYLOV_AND_STEPSIZES
+#ifdef DEBUG
+  #define LOG_KRYLOV_AND_STEPSIZES
+#endif
+
+// load same initial conditions for all threads
+#define SAME_IC
+
+// shuffle initial conditions randomly
+//#define SHUFFLE
+
+// output ignition time
+#define IGN
+
+#define PRINT
+
+//#define LOG_OUTPUT
 
 #endif

@@ -13,19 +13,20 @@ NCC = cc
 NCC_BIN = /usr/bin
 NVCC = $(CUDA_PATH)/bin/nvcc
 LINK   = $(CC) -fPIC
-NLINK = $(NCC) -Wl,--no-undefined -fPIC -Xlinker -rpath $(CUDA_PATH)/lib64
+NLINK = $(NCC) -fPIC -fopenmp -Xlinker -rpath $(CUDA_PATH)/lib64
+FLAGS = 
+NVCCFLAGS = -Xcompiler -fopenmp
+NVCCINCLUDES = -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
+NVCCLIBS = -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++
+LIBS = -lm
+RA_LIBS = -lfftw3
+CV_LIBS = -lsundials_cvodes -lsundials_nvecserial
+FAST_MATH = TRUE
 
 # Directories
 ODIR = ./obj
 SDIR = ./src
 
-#turn on line and spilling info
-ifndef CUDA_PROFILER
-  CUDA_PROFILER = 0
-endif
-ifeq ("$(CUDA_PROFILER)", "4")
-  L = 4
-endif
 #FLAGS, L=0 for testing, L=4 for optimization
 ifndef L
   L = 4
@@ -36,157 +37,183 @@ ifndef USE_LAPACK
 endif
 
 # Paths
-INCLUDES    = -I. -I/usr/local/include/
+INCLUDES = -I/usr/local/include/
 
 _DEPS = header.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
 
-_OBJ = main.o phiA.o cf.o exp4.o complexInverse.o \
-       dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
-       rxn_rates_pres_mod.o mechanism.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+#generic objects for CPU mechanism
+_MECH = dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o mechanism.o
 
-_OBJ_GPU = main.cu.o phiA.cu.o cf.o exp4.cu.o complexInverse.cu.o \
-           dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o \
-					 spec_rates.cu.o rxn_rates_pres_mod.cu.o mechanism.o
-OBJ_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_GPU))
+#generic objects for GPU mechanism
+_MECH_GPU = dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o mechanism.cu.o gpu_memory.cu.o
 
-_OBJ_CVODES = main_cvodes.o dydt.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
-              rxn_rates_pres_mod.o dydt_cvodes.o mechanism.o
-OBJ_CVODES = $(patsubst %,$(ODIR)/%,$(_OBJ_CVODES))
+#Generic objects for CPU solver
+_OBJ = solver_main.o $(_MECH)
 
-_OBJ_KRYLOV = main_krylov.o phiAHessenberg.o cf.o krylov.o complexInverse.o \
-       dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
-       rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o
-OBJ_KRYLOV = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV))
+#Generic objects for GPU solver
+_OBJ_GPU = solver_main.cu.o $(_MECH_GPU)
 
-_OBJ_RB43 = main_rb43.o phiAHessenberg.o cf.o exprb43.o complexInverse.o \
-       dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o \
-       rxn_rates_pres_mod.o mechanism.o sparse_multiplier.o inverse.o
-OBJ_RB43 = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43))
+#Generic objects for CPU solvers using rational approxmiation / krylov subspaces
+_OBJ_RA = cf.o rational_approximant.o phiAHessenberg.o complexInverse.o linear-algebra.o sparse_multiplier.o $(_OBJ)
 
-_OBJ_RB43_GPU = main_rb43.cu.o phiAHessenberg.cu.o linear-algebra.o cf.o exprb43.cu.o complexInverse.cu.o \
-       dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
-       rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
-OBJ_RB43_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_RB43_GPU))
+#Generic objects for GPU solvers using rational approxmiation / krylov subspaces
+_OBJ_GPU_RA = cf.o rational_approximant.cu.o phiAHessenberg.cu.o complexInverse.cu.o linear-algebra.o sparse_multiplier.cu.o $(_OBJ_GPU)
 
-_OBJ_KRYLOV_GPU = main_krylov.cu.o phiAHessenberg.cu.o cf.o krylov.cu.o complexInverse.cu.o \
-       dydt.cu.o fd_jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o \
-       rxn_rates_pres_mod.cu.o mechanism.o sparse_multiplier.cu.o
-OBJ_KRYLOV_GPU = $(patsubst %,$(ODIR)/%,$(_OBJ_KRYLOV_GPU))
+#solver specific objects
+exprb43-int : FLAGS += -DRB43 -fopenmp
+exprb43-int : LIBS += $(RA_LIBS)
 
-_OBJ_GPU_PROFILER = mechanism.cu.o mass_mole.o fd_jacob.cu.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o chem_utils.cu.o rateOutputTest.cu.o dydt.cu.o gpu_memory.cu.o
-OBJ_GPU_PROFILER =  $(patsubst %,$(ODIR)/%,$(_OBJ_GPU_PROFILER))
+exp4-int : FLAGS += -DEXP4 -fopenmp
+exp4-int : LIBS += $(RA_LIBS)
 
-_OBJ_TEST = unit_tests.o complexInverse.o phiA.o phiAHessenberg.o cf.o krylov.o\
-            dydt.o fd_jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o sparse_multiplier.o rxn_rates_pres_mod.o
-OBJ_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_TEST))
+exprb43-int-gpu : NVCCFLAGS += $(NVCCINCLUDES) -DRB43
+exprb43-int-gpu : LIBS += $(RA_LIBS) $(NVCCLIBS)
 
-_OBJ_RATES_TEST = mechanism.o mass_mole.o jacob.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o chem_utils.o rateOutputTest.o dydt.o
-OBJ_RATES_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_RATES_TEST))
+exp4-int-gpu : NVCCFLAGS += $(NVCCINCLUDES) -DEXP4
+exp4-int-gpu : LIBS +=  $(RA_LIBS) $(NVCCLIBS)
 
-_OBJ_GPU_RATES_TEST = mechanism.cu.o mass_mole.o fd_jacob.cu.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o chem_utils.cu.o rateOutputTest.cu.o dydt.cu.o gpu_memory.cu.o
-OBJ_GPU_RATES_TEST =  $(patsubst %,$(ODIR)/%,$(_OBJ_GPU_RATES_TEST))
+cvodes-int : FLAGS += -DCVODES -fopenmp
+cvodes-int : LIBS += $(CV_LIBS)
 
+profiler : L = 4
+profiler : FLAGS += -pg -DPROFILER
 
-# Paths
-INCLUDES = -I. -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
-LIBS = -lm -lfftw3 -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++ -lsundials_cvodes -lsundials_nvecserial
-
-#flags
-#ifeq ("$(CC)", "gcc")
-  
-ifeq ($(L), 0)
-  FLAGS = -O0 -g3 -fbounds-check -Wunused-variable -Wunused-parameter \
-  	  -Wall -ftree-vrp -std=c99 -fopenmp -DDEBUG
-  NVCCFLAGS = -g -G -arch=sm_20 -m64 -DDEBUG
-else ifeq ($(L), 4)
-  FLAGS = -O3 -std=c99 -fopenmp -funroll-loops
-  NVCCFLAGS = -O3 -arch=sm_20 -m64
-endif
-ifeq ($(L), 4)
-  ifeq ("$(CC)", "gcc")
-    FLAGS += -mtune=native
-  endif
-endif
-
-NVCCFLAGS += --ftz=false --prec-div=true --prec-sqrt=true
-# --fmad=false
-
-ifeq ($(CUDA_PROFILER), 4)
-  NVCCFLAGS += -Xnvlink -v --ptxas-options=-v -lineinfo -g --keep-dir=keepfiles/
-endif
-
-ifeq ($(USE_LAPACK), 4)
-  FLAGS += -DSUNDIALS_USE_LAPACK -I${MKLROOT}/include
-  CV_LIBS = -L${MKLROOT}/lib/intel64/ -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_gnu_thread -ldl -lpthread -lmkl_mc -lmkl_def
-else ifeq ($(USE_LAPACK), 2)
-  FLAGS += -DSUNDIALS_USE_LAPACK
-  CV_LIBS = -L/usr/local/lib -llapack -lblas
-endif
+gpuprofiler : L = 4
+gpuprofiler : FLAGS += $(NVCCFLAGS) $(NVCCINCLUDES) -DPROFILER -Xnvlink -v --ptxas-options=-v -lineinfo
+gpuprofiler : LIBS += $(NVCCLIBS)
 
 ratestest : FLAGS += -DRATES_TEST
 
 gpuratestest : NVCCFLAGS += -DRATES_TEST
+gpuratestest : LIBS +=  $(NVCCLIBS)
 
-gpu-profiler : NVCCFLAGS += -DPROFILER
+#standard flags
+FLAGS += -std=c99
+NVCCFLAGS += -arch=sm_20 -m64
 
-$(ODIR)/%.o : $(SDIR)/%.c $(DEPS)
-	$(CC) $(FLAGS) $(INCLUDES) -c -o $@ $<
+#fast math
+ifeq ("$(FAST_MATH)", "TRUE")
+	NVCCFLAGS += --use_fast_math
+else
+	NVCCFLAGS += --ftz=false --prec-div=true --prec-sqrt=true --fmad=false
+endif
 
-$(ODIR)/%.cu.o : $(SDIR)/%.cu $(DEPS)
-	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) -dc -o $@ $<
+#flags for various debug levels
+ifeq ($(L), 0)
+  FLAGS += -O0 -g -fbounds-check -Wunused-variable -Wunused-parameter \
+	  -Wall -ftree-vrp -DDEBUG
+  NVCCFLAGS += -g -G -DDEBUG
+else ifeq ($(L), 4)
+  FLAGS += -O3 -funroll-loops
+  NVCCFLAGS += -O3
+endif
 
-default: $(ODIR) all
+#GCC tuning
+ifeq ($(L), 4)
+  ifeq ("$(CC)", "gcc")
+	FLAGS += -mtune=native
+  endif
+endif
+
+#LAPACK levels
+ifeq ($(USE_LAPACK), 4)
+  FLAGS += -DSUNDIALS_USE_LAPACK -I${MKLROOT}/include
+  LIBS += -L${MKLROOT}/lib/intel64/ -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_gnu_thread -ldl -lpthread -lmkl_mc -lmkl_def
+else ifeq ($(USE_LAPACK), 2)
+  FLAGS += -DSUNDIALS_USE_LAPACK
+  LIBS += -L/usr/local/lib -llapack -lblas
+endif
+
+_OBJ_RB43 = exprb43_init.o exprb43.o solver_generic.o $(_OBJ_RA)
+OBJ_RB43 = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43))
+
+_OBJ_EXP4 = exp4_init.o exp4.o solver_generic.o $(_OBJ_RA)
+OBJ_EXP4 = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4))
+
+_OBJ_RB43_GPU = exprb43_init.cu.o exprb43.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
+OBJ_RB43_GPU = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43_GPU))
+
+_OBJ_EXP4_GPU = exp4_init.cu.o exp4.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
+OBJ_EXP4_GPU = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4_GPU))
+
+_OBJ_CVODES += dydt_cvodes.o cvodes_init.o solver_cvodes.o $(_OBJ)
+OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES))
+
+_OBJ_PROFILER = rateOutputTest.o $(_MECH)
+OBJ_PROFILER = $(patsubst %,$(ODIR)/profiler/%,$(_OBJ_PROFILER))
+
+_OBJ_GPU_PROFILER = rateOutputTest.cu.o $(_MECH_GPU)
+OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/profiler/%,$(_OBJ_GPU_PROFILER))
+
+_OBJ_RATES_TEST = rateOutputTest.o $(_MECH) 
+OBJ_RATES_TEST = $(patsubst %,$(ODIR)/ratestest/%,$(_OBJ_RATES_TEST))
+
+_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o $(_MECH_GPU)
+OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/ratestest/%,$(_OBJ_GPU_RATES_TEST))
+
+define module_rules
+$(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS)
+	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
+
+$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS)
+	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
+endef
+
+define create_folders
+makedir-$1 : 
+	mkdir -p $(ODIR)/$(1)
+endef
+
+MODULES := rb43 exp4 cvodes prof rates
+
+default: all clean 
 
 $(ODIR):
 	mkdir $(ODIR)
 
-all: exp-int exp-int-gpu exp-int-cvodes exp-int-krylov exp-int-krylov-gpu tests
+all : exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest 
 
 print-%  : ; @echo $* = $($*)
 
-exp-int : $(OBJ)
-	$(LINK) $(OBJ) $(LIBS) $(FLAGS) -o $@
+exprb43-int : $(OBJ_RB43)
+	$(LINK) $(OBJ_RB43) $(LIBS) -o $@
 
-exp-int-krylov : $(OBJ_KRYLOV)
-	$(LINK) $(OBJ_KRYLOV) $(LIBS) $(FLAGS) -o $@
+exp4-int : $(OBJ_EXP4)
+	$(LINK) $(OBJ_EXP4) $(LIBS) -o $@
 
-exp-int-rb43 : $(OBJ_RB43)
-	$(LINK) $(OBJ_RB43) $(LIBS) $(FLAGS) -o $@
+exprb43-int-gpu : $(OBJ_RB43_GPU)
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU) $(LIBS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_RB43_GPU) dlink.o $(LIBS) -o $@
 
-exp-int-rb43-gpu : $(OBJ_RB43_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_RB43_GPU) dlink.o $(LIBS) $(FLAGS) -o $@
+exp4-int-gpu : $(OBJ_EXP4_GPU)
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_EXP4_GPU) $(LIBS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_EXP4_GPU) dlink.o $(LIBS) -o $@
 
-exp-int-gpu : $(OBJ_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_GPU) dlink.o $(LIBS) -llapack $(FLAGS) -o $@
+cvodes-int : $(OBJ_CVODES)
+	$(LINK) $(OBJ_CVODES) $(LIBS) -o $@
 
-gpu-profiler : $(OBJ_GPU_PROFILER)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_PROFILER) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_GPU_PROFILER) dlink.o $(LIBS) $(FLAGS) -o $@
+profiler : $(OBJ_PROFILER)
+	$(LINK) $(OBJ_PROFILER) $(LIBS) -o $@
 
-exp-int-krylov-gpu : $(OBJ_KRYLOV_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_KRYLOV_GPU) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_KRYLOV_GPU) dlink.o $(LIBS) $(FLAGS) -o $@
+gpuprofiler : $(OBJ_GPU_PROFILER)
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_PROFILER) $(LIBS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_GPU_PROFILER) dlink.o $(LIBS) -o $@
 
-exp-int-cvodes : $(OBJ_CVODES)
-	$(LINK) $(OBJ_CVODES) $(LIBS) $(CV_LIBS) $(FLAGS) -o $@
+ratestest : $(OBJ_RATES_TEST)
+	$(LINK) $(OBJ_RATES_TEST) $(LIBS) -o $@
 
-tests : $(OBJ_TEST)
-	$(LINK) $(OBJ_TEST) $(LIBS) $(FLAGS) -o $@
+gpuratestest : $(OBJ_GPU_RATES_TEST)
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RATES_TEST) $(LIBS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_GPU_RATES_TEST) dlink.o $(LIBS) -o $@
 
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
-ratestest : $(OBJ_RATES_TEST)
-	$(LINK) -DRATES_TEST $(OBJ_RATES_TEST) $(LIBS) $(FLAGS) -o $@
-
-gpuratestest : $(OBJ_GPU_RATES_TEST)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RATES_TEST) $(LIBS) $(NVCCFLAGS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_GPU_RATES_TEST) dlink.o $(LIBS) $(FLAGS) -o $@
-
-.PHONY : clean		
 clean :
-	rm -f $(OBJ) $(OBJ_GPU) $(OBJ_CVODES) $(OBJ_KRYLOV) $(OBJ_TEST) $(OBJ_KRYLOV_GPU) $(OBJ_RB43) $(OBJ_RB43_GPU) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) gpu-profiler exp-int exp-int-gpu exp-int-cvodes exp-int-krylov exp-int-krylov-gpu exp-int-rb43 exp-int-rb43-gpu tests ratestest gpuratestest dlink.o
+	rm -f $(OBJ_EXP4) $(OBJ_RB43) $(OBJ_CVODES) $(OBJ_RB43_GPU) $(OBJ_EXP4_GPU) $(OBJ_PROFILER) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) \
+		exprb43-int exp4-int exprb43-int exp4-int cvodes-int profiler gpuprofiler ratestest gpuratestest doc \
+		dlink.o
+
+$(foreach mod,$(MODULES),$(eval $(call create_folders,$(mod))))
+$(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))

@@ -39,39 +39,6 @@ Real complex res[N_RA];
 
 /////////////////////////////////////////////////////////////////////////////
 
-void intDriver (const int NUM, const Real t, const Real t_end, 
-                const Real* pr_global, Real* y_global) {
-
-	int tid;
-	#pragma omp parallel for shared(y_global, pr_global) private(tid)
-	for (tid = 0; tid < NUM; ++tid) {
-		// local array with initial values
-		Real y_local[NN];
-		Real pr_local = pr_global[tid];
-
-		// load local array with initial values from global array
-		#pragma unroll
-		for (int i = 0; i < NN; i++)
-		{
-			y_local[i] = y_global[tid + i * NUM];
-		}
-
-		// call integrator for one time step
-		exprb43_int (t, t_end, pr_local, y_local);
-
-		// update global array with integrated values
-		#pragma unroll
-		for (int i = 0; i < NN; i++)
-		{
-			y_global[tid + i * NUM] = y_local[i];
-		}
-
-	} // end tid loop
-
-} // end intDriver
-
-/////////////////////////////////////////////////////////////////////////////
-
 /** Main function
  * 
  * 

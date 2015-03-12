@@ -213,7 +213,7 @@ void getComplexInverse (int n, double complex* A) {
 	// first get LU factorization
 	info = getComplexLU (n, A, ipiv);
 	
-#ifndef NDEBUG
+#ifdef DEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexLU failure, info = %d.\n", info);
@@ -231,7 +231,7 @@ void getComplexInverse (int n, double complex* A) {
 	free (work);
 	free (ipiv);
 	
-#ifndef NDEBUG
+#ifdef DEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexInverseLU failure, info = %d.\n", info);
@@ -301,7 +301,7 @@ void getComplexInverseHessenberg (const int n, double complex* A)
 	// first get LU factorization
 	info = getHessenbergLU (n, A, ipiv);
 
-#ifndef NDEBUG
+#ifndef DEBUG
 	if (info != 0)
 	{
 		printf ("getHessenbergLU failure, info = %d.\n", info);
@@ -319,7 +319,7 @@ void getComplexInverseHessenberg (const int n, double complex* A)
 	free (work);
 	free (ipiv);
 	
-#ifndef NDEBUG
+#ifdef DEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexInverseLU failure, info = %d.\n", info);
