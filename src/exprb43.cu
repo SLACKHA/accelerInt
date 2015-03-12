@@ -30,9 +30,9 @@
 #ifdef LOG_KRYLOV_AND_STEPSIZES
  	#define T_ID (threadIdx.x + blockIdx.x * blockDim.x)
  	extern __device__ double err_log[MAX_STEPS];
- 	extern __device__ double m_log[MAX_STEPS];
- 	extern __device__ double m1_log[MAX_STEPS];
- 	extern __device__ double m2_log[MAX_STEPS];
+ 	extern __device__ int m_log[MAX_STEPS];
+ 	extern __device__ int m1_log[MAX_STEPS];
+ 	extern __device__ int m2_log[MAX_STEPS];
  	extern __device__ double t_log[MAX_STEPS];
  	extern __device__ double h_log[MAX_STEPS];
  	extern __device__ bool reject_log[MAX_STEPS];
@@ -200,6 +200,24 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
+
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+			if (T_ID == 0 && num_integrator_steps >= 0) {
+				err_log[num_integrator_steps] = err;
+				m_log[num_integrator_steps] = m;
+				m1_log[num_integrator_steps] = m1;
+				m2_log[num_integrator_steps] = m2;
+				t_log[num_integrator_steps] = t;
+				h_log[num_integrator_steps] = h;
+				reject_log[num_integrator_steps] = err > ONE;
+				num_integrator_steps++;
+				if (num_integrator_steps >= MAX_STEPS)
+				{
+					printf("Number of steps out of bounds! Overwriting\n");
+					num_integrator_steps = -1;
+				}
+			}
+#endif
 			
 			if (err <= ONE) {
 
@@ -239,23 +257,6 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				reject = true;
 				h = fmin(h, h_new);
 			}
-#ifdef LOG_KRYLOV_AND_STEPSIZES
-			if (T_ID == 0 && num_integrator_steps >= 0) {
-				err_log[num_integrator_steps] = err;
-				m_log[num_integrator_steps] = m;
-				m1_log[num_integrator_steps] = m1;
-				m2_log[num_integrator_steps] = m2;
-				t_log[num_integrator_steps] = t;
-				h_log[num_integrator_steps] = h;
-				reject_log[num_integrator_steps] = reject;
-				num_integrator_steps++;
-				if (num_integrator_steps >= MAX_STEPS)
-				{
-					printf("Number of steps out of bounds! Overwriting\n");
-					num_integrator_steps = -1;
-				}
-			}
-#endif
 		} while(err >= ONE);
 
 	} // end while

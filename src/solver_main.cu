@@ -41,9 +41,9 @@
 #ifdef LOG_KRYLOV_AND_STEPSIZES
     //make logging array definitions
     __device__ double err_log[MAX_STEPS];
-    __device__ double m_log[MAX_STEPS];
-    __device__ double m1_log[MAX_STEPS];
-    __device__ double m2_log[MAX_STEPS];
+    __device__ int m_log[MAX_STEPS];
+    __device__ int m1_log[MAX_STEPS];
+    __device__ int m2_log[MAX_STEPS];
     __device__ double t_log[MAX_STEPS];
     __device__ double h_log[MAX_STEPS];
     __device__ bool reject_log[MAX_STEPS];
@@ -182,9 +182,9 @@ int main (int argc, char *argv[])
 #ifdef LOG_KRYLOV_AND_STEPSIZES
     //create host logging arrays
     double* err_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
-    double* m_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
-    double* m1_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
-    double* m2_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
+    int* m_log_host = (int*)malloc(MAX_STEPS * sizeof(int));
+    int* m1_log_host = (int*)malloc(MAX_STEPS * sizeof(int));
+    int* m2_log_host = (int*)malloc(MAX_STEPS * sizeof(int));
     double* t_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
     double* h_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
     bool* reject_log_host = (bool*)malloc(MAX_STEPS * sizeof(bool));
@@ -281,9 +281,9 @@ int main (int argc, char *argv[])
             exit(-1);
         //otherwise copy back
         cudaErrorCheck( cudaMemcpyFromSymbol(err_log_host, err_log, num_integrator_steps_host * sizeof(double)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(m_log_host, m_log, num_integrator_steps_host * sizeof(double)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(m1_log_host, m1_log, num_integrator_steps_host * sizeof(double)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(m2_log_host, m2_log, num_integrator_steps_host * sizeof(double)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(m_log_host, m_log, num_integrator_steps_host * sizeof(int)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(m1_log_host, m1_log, num_integrator_steps_host * sizeof(int)) );
+        cudaErrorCheck( cudaMemcpyFromSymbol(m2_log_host, m2_log, num_integrator_steps_host * sizeof(int)) );
         cudaErrorCheck( cudaMemcpyFromSymbol(t_log_host, t_log, num_integrator_steps_host * sizeof(double)) );
         cudaErrorCheck( cudaMemcpyFromSymbol(h_log_host, h_log, num_integrator_steps_host * sizeof(double)) );
         cudaErrorCheck( cudaMemcpyFromSymbol(reject_log_host, reject_log, num_integrator_steps_host * sizeof(bool)) );
