@@ -24,8 +24,13 @@ CV_LIBS = -lsundials_cvodes -lsundials_nvecserial
 FAST_MATH = TRUE
 
 # Directories
-ODIR = ./obj
-SDIR = ./src
+ODIR := ./obj
+SDIR := ./src
+LOGDIR := ./log
+
+#Modules
+MODULES := rb43 exp4 cvodes prof rates
+MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
 
 #FLAGS, L=0 for testing, L=4 for optimization
 ifndef L
@@ -77,13 +82,15 @@ cvodes-int : FLAGS += -DCVODES -fopenmp
 cvodes-int : LIBS += $(CV_LIBS) -fopenmp
 
 profiler : L = 4
-profiler : FLAGS += -pg -DPROFILER
+profiler : FLAGS += -pg -DPROFILER -fopenmp
+profiler : LIBS += -fopenmp
 
 gpuprofiler : L = 4
 gpuprofiler : FLAGS += $(NVCCFLAGS) $(NVCCINCLUDES) -DPROFILER -Xnvlink -v --ptxas-options=-v -lineinfo
 gpuprofiler : LIBS += $(NVCCLIBS)
 
-ratestest : FLAGS += -DRATES_TEST
+ratestest : FLAGS += -DRATES_TEST -fopenmp
+ratestest : LIBS += -fopenmp
 
 gpuratestest : NVCCFLAGS += -DRATES_TEST
 gpuratestest : LIBS +=  $(NVCCLIBS)
@@ -154,59 +161,55 @@ OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST))
 
 define module_rules
 $(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS)
+	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
 
 $(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS)
+	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 endef
 
-define create_folders
-makedir-$1 : 
-	mkdir -p $(ODIR)/$(1)
-endef
+default: all
 
-MODULES := rb43 exp4 cvodes prof rates
-
-default: all clean log
-
+all : $(ODIR) $(LOGDIR) exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest
 $(ODIR):
-	mkdir $(ODIR)
+	mkdir -p $(ODIR)
+$(LOGDIR):
+	mkdir -p $(LOGDIR)
+.PHONY: clean all $(ODIR) $(LOGDIR)
 
-log:
-	mkdir log
-
-all : exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest 
+log_maker := $(shell test -d $(LOGDIR) || mkdir -p $(LOGDIR))
 
 print-%  : ; @echo $* = $($*)
 
-exprb43-int : $(OBJ_RB43) log
+exprb43-int : $(OBJ_RB43)
 	$(LINK) $(OBJ_RB43) $(LIBS) -o $@
 
-exp4-int : $(OBJ_EXP4) log
+exp4-int : $(OBJ_EXP4)
 	$(LINK) $(OBJ_EXP4) $(LIBS) -o $@
 
-exprb43-int-gpu : $(OBJ_RB43_GPU) log
+exprb43-int-gpu : $(OBJ_RB43_GPU)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU) $(LIBS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_RB43_GPU) dlink.o $(LIBS) -o $@
 
-exp4-int-gpu : $(OBJ_EXP4_GPU) log
+exp4-int-gpu : $(OBJ_EXP4_GPU)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_EXP4_GPU) $(LIBS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_EXP4_GPU) dlink.o $(LIBS) -o $@
 
-cvodes-int : $(OBJ_CVODES) log
+cvodes-int : $(OBJ_CVODES)
 	$(LINK) $(OBJ_CVODES) $(LIBS) -o $@
 
-profiler : $(OBJ_PROFILER) log
+profiler : $(OBJ_PROFILER)
 	$(LINK) $(OBJ_PROFILER) $(LIBS) -o $@
 
-gpuprofiler : $(OBJ_GPU_PROFILER) log
+gpuprofiler : $(OBJ_GPU_PROFILER)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_PROFILER) $(LIBS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_GPU_PROFILER) dlink.o $(LIBS) -o $@
 
-ratestest : $(OBJ_RATES_TEST) log
+ratestest : $(OBJ_RATES_TEST)
 	$(LINK) $(OBJ_RATES_TEST) $(LIBS) -o $@
 
-gpuratestest : $(OBJ_GPU_RATES_TEST) log
+gpuratestest : $(OBJ_GPU_RATES_TEST)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RATES_TEST) $(LIBS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_GPU_RATES_TEST) dlink.o $(LIBS) -o $@
 
@@ -218,5 +221,4 @@ clean :
 		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest doc \
 		dlink.o
 
-$(foreach mod,$(MODULES),$(eval $(call create_folders,$(mod))))
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))
