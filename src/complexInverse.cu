@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "header.h"
+#include "solver_props.h"
 #include <cuComplex.h>
 
 ///////////////////////////////////////////////////////////
@@ -89,20 +90,20 @@ void getComplexLU (const int n, cuDoubleComplex* A, int* indPivot) {
 		
 		// find pivot and test for singularity
 		
-		int jp = j + getComplexMax (n - j, &A[j + (n * j)]);
+		int jp = j + getComplexMax (n - j, &A[j + (STRIDE * j)]);
 		indPivot[j] = jp;
 		
 		//if (A[jp + (n * j)] != 0.0) {
-    if (cuCabs(A[jp + (n * j)]) > 0.0) {
+    if (cuCabs(A[jp + (STRIDE * j)]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swapComplex (n, &A[j], n, &A[jp], n);
+				swapComplex (n, &A[j], STRIDE, &A[jp], STRIDE);
 			
 			// compute elements j+1:m-1 of the jth column
 			
 			if (j < n - 1)
-				scaleComplex (n - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (n * j)]), &A[j + 1 + (n * j)]);
+				scaleComplex (n - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (STRIDE * j)]), &A[j + 1 + (STRIDE * j)]);
 			
 		} //else if (info == 0) {
 			//info = j + 1;
@@ -110,7 +111,7 @@ void getComplexLU (const int n, cuDoubleComplex* A, int* indPivot) {
 		
 		// update trailing submatrix
 		if (j < n - 1)
-			complexGERU (n - j - 1, alpha, &A[j + 1 + (n * j)], &A[j + n * (j + 1)], n, &A[j + 1 + n * (j + 1)], n);
+			complexGERU (n - j - 1, alpha, &A[j + 1 + (STRIDE * j)], &A[j + STRIDE * (j + 1)], STRIDE, &A[j + 1 + STRIDE * (j + 1)], STRIDE);
 		
 	}
 	
@@ -129,10 +130,10 @@ void multiplyComplexUpperMV (const int n, cuDoubleComplex* x, const int lda, con
 			cuDoubleComplex temp = x[j];
 			for (int i = 0; i < j; ++i) {
 				//x[i] += temp * A[i + (lda * j)];
-        x[i] = cuCfma(temp, A[i + (lda * j)], x[i]);
+       			x[i] = cuCfma(temp, A[i + (lda * j)], x[i]);
 			}
 			//x[j] *= A[j + (lda * j)];
-      x[j] = cuCmul(x[j], A[j + (lda * j)]);
+      		x[j] = cuCmul(x[j], A[j + (lda * j)]);
 		}
 	}
 	
@@ -156,7 +157,7 @@ void complexGEMV (const int m, const int n, const cuDoubleComplex alpha, const c
       
 			for (int i = 0; i < m; ++i) {
 				//arrY[i] += temp * A[i + (m * j)];
-        arrY[i] = cuCfma(temp, A[i + (m * j)], arrY[i]);
+        arrY[i] = cuCfma(temp, A[i + (STRIDE * j)], arrY[i]);
 			}
 		}
 	}
@@ -172,14 +173,14 @@ void getComplexInverseLU (const int n, cuDoubleComplex* A, const int* indPivot, 
 	
 	// form inv(U)
 	for (int j = 0; j < n; ++j) {
-		A[j + (n * j)] = cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (n * j)]);
-		cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[j + (n * j)]);
+		A[j + (STRIDE * j)] = cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (STRIDE * j)]);
+		cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[j + (STRIDE * j)]);
 		
 		// compute elements 0:j-1 of jth column
-		multiplyComplexUpperMV (j, &A[n * j], n, A);
+		multiplyComplexUpperMV (j, &A[STRIDE * j], STRIDE, A);
 		
 		// scale
-		scaleComplex (j, Ajj, &A[n * j]);
+		scaleComplex (j, Ajj, &A[STRIDE * j]);
 	}
 	
 	// solve equation inv(A)*L = inv(U) for inv(A)
@@ -188,13 +189,13 @@ void getComplexInverseLU (const int n, cuDoubleComplex* A, const int* indPivot, 
 		
 		// copy current column of L to work and replace with 0.0s
 		for (int i = j + 1; i < n; ++i) {
-			work[i] = A[i + (n * j)];
-			A[i + (n * j)] = make_cuDoubleComplex(0.0, 0.0);
+			work[i] = A[i + (STRIDE * j)];
+			A[i + (STRIDE * j)] = make_cuDoubleComplex(0.0, 0.0);
 		}
 		
 		// compute current column of inv(A)
 		if (j < n - 1)
-			complexGEMV (n, n - j, make_cuDoubleComplex(-1.0, 0.0), &A[n * (j + 1)], &work[j + 1], &A[n * j]);
+			complexGEMV (n, n - j, make_cuDoubleComplex(-1.0, 0.0), &A[STRIDE * (j + 1)], &work[j + 1], &A[STRIDE * j]);
 		
 	}
 	
@@ -203,7 +204,7 @@ void getComplexInverseLU (const int n, cuDoubleComplex* A, const int* indPivot, 
 	for (int j = n - 2; j >= 0; --j) {
     
 		if (indPivot[j] != j)
-			swapComplex (n, &A[n * j], 1, &A[n * indPivot[j]], 1);
+			swapComplex (n, &A[STRIDE * j], 1, &A[STRIDE * indPivot[j]], 1);
 	}
 	
 	//return info;
@@ -216,7 +217,7 @@ void getComplexInverse (cuDoubleComplex* A) {
 	
 	// pivot indices
 	//int* ipiv = (int*) calloc (n, sizeof(int));
-  int ipiv[NN];
+  	int ipiv[NN];
 	
 	// output flag
 	//int info = 0;
@@ -234,7 +235,7 @@ void getComplexInverse (cuDoubleComplex* A) {
 	
 	// work array
 	//cuDoubleComplex* work = (double complex*) calloc (n, sizeof(double complex));
-  cuDoubleComplex work[NN];
+  	cuDoubleComplex work[NN];
 	
 	// now get inverse
 	getComplexInverseLU (NN, A, ipiv, work);
@@ -260,10 +261,10 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
 	int last_free = 0;
 	for (int i = 0; i < n - 1; i ++)
 	{
-		if (cuCabs(A[i * n + i]) < cuCabs(A[i * n + i + 1]))
+		if (cuCabs(A[i * STRIDE + i]) < cuCabs(A[i * STRIDE + i + 1]))
 		{
 			//swap rows
-			swapComplex(n - last_free, &A[last_free * n + i], n, &A[last_free * n + i + 1], n);
+			swapComplex(n - last_free, &A[last_free * STRIDE + i], STRIDE, &A[last_free * STRIDE + i + 1], STRIDE);
 			indPivot[i] = i + 1;
 		}
 		else
@@ -271,22 +272,22 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
 			indPivot[i] = i;
 			last_free = i;
 		}
-		if (cuCabs(A[i * n + i]) > 0.0)
+		if (cuCabs(A[i * STRIDE + i]) > 0.0)
 		{
 		#ifdef DOUBLE
-			cuDoubleComplex tau = cuCdiv(A[i * n + i + 1], A[i * n + i]);
+			cuDoubleComplex tau = cuCdiv(A[i * STRIDE + i + 1], A[i * STRIDE + i]);
 		#else
-			cuFloatComplex tau = cuCdivf(A[i * n + i + 1], A[i * n + i]);
+			cuFloatComplex tau = cuCdivf(A[i * STRIDE + i + 1], A[i * STRIDE + i]);
 		#endif
 			for (int j = i + 1; j < n; j++)
 			{
 			#ifdef DOUBLE
-				A[j * n + i + 1] = cuCsub(A[j * n + i + 1], cuCmul(tau, A[j * n + i]));
+				A[j * STRIDE + i + 1] = cuCsub(A[j * STRIDE + i + 1], cuCmul(tau, A[j * STRIDE + i]));
 			#else
-				A[j * n + i + 1] = cuCsubf(A[j * n + i + 1], cuCmulf(tau, A[j * n + i]));
+				A[j * STRIDE + i + 1] = cuCsubf(A[j * STRIDE + i + 1], cuCmulf(tau, A[j * STRIDE + i]));
 			#endif
 			}
-			A[i * n + i + 1] = tau;
+			A[i * STRIDE + i + 1] = tau;
 		}
 	}
 	//last index is not pivoted
@@ -297,19 +298,14 @@ __device__
 void getComplexInverseHessenberg (const int n, cuDoubleComplex* A)
 {
 	// pivot indices
-	int* ipiv = (int*) malloc (n * sizeof(int));
-	memset (ipiv, 0, n * sizeof(int));
+	int ipiv[STRIDE];
 	
 	// first get LU factorization
 	getHessenbergLU (n, A, ipiv);
 
 	// work array
-	cuDoubleComplex* work = (cuDoubleComplex*) malloc (n * sizeof(cuDoubleComplex));
-  	memset (work, 0.0, n * sizeof(cuDoubleComplex));
+	cuDoubleComplex work[STRIDE];
 	
 	// now get inverse
 	getComplexInverseLU (n, A, ipiv, work);
-
-	free(ipiv);
-	free(work);
 }

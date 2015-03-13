@@ -51,15 +51,10 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 	double store = 0;
 	int index = 0;
 	int j = 0;
-	double err = 0;
+	double err = 2.0;
 
-	do
+	while (err >= ONE && j + p < M_MAX)
 	{
-		if (j + p >= M_MAX) //need to modify h_kry and restart
-		{
-			break;
-		}
-		#pragma unroll
 		for (; j < index_list[index]; j++)
 		{
 			sparse_multiplier(A, &Vm[j * NN], w);
@@ -83,7 +78,8 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		Hm[(*m - 1) * STRIDE + *m] = ZERO;
 
 		//0. fill potentially non-empty memory first
-		memset(&Hm[*m * STRIDE], 0, (*m + 1) * sizeof(double)); 
+		for (int i = 0; i < (*m + 1); ++i)
+			Hm[*m * STRIDE + i] = 0;
 
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
@@ -92,16 +88,17 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
-			memset(&Hm[(*m + i) * STRIDE], 0, (*m + i + 1) * sizeof(double));
+			for (int j = 0; j < (*m + i + 1); ++j)
+				Hm[(*m + i) * STRIDE + j] = 0;
 			Hm[(*m + i) * STRIDE + (*m + i - 1)] = ONE;
 		}
 
 #ifdef RB43
 		//2. Get phiHm
-		expAc_variable (*m + p, STRIDE, Hm, h * scale, phiHm);
+		expAc_variable (*m + p, Hm, h * scale, phiHm);
 #elif EXP4
 		//2. Get phiHm
-		phiAc_variable (*m + p, STRIDE, Hm, h * scale, phiHm);
+		phiAc_variable (*m + p, Hm, h * scale, phiHm);
 #endif
 
 		//3. Get error
@@ -154,8 +151,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 
 		//restore real Hm (NOTE: untested in RB43)
 		Hm[(*m) * STRIDE] = ZERO;
-
-	} while (err >= ONE);
+	}
 
 	return j;
 }

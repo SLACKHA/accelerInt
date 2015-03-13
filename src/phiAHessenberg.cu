@@ -2,8 +2,10 @@
 #include <complex.h>
 
 #include "header.h"
+#include "solver_props.h"
 //#include "linear-algebra.h"
 #include "complexInverse.cuh"
+#include <stdio.h>
 
 #ifdef DOUBLE
 extern __device__ __constant__ cuDoubleComplex poles[N_RA];
@@ -15,12 +17,12 @@ extern __device__ __constant__ cuFloatComplex res[N_RA];
 
 
 __device__
-void phi2Ac_variable(const int m, const int STRIDE, const Real* A, const Real c, Real* phiA) {
+void phi2Ac_variable(const int m, const Real* A, const Real c, Real* phiA) {
 	
 #ifdef DOUBLE
-	cuDoubleComplex* invA = (cuDoubleComplex*)malloc(m * m * sizeof(cuDoubleComplex));
+	cuDoubleComplex invA[STRIDE * STRIDE];
 #else
-  	cuFloatComplex* invA = *cuFloatComplex*(malloc(m * m * sizeof(cuFloatComplex));
+  	cuFloatComplex invA[STRIDE * STRIDE];
 #endif
 	
 	#pragma unroll
@@ -40,15 +42,15 @@ void phi2Ac_variable(const int m, const int STRIDE, const Real* A, const Real c,
 				// A - theta * I
 			#ifdef DOUBLE
 				if (i == j) {
-					invA[i + j*m] = cuCsub(make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
+					invA[i + j*STRIDE] = cuCsub(make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
 				} else {
-					invA[i + j*m] = make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0);
+					invA[i + j*STRIDE] = make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0);
 				}
 			#else
 				if (i == j) {
-					invA[i + j*m] = cuCsubf(make_cuFloatComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
+					invA[i + j*STRIDE] = cuCsubf(make_cuFloatComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
 				} else {
-					invA[i + j*m] = make_cuFloatComplex(c * A[i + j*STRIDE], 0.0);
+					invA[i + j*STRIDE] = make_cuFloatComplex(c * A[i + j*STRIDE], 0.0);
 				}
 			#endif
 			}
@@ -63,23 +65,22 @@ void phi2Ac_variable(const int m, const int STRIDE, const Real* A, const Real c,
 			#pragma unroll
 			for (int j = 0; j < m; ++j) {
 			#ifdef DOUBLE
-				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( cuCdiv(res[q], cuCmul(poles[q], poles[q])), invA[i + j*m]) );
+				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( cuCdiv(res[q], cuCmul(poles[q], poles[q])), invA[i + j*STRIDE]) );
 			#else
-				phiA[i + j*STRIDE] += 2.0 * cuCrealf( cuCmulf( cuCdivf(res[q], cuCmulf(poles[q], poles[q])), invA[i + j*m]) );
+				phiA[i + j*STRIDE] += 2.0 * cuCrealf( cuCmulf( cuCdivf(res[q], cuCmulf(poles[q], poles[q])), invA[i + j*STRIDE]) );
 			#endif
 			}
 		}
 	}
-	free (invA);
 }
 
 __device__
-void phiAc_variable(const int m, const int STRIDE, const Real* A, const Real c, Real* phiA) {
+void phiAc_variable(const int m, const Real* A, const Real c, Real* phiA) {
 	
 #ifdef DOUBLE
-	cuDoubleComplex* invA = (cuDoubleComplex*)malloc(m * m * sizeof(cuDoubleComplex));
+	cuDoubleComplex invA[STRIDE * STRIDE];
 #else
-  	cuFloatComplex* invA = *cuFloatComplex*(malloc(m * m * sizeof(cuFloatComplex));
+  	cuFloatComplex invA[STRIDE * STRIDE];
 #endif
 	
 	#pragma unroll
@@ -99,15 +100,15 @@ void phiAc_variable(const int m, const int STRIDE, const Real* A, const Real c, 
 				// A - theta * I
 			#ifdef DOUBLE
 				if (i == j) {
-					invA[i + j*m] = cuCsub(make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
+					invA[i + j*STRIDE] = cuCsub(make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
 				} else {
-					invA[i + j*m] = make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0);
+					invA[i + j*STRIDE] = make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0);
 				}
 			#else
 				if (i == j) {
-					invA[i + j*m] = cuCsubf(make_cuFloatComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
+					invA[i + j*STRIDE] = cuCsubf(make_cuFloatComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
 				} else {
-					invA[i + j*m] = make_cuFloatComplex(c * A[i + j*STRIDE], 0.0);
+					invA[i + j*STRIDE] = make_cuFloatComplex(c * A[i + j*STRIDE], 0.0);
 				}
 			#endif
 			}
@@ -122,23 +123,22 @@ void phiAc_variable(const int m, const int STRIDE, const Real* A, const Real c, 
 			#pragma unroll
 			for (int j = 0; j < m; ++j) {
 			#ifdef DOUBLE
-				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( cuCdiv(res[q], poles[q]), invA[i + j*m]) );
+				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( cuCdiv(res[q], poles[q]), invA[i + j*STRIDE]) );
 			#else
-				phiA[i + j*STRIDE] += 2.0 * cuCrealf( cuCmulf( cuCdivf(res[q], poles[q]), invA[i + j*m]) );
+				phiA[i + j*STRIDE] += 2.0 * cuCrealf( cuCmulf( cuCdivf(res[q], poles[q]), invA[i + j*STRIDE]) );
 			#endif
 			}
 		}
 	}
-	free (invA);
 }
 
 __device__
-void expAc_variable(const int m, const int STRIDE, const Real* A, const Real c, Real* phiA) {
+void expAc_variable(const int m, const Real* A, const Real c, Real* phiA) {
 	
 #ifdef DOUBLE
-	cuDoubleComplex* invA = (cuDoubleComplex*)malloc(m * m * sizeof(cuDoubleComplex));
+	cuDoubleComplex invA[STRIDE * STRIDE];
 #else
-  	cuFloatComplex* invA = *cuFloatComplex*(malloc(m * m * sizeof(cuFloatComplex));
+  	cuFloatComplex invA[STRIDE * STRIDE];
 #endif
 	
 	#pragma unroll
@@ -158,15 +158,15 @@ void expAc_variable(const int m, const int STRIDE, const Real* A, const Real c, 
 				// A - theta * I
 			#ifdef DOUBLE
 				if (i == j) {
-					invA[i + j*m] = cuCsub(make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
+					invA[i + j*STRIDE] = cuCsub(make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
 				} else {
-					invA[i + j*m] = make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0);
+					invA[i + j*STRIDE] = make_cuDoubleComplex(c * A[i + j*STRIDE], 0.0);
 				}
 			#else
 				if (i == j) {
-					invA[i + j*m] = cuCsubf(make_cuFloatComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
+					invA[i + j*STRIDE] = cuCsubf(make_cuFloatComplex(c * A[i + j*STRIDE], 0.0), poles[q]);
 				} else {
-					invA[i + j*m] = make_cuFloatComplex(c * A[i + j*STRIDE], 0.0);
+					invA[i + j*STRIDE] = make_cuFloatComplex(c * A[i + j*STRIDE], 0.0);
 				}
 			#endif
 			}
@@ -181,12 +181,11 @@ void expAc_variable(const int m, const int STRIDE, const Real* A, const Real c, 
 			#pragma unroll
 			for (int j = 0; j < m; ++j) {
 			#ifdef DOUBLE
-				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( res[q], invA[i + j*m]) );
+				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( res[q], invA[i + j*STRIDE]) );
 			#else
-				phiA[i + j*STRIDE] += 2.0 * cuCrealf( cuCmulf( res[q], invA[i + j*m]) )
+				phiA[i + j*STRIDE] += 2.0 * cuCrealf( cuCmulf( res[q], invA[i + j*STRIDE]) )
 			#endif
 			}
 		}
 	}
-	free (invA);
 }
