@@ -70,6 +70,11 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 #endif
 
 	double beta = 0;
+	double A[NN * NN] = {ZERO};
+	double Hm[STRIDE * STRIDE] = {ZERO};
+	double Vm[NN * STRIDE];
+	double phiHm[STRIDE * STRIDE];
+	double savedActions[NN * 5];
 	while ((t < t_end) && (t + h > t)) {
 		//initial krylov subspace sizes
 		int m, m1, m2;
@@ -86,7 +91,6 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		dydt (t, pr, y, fy);
 
 		// Jacobian matrix
-		double A[NN * NN] = {ZERO};
 		eval_jacob (t, pr, y, A);
     	double gy[NN];
     	//gy = fy - A * y
@@ -96,12 +100,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
     		gy[i] = fy[i] - gy[i];
     	}
 
-		double Hm[STRIDE * STRIDE] = {ZERO};
-		double Vm[NN * STRIDE] = {ZERO};
-		double phiHm[STRIDE * STRIDE] = {ZERO};
 		double err = ZERO;
-		double savedActions[NN * 5];
-
 		do
 		{
 			//do arnoldi
@@ -221,7 +220,10 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			
 			if (err <= ONE) {
 
-				memcpy(sc, f_temp, NN * sizeof(double));
+				#pragma unroll
+				for (int i = 0; i < NN; ++i)
+					sc[i] = f_temp[i];
+				//memcpy(sc, f_temp, NN * sizeof(double));
 				
 				// minimum of classical and Gustafsson step size prediction
 				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
