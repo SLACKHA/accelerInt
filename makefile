@@ -86,7 +86,7 @@ profiler : FLAGS += -pg -DPROFILER -fopenmp
 profiler : LIBS += -fopenmp
 
 gpuprofiler : L = 4
-gpuprofiler : FLAGS += $(NVCCFLAGS) $(NVCCINCLUDES) -DPROFILER -Xnvlink -v --ptxas-options=-v -lineinfo
+gpuprofiler : NVCCFLAGS += -DPROFILER -Xnvlink -v --ptxas-options=-v -lineinfo
 gpuprofiler : LIBS += $(NVCCLIBS)
 
 ratestest : FLAGS += -DRATES_TEST -fopenmp
