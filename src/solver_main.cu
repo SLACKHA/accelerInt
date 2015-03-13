@@ -178,6 +178,10 @@ int main (int argc, char *argv[])
         }
         cudaErrorCheck (cudaGetDeviceProperties(&devProp, id));
     }
+    //bump up shared mem bank size
+    cudaErrorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
+    //and L1 size
+    cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
     //create host logging arrays
