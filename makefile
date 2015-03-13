@@ -89,6 +89,10 @@ gpuprofiler : L = 4
 gpuprofiler : NVCCFLAGS += -DPROFILER -Xnvlink -v --ptxas-options=-v -lineinfo
 gpuprofiler : LIBS += $(NVCCLIBS)
 
+rb43profiler : L = 4
+rb43profiler : NVCCFLAGS += -DRB43 -Xnvlink -v --ptxas-options=-v -lineinfo
+rb43profiler : LIBS += $(NVCCLIBS) $(RA_LIBS)
+
 ratestest : FLAGS += -DRATES_TEST -fopenmp
 ratestest : LIBS += -fopenmp
 
@@ -144,7 +148,7 @@ OBJ_RB43_GPU = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43_GPU))
 _OBJ_EXP4_GPU = exp4_init.cu.o exp4.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
 OBJ_EXP4_GPU = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4_GPU))
 
-_OBJ_CVODES += dydt_cvodes.o cvodes_init.o solver_cvodes.o $(_OBJ)
+_OBJ_CVODES += dydt_cvodes.o cvodes_init.o solver_cvodes.o $(filter-out jacob.o,$(_OBJ))
 OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES))
 
 _OBJ_PROFILER = rateOutputTest.o $(_MECH)
@@ -152,6 +156,9 @@ OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER))
 
 _OBJ_GPU_PROFILER = rateOutputTest.cu.o $(_MECH_GPU)
 OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER))
+
+_OBJ_RB43_GPU_PROFILER = solver_profiler.cu.o exprb43_init.cu.o $(filter-out solver_main.cu.o,$(_OBJ_GPU_RA))
+OBJ_RB43_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_RB43_GPU_PROFILER))
 
 _OBJ_RATES_TEST = rateOutputTest.o $(_MECH) 
 OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST))
@@ -213,12 +220,16 @@ gpuratestest : $(OBJ_GPU_RATES_TEST)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RATES_TEST) $(LIBS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_GPU_RATES_TEST) dlink.o $(LIBS) -o $@
 
+rb43profiler : $(OBJ_RB43_GPU_PROFILER)
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU_PROFILER) $(LIBS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_RB43_GPU_PROFILER) dlink.o $(LIBS) -o $@
+
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
 clean :
-	rm -f $(OBJ_EXP4) $(OBJ_RB43) $(OBJ_CVODES) $(OBJ_RB43_GPU) $(OBJ_EXP4_GPU) $(OBJ_PROFILER) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) \
-		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest doc \
+	rm -f $(OBJ_EXP4) $(OBJ_RB43) $(OBJ_CVODES) $(OBJ_RB43_GPU) $(OBJ_EXP4_GPU) $(OBJ_PROFILER) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) $(OBJ_RB43_GPU_PROFILER) \
+		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler doc \
 		dlink.o
 
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))
