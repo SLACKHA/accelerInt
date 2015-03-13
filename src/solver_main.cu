@@ -88,7 +88,7 @@ int main (int argc, char *argv[])
     /* Block size */
     int BLOCK_SIZE = 64;
 
-    int g_num = (int)round(((double)NUM) / ((double)BLOCK_SIZE) + 0.5);
+    int g_num = (int)round(((double)NUM) / ((double)BLOCK_SIZE));
     if (g_num == 0)
         g_num = 1;
     dim3 dimGrid (g_num, 1 );
