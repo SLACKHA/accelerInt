@@ -11,8 +11,11 @@
  #ifndef SOLVER_CUH
  #define SOLVER_CUH
 
- __global__
- void intDriver (const int, const double, const double, 
+ #include "launch_bounds.cuh"
+
+ __global__ void 
+ __launch_bounds__(TARGET_BLOCK_SIZE, TARGET_BLOCKS)
+ intDriver (const int, const double, const double, 
                 const double*, double*);
 
  __device__

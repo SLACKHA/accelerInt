@@ -13,8 +13,8 @@
 
 #define T_ID (threadIdx.x + (blockDim.x * blockIdx.x))
 
- __global__
-void intDriver (const int NUM, const double t, const double t_end,
+ __global__ void
+intDriver (const int NUM, const double t, const double t_end,
                 const double *pr_global, double *y_global)
 {
     if (T_ID < NUM)

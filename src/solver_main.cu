@@ -37,6 +37,7 @@
 #include "solver_props.h"
 #include "gpu_memory.cuh"
 #include "read_initial_conditions.h"
+#include "launch_bounds.cuh"
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
     //make logging array definitions
@@ -85,17 +86,14 @@ int main (int argc, char *argv[])
         NUM = problemsize;
     }
 
-    /* Block size */
-    int BLOCK_SIZE = 64;
-
-    int g_num = (int)round(((double)NUM) / ((double)BLOCK_SIZE));
+    int g_num = (int)round(((double)NUM) / ((double)TARGET_BLOCK_SIZE));
     if (g_num == 0)
         g_num = 1;
     dim3 dimGrid (g_num, 1 );
-    dim3 dimBlock(BLOCK_SIZE, 1);
+    dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
 
     // print number of threads and block size
-    printf ("# threads: %d \t block size: %d\n", NUM, BLOCK_SIZE);
+    printf ("# threads: %d \t block size: %d\n", NUM, TARGET_BLOCK_SIZE);
 
     // time span
     double t_start = 0.0;
@@ -108,17 +106,17 @@ int main (int argc, char *argv[])
     double* pres_device;
     double* pres_host;
 #ifdef SAME_IC
-    int padded = set_same_initial_conditions(NUM, BLOCK_SIZE, g_num, &y_host, &y_device, &pres_host, &pres_device);
+    int padded = set_same_initial_conditions(NUM, &y_host, &y_device, &pres_host, &pres_device);
 #else
-    int padded = read_initial_conditions(NUM, BLOCK_SIZE, g_num, &y_host, &y_device, &pres_host, &pres_device);
+    int padded = read_initial_conditions(NUM, &y_host, &y_device, &pres_host, &pres_device);
 #endif
 #elif CONV
     double* rho_device;
     double* rho_device;
 #ifdef SAME_IC
-    int padded = set_same_initial_conditions(NUM, BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
+    int padded = set_same_initial_conditions(NUM, &y_host, &y_device, &rho_host, &rho_device);
 #else
-    int padded = read_initial_conditions(NUM, BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
+    int padded = read_initial_conditions(NUM, &y_host, &y_device, &rho_host, &rho_device);
 #endif
 #endif
 
@@ -237,10 +235,10 @@ int main (int argc, char *argv[])
 
 #if defined(CONP)
         // constant pressure case
-        intDriver <<< dimGrid, dimBlock>>> (padded, t, t_next, pres_device, y_device);
+        intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (padded, t, t_next, pres_device, y_device);
 #elif defined(CONV)
         // constant volume case
-        intDriver <<< dimGrid, dimBlock>>> (padded, t, t_next, rho_device, y_device);
+        intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (padded, t, t_next, rho_device, y_device);
 #endif
         cudaErrorCheck( cudaPeekAtLastError() );
         cudaErrorCheck( cudaDeviceSynchronize() );
