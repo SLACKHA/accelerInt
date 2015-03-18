@@ -133,14 +133,14 @@ int main (int argc, char *argv[])
     FILE *pFile;
     const char* f_name = solver_name();
     int len = strlen(f_name);
-    char out_name[len + 9];
-    sprintf(out_name, "%s-log.txt", f_name);
+    char out_name[len + 13];
+    sprintf(out_name, "log/%s-log.txt", f_name);
     pFile = fopen(out_name, "w");
 
-    fprintf(pFile, "%e", t_start);
+    fprintf(pFile, "%.15le", t_start);
     for (int i = 0; i < NN; ++i)
     {
-        fprintf(pFile, "\t%e", y_host[NUM * i]);
+        fprintf(pFile, ",%.15e", y_host[NUM * i]);
     }
     fprintf(pFile, "\n");
 #endif
@@ -262,7 +262,7 @@ int main (int argc, char *argv[])
         }
 #endif
 #ifdef LOG_OUTPUT
-        printf("%.15le", t);
+        fprintf(pFile, "%.15le", t);
         for (int i = 0; i < NN; i++) {
         	fprintf(pFile, ",");
         	fprintf(pFile, "%.15le", y_host[i * NUM]);
@@ -314,6 +314,9 @@ int main (int argc, char *argv[])
     printf ("Time: %e sec\n", runtime);
     runtime = runtime / ((Real)(numSteps));
     printf ("Time per step: %e (s)\t%e (s/thread)\n", runtime, runtime / NUM);
+#ifdef IGN
+    printf ("Ig. Delay (s): %e\n", t_ign);
+#endif
 
 #ifdef LOG_OUTPUT
     fclose (pFile);
