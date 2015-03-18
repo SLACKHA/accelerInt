@@ -177,15 +177,14 @@ __device__ void RK_Make_Interpolate(double* Z1, double* Z2, double* Z3, double* 
 	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]); 
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
-		CONT[i * 3] = ((((-rkC[2] * rkC[2]) * rkC[1] * Z1[i]) + (Z3[i]*rkC[1])*(rkC[0] * rkC[0])
-                    + (rkC[1] * rkC[1])*(rkC[2]*Z1[i])-(rkC[1] * rkC[1])*(rkC[0]*Z3[i]) 
-                    +(rkC[2] * rkC[2])*(rkC[0]*Z2[i])-(Z2[i]*rkC[2])*(rkC[0] * rkC[0]))
+		CONT[i] = ((-rkC[2] * rkC[2] * rkC[1] * Z1[i] + Z3[i] * rkC[1]* rkC[0] * rkC[0]
+                    + rkC[1] * rkC[1] * rkC[2] * Z1[i] - rkC[1] * rkC[1] * rkC[0] * Z3[i] 
+                    + rkC[2] * rkC[2] * rkC[0] * Z2[i] - Z2[i] * rkC[2] * rkC[0] * rkC[0])
                     /den)-Z3[i];
-        CONT[i * 3 + 1] = -(rkC[0] * rkC[0] * (Z3[i] - Z2[i]) +
-        					rkC[1] * rkC[1] * (Z1[i] - Z3[i]) +
-        					rkC[2] * rkC[2] * (Z2[i] - Z1[i])) / den;
-        CONT[i * 3 + 2] = (rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * (Z1[i] - Z3[i]) + 
-        					rkC[2] * (Z2[i] - Z1[i])) / den;
+        CONT[NN + i] = -( rkC[0] * rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * rkC[1] * (Z1[i] - Z3[i]) 
+        				 + rkC[2] * rkC[2] * (Z2[i] - Z1[i]) )/den;
+        CONT[NN + NN + i] = ( rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * (Z1[i] - Z3[i]) 
+                           + rkC[2] * (Z2[i] - Z1[i]) ) / den;
 	}
 }
 
@@ -196,9 +195,9 @@ __device__ void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, do
 	register double x3 = ONE + rkC[2] * r;
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
-		Z1[i] = CONT[i * 3] + x1 * (CONT[i * 3 + 1] + x1 * CONT[i * 3 + 2]);
-		Z2[i] = CONT[i * 3] + x2 * (CONT[i * 3 + 1] + x2 * CONT[i * 3 + 2]);
-		Z3[i] = CONT[i * 3] + x2 * (CONT[i * 3 + 1] + x3 * CONT[i * 3 + 2]);
+		Z1[i] = CONT[i] + x1 * (CONT[NN + i] + x1 * CONT[NN + NN + i]);
+		Z2[i] = CONT[i] + x2 * (CONT[NN + i] + x2 * CONT[NN + NN + i]);
+		Z3[i] = CONT[i] + x2 * (CONT[NN + i] + x3 * CONT[NN + NN + i]);
 	}
 }
 
