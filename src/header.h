@@ -111,7 +111,9 @@ typedef unsigned short int usint;
 
 //turn on to log the krylov space and step sizes to log.txt
 #ifdef DEBUG
-  #define LOG_KRYLOV_AND_STEPSIZES
+  #if defined(RB43) || defined(EXP4)
+    #define LOG_KRYLOV_AND_STEPSIZES
+  #endif
 #endif
 
 // load same initial conditions for all threads

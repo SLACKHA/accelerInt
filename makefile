@@ -29,7 +29,7 @@ SDIR := ./src
 LOGDIR := ./log
 
 #Modules
-MODULES := rb43 exp4 cvodes prof rates
+MODULES := rb43 exp4 cvodes prof rates radau2a
 MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
 
 #FLAGS, L=0 for testing, L=4 for optimization
@@ -77,6 +77,9 @@ exprb43-int-gpu : LIBS += $(RA_LIBS) $(NVCCLIBS)
 
 exp4-int-gpu : NVCCFLAGS += $(NVCCINCLUDES) -DEXP4
 exp4-int-gpu : LIBS +=  $(RA_LIBS) $(NVCCLIBS)
+
+radau2a-int-gpu : NVCCFLAGS += $(NVCCINCLUDES) -DRADAU2A
+radau2a-int-gpu : LIBS += $(NVCCLIBS)
 
 cvodes-int : FLAGS += -DCVODES -fopenmp
 cvodes-int : LIBS += $(CV_LIBS) -fopenmp
@@ -166,6 +169,9 @@ OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST))
 _OBJ_GPU_RATES_TEST = rateOutputTest.cu.o $(_MECH_GPU)
 OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST))
 
+_OBJ_GPU_RADAU2A = radau2a.cu.o radau2a_init.cu.o  inverse.cu.o complexInverse_NN.cu.o solver_generic.cu.o $(_OBJ_GPU)
+OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A))
+
 define module_rules
 $(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS)
 	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
@@ -224,12 +230,16 @@ rb43profiler : $(OBJ_RB43_GPU_PROFILER)
 	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU_PROFILER) $(LIBS) -dlink -o dlink.o
 	$(NLINK) $(OBJ_RB43_GPU_PROFILER) dlink.o $(LIBS) -o $@
 
+radau2a-int-gpu : $(OBJ_GPU_RADAU2A)
+	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RADAU2A) $(LIBS) -dlink -o dlink.o
+	$(NLINK) $(OBJ_GPU_RADAU2A) dlink.o $(LIBS) -o $@
+
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
 clean :
-	rm -f $(OBJ_EXP4) $(OBJ_RB43) $(OBJ_CVODES) $(OBJ_RB43_GPU) $(OBJ_EXP4_GPU) $(OBJ_PROFILER) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) $(OBJ_RB43_GPU_PROFILER) \
-		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler doc \
+	rm -f $(OBJ_EXP4) $(OBJ_RB43) $(OBJ_CVODES) $(OBJ_RB43_GPU) $(OBJ_EXP4_GPU) $(OBJ_PROFILER) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) $(OBJ_RB43_GPU_PROFILER) $(OBJ_GPU_RADAU2A) \
+		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu doc \
 		dlink.o
 
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))
