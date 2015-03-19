@@ -236,6 +236,7 @@ int main (int argc, char *argv[])
 #ifdef IGN
     printf ("Ig. Delay (s): %e\n", t_ign);
 #endif
+    printf("TFinal: %e\n", y_host[0]);
 
 #ifdef LOG_OUTPUT
     fclose (pFile);

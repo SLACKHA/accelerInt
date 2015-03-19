@@ -3,6 +3,6 @@
 
 #include <cuComplex.h>
 
-__device__ void getComplexLU (cuDoubleComplex*, int*);
+__device__ void getComplexLU (cuDoubleComplex*, int*, int*);
 
 #endif

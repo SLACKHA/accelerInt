@@ -29,12 +29,11 @@ extern __device__ Real* f_temp;
 
 __device__
 void eval_jacob (const Real t, const Real pres, Real * y, Real * jac) {
-  
+  Real dy[NN];
+  Real error[NN];
+
   dydt (t, pres, y, dy);
   
-#ifndef GLOBAL_MEM
-  Real ewt[NN];
-#endif
   #pragma unroll
   for (uint i = 0; i < NN; ++i) {
     error[INDEX(i)] = ATOL + (RTOL * fabs(y[INDEX(i)]));

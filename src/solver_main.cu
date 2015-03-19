@@ -86,6 +86,41 @@ int main (int argc, char *argv[])
         NUM = problemsize;
     }
 
+    // set & initialize device using command line argument (if any)
+    cudaDeviceProp devProp;
+    if (argc <= 2)
+    {
+        // default device id is 0
+        cudaErrorCheck (cudaSetDevice (0) );
+        cudaErrorCheck (cudaGetDeviceProperties(&devProp, 0));
+    }
+    else
+    {
+        // use second argument for number
+
+        // get number of devices
+        int num_devices;
+        cudaGetDeviceCount(&num_devices);
+
+        int id = 0;
+        if (sscanf(argv[2], "%i", &id) == 1 && (id >= 0) && (id < num_devices))
+        {
+            checkCudaErrors (cudaSetDevice (id) );
+        }
+        else
+        {
+            // not in range, error
+            printf("Error: GPU device number not in correct range\n");
+            printf("Provide number between 0 and %i\n", num_devices - 1);
+            exit(1);
+        }
+        cudaErrorCheck (cudaGetDeviceProperties(&devProp, id));
+    }
+    //bump up shared mem bank size
+    cudaErrorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
+    //and L1 size
+    cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
+
     int g_num = (int)round(((double)NUM) / ((double)TARGET_BLOCK_SIZE));
     if (g_num == 0)
         g_num = 1;
@@ -145,41 +180,6 @@ int main (int argc, char *argv[])
     fprintf(pFile, "\n");
 #endif
 
-
-    // set & initialize device using command line argument (if any)
-    cudaDeviceProp devProp;
-    if (argc <= 2)
-    {
-        // default device id is 0
-        cudaErrorCheck (cudaSetDevice (0) );
-        cudaErrorCheck (cudaGetDeviceProperties(&devProp, 0));
-    }
-    else
-    {
-        // use second argument for number
-
-        // get number of devices
-        int num_devices;
-        cudaGetDeviceCount(&num_devices);
-
-        int id = 0;
-        if (sscanf(argv[2], "%i", &id) == 1 && (id >= 0) && (id < num_devices))
-        {
-            checkCudaErrors (cudaSetDevice (id) );
-        }
-        else
-        {
-            // not in range, error
-            printf("Error: GPU device number not in correct range\n");
-            printf("Provide number between 0 and %i\n", num_devices - 1);
-            exit(1);
-        }
-        cudaErrorCheck (cudaGetDeviceProperties(&devProp, id));
-    }
-    //bump up shared mem bank size
-    cudaErrorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
-    //and L1 size
-    cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
     //create host logging arrays
@@ -317,6 +317,7 @@ int main (int argc, char *argv[])
 #ifdef IGN
     printf ("Ig. Delay (s): %e\n", t_ign);
 #endif
+    printf("TFinal: %e\n", y_host[0]);
 
 #ifdef LOG_OUTPUT
     fclose (pFile);

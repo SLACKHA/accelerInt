@@ -184,7 +184,7 @@ endef
 
 default: all
 
-all : $(ODIR) $(LOGDIR) exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest
+all : $(ODIR) $(LOGDIR) exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest radau2a-int-gpu
 $(ODIR):
 	mkdir -p $(ODIR)
 $(LOGDIR):

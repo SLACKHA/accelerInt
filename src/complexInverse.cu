@@ -69,8 +69,7 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 			cuDoubleComplex temp = cuCmul(alpha, arrY[j * incY]);
       
 			for (int i = 0; i < n; ++i) {
-				//A[i + (lda * j)] += cuCmul(arrX[i], temp);
-        A[i + (lda * j)] = cuCfma(arrX[i], temp, A[i + (lda * j)]);
+				A[i + (lda * j)] = cuCadd(A[i + (lda * j)], cuCmul(arrX[i], temp));
 			}
       
 		}    
@@ -130,7 +129,7 @@ void multiplyComplexUpperMV (const int n, cuDoubleComplex* x, const int lda, con
 			cuDoubleComplex temp = x[j];
 			for (int i = 0; i < j; ++i) {
 				//x[i] += temp * A[i + (lda * j)];
-       			x[i] = cuCfma(temp, A[i + (lda * j)], x[i]);
+       			x[i] = cuCadd(x[i], cuCmul(temp, A[i + (lda * j)]));
 			}
 			//x[j] *= A[j + (lda * j)];
       		x[j] = cuCmul(x[j], A[j + (lda * j)]);
@@ -157,7 +156,7 @@ void complexGEMV (const int m, const int n, const cuDoubleComplex alpha, const c
       
 			for (int i = 0; i < m; ++i) {
 				//arrY[i] += temp * A[i + (m * j)];
-        arrY[i] = cuCfma(temp, A[i + (STRIDE * j)], arrY[i]);
+        		arrY[i] = cuCadd(arrY[i], cuCmul(A[i + (STRIDE * j)], temp));
 			}
 		}
 	}

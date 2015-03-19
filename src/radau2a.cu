@@ -11,12 +11,35 @@
 */
 
 #include "header.h"
-#include "exponential_linear_algebra.cuh"
 #include "inverse.cuh"
 #include "complexInverse_NN.cuh"
 #include "dydt.cuh"
 #include "jacob.cuh"
 #include <cuComplex.h>
+
+__device__
+void scale_init (const double * y0, double * sc) {
+	#pragma unroll
+	for (uint i = 0; i < NN; ++i) {
+		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
+	}
+}
+
+#define Max_no_steps (200000)
+#define NewtonMaxit (8)
+#define StartNewton (true)
+#define Gustafsson
+#define Roundoff (EPS)
+#define FacMin (0.2)
+#define FacMax (8)
+#define FacSafe (0.9)
+#define FacRej (0.1)
+#define ThetaMin (0.001)
+#define NewtonTol (0.03)
+#define Qmin (1.0)
+#define Qmax (1.2)
+#define UNROLL (8)
+#define SDIRK_ERROR
 
 __constant__ double rkA[3][3] = { {
 	 1.968154772236604258683861429918299e-1,
@@ -45,21 +68,45 @@ __constant__ double rkC[3] = {
 1.0
 };
 
-// Classical error estimator: 
-// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
-__constant__ double rkE[4] = {
-1.0*0.05,
--10.04880939982741556246032950764708e0*0.05,
-1.382142733160748895793662840980412e0*0.05,
--0.3333333333333333333333333333333333e0*0.05
-};
-
-// H* Sum Bgam_j*f(Z_j) = H*Bgam(0)*f(0) + Sum Theta_j*Z_j
-__constant__ double rkTheta[3] = {
--1.520677486405081647234271944611547e0-10.04880939982741556246032950764708e0*0.05,
-2.070455145596436382729929151810376e0+1.382142733160748895793662840980413e0*0.05,
--0.3333333333333333333333333333333333e0*0.05-0.3744441479783868387391430179970741e0
-};
+#ifdef SDIRK_ERROR
+	// Classical error estimator: 
+	// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
+	__constant__ double rkE[4] = {
+	1.0*0.05,
+	-10.04880939982741556246032950764708e0*0.02,
+	1.382142733160748895793662840980412e0*0.02,
+	-0.3333333333333333333333333333333333e0*0.02
+	};
+	// H* Sum Bgam_j*f(Z_j) = H*Bgam(0)*f(0) + Sum Theta_j*Z_j
+	__constant__ double rkTheta[3] = {
+	-1.520677486405081647234271944611547e0 - 10.04880939982741556246032950764708e0*0.02,
+	2.070455145596436382729929151810376e0 + 1.382142733160748895793662840980413e0*0.02,
+	-0.3333333333333333333333333333333333e0*0.02 - 0.3744441479783868387391430179970741
+	};
+	// ! Sdirk error estimator
+	__constant__ double rkBgam[5] = {
+	0.02,
+	0.3764030627004672750500754423692807-1.558078204724922382431975370686279*0.02,
+	0.8914115380582557157653087040196118*0.02+.5124858261884216138388134465196077,
+	-0.1637777184845662566367174924883037-0.3333333333333333333333333333333333*0.02,
+	0.2748888295956773677478286035994148
+	};
+#else
+	// Classical error estimator: 
+	// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
+	__constant__ double rkE[4] = {
+	1.0*0.05,
+	-10.04880939982741556246032950764708e0*0.05,
+	1.382142733160748895793662840980412e0*0.05,
+	-0.3333333333333333333333333333333333e0*0.05
+	};
+	// H* Sum Bgam_j*f(Z_j) = H*Bgam(0)*f(0) + Sum Theta_j*Z_j
+	__constant__ double rkTheta[3] = {
+	-1.520677486405081647234271944611547e0 - 10.04880939982741556246032950764708e0*0.05,
+	2.070455145596436382729929151810376e0 + 1.382142733160748895793662840980413e0*0.05,
+	-0.3333333333333333333333333333333333e0*0.05 - 0.3744441479783868387391430179970741e0
+	};
+#endif
 
 //Local order of error estimator 
 /*
@@ -128,26 +175,10 @@ __constant__ double rkELO = 4;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define Max_no_steps (200000)
-#define NewtonMaxit (8)
-#define StartNewton (true)
-#define Gustafsson
-#define Roundoff (EPS)
-#define FacMin (0.2)
-#define FacMax (8)
-#define FacSafe (0.9)
-#define FacRej (0.1)
-#define ThetaMin (0.001)
-#define NewtonTol (0.03)
-#define Qmin (1.0)
-#define Qmax (1.2)
-#define UNROLL (8)
-
-
 /*
 * calculate E1 & E2 matricies and their LU Decomposition
 */
-__device__ void RK_Decomp(double H, double* E1, cuDoubleComplex* E2, double* Jac, int* ipiv1, int* ipiv2) {
+__device__ void RK_Decomp(double H, double* E1, cuDoubleComplex* E2, double* Jac, int* ipiv1, int* ipiv2, int* info) {
 	cuDoubleComplex temp = make_cuDoubleComplex(rkAlpha/H, rkBeta/H);
 	#pragma unroll
 	for (int i = 0; i < NN; i++)
@@ -161,16 +192,11 @@ __device__ void RK_Decomp(double H, double* E1, cuDoubleComplex* E2, double* Jac
 		E1[i + i * NN] += rkGamma / H;
 		E2[i + i * NN] = cuCadd(E2[i + i * NN], temp); 
 	}
-	getLU(E1, ipiv1);
-	getComplexLU(E2, ipiv2);
-}
-
-__device__ void SetToZeroNN(double* Array) {
-	#pragma unroll
-	for(int i = 0; i < NN; i++)
-	{
-		Array[i] = ZERO;
+	getLU(E1, ipiv1, info);
+	if (*info != 0) {
+		return;
 	}
+	getComplexLU(E2, ipiv2, info);
 }
 
 __device__ void RK_Make_Interpolate(double* Z1, double* Z2, double* Z3, double* CONT) {
@@ -210,6 +236,15 @@ __device__ void WADD(double* X, double* Y, double* Z) {
 	}
 }
 
+__device__ void DAXPY3(double DA1, double DA2, double DA3, double* DX, double* DY1, double* DY2, double* DY3) {
+	#pragma unroll
+	for (int i = 0; i < NN; i++) {
+		DY1[i] += DA1 * DX[i];
+		DY2[i] += DA2 * DX[i];
+		DY3[i] += DA3 * DX[i];
+	}
+}
+
 /*
 *Prepare the right-hand side for Newton iterations
 *     R = Z - hA * F
@@ -228,69 +263,62 @@ __device__ void RK_PrepareRHS(double t, double pr, double H, double* Y, double* 
 	WADD(Y, Z1, TMP);
 	dydt(t + rkC[0] * H, pr, TMP, F);
 	//R[:] -= -h * rkA[:][0] * F[:]
-	#pragma unroll
-	for (int i = 0; i < NN; i++) {
-		R1[i] += -H * rkA[0][0] * F[i];
-		R2[i] += -H * rkA[1][0] * F[i];
-		R3[i] += -H * rkA[2][0] * F[i];
-	}
+	DAXPY3(-H * rkA[0][0], -H * rkA[1][0], -H * rkA[2][0], F, R1, R2, R3);
 
 	// TMP = Y + Z2
 	WADD(Y, Z2, TMP);
 	dydt(t + rkC[1] * H, pr, TMP, F);
 	//R[:] -= -h * rkA[:][1] * F[:]
-	#pragma unroll
-	for (int i = 0; i < NN; i++) {
-		R1[i] += -H * rkA[0][1] * F[i];
-		R2[i] += -H * rkA[1][1] * F[i];
-		R3[i] += -H * rkA[2][1] * F[i];
-	}
+	DAXPY3(-H * rkA[0][1], -H * rkA[1][1], -H * rkA[2][1], F, R1, R2, R3);
 
 	// TMP = Y + Z3
 	WADD(Y, Z3, TMP);
 	dydt(t + rkC[2] * H, pr, TMP, F);
 	//R[:] -= -h * rkA[:][2] * F[:]
-	#pragma unroll
-	for (int i = 0; i < NN; i++) {
-		R1[i] += -H * rkA[0][2] * F[i];
-		R2[i] += -H * rkA[1][2] * F[i];
-		R3[i] += -H * rkA[2][2] * F[i];
-	}
+	DAXPY3(-H * rkA[0][2], -H * rkA[1][2], -H * rkA[2][2], F, R1, R2, R3);
 }
 
 __device__ void dlaswp(double* A, int* ipiv) {
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
-		if (ipiv[i] != i) {
+		int ip = ipiv[i];
+		if (ip != i) {
 			double temp = A[i];
-			A[i] = A[ipiv[i]];
-			A[ipiv[i]] = temp;
+			A[i] = A[ip];
+			A[ip] = temp;
 		}
 	}	
 }
 
-__device__ void dtrsm_upper(double* A, double* B) {
-	#pragma unroll
-	for (int k = NN - 1; k >= 0; k--) {
-		if (B[k] != ZERO) {
-			B[k] /= A[k + k * NN];
+//diag == 'n' -> nounit = true
+//upper == 'u' -> upper = true
+__device__ void dtrsm(bool upper, bool nounit, double* A, double* b) {
+	if (upper) {
+		#pragma unroll
+		for (int k = NN - 1; k >= 0; --k)
+		{
+			if (nounit) {
+				b[k] /= A[k + k * NN];
+			}
 			#pragma unroll
 			for (int i = 0; i < k; i++)
 			{
-				B[i] -= B[k] * A[i + k * NN];
+				b[i] -= b[k] * A[i + k * NN];
 			}
 		}
 	}
-}
-
-__device__ void dtrsm_lower(double* A, double* B) {
-	#pragma unroll
-	for (int k = 0; k < NN; k++) {
-		if (B[k] != ZERO) {
-			#pragma unroll
-			for (int i = k + 1; i < NN; i++)
-			{
-				B[i] -= B[k] * A[i + k * NN];
+	else{
+		#pragma unroll
+		for (int k = 0; k < NN; k++) {
+			if (fabs(b[k]) > 0) {
+				if (nounit) {
+					b[k] /= A[k + k * NN];
+				}
+				#pragma unroll
+				for (int i = k + 1; i < NN; i++)
+				{
+					b[i] -= b[k] * A[i + k * NN];
+				}
 			}
 		}
 	}
@@ -298,43 +326,51 @@ __device__ void dtrsm_lower(double* A, double* B) {
 
 __device__ void dgetrs(double* A, double* B, int* ipiv) {
 	dlaswp(B, ipiv);
-	dtrsm_lower(A, B);
-	dtrsm_upper(A, B);
+	dtrsm(false, false, A, B);
+	dtrsm(true, true, A, B);
 }
 
 __device__ void zlaswp(cuDoubleComplex* A, int* ipiv) {
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
-		if (ipiv[i] != i) {
+		int ip = ipiv[i];
+		if (ip != i) {
 			cuDoubleComplex temp = A[i];
-			A[i] = A[ipiv[i]];
-			A[ipiv[i]] = temp;
+			A[i] = A[ip];
+			A[ip] = temp;
 		}
 	}	
 }
 
-__device__ void ztrsm_upper(cuDoubleComplex* A, cuDoubleComplex* B) {
-	#pragma unroll
-	for (int k = NN - 1; k >= 0; k--) {
-		if (cuCabs(B[k]) > ZERO) {
-			B[k] = cuCdiv(B[k], A[k + k * NN]);
+//diag == 'n' -> nounit = true
+//upper == 'u' -> upper = true
+__device__ void ztrsm(bool upper, bool nounit, cuDoubleComplex* A, cuDoubleComplex* b) {
+	if (upper) {
+		#pragma unroll
+		for (int k = NN - 1; k >= 0; --k)
+		{
+			if (nounit) {
+				b[k] = cuCdiv(b[k], A[k + k * NN]);
+			}
 			#pragma unroll
 			for (int i = 0; i < k; i++)
 			{
-				B[i] = cuCsub(B[i], cuCmul(B[k], A[i + k * NN]));
+				b[i] = cuCsub(b[i], cuCmul(b[k], A[i + k * NN]));
 			}
 		}
 	}
-}
-
-__device__ void ztrsm_lower(cuDoubleComplex* A, cuDoubleComplex* B) {
-	#pragma unroll
-	for (int k = 0; k < NN; k++) {
-		if (cuCabs(B[k]) > ZERO) {
-			#pragma unroll
-			for (int i = k + 1; i < NN; i++)
-			{
-				B[i] = cuCsub(B[i], cuCmul(B[k], A[i + k * NN]));
+	else{
+		#pragma unroll
+		for (int k = 0; k < NN; k++) {
+			if (cuCabs(b[k]) > 0) {
+				if (nounit) {
+					b[k] = cuCdiv(b[k], A[k + k * NN]);
+				}
+				#pragma unroll
+				for (int i = k + 1; i < NN; i++)
+				{
+					b[i] = cuCsub(b[i], cuCmul(b[k], A[i + k * NN]));
+				}
 			}
 		}
 	}
@@ -342,8 +378,8 @@ __device__ void ztrsm_lower(cuDoubleComplex* A, cuDoubleComplex* B) {
 
 __device__ void zgetrs(cuDoubleComplex* A, cuDoubleComplex* B, int* ipiv) {
 	zlaswp(B, ipiv);
-	ztrsm_lower(A, B);
-	ztrsm_upper(A, B);
+	ztrsm(false, false, A, B);
+	ztrsm(true, true, A, B);
 }
 
 __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, double* R2, double* R3, int* ipiv1, int* ipiv2) {
@@ -390,7 +426,7 @@ __device__ double RK_ErrorNorm(double* scale, double* DY) {
 	int start = NN % UNROLL;
 	//take care of mod part
 	if (start != 0) {
-		for (int i = 0; i < start && i < NN; i++)
+		for (int i = 0; i < start; i++)
 		{
 			sums[i] += (scale[i] * scale[i] * DY[i] * DY[i]);
 		}
@@ -400,7 +436,7 @@ __device__ double RK_ErrorNorm(double* scale, double* DY) {
 	for (int i = start; i < NN; i += UNROLL)
 	{
 		#pragma unroll
-		for (int j = 0; j < UNROLL && i + j < NN; ++j) {
+		for (int j = 0; j < UNROLL; ++j) {
 			sums[j] += (scale[i + j] * scale[i + j] * DY[i + j] * DY[i + j]);
 		}
 	}
@@ -418,6 +454,7 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
 
+    double F1[NN];
     double F2[NN];
     double TMP[NN];
     #pragma unroll
@@ -430,8 +467,11 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
     }
     dgetrs(E1, TMP, ipiv1);
     double Err = RK_ErrorNorm(scale, TMP);
-    if (Err > ONE && (FirstStep || Reject)) {
-    	double F1[NN];
+    if (Err >= ONE && (FirstStep || Reject)) {
+        #pragma unroll
+    	for (int i = 0; i < NN; i++) {
+        	TMP[i] += Y[i];
+        }
     	dydt(t, pr, TMP, F1);
     	#pragma unroll
     	for (int i = 0; i < NN; i++) {
@@ -450,12 +490,12 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
 __device__ void integrate (const double t_start, const double t_end, const double pr, double* y) {
 	double Hmin = 0;
 	double Hmax = fabs(t_end - t_start);
-	double Hold = 1e-7;
+	double Hold = 0;
 #ifdef Gustafsson
 	double Hacc = 0;
 	double ErrOld = 0;
 #endif
-	double H = 1e-7;
+	double H = 1e-6;
 	double Hnew;
 	double t = t_start;
 	bool Reject = false;
@@ -471,33 +511,77 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double Z1[NN];
 	double Z2[NN];
 	double Z3[NN];
+#ifdef SDIRK_ERROR
+	double Z4[NN];
+	double DZ4[NN];
+	double G[NN];
+	double TMP[NN];
+#endif
 	double DZ1[NN];
 	double DZ2[NN];
 	double DZ3[NN];
 	double CONT[NN * 3];
 	scale_init(y, scale);
 	double F0[NN];
+	int info = 0;
+	int Nconsecutive = 0;
+	int Nsteps = 0;
 	while (t + Roundoff < t_end) {
-		dydt (t, pr, y, F0);
+		if (!Reject) {
+			dydt (t, pr, y, F0);
+		}
 		if (!SkipLU) { 
 			//need to update Jac/LU
 			if (!SkipJac) {
 				eval_jacob (t, pr, y, A);
 			}
-			RK_Decomp(H, E1, E2, A, ipiv1, ipiv2);
+			RK_Decomp(H, E1, E2, A, ipiv1, ipiv2, &info);
+			if (info != 0) {
+				Nconsecutive += 1;
+				if (Nconsecutive >= 5)
+				{
+					//todo implement return codes
+					y[0] = logf(-1);
+					return;
+				}
+				H *= 0.5;
+				Reject = true;
+				SkipJac = true;
+				SkipLU = false;
+				continue;
+			}
+			else
+			{
+				Nconsecutive = 0;
+			}
+		}
+		Nsteps += 1;
+		if (Nsteps >= Max_no_steps) {
+			//todo implement return codes
+			y[0] = logf(-1);
+			return;
+		}
+		if (0.1 * abs(H) <= abs(t) * Roundoff) {
+			//todo implement return codes
+			y[0] = logf(-1);
+			return;
 		}
 		if (FirstStep || !StartNewton) {
-			SetToZeroNN(Z1);
-			SetToZeroNN(Z2);
-			SetToZeroNN(Z3);
+			#pragma unroll
+			for(int i = 0; i < NN; i++)
+			{
+				Z1[i] = ZERO;
+				Z2[i] = ZERO;
+				Z3[i] = ZERO;
+			}
 		} else {
 			RK_Interpolate(H, Hold, Z1, Z2, Z3, CONT);
 		}
 		bool NewtonDone = false;
 		double NewtonIncrementOld = 0;
-		double Theta = ThetaMin;
 		double Fac = 0.5; //Step reduction if too many iterations
 		int NewtonIter = 0;
+		double Theta = 0;
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
 			RK_PrepareRHS(t, pr, H, y, F0, Z1, Z2, Z3, DZ1, DZ2, DZ3);
 			RK_Solve(H, E1, E2, DZ1, DZ2, DZ3, ipiv1, ipiv2);
@@ -506,6 +590,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			double d3 = RK_ErrorNorm(scale, DZ3);
 			double NewtonIncrement = sqrt((d1 * d1 + d2 * d2 + d3 * d3) / 3.0);
 			double NewtonRate = 2.0;
+			Theta = ThetaMin;
 			if (NewtonIter > 0) 
 			{
 				Theta = NewtonIncrement / NewtonIncrementOld;
@@ -517,11 +602,11 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				}
 				if (NewtonIter < NewtonMaxit) {
 					//Predict error at the end of Newton process 
-					double NewtonPredictedErr = pow(NewtonIncrement * Theta, (NewtonMaxit-NewtonIter + 1) / (ONE - Theta));
+					double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (ONE - Theta);
 					if (NewtonPredictedErr >= NewtonTol) {
 						//Non-convergence of Newton: predicted error too large
 						double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
-	                    Fac = pow(0.8 * Qnewton, -ONE/((double)(2+NewtonMaxit-NewtonIter)));
+	                    Fac = 0.8 * pow(Qnewton, -ONE/((double)(NewtonMaxit-NewtonIter)));
 	                    break;
 					}
 				}
@@ -539,6 +624,11 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
             if (NewtonDone) break;
+            if (NewtonIter == NewtonMaxit - 1) {
+            	//todo implement return codes
+				y[0] = logf(-1);
+				return;
+            }
 		}
 		if (!NewtonDone) {
 			H = Fac * H;
@@ -547,15 +637,84 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			SkipLU = false;
 			continue;
 		}
+#ifdef SDIRK_ERROR
+		//!~~~>   Prepare the loop-independent part of the right-hand side
+		//!       G = H*rkBgam(0)*F0 + rkTheta(1)*Z1 + rkTheta(2)*Z2 + rkTheta(3)*Z3
+		#pragma unroll
+		for (int i = 0; i < NN; i++) {
+			Z4[i] = Z3[i];
+			G[i] = rkBgam[0]*F0[i]*H + rkTheta[0] * Z1[i] + rkTheta[1] * Z2[i] + rkTheta[2] * Z3[i];
+		}
+		NewtonDone = false;
+        Fac = 0.5; // ! Step reduction factor if too many iterations
+        double NewtonIncrement = 0;
+        for (NewtonIter = 0; NewtonIter < NewtonMaxit; NewtonIter++) {
+        	//!~~~>   Prepare the loop-dependent part of the right-hand side
+        	WADD(y, Z4, TMP);
+        	dydt(t + H, pr, TMP, DZ4);
+        	#pragma unroll
+        	for(int i = 0; i < NN; i++){
+        		DZ4[i] += (rkGamma / H) * (G[i] - Z4[i]);
+        	}
+        	//Solve the linear system
+        	dgetrs(E1, DZ4, ipiv1);
+        	//Check convergence of Newton iterations
+        	NewtonIncrement = RK_ErrorNorm(scale,DZ4);
+        	double NewtonRate = 2.0;
+        	double ThetaSD = ThetaMin;
+        	if (NewtonIter > 0) {
+            	ThetaSD = NewtonIncrement/NewtonIncrementOld;
+            	if (ThetaSD < 0.99) {
+            		NewtonRate = ThetaSD/(ONE-ThetaSD);
+                    //! Predict error at the end of Newton process 
+                    double NewtonPredictedErr = (NewtonIncrement * pow(ThetaSD, (NewtonMaxit - NewtonIter - 1))) / (ONE - Theta);
+                    if (NewtonPredictedErr >= NewtonTol) {
+                    	//! Non-convergence of Newton: predicted error too large
+						double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
+	                    Fac = 0.8 * pow(Qnewton, -ONE/((double)(NewtonMaxit-NewtonIter)));
+	                    break;
+                    }
+            	}
+            	else
+            	{
+            		//! Non-convergence of Newton: predicted error too large
+            		break;
+            	}
+            }
+            NewtonIncrementOld = NewtonIncrement;
+            //! Update solution: Z4 <-- Z4 + DZ4
+            #pragma unroll
+            for (int i = 0; i < NN; i++) {
+            	Z4[i] += DZ4[i];
+            }
+
+            NewtonDone = (NewtonRate*NewtonIncrement <= NewtonTol);
+            if (NewtonDone) break;
+        }
+        if (!NewtonDone) {
+        	H = Fac*H;
+        	Reject = true;
+        	SkipJac = true;
+        	SkipLU = false;
+        	continue;
+		}
+#endif
+#ifdef SDIRK_ERROR
+		#pragma unroll
+		for (int i = 0; i < NN; i++) {
+			DZ4[i] = Z3[i] - Z4[i];
+		}
+		double Err = RK_ErrorNorm(scale, DZ4);
+#else
 		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, scale, E1, ipiv1, FirstStep, Reject);
+#endif
 		//!~~~> Computation of new step size Hnew
-		Fac = pow(Err, (-ONE / rkELO) * fmin(FacSafe, (ONE + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit)));
+		Fac = pow(Err, (-ONE / rkELO)) * fmin(FacSafe, (ONE + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit));
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
 		Hnew = Fac * H;
 		if (Err < ONE) {
-			FirstStep = false;
 #ifdef Gustafsson
-			if (t > t_start) {
+			if (!FirstStep) {
 				double FacGus = FacSafe * (H / Hacc) * pow(Err * Err / ErrOld, -0.25);
 				FacGus = fmin(FacMax, fmax(FacMin, FacGus));
 				Fac = fmin(Fac, FacGus);
@@ -564,6 +723,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			Hacc = H;
 			ErrOld = max(1e-2, Err);
 #endif
+			FirstStep = false;
 			Hold = H;
 			t += H;
 			#pragma unroll
@@ -586,7 +746,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				double Hratio = Hnew / H;
 	            // Reuse the LU decomposition
 	            SkipLU = (Theta <= ThetaMin) && (Hratio>=Qmin) && (Hratio<=Qmax);
-	            if (!SkipLU) H=Hnew;
+	            if (!SkipLU) H = Hnew;
 			}
 			// If convergence is fast enough, do not update Jacobian
          	SkipJac  = false;

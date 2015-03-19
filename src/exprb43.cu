@@ -74,7 +74,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double Hm[STRIDE * STRIDE] = {ZERO};
 	double Vm[NN * STRIDE];
 	double phiHm[STRIDE * STRIDE];
-	double savedActions[NN * 5];
+	double savedActions[NN * 5] = {ZERO};
 	while ((t < t_end) && (t + h > t)) {
 		//initial krylov subspace sizes
 		int m, m1, m2;
