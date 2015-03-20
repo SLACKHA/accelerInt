@@ -8,7 +8,11 @@
  */
 
 #include "header.h"
-#include "dydt_cvodes.h"
+#include "cvodes_dydt.h"
+
+#ifdef SUNDIALS_ANALYTIC_JACOBIAN
+ 	#include "cvodes_jac.h"
+#endif
 
 /* CVODES INCLUDES */
 #include "sundials/sundials_types.h"
@@ -73,10 +77,24 @@ void** integrators;
 
     	//setup the solver
 	    #if SUNDIALS_USE_LAPACK
-	        CVLapackDense(integrators[i], NN);
+	        flag = CVLapackDense(integrators[i], NN);
 	    #else
-	        CVDense(integrators[i], NN);
+	        flag = CVDense(integrators[i], NN);
 	    #endif
+
+	    if (flag != CV_SUCCESS) {
+	    	printf("Error setting up CVODES solver");
+	    	exit(-1);
+	    }
+
+	    #ifdef SUNDIALS_ANALYTIC_JACOBIAN
+	    	flag = CVDlsSetDenseJacFn(integrators[i], eval_jacob_cvodes);
+	    #endif
+
+	    if (flag != CV_SUCCESS) {
+	    	printf("Error setting analytic jacobian");
+	    	exit(-1);
+	    }
 
 	    #ifdef CV_MAX_ORD
 	        CVodeSetMaxOrd(integrators[i], CV_MAX_ORD);
@@ -111,6 +129,10 @@ void** integrators;
  }
 
  const char* solver_name() {
+#ifdef SUNDIALS_ANALYTIC_JACOBIAN
+ 	const char* name = "cvodes-analytical-int";
+#else
  	const char* name = "cvodes-int";
+#endif
  	return name;
  }
