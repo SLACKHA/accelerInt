@@ -31,7 +31,7 @@ else:
 	SHUFF = ""
 
 #force remake
-subprocess.call('make clean && make -j24 DEBUG=FALSE FAST_MATH=FALSE IGN=TRUE PRINT=FALSE LOG_OUTPUT=FALSE {} {}'.format(DIFF, SHUFF), shell=True)
+subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE',  'LOG_OUTPUT=FALSE', DIFF, SHUFF])
 
 all_exes = []
 for file in glob.glob('*-int*'):
@@ -49,7 +49,10 @@ for exe in all_exes:
 			filename = './output/' + exe + '_' + str(thread) +'_'+str(powers[i])+'.txt'
 			if (os.path.isfile(filename)):
 				continue
+			file = open(filename, "w")
 			if 'gpu' in filename:
-				subprocess.call('./'  + exe + ' ' + str(exppowers[i]) + ' > ' + filename, shell=True)
+				subprocess.call([os.path.join(os.getcwd(), exe), str(exppowers[i])], stdout=file)
 			else:
-				subprocess.call('./' + exe + ' ' + str(thread) + ' ' + str(exppowers[i]) + ' > ' + filename, shell=True)
+				subprocess.call([os.path.join(os.getcwd(), exe), str(thread), str(exppowers[i]), stdout=file)
+			file.flush()
+			file.close()

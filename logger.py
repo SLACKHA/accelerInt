@@ -5,7 +5,7 @@ import os, glob
 import sys
 
 #force remake
-subprocess.call('make clean && make -j24 DEBUG=FALSE FAST_MATH=FALSE IGN=TRUE PRINT=FALSE LOG_OUTPUT=TRUE')
+subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE'])
 
 all_exes = []
 for file in glob.glob('*-int*'):
@@ -13,4 +13,4 @@ for file in glob.glob('*-int*'):
 
 
 for exe in all_exes:
-	subprocess.call('./'  + exe, shell=True)
+	subprocess.call([os.path.join(os.getcwd(), exe)])

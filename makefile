@@ -268,7 +268,7 @@ $(ODIR)/mech/%.o : $(SDIR)/%.c $(DEPS)
 
 $(ODIR)/mech/%.cu.o : $(SDIR)/%.cu $(DEPS)
 	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
-	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $$(NVCCINCLUDES) -dc -o $@ $<
+	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
 
 #all the various targets
 define module_rules
