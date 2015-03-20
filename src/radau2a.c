@@ -1,23 +1,23 @@
 /** 
-* \file radau2a.cu
+* \file radau2a.c
 *
 * \author Nicholas J. Curtis
 * \date 03/16/2015
 *
-* A Radau2A IRK implementation for CUDA
+* A Radau2A IRK implementation for C
 * 
 * NOTE: all matricies stored in column major format!
 * 
 */
 
 #include "header.h"
-#include "inverse.cuh"
-#include "complexInverse_NN.cuh"
-#include "dydt.cuh"
-#include "jacob.cuh"
-#include <cuComplex.h>
+#include "dydt.h"
+#include "jacob.h"
+#include <complex.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 
-__device__
 void scale_init (const double * y0, double * sc) {
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
@@ -41,7 +41,7 @@ void scale_init (const double * y0, double * sc) {
 #define UNROLL (8)
 #define SDIRK_ERROR
 
-__constant__ double rkA[3][3] = { {
+const static double rkA[3][3] = { {
 	 1.968154772236604258683861429918299e-1,
 	-6.55354258501983881085227825696087e-2,
 	 2.377097434822015242040823210718965e-2
@@ -56,13 +56,13 @@ __constant__ double rkA[3][3] = { {
 	}
 };
 
-__constant__ double rkB[3] = {
+const static double rkB[3] = {
 3.764030627004672750500754423692808e-1,
 5.124858261884216138388134465196080e-1,
 1.111111111111111111111111111111111e-1
 };
 
-__constant__ double rkC[3] = {
+const static double rkC[3] = {
 1.550510257216821901802715925294109e-1,
 6.449489742783178098197284074705891e-1,
 1.0
@@ -71,40 +71,40 @@ __constant__ double rkC[3] = {
 #ifdef SDIRK_ERROR
 	// Classical error estimator: 
 	// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
-	__constant__ double rkE[4] = {
+	const static double rkE[4] = {
 	0.02,
-	-10.04880939982741556246032950764708e0*0.02,
-	1.382142733160748895793662840980412e0*0.02,
-	-0.3333333333333333333333333333333333e0*0.02
+	-10.04880939982741556246032950764708*0.02,
+	1.382142733160748895793662840980412*0.02,
+	-0.3333333333333333333333333333333333*0.02
 	};
 	// H* Sum Bgam_j*f(Z_j) = H*Bgam(0)*f(0) + Sum Theta_j*Z_j
-	__constant__ double rkTheta[3] = {
-	-1.520677486405081647234271944611547e0 - 10.04880939982741556246032950764708e0*0.02,
-	2.070455145596436382729929151810376e0 + 1.382142733160748895793662840980413e0*0.02,
-	-0.3333333333333333333333333333333333e0*0.02 - 0.3744441479783868387391430179970741
+	const static double rkTheta[3] = {
+	-1.520677486405081647234271944611547 - 10.04880939982741556246032950764708*0.02,
+	2.070455145596436382729929151810376 + 1.382142733160748895793662840980413*0.02,
+	-0.3333333333333333333333333333333333*0.02 - 0.3744441479783868387391430179970741
 	};
 	// ! Sdirk error estimator
-	__constant__ double rkBgam[5] = {
+	const static double rkBgam[5] = {
 	0.02,
 	0.3764030627004672750500754423692807-1.558078204724922382431975370686279*0.02,
-	0.8914115380582557157653087040196118*0.02+.5124858261884216138388134465196077,
+	0.8914115380582557157653087040196118*0.02+0.5124858261884216138388134465196077,
 	-0.1637777184845662566367174924883037-0.3333333333333333333333333333333333*0.02,
 	0.2748888295956773677478286035994148
 	};
 #else
 	// Classical error estimator: 
 	// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
-	__constant__ double rkE[4] = {
+	const static double rkE[4] = {
 	0.05,
-	-10.04880939982741556246032950764708e0*0.05,
-	1.382142733160748895793662840980412e0*0.05,
-	-0.3333333333333333333333333333333333e0*0.05
+	-10.04880939982741556246032950764708*0.05,
+	1.382142733160748895793662840980412*0.05,
+	-0.3333333333333333333333333333333333*0.05
 	};
 	// H* Sum Bgam_j*f(Z_j) = H*Bgam(0)*f(0) + Sum Theta_j*Z_j
-	__constant__ double rkTheta[3] = {
-	-1.520677486405081647234271944611547e0 - 10.04880939982741556246032950764708e0*0.05,
-	2.070455145596436382729929151810376e0 + 1.382142733160748895793662840980413e0*0.05,
-	-0.3333333333333333333333333333333333e0*0.05 - 0.3744441479783868387391430179970741e0
+	const static double rkTheta[3] = {
+	-1.520677486405081647234271944611547 - 10.04880939982741556246032950764708*0.05,
+	2.070455145596436382729929151810376 + 1.382142733160748895793662840980413*0.05,
+	-0.3333333333333333333333333333333333*0.05 - 0.3744441479783868387391430179970741
 	};
 #endif
 
@@ -119,27 +119,27 @@ __constant__ double rkC[3] = {
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-__constant__ double rkGamma = 3.637834252744495732208418513577775e0;
-__constant__ double rkAlpha = 2.681082873627752133895790743211112e0;
-__constant__ double rkBeta  = 3.050430199247410569426377624787569e0;
+const static double rkGamma = 3.637834252744495732208418513577775;
+const static double rkAlpha = 2.681082873627752133895790743211112;
+const static double rkBeta  = 3.050430199247410569426377624787569;
 
-__constant__ double rkT[3][3] = {
+const static double rkT[3][3] = {
 {9.443876248897524148749007950641664e-2,
 -1.412552950209542084279903838077973e-1,
 -3.00291941051474244918611170890539e-2},
 {2.502131229653333113765090675125018e-1,
 2.041293522937999319959908102983381e-1,
 3.829421127572619377954382335998733e-1},
-{1.0e0,
-1.0e0,
+{1.0,
+1.0,
 0.0e0}
 };
 
-__constant__ double rkTinv[3][3] = {
-{4.178718591551904727346462658512057e0,
+const static double rkTinv[3][3] = 
+{{4.178718591551904727346462658512057,
 3.27682820761062387082533272429617e-1,
 5.233764454994495480399309159089876e-1},
-{-4.178718591551904727346462658512057e0,
+{-4.178718591551904727346462658512057,
 -3.27682820761062387082533272429617e-1,
 4.766235545005504519600690840910124e-1},
 {-5.02872634945786875951247343139544e-1,
@@ -147,39 +147,51 @@ __constant__ double rkTinv[3][3] = {
 -5.960392048282249249688219110993024e-1}
 };
 
-__constant__ double rkTinvAinv[3][3] = {
+const static double rkTinvAinv[3][3] = {
 {1.520148562492775501049204957366528e+1,
-1.192055789400527921212348994770778e0,
-1.903956760517560343018332287285119e0},
-{-9.669512977505946748632625374449567e0,
--8.724028436822336183071773193986487e0,
-3.096043239482439656981667712714881e0},
+1.192055789400527921212348994770778,
+1.903956760517560343018332287285119},
+{-9.669512977505946748632625374449567,
+-8.724028436822336183071773193986487,
+3.096043239482439656981667712714881},
 {-1.409513259499574544876303981551774e+1,
-5.895975725255405108079130152868952e0,
+5.895975725255405108079130152868952,
 -1.441236197545344702389881889085515e-1}
 };
 
-__constant__ double rkAinvT[3][3] = {
-{0.3435525649691961614912493915818282e0,
--0.4703191128473198422370558694426832e0,
-0.3503786597113668965366406634269080e0},
-{0.9102338692094599309122768354288852e0,
-1.715425895757991796035292755937326e0,
-0.4040171993145015239277111187301784e0},
-{3.637834252744495732208418513577775e0,
-2.681082873627752133895790743211112e0,
--3.050430199247410569426377624787569e0}
+const static double rkAinvT[3][3] = {
+{0.3435525649691961614912493915818282,
+-0.4703191128473198422370558694426832,
+0.3503786597113668965366406634269080},
+{0.9102338692094599309122768354288852,
+1.715425895757991796035292755937326,
+0.4040171993145015239277111187301784},
+{3.637834252744495732208418513577775,
+2.681082873627752133895790743211112,
+-3.050430199247410569426377624787569}
 };
 
-__constant__ double rkELO = 4;
+const static double rkELO = 4;
+
+//lapack definitions
+extern void dgetrf_ (int* m, int* n, double * A, int* lda, int* ipiv, int* info);
+extern void zgetrf_ (int* m, int* n, double complex* A, int* lda, int* ipiv, int* info);
+extern void dgetrs_ (char* trans, int* n, int* nrhs, double* A, int* LDA, int* ipiv, double* B, int* LDB, int* info);
+extern void zgetrs_ (char* trans, int* n, int* nrhs, double complex* A, int* LDA, int* ipiv, double complex* B, int* LDB, int* info);
+
+//dummy size variable
+static char TRANS = 'N';
+static int NRHS = 1;
+static int ARRSIZE = NN;
 
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
 * calculate E1 & E2 matricies and their LU Decomposition
 */
-__device__ void RK_Decomp(double H, double* E1, cuDoubleComplex* E2, const double* Jac, int* ipiv1, int* ipiv2, int* info) {
-	cuDoubleComplex temp = make_cuDoubleComplex(rkAlpha/H, rkBeta/H);
+static void RK_Decomp(double H, double* E1, double complex* E2, const double* Jac, int* ipiv1, int* ipiv2, int* info) {
+	double complex temp2 = rkAlpha/H + I * rkBeta/H;
+	double temp1 = rkGamma / H;
 	#pragma unroll
 	for (int i = 0; i < NN; i++)
 	{
@@ -187,19 +199,19 @@ __device__ void RK_Decomp(double H, double* E1, cuDoubleComplex* E2, const doubl
 		for(int j = 0; j < NN; j++)
 		{
 			E1[i + j * NN] = -Jac[i + j * NN];
-			E2[i + j * NN] = make_cuDoubleComplex(-Jac[i + j * NN], 0);
+			E2[i + j * NN] = -Jac[i + j * NN] + 0 * I;
 		}
-		E1[i + i * NN] += rkGamma / H;
-		E2[i + i * NN] = cuCadd(E2[i + i * NN], temp); 
+		E1[i + i * NN] += temp1;
+		E2[i + i * NN] += temp2; 
 	}
-	getLU(E1, ipiv1, info);
+	dgetrf_(&ARRSIZE, &ARRSIZE, E1, &ARRSIZE, ipiv1, info);
 	if (*info != 0) {
 		return;
 	}
-	getComplexLU(E2, ipiv2, info);
+	zgetrf_(&ARRSIZE, &ARRSIZE, E2, &ARRSIZE, ipiv2, info);
 }
 
-__device__ void RK_Make_Interpolate(const double* Z1, const double* Z2, const double* Z3, double* CONT) {
+static void RK_Make_Interpolate(const double* Z1, const double* Z2, const double* Z3, double* CONT) {
 	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]); 
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
@@ -214,11 +226,11 @@ __device__ void RK_Make_Interpolate(const double* Z1, const double* Z2, const do
 	}
 }
 
-__device__ void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, double* Z3, const double* CONT) {
+static void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, double* Z3, const double* CONT) {
 	double r = H / Hold;
-	register double x1 = ONE + rkC[0] * r;
-	register double x2 = ONE + rkC[1] * r;
-	register double x3 = ONE + rkC[2] * r;
+	double x1 = ONE + rkC[0] * r;
+	double x2 = ONE + rkC[1] * r;
+	double x3 = ONE + rkC[2] * r;
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
 		Z1[i] = CONT[i] + x1 * (CONT[NN + i] + x1 * CONT[NN + NN + i]);
@@ -228,7 +240,7 @@ __device__ void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, do
 }
 
 
-__device__ void WADD(const double* X, const double* Y, double* Z) {
+static void WADD(const  double* X, const double* Y, double* Z) {
 	#pragma unroll
 	for (int i = 0; i < NN; i++)
 	{
@@ -236,7 +248,7 @@ __device__ void WADD(const double* X, const double* Y, double* Z) {
 	}
 }
 
-__device__ void DAXPY3(double DA1, double DA2, double DA3, const double* DX, double* DY1, double* DY2, double* DY3) {
+static void DAXPY3(double DA1, double DA2, double DA3, const double* DX, double* DY1, double* DY2, double* DY3) {
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
 		DY1[i] += DA1 * DX[i];
@@ -249,7 +261,7 @@ __device__ void DAXPY3(double DA1, double DA2, double DA3, const double* DX, dou
 *Prepare the right-hand side for Newton iterations
 *     R = Z - hA * F
 */
-__device__ void RK_PrepareRHS(double t, double pr, double H, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* R1, double* R2, double* R3) {
+void RK_PrepareRHS(double t, double pr, double H, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* R1, double* R2, double* R3) {
 	double TMP[NN];
 	double F[NN];
 	#pragma unroll
@@ -278,111 +290,7 @@ __device__ void RK_PrepareRHS(double t, double pr, double H, double* Y, double* 
 	DAXPY3(-H * rkA[0][2], -H * rkA[1][2], -H * rkA[2][2], F, R1, R2, R3);
 }
 
-__device__ void dlaswp(double* A, int* ipiv) {
-	#pragma unroll
-	for (int i = 0; i < NN; i++) {
-		int ip = ipiv[i];
-		if (ip != i) {
-			double temp = A[i];
-			A[i] = A[ip];
-			A[ip] = temp;
-		}
-	}	
-}
-
-//diag == 'n' -> nounit = true
-//upper == 'u' -> upper = true
-__device__ void dtrsm(bool upper, bool nounit, double* A, double* b) {
-	if (upper) {
-		#pragma unroll
-		for (int k = NN - 1; k >= 0; --k)
-		{
-			if (nounit) {
-				b[k] /= A[k + k * NN];
-			}
-			#pragma unroll
-			for (int i = 0; i < k; i++)
-			{
-				b[i] -= b[k] * A[i + k * NN];
-			}
-		}
-	}
-	else{
-		#pragma unroll
-		for (int k = 0; k < NN; k++) {
-			if (fabs(b[k]) > 0) {
-				if (nounit) {
-					b[k] /= A[k + k * NN];
-				}
-				#pragma unroll
-				for (int i = k + 1; i < NN; i++)
-				{
-					b[i] -= b[k] * A[i + k * NN];
-				}
-			}
-		}
-	}
-}
-
-__device__ void dgetrs(double* A, double* B, int* ipiv) {
-	dlaswp(B, ipiv);
-	dtrsm(false, false, A, B);
-	dtrsm(true, true, A, B);
-}
-
-__device__ void zlaswp(cuDoubleComplex* A, int* ipiv) {
-	#pragma unroll
-	for (int i = 0; i < NN; i++) {
-		int ip = ipiv[i];
-		if (ip != i) {
-			cuDoubleComplex temp = A[i];
-			A[i] = A[ip];
-			A[ip] = temp;
-		}
-	}	
-}
-
-//diag == 'n' -> nounit = true
-//upper == 'u' -> upper = true
-__device__ void ztrsm(bool upper, bool nounit, cuDoubleComplex* A, cuDoubleComplex* b) {
-	if (upper) {
-		#pragma unroll
-		for (int k = NN - 1; k >= 0; --k)
-		{
-			if (nounit) {
-				b[k] = cuCdiv(b[k], A[k + k * NN]);
-			}
-			#pragma unroll
-			for (int i = 0; i < k; i++)
-			{
-				b[i] = cuCsub(b[i], cuCmul(b[k], A[i + k * NN]));
-			}
-		}
-	}
-	else{
-		#pragma unroll
-		for (int k = 0; k < NN; k++) {
-			if (cuCabs(b[k]) > 0) {
-				if (nounit) {
-					b[k] = cuCdiv(b[k], A[k + k * NN]);
-				}
-				#pragma unroll
-				for (int i = k + 1; i < NN; i++)
-				{
-					b[i] = cuCsub(b[i], cuCmul(b[k], A[i + k * NN]));
-				}
-			}
-		}
-	}
-}
-
-__device__ void zgetrs(cuDoubleComplex* A, cuDoubleComplex* B, int* ipiv) {
-	zlaswp(B, ipiv);
-	ztrsm(false, false, A, B);
-	ztrsm(true, true, A, B);
-}
-
-__device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, double* R2, double* R3, int* ipiv1, int* ipiv2) {
+void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, double* R3, int* ipiv1, int* ipiv2) {
 	// Z = (1/h) T^(-1) A^(-1) * Z
 	#pragma unroll
 	for(int i = 0; i < NN; i++)
@@ -394,19 +302,28 @@ __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, 
 		R2[i] = rkTinvAinv[1][0] * x1 + rkTinvAinv[1][1] * x2 + rkTinvAinv[1][2] * x3;
 		R3[i] = rkTinvAinv[2][0] * x1 + rkTinvAinv[2][1] * x2 + rkTinvAinv[2][2] * x3;
 	}
-	dgetrs(E1, R1, ipiv1);
-	cuDoubleComplex temp[NN];
-	#pragma unroll
-	for (int i = 0; i < NN; ++i)
-	{
-		temp[i] = make_cuDoubleComplex(R2[i], R3[i]);
+	int info = 0;
+	dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, R1, &ARRSIZE, &info);
+	if (info != 0) {
+		printf("Error in back-substitution\n");
+		exit(-1);
 	}
-	zgetrs(E2, temp, ipiv2);
+	double complex temp[NN];
 	#pragma unroll
 	for (int i = 0; i < NN; ++i)
 	{
-		R2[i] = cuCreal(temp[i]);
-		R3[i] = cuCimag(temp[i]);
+		temp[i] = R2[i] + I * R3[i];
+	}
+	zgetrs_(&TRANS, &ARRSIZE, &NRHS, E2, &ARRSIZE, ipiv2, temp,  &ARRSIZE, &info);
+	if (info != 0) {
+		printf("Error in back-substitution\n");
+		exit(-1);
+	}
+	#pragma unroll
+	for (int i = 0; i < NN; ++i)
+	{
+		R2[i] = creal(temp[i]);
+		R3[i] = cimag(temp[i]);
 	}
 
 	// Z = T * Z
@@ -421,7 +338,7 @@ __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, 
 	}
 }
 
-__device__ double RK_ErrorNorm(double* scale, double* DY) {
+double RK_ErrorNorm(double* scale, double* DY) {
 	double sums[UNROLL] = {ZERO};
 	int start = NN % UNROLL;
 	//take care of mod part
@@ -449,7 +366,7 @@ __device__ double RK_ErrorNorm(double* scale, double* DY) {
 	return fmax(sqrt(sum / ((double)NN)), 1e-10);
 }
 
-__device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* scale, double* E1, int* ipiv1, bool FirstStep, bool Reject) {
+double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* scale, double* E1, int* ipiv1, bool FirstStep, bool Reject) {
 	double HrkE1  = rkE[1]/H;
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
@@ -465,7 +382,12 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
     for (int i = 0; i < NN; ++i) {
     	TMP[i] = rkE[0] * F0[i] + F2[i];
     }
-    dgetrs(E1, TMP, ipiv1);
+    int info = 0;
+    dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, TMP, &ARRSIZE, &info);
+    if (info != 0) {
+    	printf("Error on back-substitution.");
+    	exit(-1);
+    }
     double Err = RK_ErrorNorm(scale, TMP);
     if (Err >= ONE && (FirstStep || Reject)) {
         #pragma unroll
@@ -477,7 +399,11 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
     	for (int i = 0; i < NN; i++) {
         	TMP[i] = F1[i] + F2[i];
         }
-        dgetrs(E1, TMP, ipiv1);
+       	dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, TMP, &ARRSIZE, &info);
+       	if (info != 0) {
+	    	printf("Error on back-substitution.");
+	    	exit(-1);
+    	}
         Err = RK_ErrorNorm(scale, TMP);
     }
     return Err;
@@ -487,7 +413,7 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
  *  5th-order Radau2A implementation
  * 
  */
-__device__ void integrate (const double t_start, const double t_end, const double pr, double* y) {
+void integrate (const double t_start, const double t_end, const double pr, double* y) {
 	double Hmin = 0;
 	double Hmax = fabs(t_end - t_start);
 	double Hold = 0;
@@ -505,7 +431,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double scale[NN];
 	double A[NN * NN] = {ZERO};
 	double E1[NN * NN];
-	cuDoubleComplex E2[NN * NN];
+	double complex E2[NN * NN];
 	int ipiv1[NN];
 	int ipiv2[NN];
 	double Z1[NN];
@@ -557,23 +483,18 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		}
 		Nsteps += 1;
 		if (Nsteps >= Max_no_steps) {
+			printf("Max Steps exceeded...\n");
 			//todo implement return codes
-			y[0] = logf(-1);
-			return;
+			exit(-1);
 		}
 		if (0.1 * fabs(H) <= fabs(t) * Roundoff) {
-			//todo implement return codes
-			y[0] = logf(-1);
-			return;
+			printf("H smaller than minimum step-size...\n");
+			exit(-1);
 		}
 		if (FirstStep || !StartNewton) {
-			#pragma unroll
-			for(int i = 0; i < NN; i++)
-			{
-				Z1[i] = ZERO;
-				Z2[i] = ZERO;
-				Z3[i] = ZERO;
-			}
+			memset(Z1, 0, NN * sizeof(double));
+			memset(Z2, 0, NN * sizeof(double));
+			memset(Z3, 0, NN * sizeof(double));
 		} else {
 			RK_Interpolate(H, Hold, Z1, Z2, Z3, CONT);
 		}
@@ -657,7 +578,11 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
         		DZ4[i] += (rkGamma / H) * (G[i] - Z4[i]);
         	}
         	//Solve the linear system
-        	dgetrs(E1, DZ4, ipiv1);
+        	dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, DZ4, &ARRSIZE, &info);
+        	if (info != 0) {
+        		printf("Error in back-substitution\n");
+        		exit(-1);
+        	}
         	//Check convergence of Newton iterations
         	NewtonIncrement = RK_ErrorNorm(scale,DZ4);
         	double NewtonRate = 2.0;
@@ -721,7 +646,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				Hnew = Fac * H;
 			}
 			Hacc = H;
-			ErrOld = max(1e-2, Err);
+			ErrOld = fmax(1e-2, Err);
 #endif
 			FirstStep = false;
 			Hold = H;
