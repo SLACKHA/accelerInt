@@ -6,32 +6,25 @@ import sys
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Runs all integrators for the given mechanism / options')
-parser.add_argument('-diff', '--different-ics',
-					default=True,
-					action = 'store_false'
-					destination='diff_ics',
+parser.add_argument('-diff', '--different_ics',
+					default=False,
+					action = 'store_true',
 					required=False,
 					help = 'Use different initial conditions')
 parser.add_argument('-sh', '--shuffle',
-					type=str,
 					default=False,
 					action='store_true',
-					destination='shuffle',
 					required=False,
 					help = 'Shuffle the ics, implies --different-ics')
 args = parser.parse_args()
+maker = ['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE',  'LOG_OUTPUT=FALSE']
 if args.shuffle:
-	DIFF = "SAME_IC=FALSE"
-	SHUFF = "SHUFFLE=TRUE"
-elif args.diff_ics:
-	DIFF = 'SAME_IC=FALSE'
-	SHUFF = ""
-else:
-	DIFF = ""
-	SHUFF = ""
+	maker.extend(["SAME_IC=FALSE", "SHUFFLE=TRUE"])
+elif args.different_ics:
+	maker.extend(["SAME_IC=FALSE"])
 
 #force remake
-subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE',  'LOG_OUTPUT=FALSE', DIFF, SHUFF])
+subprocess.call(maker)
 
 all_exes = []
 for file in glob.glob('*-int*'):
@@ -53,6 +46,6 @@ for exe in all_exes:
 			if 'gpu' in filename:
 				subprocess.call([os.path.join(os.getcwd(), exe), str(exppowers[i])], stdout=file)
 			else:
-				subprocess.call([os.path.join(os.getcwd(), exe), str(thread), str(exppowers[i]), stdout=file)
+				subprocess.call([os.path.join(os.getcwd(), exe), str(thread), str(exppowers[i])], stdout=file)
 			file.flush()
 			file.close()
