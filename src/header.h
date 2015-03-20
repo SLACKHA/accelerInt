@@ -116,17 +116,21 @@ typedef unsigned short int usint;
   #endif
 #endif
 
+/* These are now controlled by the makefile 
 // load same initial conditions for all threads
 #define SAME_IC
 
 // shuffle initial conditions randomly
-//#define SHUFFLE
+#define SHUFFLE
+
+//print the output to screen
+#define PRINT
 
 // output ignition time
 #define IGN
 
-#define PRINT
-
-//#define LOG_OUTPUT
+//log output to file
+#define LOG_OUTPUT
+*/
 
 #endif
