@@ -29,7 +29,7 @@ SDIR := ./src
 LOGDIR := ./log
 
 #Modules
-MODULES := rb43 exp4 cvodes prof rates radau2a
+MODULES := rb43 exp4 cvodes prof rates radau2a mech
 MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
 
 #FLAGS, L=0 for testing, L=4 for optimization
@@ -49,15 +49,17 @@ DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
 
 #generic objects for CPU mechanism
 _MECH = dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o mechanism.o
+MECH = $(patsubst %,$(ODIR)/mech/%,$(_MECH))
 
 #generic objects for GPU mechanism
 _MECH_GPU = dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o mechanism.cu.o gpu_memory.cu.o
+MECH_GPU = $(patsubst %,$(ODIR)/mech/%,$(_MECH_GPU))
 
 #Generic objects for CPU solver
-_OBJ = solver_main.o $(_MECH)
+_OBJ = solver_main.o
 
 #Generic objects for GPU solver
-_OBJ_GPU = solver_main.cu.o $(_MECH_GPU)
+_OBJ_GPU = solver_main.cu.o
 
 #Generic objects for CPU solvers using rational approxmiation / krylov subspaces
 _OBJ_RA = cf.o rational_approximant.o phiAHessenberg.o complexInverse.o linear-algebra.o sparse_multiplier.o $(_OBJ)
@@ -146,43 +148,43 @@ else ifeq ($(USE_LAPACK), 2)
 endif
 
 _OBJ_RB43 = exprb43_init.o exprb43.o solver_generic.o $(_OBJ_RA)
-OBJ_RB43 = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43))
+OBJ_RB43 = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43)) $(MECH)
 
 _OBJ_EXP4 = exp4_init.o exp4.o solver_generic.o $(_OBJ_RA)
-OBJ_EXP4 = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4))
+OBJ_EXP4 = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4)) $(MECH)
 
 _OBJ_RB43_GPU = exprb43_init.cu.o exprb43.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
-OBJ_RB43_GPU = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43_GPU))
+OBJ_RB43_GPU = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43_GPU)) $(MECH_GPU)
 
 _OBJ_EXP4_GPU = exp4_init.cu.o exp4.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
-OBJ_EXP4_GPU = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4_GPU))
+OBJ_EXP4_GPU = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4_GPU)) $(MECH_GPU)
 
 _OBJ_CVODES = cvodes_dydt.o cvodes_init.o solver_cvodes.o $(filter-out jacob.o,$(_OBJ))
-OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES))
+OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES)) $(MECH)
 
 _OBJ_CVODES_ANALYTICAL = cvodes_dydt.o cvodes_jac.o cvodes_init.o solver_cvodes.o $(_OBJ)
-OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES_ANALYTICAL))
+OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES_ANALYTICAL)) $(MECH)
 
-_OBJ_PROFILER = rateOutputTest.o $(_MECH)
-OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER))
+_OBJ_PROFILER = rateOutputTest.o
+OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER)) $(MECH)
 
-_OBJ_GPU_PROFILER = rateOutputTest.cu.o $(_MECH_GPU)
-OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER))
+_OBJ_GPU_PROFILER = rateOutputTest.cu.o
+OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER)) $(MECH_GPU)
 
 _OBJ_RB43_GPU_PROFILER = solver_profiler.cu.o exprb43_init.cu.o $(filter-out solver_main.cu.o,$(_OBJ_GPU_RA))
-OBJ_RB43_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_RB43_GPU_PROFILER))
+OBJ_RB43_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_RB43_GPU_PROFILER)) $(MECH_GPU)
 
-_OBJ_RATES_TEST = rateOutputTest.o $(_MECH) 
-OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST))
+_OBJ_RATES_TEST = rateOutputTest.o 
+OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST)) $(MECH)
 
-_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o $(_MECH_GPU)
-OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST))
+_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o 
+OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST)) $(MECH_GPU)
 
 _OBJ_GPU_RADAU2A = radau2a.cu.o radau2a_init.cu.o  inverse.cu.o complexInverse_NN.cu.o solver_generic.cu.o $(_OBJ_GPU)
-OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A))
+OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A)) $(MECH_GPU)
 
 _OBJ_RADAU2A = radau2a.o radau2a_init.o solver_generic.o $(_OBJ)
-OBJ_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_RADAU2A))
+OBJ_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_RADAU2A)) $(MECH)
 
 define module_rules
 $(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS)
