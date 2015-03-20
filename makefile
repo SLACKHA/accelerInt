@@ -32,8 +32,8 @@ LOG_OUTPUT = FALSE
 SHUFFLE = FALSE
 #valid options are MKL, SYS, NONE
 USE_LAPACK = MKL
-#for CUDA
 FAST_MATH = FALSE
+
 
 #used to force a build on different flags
 CF_FILE = CONTROL_FLAGS
