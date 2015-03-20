@@ -3,49 +3,106 @@ SHELL = /bin/sh
 .SUFFIXES:
 .SUFFIXES: .c .o .cu .cu.o .omp.o
 
-CUDA_PATH = /usr/local/cuda
-SDK_PATH = /usr/local/cuda/samples/common/inc/
+CUDA_PATH := /usr/local/cuda
+SDK_PATH := /usr/local/cuda/samples/common/inc/
+# Directories
+ODIR := ./obj
+SDIR := ./src
+LOGDIR := ./log
+OUTDIR := ./output
+#create
+log_maker := $(shell test -d $(LOGDIR) || mkdir -p $(LOGDIR))
+obj_maker := $(shell test -d $(ODIR) || mkdir -p $(ODIR))
+out_maker := $(shell test -d $(OUTDIR) || mkdir -p $(OUTDIR))
 
-# Compilers
-#CC    = gcc-4.8
+#Modules
+MODULES := rb43 exp4 cvodes prof rates radau2a cvodes-analytical
+MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
+
+# Paths
+INCLUDES = -I/usr/local/include/
+
+
+#user specifiable variables, control output, optimization level, initial conditions etc.
+DEBUG = FALSE
+IGN = TRUE
+SAME_IC = TRUE
+PRINT = FALSE
+LOG_OUTPUT = FALSE
+SHUFFLE = FALSE
+#valid options are MKL, SYS, NONE
+USE_LAPACK = MKL
+#for CUDA
+FAST_MATH = FALSE
+
+#used to force a build on different flags
+CF_FILE = CONTROL_FLAGS
+DBG_FILE = DEBUG_FLAGS
+CONTROL_FLAGS = 
+DEBUG_FLAGS = 
+
+#dependencies
+_DEPS = header.h
+DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS)) $(ODIR)/$(DBG_FILE)
+
+SOLVER_DEPS = $(ODIR)/$(CF_FILE)
+
+#turn this into the control flags
+ifeq ("$(DEBUG)", "TRUE")
+    DEBUG_FLAGS += -DDEBUG
+else
+	DEBUG_FLAGS += -DNDEBUG
+endif
+ifeq ("$(SAME_IC)", "TRUE")
+    CONTROL_FLAGS += -DSAME_IC
+endif
+ifeq ("$(PRINT)", "TRUE")
+    CONTROL_FLAGS += -DPRINT
+endif
+ifeq ("$(IGN)", "TRUE")
+    CONTROL_FLAGS += -DIGN
+endif
+ifeq ("$(LOG_OUTPUT)", "TRUE")
+    CONTROL_FLAGS += -DLOG_OUTPUT
+endif
+ifeq ("$(SHUFFLE)", "TRUE")
+    CONTROL_FLAGS += -SHUFFLE
+endif
+ifeq ("$(USE_LAPACK)", "MKL")
+    CONTROL_FLAGS += -DUSE_MKL
+else ifeq ("$(USE_LAPACK)", "SYS")
+    CONTROL_FLAGS += -DUSE_SYSTEM_LAPACK
+else
+    CONTROL_FLAGS += -DNO_LAPACK
+endif
+ifeq ("$(FAST_MATH)", "TRUE")
+    CONTROL_FLAGS += -DUSE_FAST_MATH
+endif
+
+# || echo $(DEBUG_FLAGS) > $(ODIR)/$(DBG_FILE)
+#  || echo $(CONTROL_FLAGS) > $(ODIR)/$(CF_FILE)
+#test for and update (if needed) the control files
+debug_flag_maker := $(shell test -f $(ODIR)/$(DBG_FILE) || touch $(ODIR)/$(DBG_FILE))
+control_flag_maker := $(shell test -f $(ODIR)/$(CF_FILE) || touch $(ODIR)/$(CF_FILE))
+tmp1 := $(shell grep -Fx "$(DEBUG_FLAGS)" $(ODIR)/$(DBG_FILE) || echo "$(DEBUG_FLAGS)" > $(ODIR)/$(DBG_FILE))
+tmp2 := $(shell grep -Fx "$(CONTROL_FLAGS)" $(ODIR)/$(CF_FILE) || echo "$(CONTROL_FLAGS)" > $(ODIR)/$(CF_FILE))
+
+#compilers
 CC = gcc
 NCC = cc
 NCC_BIN = /usr/bin
 NVCC = $(CUDA_PATH)/bin/nvcc
 LINK   = $(CC) -fPIC
 NLINK = $(NCC) -fPIC -fopenmp -Xlinker -rpath $(CUDA_PATH)/lib64
-FLAGS = 
-NVCCFLAGS = -Xcompiler -fopenmp
+
+FLAGS = $(DEBUG_FLAGS) $(CONTROL_FLAGS)
+NVCCFLAGS = -Xcompiler -fopenmp $(DEBUG_FLAGS) $(CONTROL_FLAGS)
 NVCCINCLUDES = -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
 NVCCLIBS = -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++
 LIBS = -lm
 RA_LIBS = -lfftw3
 CV_LIBS = -lsundials_cvodes -lsundials_nvecserial
-FAST_MATH = TRUE
-
-# Directories
-ODIR := ./obj
-SDIR := ./src
-LOGDIR := ./log
-
-#Modules
-MODULES := rb43 exp4 cvodes prof rates radau2a mech cvodes-analytical
-MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
-
-#FLAGS, L=0 for testing, L=4 for optimization
-ifndef L
-  L = 4
-endif
-#FLAGS, USE_LAPACK, 4 for use MKL in CVODEs, 2 for use the system libraries, 0 for use the serial CVodes version 
-ifndef USE_LAPACK
-  USE_LAPACK = 4
-endif
-
-# Paths
-INCLUDES = -I/usr/local/include/
-
-_DEPS = header.h
-DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS))
+FAST_MATH = FALSE
 
 #generic objects for CPU mechanism
 _MECH = dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o mechanism.o
@@ -114,37 +171,55 @@ gpuratestest : LIBS +=  $(NVCCLIBS)
 FLAGS += -std=c99
 NVCCFLAGS += -arch=sm_20 -m64
 
-#fast math
+ifeq ("$(DEBUG)", "FALSE")
 ifeq ("$(FAST_MATH)", "TRUE")
-	NVCCFLAGS += --use_fast_math
-else
-	NVCCFLAGS += --ftz=false --prec-div=true --prec-sqrt=true --fmad=false
+    NVCCFLAGS += --use_fast_math
+endif
+endif
+ifeq ("$(DEBUG)", "FALSE")
+ifeq ("$(FAST_MATH)", "TRUE")
+ifeq ("$(CC)", "gcc")
+    FLAGS += -ffast-math
+else ifeq ("$(CC)", "icc")
+    FLAGS += -fp-model fast=2
+endif
+endif
 endif
 
-#flags for various debug levels
-ifeq ($(L), 0)
-  FLAGS += -O0 -g -fbounds-check -Wunused-variable -Wunused-parameter \
-	  -Wall -ftree-vrp -DDEBUG
-  NVCCFLAGS += -g -G -DDEBUG
-else ifeq ($(L), 4)
-  FLAGS += -O3 -funroll-loops
-  NVCCFLAGS += -O3
+ifeq ("$(FAST_MATH)", "FALSE")
+    NVCCFLAGS += --ftz=false --prec-div=true --prec-sqrt=true --fmad=false
+endif
+ifeq ("$(FAST_MATH)", "FALSE")
+ifeq ("$(CC)", "icc")
+    FLAGS += -fp-model precise
+endif
 endif
 
-#GCC tuning
-ifeq ($(L), 4)
-  ifeq ("$(CC)", "gcc")
-	FLAGS += -mtune=native
-  endif
+ifeq ("$(DEBUG)", "FALSE")
+    FLAGS += -O3 -funroll-loops
+    NVCCFLAGS += -O3
+endif
+ifeq ("$(DEBUG)", "FALSE")
+#tuning
+ifeq ("$(CC)", "gcc")
+    FLAGS += -mtune=native
+else ifeq ("$(CC)", "icc")
+    FLAGS += -xhost -ipo
+endif
+endif
+
+ifeq ("$(DEBUG)", "TRUE")
+    FLAGS += -O0 -g -fbounds-check -Wunused-variable -Wunused-parameter \
+        -Wall -ftree-vrp
+    NVCCFLAGS += -g -G
 endif
 
 #LAPACK levels
-ifeq ($(USE_LAPACK), 4)
-  FLAGS += -DSUNDIALS_USE_LAPACK -I${MKLROOT}/include
-  LIBS += -L${MKLROOT}/lib/intel64/ -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_gnu_thread -ldl -lpthread -lmkl_mc -lmkl_def
-else ifeq ($(USE_LAPACK), 2)
-  FLAGS += -DSUNDIALS_USE_LAPACK
-  LIBS += -L/usr/local/lib -llapack -lblas
+ifeq ("$(USE_LAPACK)", "MKL")
+    FLAGS += -I${MKLROOT}/include
+    LIBS += -L${MKLROOT}/lib/intel64/ -lmkl_rt -lmkl_intel_lp64 -lmkl_core -lmkl_gnu_thread -ldl -lpthread -lmkl_mc -lmkl_def
+else #still need lapack libraries for CF, but they will not be used by CVODEs or any of the other solvers
+    LIBS += -L/usr/local/lib -llapack -lblas
 endif
 
 _OBJ_RB43 = exprb43_init.o exprb43.o solver_generic.o $(_OBJ_RA)
@@ -186,26 +261,30 @@ OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A)) $(MECH_GPU
 _OBJ_RADAU2A = radau2a.o radau2a_init.o solver_generic.o $(_OBJ)
 OBJ_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_RADAU2A)) $(MECH)
 
+#mechanism files
+$(ODIR)/mech/%.o : $(SDIR)/%.c $(DEPS)
+	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
+	$(CC) $(FLAGS) $(INCLUDES) -c -o $@ $<
+
+$(ODIR)/mech/%.cu.o : $(SDIR)/%.cu $(DEPS)
+	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
+	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $$(NVCCINCLUDES) -dc -o $@ $<
+
+#all the various targets
 define module_rules
-$(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS)
+$(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS) $(SOLVER_DEPS)
 	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
 
-$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS)
+$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS) $(SOLVER_DEPS)
 	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 endef
 
 default: all
 
-all : $(ODIR) $(LOGDIR) exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest radau2a-int-gpu radau2a-int
-$(ODIR):
-	mkdir -p $(ODIR)
-$(LOGDIR):
-	mkdir -p $(LOGDIR)
-.PHONY: clean all $(ODIR) $(LOGDIR)
-
-log_maker := $(shell test -d $(LOGDIR) || mkdir -p $(LOGDIR))
+all : exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest radau2a-int-gpu radau2a-int
+.PHONY: clean all
 
 print-%  : ; @echo $* = $($*)
 
@@ -260,6 +339,7 @@ doc : $(DEPS) $(OBJ)
 clean :
 	rm -f $(OBJ_EXP4) $(OBJ_RB43) $(OBJ_CVODES) $(OBJ_RB43_GPU) $(OBJ_EXP4_GPU) $(OBJ_PROFILER) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) $(OBJ_RB43_GPU_PROFILER) $(OBJ_RADAU2A) $(OBJ_GPU_RADAU2A) \
 		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int doc \
+		$(ODIR)/$(CF_FILE) $(ODIR)/$(DBG_FILE)
 		dlink.o
 
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))

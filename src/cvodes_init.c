@@ -76,7 +76,7 @@ void** integrators;
     	}
 
     	//setup the solver
-	    #if SUNDIALS_USE_LAPACK
+	    #if defined(USE_MKL) || defined(USE_SYSTEM_LAPACK)
 	        flag = CVLapackDense(integrators[i], NN);
 	    #else
 	        flag = CVDense(integrators[i], NN);
