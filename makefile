@@ -29,7 +29,7 @@ SDIR := ./src
 LOGDIR := ./log
 
 #Modules
-MODULES := rb43 exp4 cvodes prof rates radau2a mech
+MODULES := rb43 exp4 cvodes prof rates radau2a mech cvodes-analytical
 MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
 
 #FLAGS, L=0 for testing, L=4 for optimization
@@ -163,7 +163,7 @@ _OBJ_CVODES = cvodes_dydt.o cvodes_init.o solver_cvodes.o $(filter-out jacob.o,$
 OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES)) $(MECH)
 
 _OBJ_CVODES_ANALYTICAL = cvodes_dydt.o cvodes_jac.o cvodes_init.o solver_cvodes.o $(_OBJ)
-OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES_ANALYTICAL)) $(MECH)
+OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes-analytical/%,$(_OBJ_CVODES_ANALYTICAL)) $(MECH)
 
 _OBJ_PROFILER = rateOutputTest.o
 OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER)) $(MECH)
