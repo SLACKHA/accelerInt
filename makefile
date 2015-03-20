@@ -223,43 +223,43 @@ else #still need lapack libraries for CF, but they will not be used by CVODEs or
 endif
 
 _OBJ_RB43 = exprb43_init.o exprb43.o solver_generic.o $(_OBJ_RA)
-OBJ_RB43 = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43)) $(MECH)
+OBJ_RB43 = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43))
 
 _OBJ_EXP4 = exp4_init.o exp4.o solver_generic.o $(_OBJ_RA)
-OBJ_EXP4 = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4)) $(MECH)
+OBJ_EXP4 = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4))
 
 _OBJ_RB43_GPU = exprb43_init.cu.o exprb43.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
-OBJ_RB43_GPU = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43_GPU)) $(MECH_GPU)
+OBJ_RB43_GPU = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43_GPU))
 
 _OBJ_EXP4_GPU = exp4_init.cu.o exp4.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
-OBJ_EXP4_GPU = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4_GPU)) $(MECH_GPU)
+OBJ_EXP4_GPU = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4_GPU))
 
 _OBJ_CVODES = cvodes_dydt.o cvodes_init.o solver_cvodes.o $(filter-out jacob.o,$(_OBJ))
-OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES)) $(MECH)
+OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES))
 
 _OBJ_CVODES_ANALYTICAL = cvodes_dydt.o cvodes_jac.o cvodes_init.o solver_cvodes.o $(_OBJ)
-OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes-analytical/%,$(_OBJ_CVODES_ANALYTICAL)) $(MECH)
+OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes-analytical/%,$(_OBJ_CVODES_ANALYTICAL))
 
-_OBJ_PROFILER = rateOutputTest.o
-OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER)) $(MECH)
+_OBJ_PROFILER = rateOutputTest.o $(_MECH)
+OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER))
 
-_OBJ_GPU_PROFILER = rateOutputTest.cu.o
-OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER)) $(MECH_GPU)
+_OBJ_GPU_PROFILER = rateOutputTest.cu.o $(_MECH_GPU)
+OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER))
 
 _OBJ_RB43_GPU_PROFILER = solver_profiler.cu.o exprb43_init.cu.o $(filter-out solver_main.cu.o,$(_OBJ_GPU_RA))
-OBJ_RB43_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_RB43_GPU_PROFILER)) $(MECH_GPU)
+OBJ_RB43_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_RB43_GPU_PROFILER))
 
-_OBJ_RATES_TEST = rateOutputTest.o 
-OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST)) $(MECH)
+_OBJ_RATES_TEST = rateOutputTest.o $(_MECH)
+OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST))
 
-_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o 
-OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST)) $(MECH_GPU)
+_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o $(_MECH_GPU)
+OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST))
 
 _OBJ_GPU_RADAU2A = radau2a.cu.o radau2a_init.cu.o  inverse.cu.o complexInverse_NN.cu.o solver_generic.cu.o $(_OBJ_GPU)
-OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A)) $(MECH_GPU)
+OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A))
 
 _OBJ_RADAU2A = radau2a.o radau2a_init.o solver_generic.o $(_OBJ)
-OBJ_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_RADAU2A)) $(MECH)
+OBJ_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_RADAU2A))
 
 #mechanism files
 $(ODIR)/mech/%.o : $(SDIR)/%.c $(DEPS)
@@ -283,63 +283,62 @@ endef
 
 default: all
 
-all : exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int ratestest gpuratestest radau2a-int-gpu radau2a-int
+all : exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int radau2a-int-gpu radau2a-int
+special : ratestest gpuratestest profiler gpuprofiler
 .PHONY: clean all
 
 print-%  : ; @echo $* = $($*)
 
-exprb43-int : $(OBJ_RB43)
-	$(LINK) $(OBJ_RB43) $(LIBS) -o $@
+exprb43-int : $(OBJ_RB43) $(MECH)
+	$(LINK) $^ $(LIBS) -o $@
 
-exp4-int : $(OBJ_EXP4)
-	$(LINK) $(OBJ_EXP4) $(LIBS) -o $@
+exp4-int : $(OBJ_EXP4) $(MECH)
+	$(LINK) $^ $(LIBS) -o $@
 
-exprb43-int-gpu : $(OBJ_RB43_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU) $(LIBS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_RB43_GPU) dlink.o $(LIBS) -o $@
+exprb43-int-gpu : $(OBJ_RB43_GPU) $(MECH_GPU)
+	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/rb43/dlink.o
+	$(NLINK) $^ $(ODIR)/rb43/dlink.o $(LIBS) -o $@
 
-exp4-int-gpu : $(OBJ_EXP4_GPU)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_EXP4_GPU) $(LIBS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_EXP4_GPU) dlink.o $(LIBS) -o $@
+exp4-int-gpu : $(OBJ_EXP4_GPU) $(MECH_GPU)
+	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/exp4/dlink.o
+	$(NLINK) $^ $(ODIR)/exp4/dlink.o $(LIBS) -o $@
 
-cvodes-int : $(OBJ_CVODES)
-	$(LINK) $(OBJ_CVODES) $(LIBS) -o $@
+cvodes-int : $(OBJ_CVODES) $(MECH)
+	$(LINK) $^ $(LIBS) -o $@
 
-cvodes-analytical-int : $(OBJ_CVODES_ANALYTICAL)
-	$(LINK) $(OBJ_CVODES_ANALYTICAL) $(LIBS) -o $@
+cvodes-analytical-int : $(OBJ_CVODES_ANALYTICAL) $(MECH)
+	$(LINK) $^ $(LIBS) -o $@
 
-radau2a-int : $(OBJ_RADAU2A)
-	$(LINK) $(OBJ_RADAU2A) $(LIBS) -o $@
+radau2a-int : $(OBJ_RADAU2A) $(MECH)
+	$(LINK) $^ $(LIBS) -o $@
 
-radau2a-int-gpu : $(OBJ_GPU_RADAU2A)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RADAU2A) $(LIBS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_GPU_RADAU2A) dlink.o $(LIBS) -o $@
+radau2a-int-gpu : $(OBJ_GPU_RADAU2A) $(MECH_GPU)
+	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/radau2a/dlink.o
+	$(NLINK) $^ $(ODIR)/radau2a/dlink.o $(LIBS) -o $@
 
 profiler : $(OBJ_PROFILER)
-	$(LINK) $(OBJ_PROFILER) $(LIBS) -o $@
+	$(LINK) $^ $(LIBS) -o $@
 
 gpuprofiler : $(OBJ_GPU_PROFILER)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_PROFILER) $(LIBS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_GPU_PROFILER) dlink.o $(LIBS) -o $@
+	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/prof/dlink.o
+	$(NLINK) $^ $(ODIR)/profiler/dlink.o $(LIBS) -o $@
 
 ratestest : $(OBJ_RATES_TEST)
-	$(LINK) $(OBJ_RATES_TEST) $(LIBS) -o $@
+	$(LINK) $^ $(LIBS) -o $@
 
 gpuratestest : $(OBJ_GPU_RATES_TEST)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_GPU_RATES_TEST) $(LIBS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_GPU_RATES_TEST) dlink.o $(LIBS) -o $@
+	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/rates/dlink.o
+	$(NLINK) $^ dlink.o $(LIBS) -o $@
 
-rb43profiler : $(OBJ_RB43_GPU_PROFILER)
-	$(NVCC) -ccbin=$(NCC_BIN) $(OBJ_RB43_GPU_PROFILER) $(LIBS) -dlink -o dlink.o
-	$(NLINK) $(OBJ_RB43_GPU_PROFILER) dlink.o $(LIBS) -o $@
+rb43profiler : $(OBJ_RB43_GPU_PROFILER) $(MECH)
+	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/prof/dlink.o
+	$(NLINK) $^ $(ODIR)/prof/dlink.o $(LIBS) -o $@
 
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
 clean :
-	rm -f $(OBJ_EXP4) $(OBJ_RB43) $(OBJ_CVODES) $(OBJ_RB43_GPU) $(OBJ_EXP4_GPU) $(OBJ_PROFILER) $(OBJ_GPU_PROFILER) $(OBJ_RATES_TEST) $(OBJ_GPU_RATES_TEST) $(OBJ_RB43_GPU_PROFILER) $(OBJ_RADAU2A) $(OBJ_GPU_RADAU2A) \
-		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int doc \
-		$(ODIR)/$(CF_FILE) $(ODIR)/$(DBG_FILE)
-		dlink.o
+	rm -rf $(ODIR) \
+		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int cvodes-analytical-int doc
 
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))
