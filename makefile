@@ -113,10 +113,10 @@ _MECH_GPU = dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec
 MECH_GPU = $(patsubst %,$(ODIR)/mech/%,$(_MECH_GPU))
 
 #Generic objects for CPU solver
-_OBJ = solver_main.o
+_OBJ = solver_main.o read_initial_conditions.o
 
 #Generic objects for GPU solver
-_OBJ_GPU = solver_main.cu.o
+_OBJ_GPU = solver_main.cu.o read_initial_conditions.cu.o
 
 #Generic objects for CPU solvers using rational approxmiation / krylov subspaces
 _OBJ_RA = cf.o rational_approximant.o phiAHessenberg.o complexInverse.o linear-algebra.o sparse_multiplier.o $(_OBJ)
