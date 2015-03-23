@@ -36,7 +36,7 @@
 #include "solver_init.cuh"
 #include "solver_props.h"
 #include "gpu_memory.cuh"
-#include "read_initial_conditions.h"
+#include "read_initial_conditions.cuh"
 #include "launch_bounds.cuh"
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES

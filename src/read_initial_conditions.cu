@@ -10,9 +10,12 @@
 #include "header.h"
 #include "gpu_memory.cuh"
 #include "gpu_macros.cuh"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
 
- int read_initial_conditions(int NUM, double** y_host, double** y_device, double** variable_host, double** variable_device) {
-    int padded = initialize_gpu_memory(NUM, y_host, y_device, variable_host, variable_device);
+ int read_initial_conditions(int NUM, int block_size, int grid_size, double** y_host, double** y_device, double** variable_host, double** variable_device) {
+    int padded = initialize_gpu_memory(NUM, block_size, grid_size, y_device, variable_device);
     (*y_host) = (double*)malloc(padded * NN * sizeof(double));
     (*variable_host) = (double*)malloc(padded * sizeof(double));
     FILE *fp = fopen ("ign_data.txt", "r");

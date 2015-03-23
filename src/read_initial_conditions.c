@@ -8,6 +8,9 @@
  */
 
 #include "header.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
 
  void read_initial_conditions(int NUM, double** y_host, double** variable_host) {
     (*y_host) = (double*)malloc(NUM * NN * sizeof(double));

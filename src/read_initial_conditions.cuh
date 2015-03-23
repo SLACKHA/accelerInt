@@ -9,5 +9,5 @@
 
 #ifndef READ_INITIAL_CONDITIONS_CUH
 #define READ_INITIAL_CONDITIONS_CUH
-int read_initial_conditions(int, double**, double**, double**, double**);
+int read_initial_conditions(int, int, int, double**, double**, double**, double**);
 #endif
