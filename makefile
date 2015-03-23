@@ -283,7 +283,7 @@ endef
 
 default: all
 
-all : exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int radau2a-int-gpu radau2a-int
+all : exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int cvodes-analytical-int radau2a-int-gpu radau2a-int
 special : ratestest gpuratestest profiler gpuprofiler
 .PHONY: clean all
 
