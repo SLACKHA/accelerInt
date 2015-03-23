@@ -124,8 +124,6 @@ int main (int argc, char *argv[])
     int g_num = (int)round(((double)NUM) / ((double)TARGET_BLOCK_SIZE));
     if (g_num == 0)
         g_num = 1;
-    dim3 dimGrid (g_num, 1 );
-    dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
 
     // print number of threads and block size
     printf ("# threads: %d \t block size: %d\n", NUM, TARGET_BLOCK_SIZE);
@@ -143,17 +141,23 @@ int main (int argc, char *argv[])
 #ifdef SAME_IC
     int padded = set_same_initial_conditions(NUM, &y_host, &y_device, &pres_host, &pres_device);
 #else
-    int padded = read_initial_conditions(NUM, &y_host, &y_device, &pres_host, &pres_device);
+    int padded = read_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &pres_host, &pres_device);
 #endif
 #elif CONV
     double* rho_device;
     double* rho_device;
 #ifdef SAME_IC
-    int padded = set_same_initial_conditions(NUM, &y_host, &y_device, &rho_host, &rho_device);
+    int padded = set_same_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
 #else
-    int padded = read_initial_conditions(NUM, &y_host, &y_device, &rho_host, &rho_device);
+    int padded = read_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
 #endif
 #endif
+
+    g_num = (int)round(((double)padded) / ((double)TARGET_BLOCK_SIZE));
+    if (g_num == 0)
+        g_num = 1;
+    dim3 dimGrid (g_num, 1 );
+    dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
 
 // flag for ignition
 #ifdef IGN
