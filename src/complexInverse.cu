@@ -60,7 +60,6 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
     	if (cuCabs(arrY[j * incY]) > 0.0) {
       
 			cuDoubleComplex temp = cuCmul(alpha, arrY[j * incY]);
-			zprintf(temp);
       
 			for (int i = 0; i < n; ++i) {
 				A[i + (lda * j)] = cuCfma(arrX[i], temp, A[i + (lda * j)]);
