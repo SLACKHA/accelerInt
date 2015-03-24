@@ -1,12 +1,6 @@
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-#include <string.h>
-
 #include "header.h"
 #include "solver_props.h"
 #include <cuComplex.h>
-
 ///////////////////////////////////////////////////////////
 
 __device__
@@ -63,13 +57,13 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 									const cuDoubleComplex* arrY, const int incY, cuDoubleComplex* A, const int lda) {
 	
 	for (int j = 0; j < n; ++j) {
-		//if (arrY[j * incY] != 0.0) {    
-    if (cuCabs(arrY[j * incY]) > 0.0) {
+    	if (cuCabs(arrY[j * incY]) > 0.0) {
       
 			cuDoubleComplex temp = cuCmul(alpha, arrY[j * incY]);
+			zprintf(temp);
       
 			for (int i = 0; i < n; ++i) {
-				A[i + (lda * j)] = cuCadd(A[i + (lda * j)], cuCmul(arrX[i], temp));
+				A[i + (lda * j)] = cuCfma(arrX[i], temp, A[i + (lda * j)]);
 			}
       
 		}    
@@ -83,17 +77,14 @@ __device__
 void getComplexLU (const int n, cuDoubleComplex* A, int* indPivot) {
 	
 	//int info = 0;
-	register cuDoubleComplex alpha = make_cuDoubleComplex(-1.0, 0.0);
-	
 	for (int j = 0; j < n; ++j) {
 		
 		// find pivot and test for singularity
 		
 		int jp = j + getComplexMax (n - j, &A[j + (STRIDE * j)]);
 		indPivot[j] = jp;
-		
-		//if (A[jp + (n * j)] != 0.0) {
-    if (cuCabs(A[jp + (STRIDE * j)]) > 0.0) {
+
+    	if (cuCabs(A[jp + (STRIDE * j)]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
@@ -110,7 +101,7 @@ void getComplexLU (const int n, cuDoubleComplex* A, int* indPivot) {
 		
 		// update trailing submatrix
 		if (j < n - 1)
-			complexGERU (n - j - 1, alpha, &A[j + 1 + (STRIDE * j)], &A[j + STRIDE * (j + 1)], STRIDE, &A[j + 1 + STRIDE * (j + 1)], STRIDE);
+			complexGERU (n - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[j + 1 + (STRIDE * j)], &A[j + STRIDE * (j + 1)], STRIDE, &A[j + 1 + STRIDE * (j + 1)], STRIDE);
 		
 	}
 	
@@ -129,7 +120,7 @@ void multiplyComplexUpperMV (const int n, cuDoubleComplex* x, const int lda, con
 			cuDoubleComplex temp = x[j];
 			for (int i = 0; i < j; ++i) {
 				//x[i] += temp * A[i + (lda * j)];
-       			x[i] = cuCadd(x[i], cuCmul(temp, A[i + (lda * j)]));
+       			x[i] = cuCfma(temp, A[i + (lda * j)], x[i]);
 			}
 			//x[j] *= A[j + (lda * j)];
       		x[j] = cuCmul(x[j], A[j + (lda * j)]);
@@ -156,7 +147,7 @@ void complexGEMV (const int m, const int n, const cuDoubleComplex alpha, const c
       
 			for (int i = 0; i < m; ++i) {
 				//arrY[i] += temp * A[i + (m * j)];
-        		arrY[i] = cuCadd(arrY[i], cuCmul(A[i + (STRIDE * j)], temp));
+        		 arrY[i] = cuCfma(temp, A[i + (STRIDE * j)], arrY[i]);
 			}
 		}
 	}
@@ -212,17 +203,17 @@ void getComplexInverseLU (const int n, cuDoubleComplex* A, const int* indPivot, 
 ///////////////////////////////////////////////////////////
 
 __device__
-void getComplexInverse (cuDoubleComplex* A) {
+void getComplexInverse (int n, cuDoubleComplex* A) {
 	
 	// pivot indices
 	//int* ipiv = (int*) calloc (n, sizeof(int));
-  	int ipiv[NN];
+  	int ipiv[STRIDE];
 	
 	// output flag
 	//int info = 0;
 	
 	// first get LU factorization
-	getComplexLU (NN, A, ipiv);
+	getComplexLU (n, A, ipiv);
 	
 	// check for successful exit
   /*
@@ -234,10 +225,10 @@ void getComplexInverse (cuDoubleComplex* A) {
 	
 	// work array
 	//cuDoubleComplex* work = (double complex*) calloc (n, sizeof(double complex));
-  	cuDoubleComplex work[NN];
+  	cuDoubleComplex work[STRIDE];
 	
 	// now get inverse
-	getComplexInverseLU (NN, A, ipiv, work);
+	getComplexInverseLU (n, A, ipiv, work);
 	
 	//free (work);
 	//free (ipiv);

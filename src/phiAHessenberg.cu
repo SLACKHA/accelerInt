@@ -1,11 +1,8 @@
 #include <stdlib.h>
-#include <complex.h>
-
 #include "header.h"
 #include "solver_props.h"
 //#include "linear-algebra.h"
 #include "complexInverse.cuh"
-#include <stdio.h>
 
 #ifdef DOUBLE
 extern __device__ __constant__ cuDoubleComplex poles[N_RA];
