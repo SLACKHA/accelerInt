@@ -18,7 +18,11 @@
     int padded = initialize_gpu_memory(NUM, block_size, grid_size, y_device, variable_device);
     (*y_host) = (double*)malloc(padded * NN * sizeof(double));
     (*variable_host) = (double*)malloc(padded * sizeof(double));
+#ifdef SHUFFLE
     FILE *fp = fopen ("ign_data.txt", "r");
+#else
+    FILE *fp = fopen("shuffled_data.txt", "r");
+#endif
     int buff_size = 1024;
     int retries = 0;
     //all lines should be the same size, so make sure the buffer is large enough
@@ -75,9 +79,9 @@
         double Yi[NSP];
         double Xi[NSP];
 
-        for (int j = 0; j < NSP; ++j)
+        for (int j = 1; j < NN; ++j)
         {
-            Yi[j] = (*y_host)[i + j * padded];
+            Yi[j - 1] = (*y_host)[i + j * padded];
         }
 
         mass2mole (Yi, Xi);
@@ -86,6 +90,7 @@
     }
     fclose (fp);
 
+/*
 #ifdef SHUFFLE
     // now need to shuffle order
     struct timeval tv;
@@ -114,7 +119,7 @@
 #endif
         }
     }
-#endif
+#endif*/
     //finally copy to GPU memory
     cudaErrorCheck(cudaMemcpy(*y_device, *y_host, padded * NN * sizeof(double), cudaMemcpyHostToDevice));
     cudaErrorCheck(cudaMemcpy(*variable_device, *variable_host, padded * sizeof(double), cudaMemcpyHostToDevice));

@@ -1,5 +1,6 @@
 import cantera as ct
 import numpy as np
+import random
 
 t_end = 0.001
 def main():
@@ -21,6 +22,7 @@ def main():
                     run += 1 
                     my_sum += run_sim(T, P, Phi, file, gas)
         print "# of Conditions = " + str(my_sum)
+    shuffle_states()
 
 def run_sim(T, P, Phi, file, gas):
     #state array for each simulation state, and each mass fraction + T & P
@@ -37,7 +39,7 @@ def run_sim(T, P, Phi, file, gas):
         state[0] = reac.T
         state[1] = reac.thermo.P 
         state[2:] = reac.Y[:]
-        file.write(' '.join(np.char.mod('%f', state[:])) + "\n")
+        file.write(' '.join(np.char.mod('%.15e', state[:])) + "\n")
         t = net.step(t_end)
         states += 1
 
@@ -51,13 +53,18 @@ def run_sim(T, P, Phi, file, gas):
         state[1] = reac.thermo.P 
         state[2:] = reac.Y[:]
         state_array[i, :] = state[:]
-        file.write(' '.join(np.char.mod('%f', state[:])) + "\n")
+        file.write(' '.join(np.char.mod('%.15e', state[:])) + "\n")
         t = net.step(t_end)
         states += 1
 
     return states
-                    
 
+def shuffle_states():
+    with open("ign_data.txt") as file:
+        lines = [line.strip() for line in file]
+    random.shuffle(lines)
+    with open("shuffled_data.txt", "w") as file:
+        file.write("\n".join(lines))
 
 if __name__ == "__main__":
    main()

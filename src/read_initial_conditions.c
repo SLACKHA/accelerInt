@@ -15,7 +15,11 @@
  void read_initial_conditions(int NUM, double** y_host, double** variable_host) {
     (*y_host) = (double*)malloc(NUM * NN * sizeof(double));
     (*variable_host) = (double*)malloc(NUM * sizeof(double));
+#ifdef SHUFFLE
     FILE *fp = fopen ("ign_data.txt", "r");
+#else
+    FILE *fp = fopen("shuffled_data.txt", "r");
+#endif
     int buff_size = 1024;
     int retries = 0;
     //all lines should be the same size, so make sure the buffer is large enough
@@ -72,9 +76,9 @@
         double Yi[NSP];
         double Xi[NSP];
 
-        for (int j = 0; j < NSP; ++j)
+        for (int j = 1; j < NN; ++j)
         {
-            Yi[j] = (*y_host)[i + j * NUM];
+            Yi[j - 1] = (*y_host)[i + j * NUM];
         }
 
         mass2mole (Yi, Xi);
@@ -83,6 +87,7 @@
     }
     fclose (fp);
 
+/*
 #ifdef SHUFFLE
     // now need to shuffle order
     struct timeval tv;
@@ -111,5 +116,5 @@
 #endif
         }
     }
-#endif
+#endif/*
 }
