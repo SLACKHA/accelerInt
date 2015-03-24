@@ -4,13 +4,7 @@
 #include "dydt.cuh"
 #include "gpu_macros.cuh"
 
-#define FD_ORD 1
-
-#ifdef GLOBAL_MEM
-extern __device__ Real* dy;
-extern __device__ Real* error;
-extern __device__ Real* f_temp;
-#endif
+#define FD_ORD 6
 
 // Finite difference coefficients
 #if FD_ORD == 1

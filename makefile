@@ -16,7 +16,7 @@ obj_maker := $(shell test -d $(ODIR) || mkdir -p $(ODIR))
 out_maker := $(shell test -d $(OUTDIR) || mkdir -p $(OUTDIR))
 
 #Modules
-MODULES := rb43 exp4 cvodes prof rates radau2a cvodes-analytical
+MODULES := rb43 exp4 cvodes prof rates radau2a cvodes-analytical unittest
 MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
 
 # Paths
@@ -167,6 +167,9 @@ ratestest : LIBS += -fopenmp
 gpuratestest : NVCCFLAGS += -DRATES_TEST
 gpuratestest : LIBS +=  $(NVCCLIBS)
 
+gpuunittest : NVCCFLAGS += $(NVCCINCLUDES) -DRB43
+gpuunittest : LIBS +=  $(NVCCLIBS)
+
 #standard flags
 FLAGS += -std=c99
 NVCCFLAGS += -arch=sm_20 -m64
@@ -261,6 +264,9 @@ OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A))
 _OBJ_RADAU2A = radau2a.o radau2a_init.o solver_generic.o $(_OBJ)
 OBJ_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_RADAU2A))
 
+_OBJ_GPU_UNITTEST = unit_tests.cu.o complexInverse.cu.o old_complexInverse.cu.o
+OBJ_GPU_UNITTEST = $(patsubst %,$(ODIR)/unittest/%,$(_OBJ_GPU_UNITTEST))
+
 #mechanism files
 $(ODIR)/mech/%.o : $(SDIR)/%.c $(DEPS)
 	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
@@ -328,17 +334,21 @@ ratestest : $(OBJ_RATES_TEST)
 
 gpuratestest : $(OBJ_GPU_RATES_TEST)
 	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/rates/dlink.o
-	$(NLINK) $^ dlink.o $(LIBS) -o $@
+	$(NLINK) $^ $(ODIR)/rates/dlink.o $(LIBS) -o $@
 
 rb43profiler : $(OBJ_RB43_GPU_PROFILER) $(MECH)
 	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/prof/dlink.o
 	$(NLINK) $^ $(ODIR)/prof/dlink.o $(LIBS) -o $@
+
+gpuunittest : $(OBJ_GPU_UNITTEST)
+	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/unittest/dlink.o
+	$(NLINK) $^ $(ODIR)/unittest/dlink.o $(LIBS) -o $@
 
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
 clean :
 	rm -rf $(ODIR) \
-		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int cvodes-analytical-int doc
+		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int cvodes-analytical-int gpuunittest doc
 
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))

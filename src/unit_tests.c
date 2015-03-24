@@ -14,7 +14,9 @@
 #include "phiA.h"
 #include "phiAHessenberg.h"
 #include "cf.h"
+#ifdef NotDefined
 #include "krylov.h"
+#endif
 #include "sparse_multiplier.h"
 
 static inline double getSign()
@@ -222,6 +224,7 @@ bool speedTest()
 	return passed;
 }
 
+#ifdef NotDefined
 Real complex poles[N_RA];
 Real complex res[N_RA];
 
@@ -469,6 +472,7 @@ bool ArnoldiTest()
 
 	return passed;
 }
+#endif
 
 void init()
 {
@@ -497,13 +501,14 @@ int main()
 {
 	init();
 	bool passed = true;
+	passed &= LUTests();
+#ifdef NotDefined
 	passed &= ArnoldiTest();
 	passed &= LinearAlgebraTests();
-	passed &= LUTests();
 	passed &= InverseTests();
 	passed &= PhiTests();
 	passed &= speedTest();
-
+#endif
 	printf("%s\n", passed ? "true" : "false");
 
 	return 0;
