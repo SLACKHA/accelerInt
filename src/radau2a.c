@@ -39,7 +39,7 @@ void scale_init (const double * y0, double * sc) {
 #define Qmin (1.0)
 #define Qmax (1.2)
 #define UNROLL (8)
-#define SDIRK_ERROR
+//#define SDIRK_ERROR
 
 const static double rkA[3][3] = { {
 	 1.968154772236604258683861429918299e-1,
