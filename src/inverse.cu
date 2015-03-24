@@ -32,7 +32,7 @@ __device__
 void scale (const int n, const double val, double* arrX) {
 	
 	for (int i = 0; i < n; ++i) {
-		arrX[i] = arrX[i] * val;
+		arrX[i] *= val;
 	}
 	
 }
@@ -62,13 +62,12 @@ void GERU (const int n, const double alpha, const double* arrX,
 									const double* arrY, const int incY, double* A, const int lda) {
 	
 	for (int j = 0; j < n; ++j) {
-		//if (arrY[j * incY] != 0.0) {    
-    if (fabs(arrY[j * incY]) > 0.0) {
+    	if (fabs(arrY[j * incY]) > 0.0) {
       
 			double temp = alpha * arrY[j * incY];
       
 			for (int i = 0; i < n; ++i) {
-        		A[i + (lda * j)] += arrX[i] * temp;
+				A[i + (lda * j)] += arrX[i] * temp;
 			}
       
 		}    
@@ -81,36 +80,32 @@ void GERU (const int n, const double alpha, const double* arrX,
 __device__
 void getLU (double* A, int* indPivot, int* info) {
 	
-	//int info = 0;
-	register double alpha = -1.0;
-	
-	#pragma UNROLL
+	#pragma unroll
 	for (int j = 0; j < NN; ++j) {
 		
 		// find pivot and test for singularity
 		
 		int jp = j + getMax (NN - j, &A[j + (NN * j)]);
 		indPivot[j] = jp;
-		
+
     	if (fabs(A[jp + (NN * j)]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swap (NN, &A[j], NN, &A[jp], NN);
+				swap(NN, &A[j], NN, &A[jp], NN);
 			
 			// compute elements j+1:m-1 of the jth column
 			
 			if (j < NN - 1)
-				scale (NN - j - 1, 1.0 / A[j + (NN * j)], &A[j + 1 + (NN * j)]);
+				scale(NN - j - 1, 1.0 / A[j + (NN * j)], &A[j + 1 + (NN * j)]);
 			
-		} 
-		else if (*info == 0) {
-			*info = j + 1;
+		} else if (*info == 0) {
+			*info = j;
+			break;
 		}
 		
 		// update trailing submatrix
 		if (j < NN - 1)
-			GERU (NN - j - 1, alpha, &A[j + 1 + (NN * j)], &A[j + NN * (j + 1)], NN, &A[j + 1 + NN * (j + 1)], NN);
-		
+			GERU (NN - j - 1, -1.0, &A[j + 1 + (NN * j)], &A[j + NN * (j + 1)], NN, &A[j + 1 + NN * (j + 1)], NN);	
 	}
 }

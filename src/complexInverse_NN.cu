@@ -1,12 +1,6 @@
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-#include <string.h>
-
 #include "header.h"
 #include "solver_props.h"
 #include <cuComplex.h>
-
 ///////////////////////////////////////////////////////////
 
 __device__
@@ -63,13 +57,12 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 									const cuDoubleComplex* arrY, const int incY, cuDoubleComplex* A, const int lda) {
 	
 	for (int j = 0; j < n; ++j) {
-		//if (arrY[j * incY] != 0.0) {    
-    if (cuCabs(arrY[j * incY]) > 0.0) {
+    	if (cuCabs(arrY[j * incY]) > 0.0) {
       
 			cuDoubleComplex temp = cuCmul(alpha, arrY[j * incY]);
       
 			for (int i = 0; i < n; ++i) {
-				A[i + (lda * j)] = cuCadd(A[i + (lda * j)], cuCmul(arrX[i], temp));
+				A[i + (lda * j)] = cuCfma(arrX[i], temp, A[i + (lda * j)]);
 			}
       
 		}    
@@ -82,8 +75,6 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 __device__
 void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 	
-	register cuDoubleComplex alpha = make_cuDoubleComplex(-1.0, 0.0);
-	
 	#pragma unroll
 	for (int j = 0; j < NN; ++j) {
 		
@@ -91,8 +82,7 @@ void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 		
 		int jp = j + getComplexMax (NN - j, &A[j + (NN * j)]);
 		indPivot[j] = jp;
-		
-		//if (A[jp + (n * j)] != 0.0) {
+
     	if (cuCabs(A[jp + (NN * j)]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
@@ -105,13 +95,13 @@ void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 				scaleComplex (NN - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (NN * j)]), &A[j + 1 + (NN * j)]);
 			
 		} else if (*info == 0) {
-			*info = j + 1;
+			*info = j;
+			break;
 		}
 		
 		// update trailing submatrix
 		if (j < NN - 1)
-			complexGERU (NN - j - 1, alpha, &A[j + 1 + (NN * j)], &A[j + NN * (j + 1)], NN, &A[j + 1 + NN * (j + 1)], NN);
+			complexGERU (NN - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[j + 1 + (NN * j)], &A[j + NN * (j + 1)], NN, &A[j + 1 + NN * (j + 1)], NN);
 		
 	}
-	
 }
