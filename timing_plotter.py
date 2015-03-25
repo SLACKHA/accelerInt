@@ -14,6 +14,7 @@ from argparse import ArgumentParser
 parser = ArgumentParser(description='Runs all integrators for the given mechanism / options')
 parser.add_argument('-n', '--name',
                     type=str,
+                    required=True,
                     help = 'Name of the mechanism, used in title construction')
 parser.add_argument('-diff', '--diff_ics',
                     default=False,
@@ -96,7 +97,7 @@ for desc in gpu_data:
     for block in gpu_data[desc]:
         plt.loglog(*zip(*gpu_data[desc][block]), label = desc + ' - blocksize: ' + str(block), marker = ">", basex=2)
 
-plt.legend(loc = 0, fontsize=12).draggable(state = True)
+plt.legend(loc = 0, fontsize=10).draggable(state = True)
 plt.xlabel("ODEs")
 plt.ylabel("Time (s)")
 plt.title(Title)
