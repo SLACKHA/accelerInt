@@ -18,7 +18,7 @@
     int padded = initialize_gpu_memory(NUM, block_size, grid_size, y_device, variable_device);
     (*y_host) = (double*)malloc(padded * NN * sizeof(double));
     (*variable_host) = (double*)malloc(padded * sizeof(double));
-#ifdef SHUFFLE
+#ifndef SHUFFLE
     FILE *fp = fopen ("ign_data.txt", "r");
 #else
     FILE *fp = fopen("shuffled_data.txt", "r");

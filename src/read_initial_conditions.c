@@ -15,7 +15,7 @@
  void read_initial_conditions(int NUM, double** y_host, double** variable_host) {
     (*y_host) = (double*)malloc(NUM * NN * sizeof(double));
     (*variable_host) = (double*)malloc(NUM * sizeof(double));
-#ifdef SHUFFLE
+#ifndef SHUFFLE
     FILE *fp = fopen ("ign_data.txt", "r");
 #else
     FILE *fp = fopen("shuffled_data.txt", "r");
