@@ -239,10 +239,10 @@ int main (int argc, char *argv[])
 
 #if defined(CONP)
         // constant pressure case
-        intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (padded, t, t_next, pres_device, y_device);
+        intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (NUM, t, t_next, pres_device, y_device);
 #elif defined(CONV)
         // constant volume case
-        intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (padded, t, t_next, rho_device, y_device);
+        intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (NUM, t, t_next, rho_device, y_device);
 #endif
         cudaErrorCheck( cudaPeekAtLastError() );
         cudaErrorCheck( cudaDeviceSynchronize() );
