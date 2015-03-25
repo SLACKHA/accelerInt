@@ -66,7 +66,7 @@ ifeq ("$(LOG_OUTPUT)", "TRUE")
     CONTROL_FLAGS += -DLOG_OUTPUT
 endif
 ifeq ("$(SHUFFLE)", "TRUE")
-    CONTROL_FLAGS += -SHUFFLE
+    CONTROL_FLAGS += -DSHUFFLE
 endif
 ifeq ("$(USE_LAPACK)", "MKL")
     CONTROL_FLAGS += -DUSE_MKL
