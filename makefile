@@ -46,6 +46,7 @@ _DEPS = header.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS)) $(ODIR)/$(DBG_FILE)
 
 SOLVER_DEPS = $(ODIR)/$(CF_FILE)
+GPU_SOLVER_DEPS = $(SOLVER_DEPS) $(SDIR)/launch_bounds.cuh
 
 #turn this into the control flags
 ifeq ("$(DEBUG)", "TRUE")
@@ -282,7 +283,7 @@ $(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS) $(SOLVER_DEPS)
 	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
 
-$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS) $(SOLVER_DEPS)
+$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS) $(GPU_SOLVER_DEPS)
 	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 endef
