@@ -17,4 +17,9 @@
 #define M_MAX NN
 #define STRIDE (M_MAX + P)
 
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+ 	//the size of the logging arrays
+ 	#define MAX_STEPS 10000
+#endif
+
 #endif

@@ -67,9 +67,6 @@ int main (int argc, char *argv[])
 #ifdef DEBUG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
-
-    initialize_solver();
-
     /** Number of independent systems */
     int NUM = 1;
 
@@ -120,6 +117,8 @@ int main (int argc, char *argv[])
     cudaErrorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
     //and L1 size
     cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
+
+    initialize_solver();
 
     int g_num = (int)round(((double)NUM) / ((double)TARGET_BLOCK_SIZE));
     if (g_num == 0)
@@ -198,14 +197,14 @@ int main (int argc, char *argv[])
     //open files for krylov logging
     FILE *logFile;
     //open and clear
-    const char* f_name = solver_name();
-    int len = strlen(f_name);
-    char out_name[len + 17];
-    sprintf(out_name, "log/%s-kry-log.txt", f_name);
-    logFile = fopen(out_name, "w");
+    const char* f_new_name = solver_name();
+    int len_new = strlen(f_new_name);
+    char out_name_new[len_new + 17];
+    sprintf(out_name_new, "log/%s-kry-log.txt", f_new_name);
+    logFile = fopen(out_name_new, "w");
 
-    char out_reject_name[len + 23];
-    sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);    
+    char out_reject_name[len_new + 23];
+    sprintf(out_reject_name, "log/%s-kry-reject.txt", f_new_name);    
     //file for krylov logging
     FILE *rFile;
     //open and clear
