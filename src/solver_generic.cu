@@ -10,13 +10,11 @@
 #include "header.h"
 #include "solver.cuh"
 #include "gpu_memory.cuh"
-#include "launch_bounds.cuh"
 
 #define T_ID (threadIdx.x + (blockDim.x * blockIdx.x))
 #define GRID_SIZE (blockDim.x * gridDim.x)
 
  __global__ void
- __launch_bounds__(TARGET_BLOCK_SIZE, TARGET_BLOCKS)
 intDriver (const int NUM, const double t, const double t_end,
                 const double *pr_global, double *y_global)
 {

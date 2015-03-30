@@ -38,6 +38,7 @@ FAST_MATH = FALSE
 #used to force a build on different flags
 CF_FILE = CONTROL_FLAGS
 DBG_FILE = DEBUG_FLAGS
+REG_FILE = REGISTER_COUNT
 CONTROL_FLAGS = 
 DEBUG_FLAGS = 
 
@@ -46,7 +47,7 @@ _DEPS = header.h
 DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS)) $(ODIR)/$(DBG_FILE)
 
 SOLVER_DEPS = $(ODIR)/$(CF_FILE)
-GPU_SOLVER_DEPS = $(SOLVER_DEPS) $(SDIR)/launch_bounds.cuh
+GPU_SOLVER_DEPS = $(SOLVER_DEPS) $(SDIR)/launch_bounds.cuh $(ODIR)/$(REG_FILE)
 
 #turn this into the control flags
 ifeq ("$(DEBUG)", "TRUE")
@@ -80,13 +81,16 @@ ifeq ("$(FAST_MATH)", "TRUE")
     CONTROL_FLAGS += -DUSE_FAST_MATH
 endif
 
-# || echo $(DEBUG_FLAGS) > $(ODIR)/$(DBG_FILE)
-#  || echo $(CONTROL_FLAGS) > $(ODIR)/$(CF_FILE)
+#get the stored register count
+reg_count := $(shell cat $(SDIR)/regcount)
+
 #test for and update (if needed) the control files
 debug_flag_maker := $(shell test -f $(ODIR)/$(DBG_FILE) || touch $(ODIR)/$(DBG_FILE))
 control_flag_maker := $(shell test -f $(ODIR)/$(CF_FILE) || touch $(ODIR)/$(CF_FILE))
+reg_flag_maker := $(shell test -f $(ODIR)/$(REG_FILE) || touch $(ODIR)/$(REG_FILE))
 tmp1 := $(shell grep -Fx "$(DEBUG_FLAGS)" $(ODIR)/$(DBG_FILE) || echo "$(DEBUG_FLAGS)" > $(ODIR)/$(DBG_FILE))
 tmp2 := $(shell grep -Fx "$(CONTROL_FLAGS)" $(ODIR)/$(CF_FILE) || echo "$(CONTROL_FLAGS)" > $(ODIR)/$(CF_FILE))
+tmp3 := $(shell grep -Fx "$(reg_count)" $(ODIR)/$(REG_FILE) || echo "$(reg_count)" > $(ODIR)/$(REG_FILE))
 
 #compilers
 CC = gcc
@@ -97,7 +101,7 @@ LINK   = $(CC) -fPIC
 NLINK = $(NCC) -fPIC -fopenmp -Xlinker -rpath $(CUDA_PATH)/lib64
 
 FLAGS = $(DEBUG_FLAGS) $(CONTROL_FLAGS)
-NVCCFLAGS = -Xcompiler -fopenmp $(DEBUG_FLAGS) $(CONTROL_FLAGS)
+NVCCFLAGS = -Xcompiler -fopenmp $(DEBUG_FLAGS) $(CONTROL_FLAGS) -maxrregcount $(reg_count)
 NVCCINCLUDES = -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
 NVCCLIBS = -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++
 LIBS = -lm
