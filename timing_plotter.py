@@ -7,8 +7,10 @@ from os.path import isfile, join
 from math import pow
 import re
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import sys
 from argparse import ArgumentParser
+from numpy import linspace
 
 def parse_cpu(file):
     with open(file) as infile:
@@ -39,16 +41,22 @@ def time_plotter(Title, directory, out_dir='', plot_vs_blocksize=False):
     data = {}
     gpu_data = {}
     for file in onlyfiles:
-        descriptor = file[:file.index('-int')]
+        if plot_vs_blocksize:
+            descriptor = file[file.index('_') + 1:file.rindex('_')]
+        else:
+            descriptor = file[:file.index('-int')]
         if 'gpu' in file:
-            descriptor += '-gpu'
+            if not plot_vs_blocksize:
+                descriptor += '-gpu'
             if not descriptor in gpu_data:
                 gpu_data[descriptor] = {}
             odes, block, time = parse_gpu(join(directory, file))
             if plot_vs_blocksize:
-                if not odes in gpu_data[descriptor]:
-                    gpu_data[descriptor][odes] = []
-                gpu_data[descriptor][odes].append((blocksize, time))
+                if not block in gpu_data[descriptor]:
+                    gpu_data[descriptor][block] = time
+                else:
+                    val = gpu_data[descriptor][block]
+                    gpu_data[descriptor][block] = min(time, val)
             else:
                 if not block in gpu_data[descriptor]:
                     gpu_data[descriptor][block] = []
@@ -65,19 +73,27 @@ def time_plotter(Title, directory, out_dir='', plot_vs_blocksize=False):
         for threads in data[desc]:
             data[desc][threads] = sorted(data[desc][threads], key = lambda val: val[0])
 
-    for desc in gpu_data:
-        for block in gpu_data[desc]:
-            gpu_data[desc][block] = sorted(gpu_data[desc][block], key = lambda val: val[0])
+    if not plot_vs_blocksize:
+        for desc in gpu_data:
+            for block in gpu_data[desc]:
+                gpu_data[desc][block] = sorted(gpu_data[desc][block], key = lambda val: val[0])
     		
     #plot
     for desc in data:
         for threads in data[desc]:
             plt.loglog(*zip(*data[desc][threads]), label = desc + " - " + str(threads) + " threads", marker = "v", basex=2)
+    
+    colorwheel = cm.jet(linspace(0,1,len(gpu_data)))
+    index = 0
     for desc in gpu_data:
-        for block in gpu_data[desc]:
-            if plot_vs_blocksize:
-                plt.loglog(*zip(*gpu_data[desc][block]), label = desc, marker = ">", basex=2)
-            else:
+        if plot_vs_blocksize:
+            data = []
+            for block in gpu_data[desc]:
+                data.append((block, gpu_data[desc][block]))
+            plt.loglog(*zip(*data), label = desc, marker = ">", basex=2, color=colorwheel[index])
+            index += 1
+        else:
+            for block in gpu_data[desc]:
                 plt.loglog(*zip(*gpu_data[desc][block]), label = desc + ' - blocksize: ' + str(block), marker = ">", basex=2)
 
     plt.legend(loc = 0, fontsize=10).draggable(state = True)
@@ -87,6 +103,7 @@ def time_plotter(Title, directory, out_dir='', plot_vs_blocksize=False):
         plt.xlabel("ODEs")
     plt.ylabel("Time (s)")
     plt.title(Title)
+    print out_dir, Title, '.png'
     plt.savefig(join(out_dir, Title + '.png'))
     plt.close()
 
