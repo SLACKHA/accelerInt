@@ -144,7 +144,7 @@ int main (int argc, char *argv[])
 #endif
 #elif CONV
     double* rho_device;
-    double* rho_device;
+    double* rho_host;
 #ifdef SAME_IC
     int padded = set_same_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
 #else
