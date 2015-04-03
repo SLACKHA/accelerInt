@@ -16,7 +16,7 @@ obj_maker := $(shell test -d $(ODIR) || mkdir -p $(ODIR))
 out_maker := $(shell test -d $(OUTDIR) || mkdir -p $(OUTDIR))
 
 #Modules
-MODULES := rb43 exp4 cvodes prof rates radau2a cvodes-analytical unittest
+MODULES := rb43 exp4 cvodes prof rates radau2a cvodes-analytical unittest specrad
 MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
 
 # Paths
@@ -180,6 +180,9 @@ gpuratestest : LIBS +=  $(NVCCLIBS)
 gpuunittest : NVCCFLAGS += $(NVCCINCLUDES) -DRB43
 gpuunittest : LIBS +=  $(NVCCLIBS)
 
+specradius : FLAGS += -fopenmp
+specradius : LIBS += -fopenmp
+
 #standard flags
 FLAGS += -std=c99
 NVCCFLAGS += -arch=sm_20 -m64
@@ -277,6 +280,9 @@ OBJ_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_RADAU2A))
 _OBJ_GPU_UNITTEST = unit_tests.cu.o complexInverse.cu.o old_complexInverse.cu.o
 OBJ_GPU_UNITTEST = $(patsubst %,$(ODIR)/unittest/%,$(_OBJ_GPU_UNITTEST))
 
+_OBJ_SPEC_RAD = spectral_radius_generator.o read_initial_conditions.o
+OBJ_SPEC_RAD = $(patsubst %,$(ODIR)/specrad/%,$(_OBJ_SPEC_RAD))
+
 #mechanism files
 $(ODIR)/mech/%.o : $(SDIR)/%.c $(DEPS)
 	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
@@ -359,11 +365,14 @@ gpuunittest : $(OBJ_GPU_UNITTEST)
 	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/unittest/dlink.o
 	$(NLINK) $^ $(ODIR)/unittest/dlink.o $(LIBS) -o $@
 
+specradius : $(OBJ_SPEC_RAD) $(MECH)
+	$(LINK) $^ $(LIBS) -o $@
+
 doc : $(DEPS) $(OBJ)
 	$(DOXY)
 
 clean :
 	rm -rf $(ODIR) \
-		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int cvodes-analytical-int gpuunittest doc
+		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int cvodes-analytical-int gpuunittest specradius doc
 
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))
