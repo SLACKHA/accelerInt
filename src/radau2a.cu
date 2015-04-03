@@ -582,6 +582,9 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		double Fac = 0.5; //Step reduction if too many iterations
 		int NewtonIter = 0;
 		double Theta = 0;
+#ifdef NEWTON_UNROLL
+		#pragma unroll NEWTON_UNROLL
+#endif
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
 			RK_PrepareRHS(t, pr, H, y, F0, Z1, Z2, Z3, DZ1, DZ2, DZ3);
 			RK_Solve(H, E1, E2, DZ1, DZ2, DZ3, ipiv1, ipiv2);
@@ -623,12 +626,21 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
             }
 
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
+#ifndef NEWTON_UNROLL
             if (NewtonDone) break;
             if (NewtonIter == NewtonMaxit - 1) {
             	//todo implement return codes
 				y[0] = logf(-1);
 				return;
             }
+#else //only break if it's at the end of the unroll
+            if (NewtonDone && (NewtonIter + 1) % NewtonIter == 0) break;
+            if ((NewtonIter + 1) % NewtonIter == 0 && NewtonIter == NewtonMaxit - 1) {
+            	//todo implement return codes
+				y[0] = logf(-1);
+				return;
+            }
+#endif
 		}
 		if (!NewtonDone) {
 			H = Fac * H;
@@ -648,6 +660,9 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		NewtonDone = false;
         Fac = 0.5; // ! Step reduction factor if too many iterations
         double NewtonIncrement = 0;
+#ifdef NEWTON_UNROLL
+		#pragma unroll NEWTON_UNROLL
+#endif
         for (NewtonIter = 0; NewtonIter < NewtonMaxit; NewtonIter++) {
         	//!~~~>   Prepare the loop-dependent part of the right-hand side
         	WADD(y, Z4, TMP);
@@ -688,8 +703,11 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
             	Z4[i] += DZ4[i];
             }
 
-            NewtonDone = (NewtonRate*NewtonIncrement <= NewtonTol);
+#ifndef NEWTON_UNROLL
             if (NewtonDone) break;
+#else //only break if it's at the end of the unroll
+            if (NewtonDone && (NewtonIter + 1) % NewtonIter == 0) break;
+#endif
         }
         if (!NewtonDone) {
         	H = Fac*H;
