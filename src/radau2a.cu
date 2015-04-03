@@ -25,6 +25,11 @@ void scale_init (const double * y0, double * sc) {
 	}
 }
 
+#ifdef NEWTON_UNROLL
+	#define NEWTON_UNROLLER	#pragma unroll NEWTON_UNROLL
+#else
+	#define NEWTON_UNROLLER #pragma unroll 1
+#endif
 #define Max_no_steps (200000)
 #define NewtonMaxit (8)
 #define StartNewton (true)
@@ -582,9 +587,8 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		double Fac = 0.5; //Step reduction if too many iterations
 		int NewtonIter = 0;
 		double Theta = 0;
-#ifdef NEWTON_UNROLL
-		#pragma unroll NEWTON_UNROLL
-#endif
+		
+		NEWTON_UNROLLER
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
 			RK_PrepareRHS(t, pr, H, y, F0, Z1, Z2, Z3, DZ1, DZ2, DZ3);
 			RK_Solve(H, E1, E2, DZ1, DZ2, DZ3, ipiv1, ipiv2);
@@ -660,9 +664,8 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		NewtonDone = false;
         Fac = 0.5; // ! Step reduction factor if too many iterations
         double NewtonIncrement = 0;
-#ifdef NEWTON_UNROLL
-		#pragma unroll NEWTON_UNROLL
-#endif
+		
+		NEWTON_UNROLLER
         for (NewtonIter = 0; NewtonIter < NewtonMaxit; NewtonIter++) {
         	//!~~~>   Prepare the loop-dependent part of the right-hand side
         	WADD(y, Z4, TMP);
