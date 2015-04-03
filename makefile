@@ -110,11 +110,16 @@ CV_LIBS = -lsundials_cvodes -lsundials_nvecserial
 FAST_MATH = FALSE
 
 #generic objects for CPU mechanism
-_MECH = dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o mechanism.o
+_BASE_MECH = dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o
+_MECH = $(_BASE_MECH) mechanism.o
+BASE_MECH = $(patsubst %,$(ODIR)/mech/%,$(_BASE_MECH))
 MECH = $(patsubst %,$(ODIR)/mech/%,$(_MECH))
 
 #generic objects for GPU mechanism
-_MECH_GPU = dydt.cu.o jacob.cu.o chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o mechanism.cu.o gpu_memory.cu.o
+_GPU_JACOB_FILES = $(patsubst %.cu,%.jac.cu.o,$(shell cat $(SDIR)/jacobs/jac_list))
+_BASE_MECH_GPU = dydt.cu.o jacob.cu.o $(_GPU_JACOB_FILES) chem_utils.cu.o mass_mole.o rxn_rates.cu.o spec_rates.cu.o rxn_rates_pres_mod.cu.o gpu_memory.cu.o
+_MECH_GPU = $(_BASE_MECH_GPU) mechanism.cu.o
+BASE_MECH_GPU = $(patsubst %,$(ODIR)/mech/%,$(_BASE_MECH_GPU))
 MECH_GPU = $(patsubst %,$(ODIR)/mech/%,$(_MECH_GPU))
 
 #Generic objects for CPU solver
@@ -248,20 +253,20 @@ OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES))
 _OBJ_CVODES_ANALYTICAL = cvodes_dydt.o cvodes_jac.o cvodes_init.o solver_cvodes.o $(_OBJ)
 OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes-analytical/%,$(_OBJ_CVODES_ANALYTICAL))
 
-_OBJ_PROFILER = rateOutputTest.o $(_MECH)
-OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER))
+_OBJ_PROFILER = rateOutputTest.o mechanism.o
+OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER)) $(BASE_MECH)
 
-_OBJ_GPU_PROFILER = rateOutputTest.cu.o $(_MECH_GPU)
-OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER))
+_OBJ_GPU_PROFILER = rateOutputTest.cu.o mechanism.cu.o
+OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER)) $(BASE_MECH_GPU)
 
 _OBJ_RB43_GPU_PROFILER = solver_profiler.cu.o exprb43_init.cu.o $(filter-out solver_main.cu.o,$(_OBJ_GPU_RA))
 OBJ_RB43_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_RB43_GPU_PROFILER))
 
-_OBJ_RATES_TEST = rateOutputTest.o $(_MECH)
-OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST))
+_OBJ_RATES_TEST = rateOutputTest.o mechanism.o
+OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST)) $(BASE_MECH)
 
-_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o $(_MECH_GPU)
-OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST))
+_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o mechanism.cu.o
+OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST)) $(BASE_MECH_GPU)
 
 _OBJ_GPU_RADAU2A = radau2a.cu.o radau2a_init.cu.o  inverse.cu.o complexInverse_NN.cu.o solver_generic.cu.o $(_OBJ_GPU)
 OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A))
@@ -278,6 +283,11 @@ $(ODIR)/mech/%.o : $(SDIR)/%.c $(DEPS)
 	$(CC) $(FLAGS) $(INCLUDES) -c -o $@ $<
 
 $(ODIR)/mech/%.cu.o : $(SDIR)/%.cu $(DEPS)
+	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
+	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
+
+#gpu jacob files
+$(ODIR)/mech/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(DEPS)
 	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
 	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
 
@@ -332,7 +342,7 @@ profiler : $(OBJ_PROFILER)
 
 gpuprofiler : $(OBJ_GPU_PROFILER)
 	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/prof/dlink.o
-	$(NLINK) $^ $(ODIR)/profiler/dlink.o $(LIBS) -o $@
+	$(NLINK) $^ $(ODIR)/prof/dlink.o $(LIBS) -o $@
 
 ratestest : $(OBJ_RATES_TEST)
 	$(LINK) $^ $(LIBS) -o $@
