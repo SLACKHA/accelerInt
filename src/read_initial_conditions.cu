@@ -11,6 +11,7 @@
 #include "gpu_memory.cuh"
 #include "gpu_macros.cuh"
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
 
@@ -31,7 +32,10 @@
         char buffer [buff_size];
         if (fgets (buffer, buff_size, fp) != NULL)
         {
-            break;
+            int len = strlen(buffer);
+            //test that we actually hit the newline
+            if ((len > 0) && (buffer[len - 1] == '\n'))
+                break;
         }
         rewind (fp);
         buff_size *= 2;
