@@ -13,20 +13,26 @@ from argparse import ArgumentParser
 from numpy import linspace
 
 def parse_cpu(file):
-    with open(file) as infile:
-        lines = [line.strip() for line in infile]
-    odes = int(lines[0][lines[0].index(":") + 1:])
-    threads = int(lines[1][lines[1].index(":") + 1:])
-    time = float(lines[2][lines[2].index(':') + 1:lines[2].index('sec')])
-    return odes, threads, time
+    try:
+        with open(file) as infile:
+            lines = [line.strip() for line in infile]
+        odes = int(lines[0][lines[0].index(":") + 1:])
+        threads = int(lines[1][lines[1].index(":") + 1:])
+        time = float(lines[2][lines[2].index(':') + 1:lines[2].index('sec')])
+        return odes, threads, time
+    except:
+        return None
 
 def parse_gpu(file):
-    with open(file) as infile:
-        lines = [line.strip() for line in infile]
-    odes = int(lines[0][lines[0].index(":") + 1 : lines[0].index('block')])
-    block = int(lines[0][lines[0].rindex(":") + 1:])
-    time = float(lines[1][lines[1].index(':') + 1:lines[1].index('sec')])
-    return odes, block, time
+    try:
+        with open(file) as infile:
+            lines = [line.strip() for line in infile]
+        odes = int(lines[0][lines[0].index(":") + 1 : lines[0].index('block')])
+        block = int(lines[0][lines[0].rindex(":") + 1:])
+        time = float(lines[1][lines[1].index(':') + 1:lines[1].index('sec')])
+        return odes, block, time
+    except:
+        return None
 
 def time_plotter(Title, directory, out_dir='', plot_vs_blocksize=False):
 
@@ -50,7 +56,10 @@ def time_plotter(Title, directory, out_dir='', plot_vs_blocksize=False):
                 descriptor += '-gpu'
             if not descriptor in gpu_data:
                 gpu_data[descriptor] = {}
-            odes, block, time = parse_gpu(join(directory, file))
+            tup = parse_gpu(join(directory, file))
+            if tup is None:
+                continue
+            odes, block, time = tup 
             if plot_vs_blocksize:
                 if not block in gpu_data[descriptor]:
                     gpu_data[descriptor][block] = time
@@ -64,7 +73,10 @@ def time_plotter(Title, directory, out_dir='', plot_vs_blocksize=False):
         else:
             if not descriptor in data:
                 data[descriptor] = {}
-            odes, threads, time = parse_cpu(join(directory, file))
+            tup = parse_cpu(join(directory, file))
+            if tup is None:
+                continue
+            odes, threads, time = tup
             if not threads in data[descriptor]:
                 data[descriptor][threads] = []
             data[descriptor][threads].append((odes, time))
