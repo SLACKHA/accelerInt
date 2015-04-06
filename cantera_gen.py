@@ -52,7 +52,6 @@ def run_sim(T, P, Phi, file, gas):
         state[0] = reac.T
         state[1] = reac.thermo.P 
         state[2:] = reac.Y[:]
-        state_array[i, :] = state[:]
         file.write(' '.join(np.char.mod('%.15e', state[:])) + "\n")
         t = net.step(t_end)
         states += 1
