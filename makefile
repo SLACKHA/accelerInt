@@ -30,6 +30,7 @@ SAME_IC = TRUE
 PRINT = FALSE
 LOG_OUTPUT = FALSE
 SHUFFLE = FALSE
+PROFILE = FALSE
 #valid options are MKL, SYS, NONE
 USE_LAPACK = MKL
 FAST_MATH = FALSE
@@ -80,6 +81,9 @@ endif
 ifeq ("$(FAST_MATH)", "TRUE")
     CONTROL_FLAGS += -DUSE_FAST_MATH
 endif
+ifeq ("$(PROFILE)", "TRUE")
+	CONTROL_FLAGS += -DPROFILER
+endif
 
 #get the stored register count
 reg_count := $(shell cat $(SDIR)/regcount)
@@ -107,7 +111,10 @@ NVCCLIBS = -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++
 LIBS = -lm
 RA_LIBS = -lfftw3
 CV_LIBS = -lsundials_cvodes -lsundials_nvecserial
-FAST_MATH = FALSE
+
+ifeq ("$(PROFILE)", "TRUE")
+	NVCCFLAGS += -lineinfo
+endif
 
 #generic objects for CPU mechanism
 _BASE_MECH = dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o
