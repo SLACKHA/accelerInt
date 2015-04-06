@@ -243,14 +243,16 @@ int main (int argc, char *argv[])
         // constant volume case
         intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (NUM, t, t_next, rho_device, y_device);
 #endif
+#ifdef DEBUG
         cudaErrorCheck( cudaPeekAtLastError() );
         cudaErrorCheck( cudaDeviceSynchronize() );
+#endif
+        // transfer memory back to CPU
+        cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NN * sizeof(double), cudaMemcpyDeviceToHost) );
 
         t = t_next;
         t_next += h;
 
-        // transfer memory back to CPU
-        cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NN * sizeof(double), cudaMemcpyDeviceToHost) );
 
 #if defined(DEBUG) || defined(PRINT) 
         printf("%.15le\t%.15le\n", t, y_host[0]);
@@ -326,11 +328,11 @@ int main (int argc, char *argv[])
     fclose (pFile);
 #endif
 
-    free (y_host);
+    cudaFreeHost (y_host);
 #ifdef CONP
-    free (pres_host);
+    cudaFreeHost (pres_host);
 #elif CONV
-    free (rho_host);
+    cudaFreeHost (rho_host);
 #endif
 #ifdef LOG_KRYLOV_AND_STEPSIZES
     free(err_log_host);
