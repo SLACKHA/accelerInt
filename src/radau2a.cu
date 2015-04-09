@@ -538,6 +538,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	int info = 0;
 	int Nconsecutive = 0;
 	int Nsteps = 0;
+	double NewtonRate = pow(2.0, 1.25);
 	while (t + Roundoff < t_end) {
 		if(!Reject) {
 			dydt (t, pr, y, F0);
@@ -594,6 +595,9 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		int NewtonIter = 0;
 		double Theta = 0;
 		
+		//reuse previous NewtonRate
+		NewtonRate = pow(fmax(NewtonRate, EPS), 0.8);
+
 		NEWTON_UNROLLER
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
 			RK_PrepareRHS(t, pr, H, y, F0, Z1, Z2, Z3, DZ1, DZ2, DZ3);
@@ -602,7 +606,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			double d2 = RK_ErrorNorm(scale, DZ2);
 			double d3 = RK_ErrorNorm(scale, DZ3);
 			double NewtonIncrement = sqrt((d1 * d1 + d2 * d2 + d3 * d3) / 3.0);
-			double NewtonRate = 2.0;
+
 			Theta = ThetaMin;
 			if (NewtonIter > 0) 
 			{
@@ -663,7 +667,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
         double NewtonIncrement = 0;
 		
 		NEWTON_UNROLLER
-        for (NewtonIter = 0; NewtonIter < NewtonMaxit; NewtonIter++) {
+        for (int sNewtonIter = 0; sNewtonIter < NewtonMaxit; sNewtonIter++) {
         	//!~~~>   Prepare the loop-dependent part of the right-hand side
         	WADD(y, Z4, TMP);
         	dydt(t + H, pr, TMP, DZ4);
@@ -675,18 +679,18 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
         	dgetrs(E1, DZ4, ipiv1);
         	//Check convergence of Newton iterations
         	NewtonIncrement = RK_ErrorNorm(scale,DZ4);
-        	double NewtonRate = 2.0;
+        	double sNewtonRate = 2.0;
         	double ThetaSD = ThetaMin;
-        	if (NewtonIter > 0) {
+        	if (sNewtonIter > 0) {
             	ThetaSD = NewtonIncrement/NewtonIncrementOld;
             	if (ThetaSD < 0.99) {
-            		NewtonRate = ThetaSD/(ONE-ThetaSD);
+            		sNewtonRate = ThetaSD/(ONE-ThetaSD);
                     //! Predict error at the end of Newton process 
-                    double NewtonPredictedErr = (NewtonIncrement * pow(ThetaSD, (NewtonMaxit - NewtonIter - 1))) / (ONE - Theta);
+                    double NewtonPredictedErr = (NewtonIncrement * pow(ThetaSD, (NewtonMaxit - sNewtonIter - 1))) / (ONE - Theta);
                     if (NewtonPredictedErr >= NewtonTol) {
                     	//! Non-convergence of Newton: predicted error too large
 						double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
-	                    Fac = 0.8 * pow(Qnewton, -ONE/((double)(NewtonMaxit-NewtonIter)));
+	                    Fac = 0.8 * pow(Qnewton, -ONE/((double)(NewtonMaxit-sNewtonIter)));
 	                    break;
                     }
             	}
@@ -706,7 +710,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 #ifndef NEWTON_UNROLL
             if (NewtonDone) break;
 #else //only break if it's at the end of the unroll
-            if (NewtonDone && (NewtonIter + 1) % NewtonIter == 0) break;
+            if (NewtonDone && (sNewtonIter + 1) % sNewtonIter == 0) break;
 #endif
         }
         if (!NewtonDone) {
@@ -727,7 +731,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, scale, E1, ipiv1, FirstStep, Reject);
 #endif
 		//!~~~> Computation of new step size Hnew
-		Fac = pow(Err, (-ONE / rkELO)) * fmin(FacSafe, (ONE + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit));
+		Fac = pow(Err, (-ONE / rkELO)) * FacSafe * (ONE + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
 		Hnew = Fac * H;
 		if (Err < ONE) {
@@ -739,7 +743,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				Hnew = Fac * H;
 			}
 			Hacc = H;
-			ErrOld = max(1e-2, Err);
+			ErrOld = fmax(1e-2, Err);
 #endif
 			FirstStep = false;
 			Hold = H;
@@ -767,7 +771,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	            if (!SkipLU) H = Hnew;
 			}
 			// If convergence is fast enough, do not update Jacobian
-         	SkipJac  = false;
+         	SkipJac = NewtonIter == 1 || NewtonRate <= ThetaMin;
 		}
 		else {
 			if (FirstStep || Reject) {
