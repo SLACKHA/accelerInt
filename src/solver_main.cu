@@ -120,7 +120,7 @@ int main (int argc, char *argv[])
 
     initialize_solver();
 
-    int g_num = (int)round(((double)NUM) / ((double)TARGET_BLOCK_SIZE));
+    int g_num = (int)ceil(((double)NUM) / ((double)TARGET_BLOCK_SIZE));
     if (g_num == 0)
         g_num = 1;
 
@@ -152,9 +152,6 @@ int main (int argc, char *argv[])
 #endif
 #endif
 
-    g_num = (int)round(((double)padded) / ((double)TARGET_BLOCK_SIZE));
-    if (g_num == 0)
-        g_num = 1;
     dim3 dimGrid (g_num, 1 );
     dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
 
