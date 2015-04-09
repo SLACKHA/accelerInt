@@ -25,19 +25,6 @@ void scale_init (const double * y0, double * sc) {
 	}
 }
 
-#ifdef DEBUG
-#include <stdio.h>
-#define PRINT(X, Y)  \
-	if (threadIdx.x == 0) {\
-		printf("Block:%d\t", blockIdx.x); \
-		printf(X, Y); \
-	} \
-	else \
-		(void)0
-#else
-#define PRINT(X, Y)
-#endif
-
 #ifdef NEWTON_UNROLL
 	#define NEWTON_UNROLLER	#pragma unroll NEWTON_UNROLL
 #else
@@ -552,20 +539,16 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	int Nconsecutive = 0;
 	int Nsteps = 0;
 	while (t + Roundoff < t_end) {
-		PRINT("Reject:%d\n", ANY(!Reject));
-		if(ANY(!Reject)) {
+		if(!Reject) {
 			dydt (t, pr, y, F0);
 		}
-		PRINT("LU:%d\n", ANY(!SkipLU));
-		if(ANY(!SkipLU)) { 
+		if(!SkipLU) { 
 			//need to update Jac/LU
-			PRINT("Jac:%d\n", ANY(!SkipJac));
-			if(ANY(!SkipJac)) {
+			if(!SkipJac) {
 				eval_jacob (t, pr, y, A);
 			}
 			RK_Decomp(H, E1, E2, A, ipiv1, ipiv2, &info);
-			PRINT("info:%d\n", ANY(!info));
-			if(ANY(info != 0)) {
+			if(info != 0) {
 				Nconsecutive += 1;
 				if (Nconsecutive >= 5)
 				{
@@ -624,15 +607,13 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			if (NewtonIter > 0) 
 			{
 				Theta = NewtonIncrement / NewtonIncrementOld;
-				PRINT("Theta:%d\n", ANY(Theta >= 0.99));
-				if(ANY(Theta >= 0.99)) //! Non-convergence of Newton: Theta too large
+				if(Theta >= 0.99) //! Non-convergence of Newton: Theta too large
 					break;
 				else
 					NewtonRate = Theta / (ONE - Theta);
 				//Predict error at the end of Newton process 
 				double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (ONE - Theta);
-				PRINT("Pred:%d\n", ANY(NewtonPredictedErr >= NewtonTol));
-				if(ANY (NewtonPredictedErr >= NewtonTol)) {
+				if(NewtonPredictedErr >= NewtonTol) {
 					//Non-convergence of Newton: predicted error too large
 					double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
                     Fac = 0.8 * pow(Qnewton, -ONE/((double)(NewtonMaxit-NewtonIter)));
@@ -652,10 +633,9 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
 #ifndef NEWTON_UNROLL
-            PRINT("Done:%d\n", ALL(NewtonDone));
-            if (ALL (NewtonDone)) break;
+            if (NewtonDone) break;
 #else //only break if it's at the end of the unroll
-            if(ALL (NewtonDone && (NewtonIter + 1) % NewtonIter == 0)) break;
+            if(NewtonDone && (NewtonIter + 1) % NewtonIter == 0) break;
 #endif
             if (NewtonIter >= NewtonMaxit)
             {
@@ -663,8 +643,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				return;
 			}
 		}
-		PRINT("NotDone:%d\n", ANY(!NewtonDone));
-		if(ANY (!NewtonDone)) {
+		if(!NewtonDone) {
 			H = Fac * H;
 			Reject = true;
 			SkipJac = true;
