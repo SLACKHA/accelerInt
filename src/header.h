@@ -33,11 +33,26 @@
   #include "mechanism.h"
 #endif
 
-/** Absolute tolerance */
-#define ATOL (1.0E-15)
+#ifdef LOW_TOL
+    /** Absolute tolerance */
+    #define ATOL (1.0E-10)
 
-/** Relative tolerance */
-#define RTOL (1.0E-8)
+    /** Relative tolerance */
+    #define RTOL (1.0E-6)
+
+#else
+    /** Absolute tolerance */
+    #define ATOL (1.0E-15)
+
+    /** Relative tolerance */
+    #define RTOL (1.0E-8)
+#endif
+
+#ifdef LARGE_STEP
+    #define t_step (1e-4)
+#else
+    #define t_step (1e-6)
+#endif
 
 /** type of rational approximant (n, n) */
 #define N_RA 10

@@ -31,17 +31,21 @@ PRINT = FALSE
 LOG_OUTPUT = FALSE
 SHUFFLE = FALSE
 PROFILE = FALSE
+LOW_TOL = FALSE
+LARGE_STEP = FALSE
 #valid options are MKL, SYS, NONE
 USE_LAPACK = MKL
-FAST_MATH = FALSE
+FAST_MATH = TRUE
 
 
 #used to force a build on different flags
 CF_FILE = CONTROL_FLAGS
 DBG_FILE = DEBUG_FLAGS
 REG_FILE = REGISTER_COUNT
+MAIN_FILE = MAIN_FLAGS
 CONTROL_FLAGS = 
 DEBUG_FLAGS = 
+MAIN_FLAGS =
 
 #dependencies
 _DEPS = header.h
@@ -50,26 +54,13 @@ DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS)) $(ODIR)/$(DBG_FILE)
 SOLVER_DEPS = $(ODIR)/$(CF_FILE)
 GPU_SOLVER_DEPS = $(SOLVER_DEPS) $(SDIR)/launch_bounds.cuh $(ODIR)/$(REG_FILE)
 
+MAIN_DEPS = $(ODIR)/$(MAIN_FILE)
+
 #turn this into the control flags
 ifeq ("$(DEBUG)", "TRUE")
     DEBUG_FLAGS += -DDEBUG
 else
 	DEBUG_FLAGS += -DNDEBUG
-endif
-ifeq ("$(SAME_IC)", "TRUE")
-    CONTROL_FLAGS += -DSAME_IC
-endif
-ifeq ("$(PRINT)", "TRUE")
-    CONTROL_FLAGS += -DPRINT
-endif
-ifeq ("$(IGN)", "TRUE")
-    CONTROL_FLAGS += -DIGN
-endif
-ifeq ("$(LOG_OUTPUT)", "TRUE")
-    CONTROL_FLAGS += -DLOG_OUTPUT
-endif
-ifeq ("$(SHUFFLE)", "TRUE")
-    CONTROL_FLAGS += -DSHUFFLE
 endif
 ifeq ("$(USE_LAPACK)", "MKL")
     CONTROL_FLAGS += -DUSE_MKL
@@ -81,8 +72,29 @@ endif
 ifeq ("$(FAST_MATH)", "TRUE")
     CONTROL_FLAGS += -DUSE_FAST_MATH
 endif
+ifeq ("$(LOW_TOL)", "TRUE")
+	MAIN_FLAGS += -DLOW_TOL
+endif
+ifeq ("$(LARGE_STEP)", "TRUE")
+	MAIN_FLAGS += -DLARGE_STEP
+endif
+ifeq ("$(SAME_IC)", "TRUE")
+    MAIN_FLAGS += -DSAME_IC
+endif
+ifeq ("$(PRINT)", "TRUE")
+    MAIN_FLAGS += -DPRINT
+endif
+ifeq ("$(SHUFFLE)", "TRUE")
+    MAIN_FLAGS += -DSHUFFLE
+endif
+ifeq ("$(IGN)", "TRUE")
+    MAIN_FLAGS += -DIGN
+endif
+ifeq ("$(LOG_OUTPUT)", "TRUE")
+    MAIN_FLAGS += -DLOG_OUTPUT
+endif
 ifeq ("$(PROFILE)", "TRUE")
-	CONTROL_FLAGS += -DPROFILER
+	MAIN_FLAGS += -DPROFILER
 endif
 
 #get the stored register count
@@ -92,9 +104,11 @@ reg_count := $(shell cat $(SDIR)/regcount)
 debug_flag_maker := $(shell test -f $(ODIR)/$(DBG_FILE) || touch $(ODIR)/$(DBG_FILE))
 control_flag_maker := $(shell test -f $(ODIR)/$(CF_FILE) || touch $(ODIR)/$(CF_FILE))
 reg_flag_maker := $(shell test -f $(ODIR)/$(REG_FILE) || touch $(ODIR)/$(REG_FILE))
+main_flag_maker := $(shell test -f $(ODIR)/$(MAIN_FILE) || touch $(ODIR)/$(MAIN_FILE))
 tmp1 := $(shell grep -Fx "$(DEBUG_FLAGS)" $(ODIR)/$(DBG_FILE) || echo "$(DEBUG_FLAGS)" > $(ODIR)/$(DBG_FILE))
 tmp2 := $(shell grep -Fx "$(CONTROL_FLAGS)" $(ODIR)/$(CF_FILE) || echo "$(CONTROL_FLAGS)" > $(ODIR)/$(CF_FILE))
 tmp3 := $(shell grep -Fx "$(reg_count)" $(ODIR)/$(REG_FILE) || echo "$(reg_count)" > $(ODIR)/$(REG_FILE))
+tmp4 := $(shell grep -Fx "$(MAIN_FLAGS)" $(ODIR)/$(MAIN_FILE) || echo "$(MAIN_FLAGS)" > $(ODIR)/$(MAIN_FILE))
 
 #compilers
 CC = gcc
@@ -104,8 +118,8 @@ NVCC = $(CUDA_PATH)/bin/nvcc
 LINK   = $(CC) -fPIC
 NLINK = $(NCC) -fPIC -fopenmp -Xlinker -rpath $(CUDA_PATH)/lib64
 
-FLAGS = $(DEBUG_FLAGS) $(CONTROL_FLAGS)
-NVCCFLAGS = -Xcompiler -fopenmp $(DEBUG_FLAGS) $(CONTROL_FLAGS) -maxrregcount $(reg_count)
+FLAGS = $(DEBUG_FLAGS) $(CONTROL_FLAGS) $(MAIN_FLAGS)
+NVCCFLAGS = -Xcompiler -fopenmp $(DEBUG_FLAGS) $(CONTROL_FLAGS) $(MAIN_FLAGS) -maxrregcount $(reg_count)
 NVCCINCLUDES = -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
 NVCCLIBS = -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++
 LIBS = -lm
@@ -310,7 +324,15 @@ $(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS) $(SOLVER_DEPS)
 	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
 
+$(ODIR)/$1/solver_main.o : $(SDIR)/solver_main.c $(DEPS) $(MAIN_DEPS)
+	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
+	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
+
 $(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS) $(GPU_SOLVER_DEPS)
+	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
+	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
+
+$(ODIR)/$1/solver_main.cu.o : $(SDIR)/solver_main.cu $(DEPS) $(MAIN_DEPS) $(GPU_SOLVER_DEPS)
 	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 endef
