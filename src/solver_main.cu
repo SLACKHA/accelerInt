@@ -129,8 +129,11 @@ int main (int argc, char *argv[])
 
     // time span
     double t_start = 0.0;
-    double t_end = 1.0e-3;
-    double h = 1.0e-6;
+#ifdef SAME_IC
+    double t_end = 1000 * t_step;
+#else
+    double t_end = 10 * t_step;
+#endif
 
     double* y_device;
     double* y_host;
@@ -223,7 +226,7 @@ int main (int argc, char *argv[])
 
     // set initial time
     Real t = t_start;
-    Real t_next = t + h;
+    Real t_next = t + t_step;
     int numSteps = 0;
 
     // time integration loop
@@ -248,7 +251,7 @@ int main (int argc, char *argv[])
         cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NN * sizeof(double), cudaMemcpyDeviceToHost) );
 
         t = t_next;
-        t_next += h;
+        t_next += t_step;
 
 
 #if defined(DEBUG) || defined(PRINT) 

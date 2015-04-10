@@ -98,7 +98,11 @@ int main (int argc, char *argv[])
 
     // time span
     double t_start = 0.0;
-    double t_end = 1.0e-3;
+#ifdef SAME_IC
+    double t_end = 1000 * t_step;
+#else
+    double t_end = 10 * t_step;
+#endif
     double h = 1.0e-6;
 
     /////////////////////////////////////////////////

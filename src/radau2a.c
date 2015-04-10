@@ -18,13 +18,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-void scale_init (const double * y0, double * sc) {
-	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
-		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
-	}
-}
-
 #define Max_no_steps (200000)
 #define NewtonMaxit (8)
 #define StartNewton (true)
@@ -40,6 +33,20 @@ void scale_init (const double * y0, double * sc) {
 #define Qmax (1.2)
 #define UNROLL (8)
 //#define SDIRK_ERROR
+
+void scale (const double * y0, const double* y, double * sc) {
+	#pragma unroll
+	for (uint i = 0; i < NN; ++i) {
+		sc[i] = 1.0 / (ATOL + fmax(fabs(y0[i]), fabs(y[i])) * RTOL);
+	}
+}
+
+void scale_init (const double * y0, double * sc) {
+	#pragma unroll
+	for (uint i = 0; i < NN; ++i) {
+		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
+	}
+}
 
 const static double rkA[3][3] = { {
 	 1.968154772236604258683861429918299e-1,
@@ -415,20 +422,19 @@ double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, do
  */
 void integrate (const double t_start, const double t_end, const double pr, double* y) {
 	double Hmin = 0;
-	double Hmax = fabs(t_end - t_start);
 	double Hold = 0;
 #ifdef Gustafsson
 	double Hacc = 0;
 	double ErrOld = 0;
 #endif
-	double H = 1e-6;
+	double H = t_step / 5.0;
 	double Hnew;
 	double t = t_start;
 	bool Reject = false;
 	bool FirstStep = true;
 	bool SkipJac = false;
 	bool SkipLU = false;
-	double scale[NN];
+	double sc[NN];
 	double A[NN * NN] = {ZERO};
 	double E1[NN * NN];
 	double complex E2[NN * NN];
@@ -447,7 +453,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double DZ2[NN];
 	double DZ3[NN];
 	double CONT[NN * 3];
-	scale_init(y, scale);
+	scale_init(y, sc);
+	double y0[NN];
+	memcpy(y0, y, NN * sizeof(double));
 	double F0[NN];
 	int info = 0;
 	int Nconsecutive = 0;
@@ -511,9 +519,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
 			RK_PrepareRHS(t, pr, H, y, F0, Z1, Z2, Z3, DZ1, DZ2, DZ3);
 			RK_Solve(H, E1, E2, DZ1, DZ2, DZ3, ipiv1, ipiv2);
-			double d1 = RK_ErrorNorm(scale, DZ1);
-			double d2 = RK_ErrorNorm(scale, DZ2);
-			double d3 = RK_ErrorNorm(scale, DZ3);
+			double d1 = RK_ErrorNorm(sc, DZ1);
+			double d2 = RK_ErrorNorm(sc, DZ2);
+			double d3 = RK_ErrorNorm(sc, DZ3);
 			double NewtonIncrement = sqrt((d1 * d1 + d2 * d2 + d3 * d3) / 3.0);
 			Theta = ThetaMin;
 			if (NewtonIter > 0) 
@@ -588,7 +596,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
         		exit(-1);
         	}
         	//Check convergence of Newton iterations
-        	NewtonIncrement = RK_ErrorNorm(scale,DZ4);
+        	NewtonIncrement = RK_ErrorNorm(sc,DZ4);
         	double sNewtonRate = 2.0;
         	double ThetaSD = ThetaMin;
         	if (NewtonIter > 0) {
@@ -633,12 +641,12 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		for (int i = 0; i < NN; i++) {
 			DZ4[i] = Z3[i] - Z4[i];
 		}
-		double Err = RK_ErrorNorm(scale, DZ4);
+		double Err = RK_ErrorNorm(sc, DZ4);
 #else
-		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, scale, E1, ipiv1, FirstStep, Reject);
+		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
 #endif
 		//!~~~> Computation of new step size Hnew
-		Fac = pow(Err, (-ONE / rkELO)) * FacSafe * (ONE + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
+		Fac = pow(Err, (-ONE / rkELO)) * (ONE + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
 		Hnew = Fac * H;
 		if (Err < ONE) {
@@ -663,8 +671,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			if (StartNewton) {
 				RK_Make_Interpolate(Z1, Z2, Z3, CONT);
 			}
-			scale_init(y, scale);
-			Hnew = fmin(fmax(Hnew, Hmin), Hmax);
+			scale(y, y0, sc);
+			memcpy(y0, y, NN * sizeof(double));
+			Hnew = fmin(fmax(Hnew, Hmin), t_end - t);
 			if (Reject) {
 				Hnew = fmin(Hnew, H);
 			}
