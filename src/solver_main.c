@@ -103,7 +103,6 @@ int main (int argc, char *argv[])
 #else
     double t_end = 10 * t_step;
 #endif
-    double h = 1.0e-6;
 
     /////////////////////////////////////////////////
     // arrays
@@ -179,7 +178,7 @@ int main (int argc, char *argv[])
 
     // set initial time
     double t = t_start;
-    double t_next = t + h;
+    double t_next = t + t_step;
     int numSteps = 0;
 
     // time integration loop
@@ -196,7 +195,7 @@ int main (int argc, char *argv[])
 #endif
 
         t = t_next;
-        t_next += h;
+        t_next += t_step;
 
 #if defined(DEBUG) || defined(PRINT) 
         printf("%.15le\t%.15le\n", t, y_host[0]);
