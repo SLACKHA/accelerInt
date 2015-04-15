@@ -36,88 +36,101 @@ def parse_gpu(file):
 
 def time_plotter(Title, directory, out_dir='', plot_vs_blocksize=False):
 
-    onlyfiles = [ f for f in listdir(directory) if isfile(join(directory, f)) and re.search("\d.txt$", f) ]
+    onlyfiles = [ f for f in listdir(directory) if isfile(join(directory, f)) and re.search(".*int.*\.txt$", f) ]
 
     if plot_vs_blocksize and any(x for x in onlyfiles if not 'gpu' in x):
         print 'Plot Vs Blocksize not supported for CPU data!'
         sys.exit(-1)
 
-    fig = plt.figure()
-    plot = fig.add_subplot(1,1,1)
-    data = {}
-    gpu_data = {}
-    for file in onlyfiles:
-        if plot_vs_blocksize:
-            descriptor = file[file.index('_') + 1:file.rindex('_')]
-        else:
-            descriptor = file[:file.index('-int')]
-        if 'gpu' in file:
-            if not plot_vs_blocksize:
-                descriptor += '-gpu'
-            if not descriptor in gpu_data:
-                gpu_data[descriptor] = {}
-            tup = parse_gpu(join(directory, file))
-            if tup is None:
-                continue
-            odes, block, time = tup 
+    filter_vals = ['', '_lt', '_ls', '_lt_ls']
+
+    for filter_text in filter_vals:
+        Title_out = Title
+        if '_lt' in filter_text:
+            Title_out += ' - Large Tol'
+        if '_ls' in filter_text:
+            Title_out += ' - Large Stepsize'
+
+        the_files = [f for f in onlyfiles if re.search('\d' + filter_text + '\.txt', f)]
+        print filter_text, the_files
+        if not len(the_files):
+            continue
+        fig = plt.figure()
+        plot = fig.add_subplot(1,1,1)
+        data = {}
+        gpu_data = {}
+        for file in the_files:
             if plot_vs_blocksize:
-                if not block in gpu_data[descriptor]:
-                    gpu_data[descriptor][block] = time
-                else:
-                    val = gpu_data[descriptor][block]
-                    gpu_data[descriptor][block] = min(time, val)
+                descriptor = file[file.index('_') + 1:file.rindex('_')]
             else:
-                if not block in gpu_data[descriptor]:
-                    gpu_data[descriptor][block] = []
-                gpu_data[descriptor][block].append((odes, time))
-        else:
-            if not descriptor in data:
-                data[descriptor] = {}
-            tup = parse_cpu(join(directory, file))
-            if tup is None:
-                continue
-            odes, threads, time = tup
-            if not threads in data[descriptor]:
-                data[descriptor][threads] = []
-            data[descriptor][threads].append((odes, time))
+                descriptor = file[:file.index('-int')]
+            if 'gpu' in file:
+                if not plot_vs_blocksize:
+                    descriptor += '-gpu'
+                if not descriptor in gpu_data:
+                    gpu_data[descriptor] = {}
+                tup = parse_gpu(join(directory, file))
+                if tup is None:
+                    continue
+                odes, block, time = tup 
+                if plot_vs_blocksize:
+                    if not block in gpu_data[descriptor]:
+                        gpu_data[descriptor][block] = time
+                    else:
+                        val = gpu_data[descriptor][block]
+                        gpu_data[descriptor][block] = min(time, val)
+                else:
+                    if not block in gpu_data[descriptor]:
+                        gpu_data[descriptor][block] = []
+                    gpu_data[descriptor][block].append((odes, time))
+            else:
+                if not descriptor in data:
+                    data[descriptor] = {}
+                tup = parse_cpu(join(directory, file))
+                if tup is None:
+                    continue
+                odes, threads, time = tup
+                if not threads in data[descriptor]:
+                    data[descriptor][threads] = []
+                data[descriptor][threads].append((odes, time))
 
-    for desc in data:
-        for threads in data[desc]:
-            data[desc][threads] = sorted(data[desc][threads], key = lambda val: val[0])
+        for desc in data:
+            for threads in data[desc]:
+                data[desc][threads] = sorted(data[desc][threads], key = lambda val: val[0])
 
-    if not plot_vs_blocksize:
+        if not plot_vs_blocksize:
+            for desc in gpu_data:
+                for block in gpu_data[desc]:
+                    gpu_data[desc][block] = sorted(gpu_data[desc][block], key = lambda val: val[0])
+
+        #plot
+        for desc in data:
+            for threads in data[desc]:
+                plt.loglog(*zip(*data[desc][threads]), label = desc + " - " + str(threads) + " threads", marker = "v", basex=2)
+        
+        colorwheel = cm.jet(linspace(0,1,len(gpu_data)))
+        index = 0
         for desc in gpu_data:
-            for block in gpu_data[desc]:
-                gpu_data[desc][block] = sorted(gpu_data[desc][block], key = lambda val: val[0])
-    		
-    #plot
-    for desc in data:
-        for threads in data[desc]:
-            plt.loglog(*zip(*data[desc][threads]), label = desc + " - " + str(threads) + " threads", marker = "v", basex=2)
-    
-    colorwheel = cm.jet(linspace(0,1,len(gpu_data)))
-    index = 0
-    for desc in gpu_data:
-        if plot_vs_blocksize:
-            data = []
-            for block in gpu_data[desc]:
-                data.append((block, gpu_data[desc][block]))
-            plt.loglog(*zip(*data), label = desc, marker = ">", basex=2, color=colorwheel[index])
-            index += 1
-        else:
-            for block in gpu_data[desc]:
-                plt.loglog(*zip(*gpu_data[desc][block]), label = desc + ' - blocksize: ' + str(block), marker = ">", basex=2)
+            if plot_vs_blocksize:
+                data = []
+                for block in gpu_data[desc]:
+                    data.append((block, gpu_data[desc][block]))
+                plt.loglog(*zip(*data), label = desc, marker = ">", basex=2, color=colorwheel[index])
+                index += 1
+            else:
+                for block in gpu_data[desc]:
+                    plt.loglog(*zip(*gpu_data[desc][block]), label = desc + ' - blocksize: ' + str(block), marker = ">", basex=2)
 
-    plt.legend(loc = 0, fontsize=10).draggable(state = True)
-    if plot_vs_blocksize:
-        plt.xlabel("Blocksize (# threads)")
-    else:
-        plt.xlabel("ODEs")
-    plt.ylabel("Time (s)")
-    plt.title(Title)
-    print out_dir, Title, '.png'
-    plt.savefig(join(out_dir, Title + '.png'))
-    plt.close()
+        plt.legend(loc = 0, fontsize=10).draggable(state = True)
+        if plot_vs_blocksize:
+            plt.xlabel("Blocksize (# threads)")
+        else:
+            plt.xlabel("ODEs")
+        plt.ylabel("Time (s)")
+        plt.title(Title_out)
+        print out_dir, Title_out, '.png'
+        plt.savefig(join(out_dir, Title_out + '.png'))
+        plt.close()
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Runs all integrators for the given mechanism / options')
