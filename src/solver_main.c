@@ -108,6 +108,12 @@ int main (int argc, char *argv[])
     // arrays
     /////////////////////////////////////////////////
 
+#ifdef SHUFFLE 
+    const char* filename = "shuffled_data.bin";
+#elif !defined(SAME_IC)
+    const char* filename = "ign_data.bin";
+#endif
+
     double* y_host;
 #ifdef CONP
     double* pres_host;
@@ -123,9 +129,9 @@ int main (int argc, char *argv[])
 #endif
 #else
 #ifdef CONP
-    read_initial_conditions(NUM, &y_host, &pres_host);
+    read_initial_conditions(filename, NUM, &y_host, &pres_host);
 #elif CONV
-    read_initial_conditions(NUM, &y_host, &rho_host);
+    read_initial_conditions(filename, NUM, &y_host, &rho_host);
 #endif
 #endif
 

@@ -127,6 +127,12 @@ int main (int argc, char *argv[])
     // print number of threads and block size
     printf ("# threads: %d \t block size: %d\n", NUM, TARGET_BLOCK_SIZE);
 
+#ifdef SHUFFLE 
+    const char* filename = "shuffled_data.bin";
+#elif !defined(SAME_IC)
+    const char* filename = "ign_data.bin";
+#endif
+
     // time span
     double t_start = 0.0;
 #ifdef SAME_IC
@@ -143,7 +149,7 @@ int main (int argc, char *argv[])
 #ifdef SAME_IC
     int padded = set_same_initial_conditions(NUM, &y_host, &y_device, &pres_host, &pres_device);
 #else
-    int padded = read_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &pres_host, &pres_device);
+    int padded = read_initial_conditions(filename, NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &pres_host, &pres_device);
 #endif
 #elif CONV
     double* rho_device;
@@ -151,7 +157,7 @@ int main (int argc, char *argv[])
 #ifdef SAME_IC
     int padded = set_same_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
 #else
-    int padded = read_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
+    int padded = read_initial_conditions(filename, NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
 #endif
 #endif
 

@@ -9,5 +9,5 @@
 
 #ifndef READ_INITIAL_CONDITIONS_H
 #define READ_INITIAL_CONDITIONS_H
-void read_initial_conditions(int NUM, double** y_host, double** variable_host);
+void read_initial_conditions(const char* filename, int NUM, double** y_host, double** variable_host);
 #endif

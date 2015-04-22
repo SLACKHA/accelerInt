@@ -15,68 +15,37 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
- int read_initial_conditions(int NUM, int block_size, int grid_size, double** y_host, double** y_device, double** variable_host, double** variable_device) {
+ int read_initial_conditions(const char* filename, int NUM, int block_size, int grid_size, double** y_host, double** y_device, double** variable_host, double** variable_device) {
     int padded = initialize_gpu_memory(NUM, block_size, grid_size, y_device, variable_device);
     (*y_host) = (double*)malloc(padded * NN * sizeof(double));
     (*variable_host) = (double*)malloc(padded * sizeof(double));
-#ifndef SHUFFLE
-    FILE *fp = fopen ("ign_data.txt", "r");
-#else
-    FILE *fp = fopen("shuffled_data.txt", "r");
-#endif
-    int buff_size = 1024;
-    int retries = 0;
-    //all lines should be the same size, so make sure the buffer is large enough
-    for (retries = 0; retries < 5; retries++)
+    FILE *fp = fopen (filename, "rb");
+    if (fp == NULL)
     {
-        char buffer [buff_size];
-        if (fgets (buffer, buff_size, fp) != NULL)
-        {
-            int len = strlen(buffer);
-            //test that we actually hit the newline
-            if ((len > 0) && (buffer[len - 1] == '\n'))
-                break;
-        }
-        rewind (fp);
-        buff_size *= 2;
-    }
-    if (retries == 5)
-    {
-        printf("Could not parse ign_data.txt line with maximum buffer size of %d", buff_size);
+        fprintf(stderr, "Could not open file: %s\n", filename);
         exit(-1);
     }
+    double buffer[NN + 1];
 
-    //rewind and read
-    rewind (fp);
-
-    char buffer [buff_size];
-    char *ptr, *eptr;
-    double res[NN + 1];
     // load temperature and mass fractions for all threads (cells)
     for (int i = 0; i < NUM; ++i)
     {
         // read line from data file
-        if (fgets (buffer, buff_size, fp) == NULL)
+        int count = fread(buffer, sizeof(double), NN + 1, fp);
+        if (count != (NN + 1))
         {
-            printf("Error reading ign_data.txt, exiting...");
+            fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", filename, NN + 1, count);
             exit(-1);
         }
-        //read doubles from buffer
-        ptr = buffer;
-        for (int j = 0 ; j <= NN; j++)
-        {
-            res[j] = strtod(ptr, &eptr);
-            ptr = eptr;
-        }
         //put into y_host
-        (*y_host)[i] = res[0];
+        (*y_host)[i] = buffer[0];
 #ifdef CONP
-        (*variable_host)[i] = res[1];
+        (*variable_host)[i] = buffer[1];
 #elif CONV
-        double pres = res[1];
+        double pres = buffer[1];
 #endif
         for (int j = 2; j <= NN; j++)
-            (*y_host)[i + (j - 1) * padded] = res[j];
+            (*y_host)[i + (j - 1) * NUM] = buffer[j];
 
         // if constant volume, calculate density
 #ifdef CONV
@@ -85,7 +54,7 @@
 
         for (int j = 1; j < NN; ++j)
         {
-            Yi[j - 1] = (*y_host)[i + j * padded];
+            Yi[j - 1] = (*y_host)[i + j * NUM];
         }
 
         mass2mole (Yi, Xi);
@@ -93,37 +62,6 @@
 #endif
     }
     fclose (fp);
-
-/*
-#ifdef SHUFFLE
-    // now need to shuffle order
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    int usec = tv.tv_usec;
-    srand48(usec);
-
-    for (size_t i = NUM - 1; i > 0; i--)
-    {
-        size_t j = (unsigned int) (drand48() * (i + 1));
-
-        for (size_t ind = 0; ind < NN; ++ind)
-        {
-            double t = (*y_host)[j + padded * ind];
-            (*y_host)[j + padded * ind] = (*y_host)[i + padded * ind];
-            (*y_host)[i + padded * ind] = t;
-
-#ifdef CONP
-            t = (*variable_host)[j];
-            (*variable_host)[j] = (*variable_host)[i];
-            (*variable_host)[i] = t;
-#else
-            t = (*variable_host)[j];
-            (*variable_host)[j] = (*variable_host)[i];
-            rho_host[i] = t;
-#endif
-        }
-    }
-#endif*/
     //finally copy to GPU memory
     cudaErrorCheck(cudaMemcpy(*y_device, *y_host, padded * NN * sizeof(double), cudaMemcpyHostToDevice));
     cudaErrorCheck(cudaMemcpy(*variable_device, *variable_host, padded * sizeof(double), cudaMemcpyHostToDevice));
