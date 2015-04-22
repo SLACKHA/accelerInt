@@ -2,7 +2,6 @@
 
 import cantera as ct
 import numpy as np
-import random
 import multiprocessing
 from argparse import ArgumentParser
 
@@ -46,51 +45,54 @@ def compute_stoich(gas, fuel, Phi):
 def write_array(file, array):
     if array is None:
         return 0
-    for i in range(array.shape[0]):
-        file.write(' '.join(np.char.mod('%.15e', array[i, :])) + "\n")
+    array.tofile(file)
     return array.shape[0]
 
 
-def main(mechanism, fuel, n_threads=12):
+def main(mechanism, fuel, Step, n_threads=12):
     gas = ct.Solution(mechanism)
     if not fuel in gas.species_names:
         raise Exception("Fuel not found!")
 
     mechanism = mechanism.replace(".cti", ".xml")
-    file = open("ign_data.txt", "w")
-    #conditions
-    T_start = np.linspace(1000.0, 3000.0, num=25)
-    P_start = np.linspace(101325.0, 50.0 * 101325.0, num=25)
-    Phi_start = np.arange(0.25, 3.0, 0.25)
+    with open("ign_data.bin", "wb") as file:
+        #conditions
+        T_start = np.linspace(1000.0, 2200.0, num=25)
+        P_start = np.linspace(101325.0, 50.0 * 101325.0, num=25)
+        Phi_start = np.arange(0.25, 3.0, 0.25)
 
-    my_sum = 0
+        my_sum = 0
 
-    pool = multiprocessing.Pool(n_threads)
+        pool = multiprocessing.Pool(n_threads)
 
-    runs = len(T_start) * len(P_start) * len(Phi_start)
-    run = 0
-    total = 0
-    results = []
-    for T in T_start:
-        for Phi in Phi_start:
-            for P in P_start:
-                results.append(pool.apply_async(run_sim, [run, mechanism, fuel, T, P, Phi]))
-                run += 1
-        arrays = [p.get() for p in results]
-        for i in range(len(arrays)):
-            my_sum += write_array(file, arrays[i][1])
-            my_sum += write_array(file, arrays[i][2])
-        total += len(arrays)
-        print "{} / {}".format(total, runs)
-
+        runs = len(T_start) * len(P_start) * len(Phi_start)
         run = 0
+        total = 0
         results = []
-    print "# of Conditions = " + str(my_sum) + (" > " if my_sum > N_MAX else " < ") + '2 ^ 20'
-    shuffle_states()
-    file.flush()
-    file.close()
+        arrays = []
+        for T in T_start:
+            for Phi in Phi_start:
+                for P in P_start:
+                    if n_threads <= 1:
+                        results.append(run_sim(run, mechanism, fuel, T, P, Phi, Step))
+                    else:
+                        results.append(pool.apply_async(run_sim, [run, mechanism, fuel, T, P, Phi, Step]))
+                    run += 1
+            if n_threads <= 1:
+                arrays = results
+            else:
+                arrays = [p.get() for p in results]
+            for i in range(len(arrays)):
+                my_sum += write_array(file, arrays[i][1])
+                my_sum += write_array(file, arrays[i][2])
+            total += len(results)
+            run = 0
+            print "{} / {}".format(total, runs)
+            results = []
+        print "# of Conditions = " + str(my_sum) + (" > " if my_sum > N_MAX else " < ") + '2 ^ 20'
+    shuffle_states(2 + gas.n_species)
 
-def run_sim(index, mech, fuel, T, P, Phi):
+def run_sim(index, mech, fuel, T, P, Phi, Step = False):
     gas = ct.Solution(mech)
     gas.TPX = T, P, compute_stoich(gas, fuel, Phi)
     #state array for each simulation state, and each mass fraction + T & P
@@ -104,12 +106,19 @@ def run_sim(index, mech, fuel, T, P, Phi):
     t = 0
     i = 0
     while t < t_end:
+        if Step and i >= states.shape[0]:
+            states = np.vstack((states, np.zeros((t_end / t_step, gas.n_species + 2))))
         states[i, 0] = reac.T
         states[i, 1] = reac.thermo.P 
         states[i, 2:] = reac.Y[:]
-        net.advance(t + t_step)
-        t += t_step
+        if Step:
+            t = net.step(t_end)
+        else:
+            net.advance(t + t_step)
+            t += t_step
         i += 1
+    if Step:
+        states = np.delete(states, range(i, states.shape[0]), axis=0)
 
     if reac.T > T + 400:
         #ignition, use it
@@ -125,24 +134,33 @@ def run_sim(index, mech, fuel, T, P, Phi):
     t = 0
     i = 0
     while t < t_end:
+        if Step and i >= states.shape[0]:
+            states = np.vstack((states, np.zeros((t_end / t_step, gas.n_species + 2))))
         states[i, 0] = reac.T
         states[i, 1] = reac.thermo.P 
         states[i, 2:] = reac.Y[:]
-        net.advance(t + t_step)
-        t += t_step
+        if Step:
+            t = net.step(t_end)
+        else:
+            net.advance(t + t_step)
+            t += t_step
         i += 1
+
+    if Step:
+        states = np.delete(states, range(i, states.shape[0]), axis=0)
     if reac.T > T + 400:
         #ignition, use it
         conv_states = np.copy(states)
 
     return index, conp_states, conv_states
 
-def shuffle_states():
-    with open("ign_data.txt") as file:
-        lines = [line.strip() for line in file]
-    random.shuffle(lines)
-    with open("shuffled_data.txt", "w") as file:
-        file.write("\n".join(lines))
+def shuffle_states(num):
+    array = np.fromfile('ign_data.bin', dtype='float64')
+    array = array.reshape((array.shape[0] / num, num))
+    np.random.shuffle(array)
+
+    with open("shuffled_data.bin", "wb") as file:
+        array.tofile(file)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description='Generates initial conditions for a specified fuel / mechanism')
@@ -154,5 +172,9 @@ if __name__ == "__main__":
                     type=str,
                     required=True,
                     help = 'The mechanism to use')
+    parser.add_argument('-s', '--step',
+                        required=False,
+                        action='store_true',
+                        default=False)
     args = parser.parse_args()
-    main(args.mechanism, args.fuel)
+    main(args.mechanism, args.fuel, args.step)
