@@ -78,14 +78,13 @@ endif
 ifeq ("$(LARGE_STEP)", "TRUE")
 	MAIN_FLAGS += -DLARGE_STEP
 endif
-ifeq ("$(SAME_IC)", "TRUE")
+ifeq ("$(SHUFFLE)", "TRUE")
+    MAIN_FLAGS += -DSHUFFLE
+else ifeq ("$(SAME_IC)", "TRUE")
     MAIN_FLAGS += -DSAME_IC
 endif
 ifeq ("$(PRINT)", "TRUE")
     MAIN_FLAGS += -DPRINT
-endif
-ifeq ("$(SHUFFLE)", "TRUE")
-    MAIN_FLAGS += -DSHUFFLE
 endif
 ifeq ("$(IGN)", "TRUE")
     MAIN_FLAGS += -DIGN
