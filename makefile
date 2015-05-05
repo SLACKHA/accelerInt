@@ -8,13 +8,15 @@ SDK_PATH := /usr/local/cuda/samples/common/inc/
 # Directories
 ODIR := ./obj
 SDIR := ./src
+JDIR := ./src/jacobs
 LOGDIR := ./log
 OUTDIR := ./output
 #create
 log_maker := $(shell test -d $(LOGDIR) || mkdir -p $(LOGDIR))
 obj_maker := $(shell test -d $(ODIR) || mkdir -p $(ODIR))
 out_maker := $(shell test -d $(OUTDIR) || mkdir -p $(OUTDIR))
-
+j_maker := $(shell test -d $(JDIR) || mkdir -p $(JDIR))
+j_maker2 := $(shell test -f $(JDIR)/jac_list || touch $(JDIR)/jac_list)
 #Modules
 MODULES := rb43 exp4 cvodes prof rates radau2a cvodes-analytical unittest specrad
 MODDIRS := $(patsubst %,$(ODIR)/%/,$(MODULES))
@@ -30,84 +32,63 @@ SAME_IC = TRUE
 PRINT = FALSE
 LOG_OUTPUT = FALSE
 SHUFFLE = FALSE
-PROFILE = FALSE
 LOW_TOL = FALSE
 LARGE_STEP = FALSE
 #valid options are MKL, SYS, NONE
 USE_LAPACK = MKL
-FAST_MATH = TRUE
-
+FAST_MATH = FALSE
 
 #used to force a build on different flags
-CF_FILE = CONTROL_FLAGS
-DBG_FILE = DEBUG_FLAGS
-REG_FILE = REGISTER_COUNT
-MAIN_FILE = MAIN_FLAGS
-CONTROL_FLAGS = 
-DEBUG_FLAGS = 
-MAIN_FLAGS =
+CPU_FILE = CPU_FLAGS
+GPU_FILE = GPU_FLAGS
+DEF_FILE = DEF_FLAGS
+
+DEFINES = 
 
 #dependencies
-_DEPS = header.h
-DEPS = $(patsubst %,$(SDIR)/%,$(_DEPS)) $(ODIR)/$(DBG_FILE)
-
-SOLVER_DEPS = $(ODIR)/$(CF_FILE)
-GPU_SOLVER_DEPS = $(SOLVER_DEPS) $(SDIR)/launch_bounds.cuh $(ODIR)/$(REG_FILE)
-
-MAIN_DEPS = $(ODIR)/$(MAIN_FILE)
+_DEPS = $(SDIR)/header.h
+CPU_DEPS = $(_DEPS)
+GPU_DEPS = $(_DEPS) $(SDIR)/launch_bounds.cuh $(SDIR)/jacobs/jac_list
 
 #turn this into the control flags
 ifeq ("$(DEBUG)", "TRUE")
-    DEBUG_FLAGS += -DDEBUG
+    DEFINES += -DDEBUG
 else
-	DEBUG_FLAGS += -DNDEBUG
+	DEFINES += -DNDEBUG
 endif
 ifeq ("$(USE_LAPACK)", "MKL")
-    CONTROL_FLAGS += -DUSE_MKL
+    DEFINES += -DUSE_MKL
 else ifeq ("$(USE_LAPACK)", "SYS")
-    CONTROL_FLAGS += -DUSE_SYSTEM_LAPACK
+    DEFINES += -DUSE_SYSTEM_LAPACK
 else
-    CONTROL_FLAGS += -DNO_LAPACK
+    DEFINES += -DNO_LAPACK
 endif
 ifeq ("$(FAST_MATH)", "TRUE")
-    CONTROL_FLAGS += -DUSE_FAST_MATH
+    DEFINES += -DUSE_FAST_MATH
 endif
 ifeq ("$(LOW_TOL)", "TRUE")
-	MAIN_FLAGS += -DLOW_TOL
+	DEFINES += -DLOW_TOL
 endif
 ifeq ("$(LARGE_STEP)", "TRUE")
-	MAIN_FLAGS += -DLARGE_STEP
+	DEFINES += -DLARGE_STEP
 endif
 ifeq ("$(SHUFFLE)", "TRUE")
-    MAIN_FLAGS += -DSHUFFLE
+    DEFINES += -DSHUFFLE
 else ifeq ("$(SAME_IC)", "TRUE")
-    MAIN_FLAGS += -DSAME_IC
+    DEFINES += -DSAME_IC
 endif
 ifeq ("$(PRINT)", "TRUE")
-    MAIN_FLAGS += -DPRINT
+    DEFINES += -DPRINT
 endif
 ifeq ("$(IGN)", "TRUE")
-    MAIN_FLAGS += -DIGN
+    DEFINES += -DIGN
 endif
 ifeq ("$(LOG_OUTPUT)", "TRUE")
-    MAIN_FLAGS += -DLOG_OUTPUT
-endif
-ifeq ("$(PROFILE)", "TRUE")
-	MAIN_FLAGS += -DPROFILER
+    DEFINES += -DLOG_OUTPUT
 endif
 
 #get the stored register count
 reg_count := $(shell cat $(SDIR)/regcount)
-
-#test for and update (if needed) the control files
-debug_flag_maker := $(shell test -f $(ODIR)/$(DBG_FILE) || touch $(ODIR)/$(DBG_FILE))
-control_flag_maker := $(shell test -f $(ODIR)/$(CF_FILE) || touch $(ODIR)/$(CF_FILE))
-reg_flag_maker := $(shell test -f $(ODIR)/$(REG_FILE) || touch $(ODIR)/$(REG_FILE))
-main_flag_maker := $(shell test -f $(ODIR)/$(MAIN_FILE) || touch $(ODIR)/$(MAIN_FILE))
-tmp1 := $(shell grep -Fx "$(DEBUG_FLAGS)" $(ODIR)/$(DBG_FILE) || echo "$(DEBUG_FLAGS)" > $(ODIR)/$(DBG_FILE))
-tmp2 := $(shell grep -Fx "$(CONTROL_FLAGS)" $(ODIR)/$(CF_FILE) || echo "$(CONTROL_FLAGS)" > $(ODIR)/$(CF_FILE))
-tmp3 := $(shell grep -Fx "$(reg_count)" $(ODIR)/$(REG_FILE) || echo "$(reg_count)" > $(ODIR)/$(REG_FILE))
-tmp4 := $(shell grep -Fx "$(MAIN_FLAGS)" $(ODIR)/$(MAIN_FILE) || echo "$(MAIN_FLAGS)" > $(ODIR)/$(MAIN_FILE))
 
 #compilers
 CC = gcc
@@ -117,17 +98,13 @@ NVCC = $(CUDA_PATH)/bin/nvcc
 LINK   = $(CC) -fPIC
 NLINK = $(NCC) -fPIC -fopenmp -Xlinker -rpath $(CUDA_PATH)/lib64
 
-FLAGS = $(DEBUG_FLAGS) $(CONTROL_FLAGS) $(MAIN_FLAGS)
-NVCCFLAGS = -Xcompiler -fopenmp $(DEBUG_FLAGS) $(CONTROL_FLAGS) $(MAIN_FLAGS) -maxrregcount $(reg_count)
+NVCCFLAGS := -arch=sm_20 -m64 -maxrregcount $(reg_count) -Xcompiler -fopenmp
+FLAGS = -std=c99
 NVCCINCLUDES = -I$(CUDA_PATH)/include/ -I$(SDK_PATH)
 NVCCLIBS = -L$(CUDA_PATH)/lib64 -L/usr/local/lib -lcuda -lcudart -lstdc++
 LIBS = -lm
 RA_LIBS = -lfftw3
 CV_LIBS = -lsundials_cvodes -lsundials_nvecserial
-
-ifeq ("$(PROFILE)", "TRUE")
-	NVCCFLAGS += -lineinfo
-endif
 
 #generic objects for CPU mechanism
 _BASE_MECH = dydt.o jacob.o chem_utils.o mass_mole.o rxn_rates.o spec_rates.o rxn_rates_pres_mod.o
@@ -180,16 +157,12 @@ radau2a-int : FLAGS += -DRADAU2A -fopenmp
 radau2a-int : LIBS += -fopenmp
 
 profiler : L = 4
-profiler : FLAGS += -pg -DPROFILER -fopenmp
-profiler : LIBS += -fopenmp
+profiler : FLAGS += -DPROFILER -fopenmp -pg
+profiler : LIBS += -fopenmp -pg
 
 gpuprofiler : L = 4
 gpuprofiler : NVCCFLAGS += -DPROFILER -Xnvlink -v --ptxas-options=-v -lineinfo
 gpuprofiler : LIBS += $(NVCCLIBS)
-
-rb43profiler : L = 4
-rb43profiler : NVCCFLAGS += -DRB43 -Xnvlink -v --ptxas-options=-v -lineinfo
-rb43profiler : LIBS += $(NVCCLIBS) $(RA_LIBS)
 
 ratestest : FLAGS += -DRATES_TEST -fopenmp
 ratestest : LIBS += -fopenmp
@@ -203,10 +176,7 @@ gpuunittest : LIBS +=  $(NVCCLIBS)
 specradius : FLAGS += -fopenmp
 specradius : LIBS += -fopenmp
 
-#standard flags
-FLAGS += -std=c99
-NVCCFLAGS += -arch=sm_20 -m64
-
+#add specific flags based on control options, updating will be handled by the files above in conjuction with the control options
 ifeq ("$(DEBUG)", "FALSE")
 ifeq ("$(FAST_MATH)", "TRUE")
     NVCCFLAGS += --use_fast_math
@@ -276,20 +246,17 @@ OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES))
 _OBJ_CVODES_ANALYTICAL = cvodes_dydt.o cvodes_jac.o cvodes_init.o solver_cvodes.o $(_OBJ)
 OBJ_CVODES_ANALYTICAL = $(patsubst %,$(ODIR)/cvodes-analytical/%,$(_OBJ_CVODES_ANALYTICAL))
 
-_OBJ_PROFILER = rateOutputTest.o mechanism.o
-OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER)) $(BASE_MECH)
+_OBJ_PROFILER = rateOutputTest.o $(_MECH)
+OBJ_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_PROFILER))
 
-_OBJ_GPU_PROFILER = rateOutputTest.cu.o mechanism.cu.o
-OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER)) $(BASE_MECH_GPU)
+_OBJ_GPU_PROFILER = rateOutputTest.cu.o $(_MECH_GPU)
+OBJ_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_GPU_PROFILER))
 
-_OBJ_RB43_GPU_PROFILER = solver_profiler.cu.o exprb43_init.cu.o $(filter-out solver_main.cu.o,$(_OBJ_GPU_RA))
-OBJ_RB43_GPU_PROFILER = $(patsubst %,$(ODIR)/prof/%,$(_OBJ_RB43_GPU_PROFILER))
+_OBJ_RATES_TEST = rateOutputTest.o $(_MECH)
+OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST))
 
-_OBJ_RATES_TEST = rateOutputTest.o mechanism.o
-OBJ_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_RATES_TEST)) $(BASE_MECH)
-
-_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o mechanism.cu.o
-OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST)) $(BASE_MECH_GPU)
+_OBJ_GPU_RATES_TEST = rateOutputTest.cu.o $(_MECH_GPU)
+OBJ_GPU_RATES_TEST = $(patsubst %,$(ODIR)/rates/%,$(_OBJ_GPU_RATES_TEST))
 
 _OBJ_GPU_RADAU2A = radau2a.cu.o radau2a_init.cu.o  inverse.cu.o complexInverse_NN.cu.o solver_generic.cu.o $(_OBJ_GPU)
 OBJ_GPU_RADAU2A = $(patsubst %,$(ODIR)/radau2a/%,$(_OBJ_GPU_RADAU2A))
@@ -303,37 +270,37 @@ OBJ_GPU_UNITTEST = $(patsubst %,$(ODIR)/unittest/%,$(_OBJ_GPU_UNITTEST))
 _OBJ_SPEC_RAD = spectral_radius_generator.o read_initial_conditions.o
 OBJ_SPEC_RAD = $(patsubst %,$(ODIR)/specrad/%,$(_OBJ_SPEC_RAD))
 
+#mechanism files only depend on the actual flags
+mech_folder_maker := $(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
+mech_cpu_maker := $(shell test -f $(ODIR)/mech/$(CPU_FILE) || touch $(ODIR)/mech/$(CPU_FILE))
+mech_gpu_maker := $(shell test -f $(ODIR)/mech/$(GPU_FILE) || touch $(ODIR)/mech/$(GPU_FILE))
+mech_tmp1 := $(shell grep -Fx -e "$(FLAGS)" $(ODIR)/mech/$(CPU_FILE) || echo "$(FLAGS)" > $(ODIR)/mech/$(CPU_FILE))
+mech_tmp2 := $(shell grep -Fx -e "$(NVCCFLAGS)" $(ODIR)/mech/$(GPU_FILE) || echo "$(NVCCFLAGS)" > $(ODIR)/mech/$(GPU_FILE))
 #mechanism files
-$(ODIR)/mech/%.o : $(SDIR)/%.c $(DEPS)
-	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
+$(ODIR)/mech/%.o : $(SDIR)/%.c $(CPU_DEPS) $(ODIR)/mech/$(CPU_FILE)
 	$(CC) $(FLAGS) $(INCLUDES) -c -o $@ $<
-
-$(ODIR)/mech/%.cu.o : $(SDIR)/%.cu $(DEPS)
-	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
+$(ODIR)/mech/%.cu.o : $(SDIR)/%.cu $(CPU_DEPS) $(ODIR)/mech/$(GPU_FILE)
 	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
-
 #gpu jacob files
-$(ODIR)/mech/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(DEPS)
-	$(shell test -d $(ODIR)/mech || mkdir -p $(ODIR)/mech)
+$(ODIR)/mech/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS $(ODIR)/mech/$(GPU_FILE)
 	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
 
 #all the various targets
 define module_rules
-$(ODIR)/$1/%.o : $(SDIR)/%.c $(DEPS) $(SOLVER_DEPS)
-	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
-	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
+#make folder
+folder_maker := $(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
+#test for and update (if needed) the defines file
+def_mater := $(shell test -f $(ODIR)/$1/$(DEF_FILE) || touch $(ODIR)/$1/$(DEF_FILE))
+tmp1 := $(shell grep -Fx -e "$(DEFINES)" $(ODIR)/$1/$(DEF_FILE) || echo "$(DEFINES)" > $(ODIR)/$1/$(DEF_FILE))
 
-$(ODIR)/$1/solver_main.o : $(SDIR)/solver_main.c $(DEPS) $(MAIN_DEPS)
-	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
-	$(CC) $$(FLAGS) $$(INCLUDES) -c -o $$@ $$<
+$(ODIR)/$1/%.o : $(SDIR)/%.c $(CPU_DEPS) $(ODIR)/$1/$(DEF_FILE)
+	$(CC) $$(FLAGS) $$(DEFINES) $$(INCLUDES) -c -o $$@ $$<
 
-$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(DEPS) $(GPU_SOLVER_DEPS)
-	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
-	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
+$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE)
+	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(DEFINES)  $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 
-$(ODIR)/$1/solver_main.cu.o : $(SDIR)/solver_main.cu $(DEPS) $(MAIN_DEPS) $(GPU_SOLVER_DEPS)
-	$(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
-	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
+$(ODIR)/$1/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE)
+	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(DEFINES) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 endef
 
 default: all
@@ -385,10 +352,6 @@ gpuratestest : $(OBJ_GPU_RATES_TEST)
 	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/rates/dlink.o
 	$(NLINK) $^ $(ODIR)/rates/dlink.o $(LIBS) -o $@
 
-rb43profiler : $(OBJ_RB43_GPU_PROFILER) $(MECH)
-	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/prof/dlink.o
-	$(NLINK) $^ $(ODIR)/prof/dlink.o $(LIBS) -o $@
-
 gpuunittest : $(OBJ_GPU_UNITTEST)
 	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/unittest/dlink.o
 	$(NLINK) $^ $(ODIR)/unittest/dlink.o $(LIBS) -o $@
@@ -401,6 +364,6 @@ doc : $(DEPS) $(OBJ)
 
 clean :
 	rm -rf $(ODIR) \
-		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest rb43profiler radau2a-int-gpu radau2a-int cvodes-analytical-int gpuunittest specradius doc
+		exprb43-int exp4-int exprb43-int-gpu exp4-int-gpu cvodes-int profiler gpuprofiler ratestest gpuratestest radau2a-int-gpu radau2a-int cvodes-analytical-int gpuunittest specradius doc
 
 $(foreach mod,$(MODULES),$(eval $(call module_rules,$(mod))))
