@@ -10,5 +10,5 @@ in order to easily compare between different versions of the rates and jacobian 
 #include "header.h"
 
 int main (int argc, char *argv[]) {
-	write_jacobian_and_rates_output();
+	write_jacobian_and_rates_output(16384);
 }
