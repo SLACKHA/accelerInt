@@ -290,16 +290,20 @@ define module_rules
 #make folder
 folder_maker := $(shell test -d $(ODIR)/$1 || mkdir -p $(ODIR)/$1)
 #test for and update (if needed) the defines file
-def_mater := $(shell test -f $(ODIR)/$1/$(DEF_FILE) || touch $(ODIR)/$1/$(DEF_FILE))
+def_maker := $(shell test -f $(ODIR)/$1/$(DEF_FILE) || touch $(ODIR)/$1/$(DEF_FILE))
+cpu_maker := $(shell test -f $(ODIR)/$1/$(CPU_FILE) || touch $(ODIR)/$1/$(CPU_FILE))
+gpu_maker := $(shell test -f $(ODIR)/$1/$(GPU_FILE) || touch $(ODIR)/$1/$(GPU_FILE))
 tmp1 := $(shell grep -Fx -e "$(DEFINES)" $(ODIR)/$1/$(DEF_FILE) || echo "$(DEFINES)" > $(ODIR)/$1/$(DEF_FILE))
+tmp2 := $(shell grep -Fx -e "$(FLAGS)" $(ODIR)/$1/$(CPU_FILE) || echo "$(FLAGS)" > $(ODIR)/$1/$(CPU_FILE))
+tmp3 := $(shell grep -Fx -e "$(NVCCFLAGS)" $(ODIR)/$1/$(GPU_FILE) || echo "$(NVCCFLAGS)" > $(ODIR)/$1/$(GPU_FILE))
 
-$(ODIR)/$1/%.o : $(SDIR)/%.c $(CPU_DEPS) $(ODIR)/$1/$(DEF_FILE)
+$(ODIR)/$1/%.o : $(SDIR)/%.c $(CPU_DEPS) $(ODIR)/$1/$(DEF_FILE) $(ODIR)/$1/$(CPU_FILE)
 	$(CC) $$(FLAGS) $$(DEFINES) $$(INCLUDES) -c -o $$@ $$<
 
-$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE)
+$(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE) $(ODIR)/$1/$(GPU_FILE)
 	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(DEFINES)  $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 
-$(ODIR)/$1/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE)
+$(ODIR)/$1/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE) $(ODIR)/$1/$(GPU_FILE)
 	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(DEFINES) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 endef
 
