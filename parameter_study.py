@@ -24,7 +24,7 @@ import timing_plotter
 MAX_BLOCKS_PER_SM = 8
 BLOCK_LIST = [4, 6, 8]
 THREAD_LIST = [32, 64, 128]
-NUM_ODES = 4096
+NUM_ODES = 65536
 
 class jac_params:
     def __init__(self, mech_name, therm_name, optimize_cache, inital_state, num_blocks, \
@@ -68,11 +68,11 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out):
     files = os.listdir(os.path.join(mechanism_src, 'jacobs'))
     for file_name in files:
         full_file_name = os.path.join(mechanism_src, 'jacobs', file_name)
-        out_file_name = os.path.join(src, file_name)
+        out_file_name = os.path.join(src, 'jacobs', file_name)
         if os.path.isfile(full_file_name):
             shutil.copyfile(full_file_name, out_file_name)
     #make
-    subprocess.call(['make', exe, '-j12'])
+    subprocess.call(['make', exe, 'SAME_IC=FALSE', '-j12'])
     #run
     file = open(file_name_out, 'w')
     subprocess.call([os.path.join(os.getcwd(), exe), str(NUM_ODES)], stdout=file)
