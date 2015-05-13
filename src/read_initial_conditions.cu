@@ -45,7 +45,7 @@
         double pres = buffer[1];
 #endif
         for (int j = 2; j <= NN; j++)
-            (*y_host)[i + (j - 1) * NUM] = buffer[j];
+            (*y_host)[i + (j - 1) * padded] = buffer[j];
 
         // if constant volume, calculate density
 #ifdef CONV
@@ -54,7 +54,7 @@
 
         for (int j = 1; j < NN; ++j)
         {
-            Yi[j - 1] = (*y_host)[i + j * NUM];
+            Yi[j - 1] = (*y_host)[i + j * padded];
         }
 
         mass2mole (Yi, Xi);
