@@ -284,7 +284,15 @@ $(ODIR)/mech/%.cu.o : $(SDIR)/%.cu $(CPU_DEPS) $(ODIR)/mech/$(GPU_FILE)
 #gpu jacob files
 $(ODIR)/mech/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS $(ODIR)/mech/$(GPU_FILE)
 	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
-
+#rates and prof GPU
+rate_gpu_maker := $(shell test -f $(ODIR)/rates/$(GPU_FILE) || touch $(ODIR)/rates/$(GPU_FILE))
+rate_tmp := $(shell grep -Fx -e "$(NVCCFLAGS)" $(ODIR)/rates/$(GPU_FILE) || echo "$(NVCCFLAGS)" > $(ODIR)/rates/$(GPU_FILE))
+$(ODIR)/rates/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS $(ODIR)/rates/$(GPU_FILE)
+	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
+prof_gpu_maker := $(shell test -f $(ODIR)/prof/$(GPU_FILE) || touch $(ODIR)/prof/$(GPU_FILE))
+prof_tmp := $(shell grep -Fx -e "$(NVCCFLAGS)" $(ODIR)/prof/$(GPU_FILE) || echo "$(NVCCFLAGS)" > $(ODIR)/prof/$(GPU_FILE))
+$(ODIR)/prof/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS $(ODIR)/prof/$(GPU_FILE)
+	$(NVCC) -ccbin=$(NCC_BIN) $(NVCCFLAGS) $(INCLUDES) $(NVCCINCLUDES) -dc -o $@ $<
 #all the various targets
 define module_rules
 #make folder
