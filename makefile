@@ -302,9 +302,6 @@ $(ODIR)/$1/%.o : $(SDIR)/%.c $(CPU_DEPS) $(ODIR)/$1/$(DEF_FILE) $(ODIR)/$1/$(CPU
 
 $(ODIR)/$1/%.cu.o : $(SDIR)/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE) $(ODIR)/$1/$(GPU_FILE)
 	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(DEFINES)  $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
-
-$(ODIR)/$1/%.jac.cu.o : $(SDIR)/jacobs/%.cu $(GPU_DEPS) $(ODIR)/$1/$(DEF_FILE) $(ODIR)/$1/$(GPU_FILE)
-	$(NVCC) -ccbin=$$(NCC_BIN) $$(NVCCFLAGS) $$(DEFINES) $$(INCLUDES) $$(NVCCINCLUDES) -dc -o $$@ $$<
 endef
 
 default: all
