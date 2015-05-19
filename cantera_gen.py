@@ -57,7 +57,7 @@ def main(mechanism, fuel, Step, n_threads=12):
     mechanism = mechanism.replace(".cti", ".xml")
     with open("ign_data.bin", "wb") as file:
         #conditions
-        T_start = np.linspace(1000.0, 2200.0, num=25)
+        T_start = np.linspace(1000.0, 2000.0, num=25)
         P_start = np.linspace(101325.0, 50.0 * 101325.0, num=25)
         Phi_start = np.arange(0.25, 3.0, 0.25)
 
@@ -95,8 +95,9 @@ def main(mechanism, fuel, Step, n_threads=12):
 def run_sim(index, mech, fuel, T, P, Phi, Step = False):
     gas = ct.Solution(mech)
     gas.TPX = T, P, compute_stoich(gas, fuel, Phi)
+    end_time = t_end
     #state array for each simulation state, and each mass fraction + T & P
-    states = np.zeros((t_end / t_step, gas.n_species + 2))
+    states = np.zeros((end_time / t_step, gas.n_species + 2))
     conp_states = None
     conv_states = None
 
@@ -105,49 +106,56 @@ def run_sim(index, mech, fuel, T, P, Phi, Step = False):
 
     t = 0
     i = 0
-    while t < t_end:
-        if Step and i >= states.shape[0]:
-            states = np.vstack((states, np.zeros((t_end / t_step, gas.n_species + 2))))
+    ign = False
+    while t < end_time:
+        if i >= states.shape[0]:
+            states = np.vstack((states, np.zeros((end_time / t_step, gas.n_species + 2))))
+        if reac.T > T + 400 and not ign:
+            end_time = t * 2
+            ign = True 
         states[i, 0] = reac.T
         states[i, 1] = reac.thermo.P 
         states[i, 2:] = reac.Y[:]
         if Step:
-            t = net.step(t_end)
+            t = net.step(end_time)
         else:
             net.advance(t + t_step)
             t += t_step
         i += 1
-    if Step:
-        states = np.delete(states, range(i, states.shape[0]), axis=0)
+    states = np.delete(states, range(i, states.shape[0]), axis=0)
 
-    if reac.T > T + 400:
+    if ign:
         #ignition, use it
         conp_states = np.copy(states)
 
     #conv run
     gas.TPX = T, P, compute_stoich(gas, fuel, Phi)
+    end_time = t_end
     #state array for each simulation state, and each mass fraction + T & P
-    states = np.zeros((t_end / t_step, gas.n_species + 2))
+    states = np.zeros((end_time / t_step, gas.n_species + 2))
     reac = ct.IdealGasReactor(gas)
     net = ct.ReactorNet([reac])
 
     t = 0
     i = 0
-    while t < t_end:
-        if Step and i >= states.shape[0]:
-            states = np.vstack((states, np.zeros((t_end / t_step, gas.n_species + 2))))
+    ign = False
+    while t < end_time:
+        if i >= states.shape[0]:
+            states = np.vstack((states, np.zeros((end_time / t_step, gas.n_species + 2))))
+        if reac.T > T + 400 and not ign:
+            end_time = t * 2
+            ign = True 
         states[i, 0] = reac.T
         states[i, 1] = reac.thermo.P 
         states[i, 2:] = reac.Y[:]
         if Step:
-            t = net.step(t_end)
+            t = net.step(end_time)
         else:
             net.advance(t + t_step)
             t += t_step
         i += 1
 
-    if Step:
-        states = np.delete(states, range(i, states.shape[0]), axis=0)
+    states = np.delete(states, range(i, states.shape[0]), axis=0)
     if reac.T > T + 400:
         #ignition, use it
         conv_states = np.copy(states)

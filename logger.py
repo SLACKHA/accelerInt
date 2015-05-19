@@ -3,14 +3,91 @@ import math
 import subprocess
 import os, glob
 import sys
+import numpy as np
+
+NUM_ODES = 1000
+N_THREADS = 12
+NVAR = 56 #t, T, P, 53 mass fractions
 
 #force remake
-subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE'])
+subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=TRUE'])
 
 all_exes = []
 for file in glob.glob('*-int*'):
-	all_exes.append(file)
+    all_exes.append(file)
 
 
 for exe in all_exes:
-	subprocess.call([os.path.join(os.getcwd(), exe)])
+    if 'gpu' in exe and 'exp' in exe:
+        continue
+    print exe
+    if 'gpu' in exe:
+        subprocess.call([os.path.join(os.getcwd(), exe), str(NUM_ODES)])
+    else:
+        subprocess.call([os.path.join(os.getcwd(), exe), str(N_THREADS), str(NUM_ODES)])
+
+files = [f for f in os.listdir('log') if os.path.isfile(os.path.join('log', f)) and f.endswith('.bin')]
+
+key_file = [f for f in files if 'cvodes' in f and 'analytical' in f]
+if not key_file:
+    print "cvodes-analytic not found!"
+    sys.exit(-1)
+key_file = key_file[0]
+print key_file
+
+the_data = {}
+with open('error_results.txt', 'w') as outfile:
+    for file in files:
+        array = np.fromfile(os.path.join('log', file), dtype='float64')
+        array = array.reshape((array.shape[0] / (NVAR * NUM_ODES), (NVAR * NUM_ODES)))
+        the_data[file] = array
+
+    for file in files:
+        print file
+        outfile.write(file + '\n')
+        max_err_ode = -1
+        max_zero_err_ode = -1
+        for ode in range(NUM_ODES):
+            start_ind = NVAR * ode
+            key_arr = the_data[key_file][:, start_ind : start_ind + NVAR]
+
+            if file == key_file:
+                continue
+            data_arr = the_data[file][:, start_ind : start_ind + NVAR]
+
+            #now compare column by column and get max err
+            max_err = 0
+            max_zero_err = 0
+            max_err_col = 'N/A'
+            max_zero_err_col = 'N/A'
+            #skip time col
+            for col in range(1, NVAR):
+                for row in range(key_arr.shape[0]):
+                    zero_err = False
+                    if np.abs(key_arr[row, col]) < 1e-15:
+                        err = np.abs(key_arr[row, col] - data_arr[row, col])
+                        zero_err = True
+                    else:
+                        err = 100.0 * np.abs(key_arr[row, col] - data_arr[row, col]) / key_arr[row, col]
+                    if zero_err:
+                        if err > max_zero_err:
+                            max_zero_err = err
+                            max_zero_err_ode = ode
+                            if col == 1:
+                                max_zero_err_col = 'T'
+                            elif col == 2:
+                                max_zero_err_col = 'P'
+                            else:
+                                max_zero_err_col = 'Y_{}'.format(col - 3)
+                    else:
+                        if err > max_err:
+                            max_err = err
+                            max_err_ode = ode
+                            if col == 1:
+                                max_err_col = 'T'
+                            elif col == 2:
+                                max_err_col = 'P'
+                            else:
+                                max_err_col = 'Y_{}'.format(col - 3)
+        outfile.write("max zero err: {} in col {} for ODE {}\n".format(max_zero_err, max_zero_err_col, max_zero_err_ode + 1))
+        outfile.write("max err: {} in col {} for ODE {}\n".format(max_err, max_err_col, max_err_ode + 1))
