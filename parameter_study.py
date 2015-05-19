@@ -19,11 +19,12 @@ import subprocess
 from argparse import ArgumentParser
 import shutil
 import matplotlib.pyplot as plt
-import timing_plotter
+from timing_plotter import parse_gpu
+import re
 
 MAX_BLOCKS_PER_SM = 8
 BLOCK_LIST = [4, 6, 8]
-THREAD_LIST = [32, 64, 128]
+THREAD_LIST = [32, 64, 128, 256]
 NUM_ODES = 65536
 
 class jac_params:
@@ -71,7 +72,23 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out):
         out_file_name = os.path.join(src, 'jacobs', file_name)
         if os.path.isfile(full_file_name):
             shutil.copyfile(full_file_name, out_file_name)
-    #make
+    #make and test rates
+    subprocess.call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'])
+    subprocess.call(['gpuratestest'])
+    file = open('ratescomp_output', 'w')
+    subprocess.call([os.path.join(lib_path, 'ratescomp.py'), '-n rates_data.txt', '-b rates_and_jacob/baseline_new_withspec.txt'], stdout=file)
+    file.flush()
+    file.close()
+    with open('ratescomp_output', 'r') as file:
+        lines = [file.strip(line) for line in lines]
+        for line in lines:
+            match = re.search('(\d+\.\d+)%', line)
+            if match:
+                perc = float(match.groups()[0])
+                if perc > 0.0003:
+                    raise Exception("Invalid Jacobian/Rates detected!")
+
+    #do actual parameter run
     subprocess.call(['make', exe, 'SAME_IC=FALSE', '-j12'])
     #run
     file = open(file_name_out, 'w')
@@ -110,10 +127,10 @@ parser.add_argument('-ic', '--initial-conditions',
                             Species in moles')
 args = parser.parse_args()
 
+out_dir = os.path.abspath('cuda_parameter_study')
 #make sure the output directory exists
-if not os.path.isdir('cuda_parameter_study'):
-    os.mkdir('cuda_parameter_study')
-
+if not os.path.isdir(out_dir):
+    os.mkdir(out_dir)
 mech_path = os.path.abspath(args.directory)
 mechanism = os.path.abspath(os.path.join(mech_path, args.input))
 have_thermo = args.thermo != ''
@@ -123,35 +140,47 @@ src = os.path.abspath('src')
 
 options = ['-nco', '-pshare', '-nosmem']
 
-params = jac_params(mechanism, thermo, False, args.initial_conditions, MAX_BLOCKS_PER_SM, THREAD_LIST[0], True, True)
 for block in BLOCK_LIST:
+    #reset params
+    params = jac_params(mechanism, thermo, False, args.initial_conditions, MAX_BLOCKS_PER_SM, THREAD_LIST[0], True, True)
     params.num_blocks = block
     #do the base ones
     for thread in THREAD_LIST:
         params.num_threads = thread
-        outname = os.path.abspath(os.path.join('cuda_parameter_study', '{}_base_{}_{}.txt'.format(args.solver, block, thread)))
+        outname = os.path.abspath(os.path.join(out_dir, '{}_base_{}_{}.txt'.format(args.solver, block, thread)))
         create_copy_and_run(params, mechanism_src, src, args.solver, outname)
 
     #next turn on cache optimizations
     params.optimize_cache = True
     for thread in THREAD_LIST:
         params.num_threads = thread
-        outname = os.path.abspath(os.path.join('cuda_parameter_study', '{}_cache_opt_{}_{}.txt'.format(args.solver, block, thread)))
+        outname = os.path.abspath(os.path.join(out_dir, '{}_cache_opt_{}_{}.txt'.format(args.solver, block, thread)))
         create_copy_and_run(params, mechanism_src, src, args.solver, outname)
 
     #next turn on shared memory
     params.no_shared=False
     for thread in THREAD_LIST:
         params.num_threads = thread
-        outname = os.path.abspath(os.path.join('cuda_parameter_study', '{}_cache_opt_smem_{}_{}.txt'.format(args.solver, block, thread)))
+        outname = os.path.abspath(os.path.join(out_dir, '{}_cache_opt_smem_{}_{}.txt'.format(args.solver, block, thread)))
         create_copy_and_run(params, mechanism_src, src, args.solver, outname)
 
     #finally prefer shared
     params.L1_Preferred = False
     for thread in THREAD_LIST:
         params.num_threads = thread
-        outname = os.path.abspath(os.path.join('cuda_parameter_study', '{}_cache_opt_smem_pref_{}_{}.txt'.format(args.solver, block, thread)))
+        outname = os.path.abspath(os.path.join(out_dir, '{}_cache_opt_smem_pref_{}_{}.txt'.format(args.solver, block, thread)))
         create_copy_and_run(params, mechanism_src, src, args.solver, outname)
 
 #and finally plot
-timing_plotter.time_plotter('CUDA Parameter Study - {} ODES'.format(NUM_ODES), 'cuda_parameter_study', os.getcwd(), True)
+results = []
+files = os.listdir(out_dir)
+for file in files:
+    val = parse_gpu(os.path.join(out_dir, file))
+    if val is not None:
+        odes, block, time = val
+        if not odes == NUM_ODES:
+            print "invalid file: {}".format(file)
+        results.append((file, block, time))
+results = sorted(results, key=lambda x: x[2])
+for r in results:
+    print r
