@@ -74,7 +74,7 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out):
             shutil.copyfile(full_file_name, out_file_name)
     #make and test rates
     subprocess.call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'])
-    subprocess.call(['gpuratestest'])
+    subprocess.call([os.path.join(os.getcwd(), 'gpuratestest')])
     file = open('ratescomp_output', 'w')
     subprocess.call([os.path.join(lib_path, 'ratescomp.py'), '-n rates_data.txt', '-b rates_and_jacob/baseline_new_withspec.txt'], stdout=file)
     file.flush()
