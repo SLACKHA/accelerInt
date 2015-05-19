@@ -51,6 +51,20 @@
     __device__ int num_integrator_steps;
 #endif
 
+void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
+{
+    double buffer[NN + 2];
+    for (int j = 0; j < NUM; j++)
+    {
+        buffer[0] = t;
+        for (int i = 0; i < NN; ++i)
+        {
+            buffer[i + 1] = y_host[padded * i];
+        }
+        fwrite(buffer, sizeof(double), NN + 2, pFile);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 /** Main function
@@ -178,15 +192,10 @@ int main (int argc, char *argv[])
     const char* f_name = solver_name();
     int len = strlen(f_name);
     char out_name[len + 13];
-    sprintf(out_name, "log/%s-log.txt", f_name);
-    pFile = fopen(out_name, "w");
+    sprintf(out_name, "log/%s-log.bin", f_name);
+    pFile = fopen(out_name, "wb");
 
-    fprintf(pFile, "%.15le", t_start);
-    for (int i = 0; i < NN; ++i)
-    {
-        fprintf(pFile, ",%.15e", y_host[NUM * i]);
-    }
-    fprintf(pFile, "\n");
+    write_log(padded, NUM, 0, y_host, pFile);
 #endif
 
 
@@ -273,12 +282,7 @@ int main (int argc, char *argv[])
         }
 #endif
 #ifdef LOG_OUTPUT
-        fprintf(pFile, "%.15le", t);
-        for (int i = 0; i < NN; i++) {
-        	fprintf(pFile, ",");
-        	fprintf(pFile, "%.15le", y_host[i * NUM]);
-        }
-        fprintf(pFile, "\n");
+        write_log(padded, NUM, t, y_host, pFile);
 #endif
 #ifdef IGN
         // determine if ignition has occurred
