@@ -545,23 +545,23 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	bool SkipLU = false;
 	double sc[NN];
 	double A[NN * NN] = {ZERO};
-	double E1[NN * NN];
-	cuDoubleComplex E2[NN * NN];
-	int ipiv1[NN];
-	int ipiv2[NN];
-	double Z1[NN];
-	double Z2[NN];
-	double Z3[NN];
+	double E1[NN * NN] = {ZERO};
+	cuDoubleComplex E2[NN * NN] = {make_cuDoubleComplex(0.0, 0.0)};
+	int ipiv1[NN] = {0};
+	int ipiv2[NN] = {0};
+	double Z1[NN] = {ZERO};
+	double Z2[NN] = {ZERO};
+	double Z3[NN] = {ZERO};
 #ifdef SDIRK_ERROR
-	double Z4[NN];
-	double DZ4[NN];
-	double G[NN];
-	double TMP[NN];
+	double Z4[NN] = {ZERO};
+	double DZ4[NN] = {ZERO};
+	double G[NN] = {ZERO};
+	double TMP[NN] = {ZERO};
 #endif
-	double DZ1[NN];
-	double DZ2[NN];
-	double DZ3[NN];
-	double CONT[NN * 3];
+	double DZ1[NN] = {ZERO};
+	double DZ2[NN] = {ZERO};
+	double DZ3[NN] = {ZERO};
+	double CONT[NN * 3] = {ZERO};
 	scale_init(y, sc);
 	double y0[NN];
 	safe_memcpy(y0, y);

@@ -62,8 +62,5 @@
 #endif
     }
     fclose (fp);
-    //finally copy to GPU memory
-    cudaErrorCheck(cudaMemcpy(*y_device, *y_host, padded * NN * sizeof(double), cudaMemcpyHostToDevice));
-    cudaErrorCheck(cudaMemcpy(*variable_device, *variable_host, padded * sizeof(double), cudaMemcpyHostToDevice));
     return padded;
 }
