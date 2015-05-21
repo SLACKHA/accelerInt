@@ -60,37 +60,28 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out):
         args.append('-pshare')
     subprocess.call(args)
     #copy
-    files = os.listdir(mechanism_src)
-    for file_name in files:
-        full_file_name = os.path.join(mechanism_src, file_name)
-        out_file_name = os.path.join(src, file_name)
-        if os.path.isfile(full_file_name):
-            shutil.copyfile(full_file_name, out_file_name)
-    files = os.listdir(os.path.join(mechanism_src, 'jacobs'))
-    for file_name in files:
-        full_file_name = os.path.join(mechanism_src, 'jacobs', file_name)
-        out_file_name = os.path.join(src, 'jacobs', file_name)
-        if os.path.isfile(full_file_name):
-            shutil.copyfile(full_file_name, out_file_name)
+    subprocess.call('cp -r {} {}'.format(os.path.join(mechanism_src, '*'), src), shell = True)
     #make and test rates
-    subprocess.call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'])
+    devnull = open('/dev/null', 'w')
+    subprocess.call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'], stdout = devnull)
     subprocess.call([os.path.join(os.getcwd(), 'gpuratestest')])
     file = open('ratescomp_output', 'w')
-    subprocess.call([os.path.join(lib_path, 'ratescomp.py'), '-n rates_data.txt', '-b rates_and_jacob/baseline_new_withspec.txt'], stdout=file)
+    subprocess.call([os.path.join(lib_path, 'ratescomp.py'), '-n=' + os.path.join(os.getcwd(), 'rates_data.txt'), '-b=' + os.path.join(os.getcwd(),'rates_and_jacob/baseline_new_withspec.txt')], stdout=file)
     file.flush()
     file.close()
     with open('ratescomp_output', 'r') as file:
-        lines = [file.strip(line) for line in lines]
+        lines = [line.strip() for line in file.readlines()]
         for line in lines:
-            match = re.search('(\d+\.\d+)%', line)
+            match = re.search('(\d+\.\d+(?:e-\d+)?)%', line)
             if match:
                 perc = float(match.groups()[0])
                 if perc > 0.0003:
                     raise Exception("Invalid Jacobian/Rates detected!")
 
     #do actual parameter run
-    subprocess.call(['make', exe, 'SAME_IC=FALSE', '-j12'])
+    subprocess.call(['make', exe, 'SAME_IC=FALSE', '-j12'], stdout = devnull)
     #run
+    devnull.close()
     file = open(file_name_out, 'w')
     subprocess.call([os.path.join(os.getcwd(), exe), str(NUM_ODES)], stdout=file)
     file.flush()
@@ -116,15 +107,10 @@ parser.add_argument('-s', '--solver',
                     default='radau2a-int-gpu',
                     required=False,
                     help = 'The solver to test')
-parser.add_argument('-ic', '--initial-conditions',
-                    type=str,
-                    dest='initial_conditions',
-                    required=True,
-                    help = 'A comma separated list of initial initial conditions to set in the set_same_initial_conditions method. \
-                            Expected Form: T,P,Species1=...,Species2=...,...\n\
-                            Temperature in K\n\
-                            Pressure in Atm\n\
-                            Species in moles')
+parser.add_argument('-check', '--checkjacobian',
+                    default=False,
+                    required=False,
+                    help = 'Check the output of the Jacobian for each case')
 args = parser.parse_args()
 
 out_dir = os.path.abspath('cuda_parameter_study')
