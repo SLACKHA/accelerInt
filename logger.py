@@ -10,7 +10,7 @@ N_THREADS = 12
 NVAR = 56 #t, T, P, 53 mass fractions
 
 #force remake
-subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=TRUE'])
+subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=TRUE', 'LARGE_STEP=TRUE'])
 
 all_exes = []
 for file in glob.glob('*-int*'):
