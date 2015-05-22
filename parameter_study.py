@@ -28,19 +28,18 @@ THREAD_LIST = [32, 64, 128, 256]
 NUM_ODES = 65536
 
 class jac_params:
-    def __init__(self, mech_name, therm_name, optimize_cache, inital_state, num_blocks, \
+    def __init__(self, mech_name, therm_name, optimize_cache, num_blocks, \
         num_threads, no_shared, L1_Preferred):
         self.lang = 'cuda'
         self.mech_name = mech_name
         self.therm_name = therm_name
         self.optimize_cache = optimize_cache
-        self.inital_state = inital_state
         self.num_blocks = num_blocks
         self.num_threads = num_threads
         self.no_shared = no_shared
         self.L1_Preferred = L1_Preferred
 
-def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out):
+def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out, check):
     if os.path.isfile(file_name_out):
         return
     #create
@@ -51,7 +50,6 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out):
         args.append('-t={}'.format(jparam.therm_name))
     if not jparam.optimize_cache:
         args.append('-nco')
-    args.append('-ic={}'.format(jparam.inital_state))
     args.append('-nb={}'.format(jparam.num_blocks))
     args.append('-nt={}'.format(jparam.num_threads))
     if jparam.no_shared:
@@ -128,34 +126,42 @@ options = ['-nco', '-pshare', '-nosmem']
 
 for block in BLOCK_LIST:
     #reset params
-    params = jac_params(mechanism, thermo, False, args.initial_conditions, MAX_BLOCKS_PER_SM, THREAD_LIST[0], True, True)
+    params = jac_params(mechanism, thermo, False, MAX_BLOCKS_PER_SM, THREAD_LIST[0], True, True)
     params.num_blocks = block
     #do the base ones
     for thread in THREAD_LIST:
         params.num_threads = thread
         outname = os.path.abspath(os.path.join(out_dir, '{}_base_{}_{}.txt'.format(args.solver, block, thread)))
-        create_copy_and_run(params, mechanism_src, src, args.solver, outname)
+        create_copy_and_run(params, mechanism_src, src, args.solver, outname, args.checkjacobian)
+
+    #next turn on shared memory
+    params.no_shared=False
+    for thread in THREAD_LIST:
+        params.num_threads = thread
+        outname = os.path.abspath(os.path.join(out_dir, '{}_smem_{}_{}.txt'.format(args.solver, block, thread)))
+        create_copy_and_run(params, mechanism_src, src, args.solver, outname, args.checkjacobian)
 
     #next turn on cache optimizations
+    params.no_shared=True
     params.optimize_cache = True
     for thread in THREAD_LIST:
         params.num_threads = thread
         outname = os.path.abspath(os.path.join(out_dir, '{}_cache_opt_{}_{}.txt'.format(args.solver, block, thread)))
-        create_copy_and_run(params, mechanism_src, src, args.solver, outname)
+        create_copy_and_run(params, mechanism_src, src, args.solver, outname, args.checkjacobian)
 
     #next turn on shared memory
     params.no_shared=False
     for thread in THREAD_LIST:
         params.num_threads = thread
         outname = os.path.abspath(os.path.join(out_dir, '{}_cache_opt_smem_{}_{}.txt'.format(args.solver, block, thread)))
-        create_copy_and_run(params, mechanism_src, src, args.solver, outname)
+        create_copy_and_run(params, mechanism_src, src, args.solver, outname, args.checkjacobian)
 
     #finally prefer shared
     params.L1_Preferred = False
     for thread in THREAD_LIST:
         params.num_threads = thread
         outname = os.path.abspath(os.path.join(out_dir, '{}_cache_opt_smem_pref_{}_{}.txt'.format(args.solver, block, thread)))
-        create_copy_and_run(params, mechanism_src, src, args.solver, outname)
+        create_copy_and_run(params, mechanism_src, src, args.solver, outname, args.checkjacobian)
 
 #and finally plot
 results = []
