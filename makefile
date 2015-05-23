@@ -240,7 +240,7 @@ OBJ_RB43_GPU = $(patsubst %,$(ODIR)/rb43/%,$(_OBJ_RB43_GPU))
 _OBJ_EXP4_GPU = exp4_init.cu.o exp4.cu.o solver_generic.cu.o $(_OBJ_GPU_RA)
 OBJ_EXP4_GPU = $(patsubst %,$(ODIR)/exp4/%,$(_OBJ_EXP4_GPU))
 
-_OBJ_CVODES = cvodes_dydt.o cvodes_init.o solver_cvodes.o $(filter-out jacob.o,$(_OBJ))
+_OBJ_CVODES = cvodes_dydt.o cvodes_init.o solver_cvodes.o $(_OBJ)
 OBJ_CVODES = $(patsubst %,$(ODIR)/cvodes/%,$(_OBJ_CVODES))
 
 _OBJ_CVODES_ANALYTICAL = cvodes_dydt.o cvodes_jac.o cvodes_init.o solver_cvodes.o $(_OBJ)
@@ -334,7 +334,7 @@ exp4-int-gpu : $(OBJ_EXP4_GPU) $(MECH_GPU)
 	$(NVCC) -ccbin=$(NCC_BIN) $^ $(LIBS) -dlink -o $(ODIR)/exp4/dlink.o
 	$(NLINK) $^ $(ODIR)/exp4/dlink.o $(LIBS) -o $@
 
-cvodes-int : $(OBJ_CVODES) $(MECH)
+cvodes-int : $(OBJ_CVODES) $(filter-out %jacob.o,$(MECH))
 	$(LINK) $^ $(LIBS) -o $@
 
 cvodes-analytical-int : $(OBJ_CVODES_ANALYTICAL) $(MECH)
