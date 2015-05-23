@@ -37,6 +37,8 @@
             fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", filename, NN + 1, count);
             exit(-1);
         }
+        //apply mask if necessary
+        apply_mask(&buffer[2]);
         //put into y_host
         (*y_host)[i] = buffer[0];
 #ifdef CONP
