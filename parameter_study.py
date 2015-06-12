@@ -58,23 +58,24 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out, check):
         args.append('-pshare')
     subprocess.call(args)
     #copy
-    subprocess.call('cp -r {} {}'.format(os.path.join(mechanism_src, '*'), src), shell = True)
-    #make and test rates
     devnull = open('/dev/null', 'w')
-    subprocess.call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'], stdout = devnull)
-    subprocess.call([os.path.join(os.getcwd(), 'gpuratestest')])
-    file = open('ratescomp_output', 'w')
-    subprocess.call([os.path.join(lib_path, 'ratescomp.py'), '-n=' + os.path.join(os.getcwd(), 'rates_data.txt'), '-b=' + os.path.join(os.getcwd(),'rates_and_jacob/baseline_new_withspec.txt')], stdout=file)
-    file.flush()
-    file.close()
-    with open('ratescomp_output', 'r') as file:
-        lines = [line.strip() for line in file.readlines()]
-        for line in lines:
-            match = re.search('(\d+\.\d+(?:e-\d+)?)%', line)
-            if match:
-                perc = float(match.groups()[0])
-                if perc > 0.0003:
-                    raise Exception("Invalid Jacobian/Rates detected!")
+    subprocess.call('cp -r {} {}'.format(os.path.join(mechanism_src, '*'), src), shell = True)
+    if check:
+        #make and test rates
+        subprocess.call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'], stdout = devnull)
+        subprocess.call([os.path.join(os.getcwd(), 'gpuratestest')])
+        file = open('ratescomp_output', 'w')
+        subprocess.call([os.path.join(lib_path, 'ratescomp.py'), '-n=' + os.path.join(os.getcwd(), 'rates_data.txt'), '-b=' + os.path.join(os.getcwd(),'rates_and_jacob/baseline_new_withspec.txt')], stdout=file)
+        file.flush()
+        file.close()
+        with open('ratescomp_output', 'r') as file:
+            lines = [line.strip() for line in file.readlines()]
+            for line in lines:
+                match = re.search('(\d+\.\d+(?:e-\d+)?)%', line)
+                if match:
+                    perc = float(match.groups()[0])
+                    if perc > 0.0003:
+                        raise Exception("Invalid Jacobian/Rates detected!")
 
     #do actual parameter run
     subprocess.call(['make', exe, 'SAME_IC=FALSE', '-j12'], stdout = devnull)

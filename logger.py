@@ -9,24 +9,72 @@ NUM_ODES = 1000
 N_THREADS = 12
 NVAR = 56 #t, T, P, 53 mass fractions
 
+def check_reorder(cache_opt, arr, order):
+    if cache_opt:
+        sub_arr = arr[:, :3]
+        temp = arr[:, 3:]
+        return np.hstack(sub_arr, temp[:, order])
+    else:
+        return arr
+
+
 #force remake
 subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=TRUE', 'LARGE_STEP=TRUE'])
+
+GPU_CACHE_OPT = False
+with open('src/mechanism.cu') as file:
+    start = False
+    for line in file.readlines():
+        if 'apply_mask' in line:
+            start = True
+        elif 'temp' in line and not start:
+            GPU_CACHE_OPT = True
+            break
+        elif start and '}' in line:
+            break
+
+CPU_CACHE_OPT = False
+with open('src/mechanism.cu') as file:
+    start = False
+    for line in file.readlines():
+        if 'apply_mask' in line:
+            start = True
+        elif 'temp' in line and not start:
+            CPU_CACHE_OPT = True
+            break
+        elif start and '}' in line:
+            break
+
+spec_ordering = None
+if GPU_CACHE_OPT or CPU_CACHE_OPT:
+    #need the reorderings
+    with open('src/optimized.pickle', 'rb') as file:
+        dummy = pickle.load(file)
+        dummy = pickle.load(file)
+        dummy = pickle.load(file)
+        dummy = pickle.load(file)
+        dummy = pickle.load(file)
+        dummy = pickle.load(file)
+        spec_ordering = pickle.load(file)
+        dummy = pickle.load(file)
 
 all_exes = []
 for file in glob.glob('*-int*'):
     all_exes.append(file)
 
 
+skip = []
 for exe in all_exes:
-    if 'gpu' in exe and 'exp' in exe:
-        continue
+    if 'exp' in exe:
+    #if 'gpu' in exe and 'exp' in exe:
+        skip.append(exe)
     print exe
     if 'gpu' in exe:
         subprocess.call([os.path.join(os.getcwd(), exe), str(NUM_ODES)])
     else:
         subprocess.call([os.path.join(os.getcwd(), exe), str(N_THREADS), str(NUM_ODES)])
 
-files = [f for f in os.listdir('log') if os.path.isfile(os.path.join('log', f)) and f.endswith('.bin')]
+files = [f for f in os.listdir('log') if os.path.isfile(os.path.join('log', f)) and f.endswith('.bin') and not any(s in f for s in skip)]
 
 key_file = [f for f in files if 'cvodes' in f and 'analytical' in f]
 if not key_file:
@@ -51,9 +99,12 @@ with open('error_results.txt', 'w') as outfile:
             start_ind = NVAR * ode
             key_arr = the_data[key_file][:, start_ind : start_ind + NVAR]
 
+            key_arr = check_reorder(CPU_CACHE_OPT, key_arr, spec_ordering)
+
             if file == key_file:
                 continue
             data_arr = the_data[file][:, start_ind : start_ind + NVAR]
+            data_arr = check_reorder(GPU_CACHE_OPT if 'gpu' in file else CPU_CACHE_OPT, data_arr, spec_ordering)
 
             #now compare column by column and get max err
             max_err = 0
