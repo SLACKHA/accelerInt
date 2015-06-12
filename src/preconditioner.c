@@ -212,8 +212,6 @@ static void get_range(const int num_threads, const int NUM, const int padded, co
 			t_maxs[index * NUM_CLUSTER_VARS + var] = fmax(t_maxs[index * NUM_CLUSTER_VARS + var], y_host[CLUSTER_VAR_INDEXES[var] * padded + tid]);
 		}
 	}
-	free(t_mins);
-	free(t_maxs);
 
 	//reduce and count how many clusters are on
 	for (int i = 0; i < num_threads; ++i)
@@ -228,6 +226,8 @@ static void get_range(const int num_threads, const int NUM, const int padded, co
 			}
 		}
 	}
+	free(t_mins);
+	free(t_maxs);
 }
 
 static void normalize(const int NUM, const int padded, const double* y_host, const double* mins, const double* maxs, const bool* is_on, double* y_norm)
