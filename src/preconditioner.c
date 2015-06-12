@@ -145,7 +145,22 @@ static void initialize(const double* mins, const double* maxs, const bool* is_on
 	int* ccount = *cluster_count;
 
 	double sample_cluster[NUM_CLUSTER_VARS] = {0};
-	memcpy(ccenter, sample_cluster, NUM_CLUSTER_VARS * sizeof(double));
+	#pragma omp parallel for shared(ccount, ccenter) private(sample_cluster)
+	for (int tid = 0; tid < num_centers; ++tid)
+	{
+		ccount[tid] = 1;
+		//figure out the sample cluster
+		for (int i = 0; i < NUM_CLUSTER_VARS - 1; ++i)
+		{
+			sample_cluster[i] = e_y * ((tid / lengths[i]) % (s_y + 1));
+		}
+		sample_cluster[NUM_CLUSTER_VARS - 1] = e_t * (tid / lengths[NUM_CLUSTER_VARS - 1]);
+		memcpy(&ccenter[tid * NUM_CLUSTER_VARS], sample_cluster, NUM_CLUSTER_VARS * sizeof(double));
+	}
+
+	/*
+	double sample_cluster[NUM_CLUSTER_VARS] = {0};
+	/*memcpy(ccenter, sample_cluster, NUM_CLUSTER_VARS * sizeof(double));
 	ccount[0] = 1;
 	for (int tid = 1; tid < num_centers; ++tid)
 	{	
@@ -166,7 +181,7 @@ static void initialize(const double* mins, const double* maxs, const bool* is_on
 			}
 		}
 		memcpy(&ccenter[tid * NUM_CLUSTER_VARS], sample_cluster, NUM_CLUSTER_VARS * sizeof(double));
-	}
+	}*/
 
 	*num_centers_out = num_centers;
 	*e_t_out = e_t;
