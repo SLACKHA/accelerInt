@@ -26,6 +26,7 @@ MAX_BLOCKS_PER_SM = 8
 BLOCK_LIST = [4, 6, 8]
 THREAD_LIST = [32, 64, 128, 256]
 NUM_ODES = 65536
+python = 'python2.7'
 
 class jac_params:
     def __init__(self, mech_name, therm_name, optimize_cache, num_blocks, \
@@ -43,7 +44,7 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out, check):
     if os.path.isfile(file_name_out):
         return
     #create
-    args = [os.path.join(lib_path, 'create_jacobian.py')]
+    args = [python, os.path.join(lib_path, 'create_jacobian.py')]
     args.append('-l={}'.format(jparam.lang))
     args.append('-i={}'.format(jparam.mech_name))
     if jparam.therm_name != '':
@@ -56,16 +57,16 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out, check):
         args.append('-nosmem')
     if not jparam.L1_Preferred:
         args.append('-pshare')
-    subprocess.call(args)
+    subprocess.check_call(args)
     #copy
     devnull = open('/dev/null', 'w')
-    subprocess.call('cp -r {} {}'.format(os.path.join(mechanism_src, '*'), src), shell = True)
+    subprocess.check_call('cp -r {} {}'.format(os.path.join(mechanism_src, '*'), src), shell = True)
     if check:
         #make and test rates
-        subprocess.call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'], stdout = devnull)
-        subprocess.call([os.path.join(os.getcwd(), 'gpuratestest')])
+        subprocess.check_call(['make', 'gpuratestest', 'SAME_IC=FALSE', '-j12'], stdout = devnull)
+        subprocess.check_call([os.path.join(os.getcwd(), 'gpuratestest')])
         file = open('ratescomp_output', 'w')
-        subprocess.call([os.path.join(lib_path, 'ratescomp.py'), '-n=' + os.path.join(os.getcwd(), 'rates_data.txt'), '-b=' + os.path.join(os.getcwd(),'rates_and_jacob/baseline_new_withspec.txt')], stdout=file)
+        subprocess.check_call([os.path.join(lib_path, 'ratescomp.py'), '-n=' + os.path.join(os.getcwd(), 'rates_data.txt'), '-b=' + os.path.join(os.getcwd(),'rates_and_jacob/baseline_new_withspec.txt')], stdout=file)
         file.flush()
         file.close()
         with open('ratescomp_output', 'r') as file:
@@ -78,11 +79,11 @@ def create_copy_and_run(jparam, mechanism_src, src, exe, file_name_out, check):
                         raise Exception("Invalid Jacobian/Rates detected!")
 
     #do actual parameter run
-    subprocess.call(['make', exe, 'SAME_IC=FALSE', '-j12'], stdout = devnull)
+    subprocess.check_call(['make', exe, 'SAME_IC=FALSE', '-j12'], stdout = devnull)
     #run
     devnull.close()
     file = open(file_name_out, 'w')
-    subprocess.call([os.path.join(os.getcwd(), exe), str(NUM_ODES)], stdout=file)
+    subprocess.check_call([os.path.join(os.getcwd(), exe), str(NUM_ODES)], stdout=file)
     file.flush()
     file.close()
 
