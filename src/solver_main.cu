@@ -32,7 +32,7 @@
 #include "header.h"
 #include "timer.h"
 //get our solver stuff
-#include "solver.cuh"sex
+#include "solver.cuh"
 #include "gpu_memory.cuh"
 #include "read_initial_conditions.cuh"
 #include "launch_bounds.cuh"
@@ -238,8 +238,8 @@ int main (int argc, char *argv[])
 #endif
 
     // set initial time
-    Real t = t_start;
-    Real t_next = t + t_step;
+    double t = t_start;
+    double t_next = t + t_step;
     int numSteps = 0;
 
     // time integration loop
@@ -333,7 +333,7 @@ int main (int argc, char *argv[])
 
     runtime /= 1000.0;
     printf ("Time: %e sec\n", runtime);
-    runtime = runtime / ((Real)(numSteps));
+    runtime = runtime / ((double)(numSteps));
     printf ("Time per step: %e (s)\t%e (s/thread)\n", runtime, runtime / NUM);
 #ifdef IGN
     printf ("Ig. Delay (s): %e\n", t_ign);

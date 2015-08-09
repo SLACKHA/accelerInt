@@ -14,7 +14,7 @@ extern __device__ __constant__ cuFloatComplex res[N_RA];
 
 
 __device__
-void phi2Ac_variable(const int m, const Real* A, const Real c, Real* phiA) {
+void phi2Ac_variable(const int m, const double* A, const double c, double* phiA) {
 	
 #ifdef DOUBLE
 	cuDoubleComplex invA[STRIDE * STRIDE];
@@ -72,7 +72,7 @@ void phi2Ac_variable(const int m, const Real* A, const Real c, Real* phiA) {
 }
 
 __device__
-void phiAc_variable(const int m, const Real* A, const Real c, Real* phiA) {
+void phiAc_variable(const int m, const double* A, const double c, double* phiA) {
 	
 #ifdef DOUBLE
 	cuDoubleComplex invA[STRIDE * STRIDE];
@@ -130,7 +130,7 @@ void phiAc_variable(const int m, const Real* A, const Real c, Real* phiA) {
 }
 
 __device__
-void expAc_variable(const int m, const Real* A, const Real c, Real* phiA) {
+void expAc_variable(const int m, const double* A, const double c, double* phiA) {
 	
 #ifdef DOUBLE
 	cuDoubleComplex invA[STRIDE * STRIDE];

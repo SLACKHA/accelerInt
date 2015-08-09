@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////
 
 static inline
-int getMax (int n, Real* arr) {
+int getMax (int n, double* arr) {
 	
 	int maxInd = 0;
 	if (n == 1)
@@ -28,7 +28,7 @@ int getMax (int n, Real* arr) {
 ///////////////////////////////////////////////////////////
 
 static inline
-void scale (int n, Real val, Real* arrX) {
+void scale (int n, double val, double* arrX) {
 	
 	for (int i = 0; i < n; ++i) {
 		arrX[i] *= val;
@@ -39,13 +39,13 @@ void scale (int n, Real val, Real* arrX) {
 ///////////////////////////////////////////////////////////
 
 static inline
-void swap (int n, Real* arrX, int incX, Real* arrY, int incY) {
+void swap (int n, double* arrX, int incX, double* arrY, int incY) {
 	
 	int ix = 0;
 	int iy = 0;
 	
 	for (int i = 0; i < n; ++i) {
-		Real temp = arrX[ix];
+		double temp = arrX[ix];
 		arrX[ix] = arrY[iy];
 		arrY[iy] = temp;
 		ix += incX;
@@ -57,13 +57,13 @@ void swap (int n, Real* arrX, int incX, Real* arrY, int incY) {
 ///////////////////////////////////////////////////////////
 
 static inline
-void multiplyUpperMV (int n, Real* x, int lda, Real* A) {
+void multiplyUpperMV (int n, double* x, int lda, double* A) {
 	
 	for (int j = 0; j < n; ++j) {
 		//if (x[j] != 0.0) {
     if (fabs(x[j]) > 0.0) {
       
-			Real temp = x[j];
+			double temp = x[j];
 			for (int i = 0; i < j; ++i) {
 				x[i] += temp * A[i + (lda * j)];
 			}
@@ -75,8 +75,8 @@ void multiplyUpperMV (int n, Real* x, int lda, Real* A) {
 ///////////////////////////////////////////////////////////
 
 static inline
-void GEMV (int m, int n, Real alpha, Real* A, 
-									Real* arrX, Real* arrY) {
+void GEMV (int m, int n, double alpha, double* A, 
+									double* arrX, double* arrY) {
 	
 	// first: y = beta*y
 	// beta = 1, so nothing
@@ -86,7 +86,7 @@ void GEMV (int m, int n, Real alpha, Real* A,
 	for (int j = 0; j < n - 1; ++j) {
 		//if (arrX[j] != 0.0) {
     if (fabs(arrX[j]) > 0.0) {
-			Real temp = alpha * arrX[j];
+			double temp = alpha * arrX[j];
 			for (int i = 0; i < m; ++i) {
 				arrY[i] += temp * A[i + (m * j)];
 			}
@@ -98,14 +98,14 @@ void GEMV (int m, int n, Real alpha, Real* A,
 ///////////////////////////////////////////////////////////
 
 static inline
-int getInverseLU (int n, Real* A, int* indPivot, Real* work) {
+int getInverseLU (int n, double* A, int* indPivot, double* work) {
 	
 	int info = 0;
 	
 	// form inv(U)
 	for (int j = 0; j < n; ++j) {
 		A[j + (n * j)] = 1.0 / A[j + (n * j)];
-		Real Ajj = -A[j + (n * j)];
+		double Ajj = -A[j + (n * j)];
 		
 		// compute elements 0:j-1 of jth column
 		multiplyUpperMV (j, &A[n * j], n, A);
@@ -144,7 +144,7 @@ int getInverseLU (int n, Real* A, int* indPivot, Real* work) {
 //adapted from Matrix Computations
 //Gene H. Golub, Charles F. Van Loan
 static inline
-int getHessenbergLU(const int n, Real* A, int* indPivot)
+int getHessenbergLU(const int n, double* A, int* indPivot)
 {
 	int last_free = 0;
 	for (int i = 0; i < n - 1; i ++)
@@ -162,7 +162,7 @@ int getHessenbergLU(const int n, Real* A, int* indPivot)
 		}
 		if (fabs(A[i * n + i]) > 0.0)
 		{
-			Real tau = A[i * n + i + 1] / A[i * n + i];
+			double tau = A[i * n + i + 1] / A[i * n + i];
 			for (int j = i + 1; j < n; j++)
 			{
 				A[j * n + i + 1] -= tau * A[j * n + i];
@@ -179,7 +179,7 @@ int getHessenbergLU(const int n, Real* A, int* indPivot)
 	return 0;
 }
 
-void getInverseHessenberg (const int n, Real* A)
+void getInverseHessenberg (const int n, double* A)
 {
 	// pivot indices
 	int* ipiv = (int*) calloc (n, sizeof(int));
@@ -199,8 +199,8 @@ void getInverseHessenberg (const int n, Real* A)
 #endif
 
 	// work array
-	Real* work = (Real*) calloc (n, sizeof(Real));
-  	// memset (work, 0.0, n * sizeof(Real));
+	double* work = (double*) calloc (n, sizeof(double));
+  	// memset (work, 0.0, n * sizeof(double));
 	
 	// now get inverse
 	info = getInverseLU (n, A, ipiv, work);

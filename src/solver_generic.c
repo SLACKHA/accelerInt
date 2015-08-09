@@ -10,16 +10,16 @@
 #include "header.h"
 #include "solver.h"
 
-void intDriver (const int NUM, const Real t, const Real t_end,
-                const Real *pr_global, Real *y_global)
+void intDriver (const int NUM, const double t, const double t_end,
+                const double *pr_global, double *y_global)
 {
     int tid;
     #pragma omp parallel for shared(y_global, pr_global) private(tid)
     for (tid = 0; tid < NUM; ++tid) {
 
         // local array with initial values
-        Real y_local[NN];
-        Real pr_local = pr_global[tid];
+        double y_local[NN];
+        double pr_local = pr_global[tid];
 
         // load local array with initial values from global array
 #pragma unroll

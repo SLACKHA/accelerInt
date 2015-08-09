@@ -225,8 +225,8 @@ bool speedTest()
 }
 
 #ifdef NotDefined
-Real complex poles[N_RA];
-Real complex res[N_RA];
+double complex poles[N_RA];
+double complex res[N_RA];
 
 bool PhiTests()
 {
@@ -328,9 +328,9 @@ bool LinearAlgebraTests()
 {
 	#ifdef COMPILE_TESTING_METHODS
 	//create and populate some matricies
-	Real A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	Real v[STRIDE_MIRROR] = {ZERO};
-	Real out[STRIDE_MIRROR] = {ZERO};
+	double A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	double v[STRIDE_MIRROR] = {ZERO};
+	double out[STRIDE_MIRROR] = {ZERO};
 	int m_size = STRIDE_MIRROR / 2;
 	for (int col = 0; col < m_size; ++col)
 	{
@@ -373,7 +373,7 @@ bool LinearAlgebraTests()
 			return false;
 	}*/
 
-	Real v2[STRIDE_MIRROR] = {ZERO};
+	double v2[STRIDE_MIRROR] = {ZERO};
 	for (int row = 0; row < NN; ++row)
 	{
 		v[row] = row;
@@ -417,7 +417,7 @@ bool LinearAlgebraTests()
 	#endif
 	return true;
 }
-void matvec (const Real * A, const Real * v, Real * Av) {
+void matvec (const double * A, const double * v, double * Av) {
 	#pragma unroll
 	for (uint i = 0; i < STRIDE_MIRROR; ++i) {
 		Av[i] = ZERO;
@@ -430,11 +430,11 @@ void matvec (const Real * A, const Real * v, Real * Av) {
 }
 bool ArnoldiTest()
 {
-	Real A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	Real Vm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	Real Hm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	Real phiHm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	Real w[STRIDE_MIRROR] = {ZERO};
+	double A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	double Vm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	double Hm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	double phiHm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
+	double w[STRIDE_MIRROR] = {ZERO};
 	Vm[0] = 1;
 	A[0] = 1;
 	A[1] = 3;

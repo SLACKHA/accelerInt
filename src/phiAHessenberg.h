@@ -4,8 +4,8 @@
 #include "header.h"
 
 //void phiAv (const double*, const double, const double*, double*);
-void phi2Ac_variable(const int, const int, const Real*, const Real, Real*);
-void phiAc_variable(const int, const int, const Real*, const Real, Real*);
-void expAc_variable(const int, const int, const Real*, const Real, Real*);
+void phi2Ac_variable(const int, const int, const double*, const double, double*);
+void phiAc_variable(const int, const int, const double*, const double, double*);
+void expAc_variable(const int, const int, const double*, const double, double*);
 
 #endif

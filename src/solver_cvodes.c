@@ -26,8 +26,8 @@ extern N_Vector *y_locals;
 extern double* y_local_vectors;
 extern void** integrators;
 
-void intDriver (const int NUM, const Real t, const Real t_end,
-                const Real *pr_global, Real *y_global)
+void intDriver (const int NUM, const double t, const double t_end,
+                const double *pr_global, double *y_global)
 {
     int tid;
     double t_next;
@@ -37,7 +37,7 @@ void intDriver (const int NUM, const Real t, const Real t_end,
 
         // local array with initial values
         N_Vector fill = y_locals[index];
-        Real pr_local = pr_global[tid];
+        double pr_local = pr_global[tid];
 
         // load local array with initial values from global array
         double* y_local = NV_DATA_S(fill);

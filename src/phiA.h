@@ -4,6 +4,6 @@
 #include "header.h"
 
 //void phiAv (const double*, const double, const double*, double*);
-void phiAc (const Real*, const Real, Real*);
+void phiAc (const double*, const double, double*);
 
 #endif

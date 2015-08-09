@@ -3,6 +3,6 @@
 
 #include "header.h"
 
-__device__ void integrate (const Real, const Real, const Real, Real*);
+__device__ void integrate (const double, const double, const double, double*);
 
 #endif

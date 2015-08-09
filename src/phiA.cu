@@ -16,7 +16,7 @@ extern __device__ __constant__ cuFloatComplex res[N_RA];
 ////////////////////////////////////////////////////////////////////////
 
 __device__
-void phiAc (const Real * A, const Real c, Real * phiA) {
+void phiAc (const double * A, const double c, double * phiA) {
 	
   #ifdef DOUBLE
 	cuDoubleComplex invA[NN * NN];

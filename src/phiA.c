@@ -5,8 +5,8 @@
 //#include "linear-algebra.h"
 #include "complexInverse.h"
 
-extern Real complex poles[N_RA];
-extern Real complex res[N_RA];
+extern double complex poles[N_RA];
+extern double complex res[N_RA];
 
 void phiAc (const double * A, const double c, double * phiA) {
 	

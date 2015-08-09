@@ -3,6 +3,6 @@
 
 #include "header.h"
 
-void exprb43_int (const Real, const Real, const Real, Real*);
+void exprb43_int (const double, const double, const double, double*);
 
 #endif

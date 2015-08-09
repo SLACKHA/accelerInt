@@ -5,14 +5,14 @@
 
 #define FD_ORD 2
 
-void eval_jacob (const Real t, const Real pres, Real * y, Real * jac) {
+void eval_jacob (const double t, const double pres, double * y, double * jac) {
   
-  Real ydot[NN];
+  double ydot[NN];
   dydt (t, pres, y, ydot);
   
   // Finite difference coefficients
-  Real x_coeffs[FD_ORD];
-  Real y_coeffs[FD_ORD];
+  double x_coeffs[FD_ORD];
+  double y_coeffs[FD_ORD];
   
   if (FD_ORD == 2) {
     // 2nd order central difference
@@ -47,29 +47,29 @@ void eval_jacob (const Real t, const Real pres, Real * y, Real * jac) {
     y_coeffs[5] = 1.0 / 60.0;
   }
   
-  Real ewt[NN];
+  double ewt[NN];
   #pragma unroll
   for (uint i = 0; i < NN; ++i) {
     ewt[i] = ATOL + (RTOL * fabs(y[i]));
   }
   
   // unit roundoff of machine
-  Real srur = sqrt(DBL_EPSILON);
+  double srur = sqrt(DBL_EPSILON);
   
-  Real sum = 0.0;
+  double sum = 0.0;
   #pragma unroll
   for (uint i = 0; i < NN; ++i) {
     sum += (ewt[i] * ydot[i]) * (ewt[i] * ydot[i]);
   }
-  Real fac = sqrt(sum / ((Real)(NN)));
-  Real r0 = 1000.0 * RTOL * DBL_EPSILON * ((Real)(NN)) * fac;
+  double fac = sqrt(sum / ((double)(NN)));
+  double r0 = 1000.0 * RTOL * DBL_EPSILON * ((double)(NN)) * fac;
   
-  Real ftemp[NN];
+  double ftemp[NN];
   
   #pragma unroll
   for (uint j = 0; j < NN; ++j) {
-    Real yj_orig = y[j];
-    Real r = fmax(srur * fabs(yj_orig), r0 / ewt[j]);
+    double yj_orig = y[j];
+    double r = fmax(srur * fabs(yj_orig), r0 / ewt[j]);
     
     #pragma unroll
     for (uint i = 0; i < NN; ++i) {

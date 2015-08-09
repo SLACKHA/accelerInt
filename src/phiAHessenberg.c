@@ -5,11 +5,11 @@
 //#include "linear-algebra.h"
 #include "complexInverse.h"
 
-extern Real complex poles[N_RA];
-extern Real complex res[N_RA];
+extern double complex poles[N_RA];
+extern double complex res[N_RA];
 
 
-void phi2Ac_variable(const int m, const int STRIDE, const Real* A, const Real c, Real* phiA) {
+void phi2Ac_variable(const int m, const int STRIDE, const double* A, const double c, double* phiA) {
 	
 	double complex invA[m * m];
 	
@@ -51,7 +51,7 @@ void phi2Ac_variable(const int m, const int STRIDE, const Real* A, const Real c,
 	//free (invA);
 }
 
-void phiAc_variable(const int m, const int STRIDE, const Real* A, const Real c, Real* phiA) {
+void phiAc_variable(const int m, const int STRIDE, const double* A, const double c, double* phiA) {
 	
 	double complex invA[m * m];
 	
@@ -93,7 +93,7 @@ void phiAc_variable(const int m, const int STRIDE, const Real* A, const Real c, 
 	//free (invA);
 }
 
-void expAc_variable(const int m, const int STRIDE, const Real* A, const Real c, Real* phiA) {
+void expAc_variable(const int m, const int STRIDE, const double* A, const double c, double* phiA) {
 	
 	double complex invA[m * m];
 	
