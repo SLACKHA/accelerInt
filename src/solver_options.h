@@ -27,6 +27,11 @@ to the solvers
     #define t_step (1e-6)
 #endif
 
+/** Machine precision constant. */
+#define EPS DBL_EPSILON
+
+#define SMALL DBL_MIN
+
 /** type of rational approximant (n, n) */
 #define N_RA 10
 
