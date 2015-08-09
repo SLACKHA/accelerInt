@@ -32,9 +32,7 @@
 #include "header.h"
 #include "timer.h"
 //get our solver stuff
-#include "solver.cuh"
-#include "solver_init.cuh"
-#include "solver_props.h"
+#include "solver.cuh"sex
 #include "gpu_memory.cuh"
 #include "read_initial_conditions.cuh"
 #include "launch_bounds.cuh"

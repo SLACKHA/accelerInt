@@ -25,7 +25,6 @@
 //our code
 #include "header.h"
 #include "solver.h"
-#include "solver_init.h"
 #include "timer.h"
 #include "read_initial_conditions.h"
 

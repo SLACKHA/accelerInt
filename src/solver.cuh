@@ -11,6 +11,9 @@
  #ifndef SOLVER_CUH
  #define SOLVER_CUH
 
+ #include "solver_props.h"
+ #include "solver_init.cuh"
+
  __global__ void 
  intDriver (const int, const double, const double, 
                 const double*, double*);

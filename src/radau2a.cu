@@ -13,8 +13,8 @@
 #include "header.h"
 #include "inverse.cuh"
 #include "complexInverse_NN.cuh"
-#include "dydt.cuh"
-#include "jacob.cuh"
+#include "solver_options.h"
+#include "derivs.cuh"
 #include <cuComplex.h>
 
 #ifdef NEWTON_UNROLL

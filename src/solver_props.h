@@ -5,6 +5,8 @@
 #ifndef SOLVER_PROPS_H
 #define SOLVER_PROPS_H
 
+#include "solver_options.h"
+
 #ifdef RB43
  	#include "exprb43_props.h"
 #elif EXP4

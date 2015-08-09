@@ -11,6 +11,9 @@
  #ifndef SOLVER_H
  #define SOLVER_H
 
+ #include "solver_props.h"
+ #include "solver_init.h"
+
  void intDriver (const int NUM, const double t, const double t_end, 
                 const double* pr_global, double* y_global);
 
