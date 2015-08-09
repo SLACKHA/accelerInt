@@ -29,7 +29,7 @@ void matvec_m_by_m (const int m, const double * A, const double * V, double * Av
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < m; ++i) {
-		Av[i] = ZERO;
+		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
@@ -57,7 +57,7 @@ __device__ void matvec_m_by_m_plusequal (const int m, const double * A, const do
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < m; ++i) {
-		Av[i] = ZERO;
+		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
@@ -84,7 +84,7 @@ void matvec_n_by_m_scale (const int m, const double scale, const double * A, con
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
-		Av[i] = ZERO;
+		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
@@ -120,7 +120,7 @@ void matvec_n_by_m_scale_special (const int m, const double scale[], const doubl
 		#pragma unroll
 		for (int k = 0; k < 3; k++)
 		{
-			Av[k][i] = ZERO;
+			Av[k][i] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
@@ -165,7 +165,7 @@ void matvec_n_by_m_scale_special2 (const int m, const double scale[], const doub
 		#pragma unroll
 		for (int k = 0; k < 2; k++)
 		{
-			Av[k][i] = ZERO;
+			Av[k][i] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
@@ -204,7 +204,7 @@ void matvec_n_by_m_scale_add (const int m, const double scale, const double * A,
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
-		Av[i] = ZERO;
+		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
@@ -236,7 +236,7 @@ void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const do
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NN; ++i) {
-		Av[i] = ZERO;
+		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
@@ -289,7 +289,7 @@ void scale_init (const double * y0, double * sc) {
  */
 __device__
 double sc_norm (const double * nums, const double * sc) {
-	double norm = ZERO;
+	double norm = 0.0;
 	
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
@@ -308,7 +308,7 @@ double sc_norm (const double * nums, const double * sc) {
 __device__
 double two_norm(const double* v)
 {
-	double norm = ZERO;
+	double norm = 0.0;
 	#pragma unroll
 	for (uint i = 0; i < NN; ++i) {
 		norm += v[i] * v[i];

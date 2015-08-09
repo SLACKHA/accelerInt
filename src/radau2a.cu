@@ -257,9 +257,9 @@ __device__ void RK_Make_Interpolate(const double* Z1, const double* Z2, const do
 
 __device__ void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, double* Z3, const double* CONT) {
 	double r = H / Hold;
-	register double x1 = ONE + rkC[0] * r;
-	register double x2 = ONE + rkC[1] * r;
-	register double x3 = ONE + rkC[2] * r;
+	register double x1 = 1.0 + rkC[0] * r;
+	register double x2 = 1.0 + rkC[1] * r;
+	register double x3 = 1.0 + rkC[2] * r;
 	#pragma unroll
 	for (int i = 0; i < NN; i++) {
 		Z1[i] = CONT[i] + x1 * (CONT[NN + i] + x1 * CONT[NN + NN + i]);
@@ -463,7 +463,7 @@ __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, 
 }
 
 __device__ double RK_ErrorNorm(double* scale, double* DY) {
-	double sums[UNROLL] = {ZERO};
+	double sums[UNROLL] = {0.0};
 	int start = NN % UNROLL;
 	//take care of mod part
 	if (start != 0) {
@@ -508,7 +508,7 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
     }
     dgetrs(E1, TMP, ipiv1);
     double Err = RK_ErrorNorm(scale, TMP);
-    if (Err >= ONE && (FirstStep || Reject)) {
+    if (Err >= 1.0 && (FirstStep || Reject)) {
         #pragma unroll
     	for (int i = 0; i < NN; i++) {
         	TMP[i] += Y[i];
@@ -544,24 +544,24 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	bool SkipJac = false;
 	bool SkipLU = false;
 	double sc[NN];
-	double A[NN * NN] = {ZERO};
-	double E1[NN * NN] = {ZERO};
+	double A[NN * NN] = {0.0};
+	double E1[NN * NN] = {0.0};
 	cuDoubleComplex E2[NN * NN] = {make_cuDoubleComplex(0.0, 0.0)};
 	int ipiv1[NN] = {0};
 	int ipiv2[NN] = {0};
-	double Z1[NN] = {ZERO};
-	double Z2[NN] = {ZERO};
-	double Z3[NN] = {ZERO};
+	double Z1[NN] = {0.0};
+	double Z2[NN] = {0.0};
+	double Z3[NN] = {0.0};
 #ifdef SDIRK_ERROR
-	double Z4[NN] = {ZERO};
-	double DZ4[NN] = {ZERO};
-	double G[NN] = {ZERO};
-	double TMP[NN] = {ZERO};
+	double Z4[NN] = {0.0};
+	double DZ4[NN] = {0.0};
+	double G[NN] = {0.0};
+	double TMP[NN] = {0.0};
 #endif
-	double DZ1[NN] = {ZERO};
-	double DZ2[NN] = {ZERO};
-	double DZ3[NN] = {ZERO};
-	double CONT[NN * 3] = {ZERO};
+	double DZ1[NN] = {0.0};
+	double DZ2[NN] = {0.0};
+	double DZ3[NN] = {0.0};
+	double CONT[NN * 3] = {0.0};
 	scale_init(y, sc);
 	double y0[NN];
 	safe_memcpy(y0, y);
@@ -639,13 +639,13 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				if(Theta >= 0.99) //! Non-convergence of Newton: Theta too large
 					break;
 				else
-					NewtonRate = Theta / (ONE - Theta);
+					NewtonRate = Theta / (1.0 - Theta);
 				//Predict error at the end of Newton process 
-				double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (ONE - Theta);
+				double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (1.0 - Theta);
 				if(NewtonPredictedErr >= NewtonTol) {
 					//Non-convergence of Newton: predicted error too large
 					double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
-                    Fac = 0.8 * pow(Qnewton, -ONE/((double)(NewtonMaxit-NewtonIter)));
+                    Fac = 0.8 * pow(Qnewton, -1.0/((double)(NewtonMaxit-NewtonIter)));
                     break;
 				}
 			}
@@ -709,13 +709,13 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
         	if (sNewtonIter > 0) {
             	ThetaSD = NewtonIncrement/NewtonIncrementOld;
             	if (ThetaSD < 0.99) {
-            		sNewtonRate = ThetaSD/(ONE-ThetaSD);
+            		sNewtonRate = ThetaSD/(1.0-ThetaSD);
                     //! Predict error at the end of Newton process 
-                    double NewtonPredictedErr = (NewtonIncrement * pow(ThetaSD, (NewtonMaxit - sNewtonIter - 1))) / (ONE - Theta);
+                    double NewtonPredictedErr = (NewtonIncrement * pow(ThetaSD, (NewtonMaxit - sNewtonIter - 1))) / (1.0 - Theta);
                     if (NewtonPredictedErr >= NewtonTol) {
                     	//! Non-convergence of Newton: predicted error too large
 						double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
-	                    Fac = 0.8 * pow(Qnewton, -ONE/((double)(NewtonMaxit-sNewtonIter)));
+	                    Fac = 0.8 * pow(Qnewton, -1.0/((double)(NewtonMaxit-sNewtonIter)));
 	                    break;
                     }
             	}
@@ -756,10 +756,10 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
 #endif
 		//!~~~> Computation of new step size Hnew
-		Fac = pow(Err, (-ONE / rkELO)) * (ONE + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
+		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
 		Hnew = Fac * H;
-		if (Err < ONE) {
+		if (Err < 1.0) {
 #ifdef Gustafsson
 			if (!FirstStep) {
 				double FacGus = FacSafe * (H / Hacc) * pow(Err * Err / ErrOld, -0.25);
@@ -788,7 +788,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				Hnew = fmin(Hnew, H);
 			}
 			Reject = false;
-			if (t + Hnew / Qmin - t_end >= ZERO) {
+			if (t + Hnew / Qmin - t_end >= 0.0) {
 				H = t_end - t;
 			} else {
 				double Hratio = Hnew / H;

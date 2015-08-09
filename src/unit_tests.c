@@ -328,9 +328,9 @@ bool LinearAlgebraTests()
 {
 	#ifdef COMPILE_TESTING_METHODS
 	//create and populate some matricies
-	double A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	double v[STRIDE_MIRROR] = {ZERO};
-	double out[STRIDE_MIRROR] = {ZERO};
+	double A[STRIDE_MIRROR * STRIDE_MIRROR] = {0.0};
+	double v[STRIDE_MIRROR] = {0.0};
+	double out[STRIDE_MIRROR] = {0.0};
 	int m_size = STRIDE_MIRROR / 2;
 	for (int col = 0; col < m_size; ++col)
 	{
@@ -373,7 +373,7 @@ bool LinearAlgebraTests()
 			return false;
 	}*/
 
-	double v2[STRIDE_MIRROR] = {ZERO};
+	double v2[STRIDE_MIRROR] = {0.0};
 	for (int row = 0; row < NN; ++row)
 	{
 		v[row] = row;
@@ -420,7 +420,7 @@ bool LinearAlgebraTests()
 void matvec (const double * A, const double * v, double * Av) {
 	#pragma unroll
 	for (uint i = 0; i < STRIDE_MIRROR; ++i) {
-		Av[i] = ZERO;
+		Av[i] = 0.0;
 		
 		#pragma unroll
 		for (uint j = 0; j < STRIDE_MIRROR; ++j) {
@@ -430,11 +430,11 @@ void matvec (const double * A, const double * v, double * Av) {
 }
 bool ArnoldiTest()
 {
-	double A[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	double Vm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	double Hm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	double phiHm[STRIDE_MIRROR * STRIDE_MIRROR] = {ZERO};
-	double w[STRIDE_MIRROR] = {ZERO};
+	double A[STRIDE_MIRROR * STRIDE_MIRROR] = {0.0};
+	double Vm[STRIDE_MIRROR * STRIDE_MIRROR] = {0.0};
+	double Hm[STRIDE_MIRROR * STRIDE_MIRROR] = {0.0};
+	double phiHm[STRIDE_MIRROR * STRIDE_MIRROR] = {0.0};
+	double w[STRIDE_MIRROR] = {0.0};
 	Vm[0] = 1;
 	A[0] = 1;
 	A[1] = 3;
@@ -456,7 +456,7 @@ bool ArnoldiTest()
 			//happy breakdown
 			break;
 		}
-		scale_mult_test(ONE / Hm[j * STRIDE_MIRROR + j + 1], w, &Vm[(j + 1) * STRIDE_MIRROR]);
+		scale_mult_test(1.0 / Hm[j * STRIDE_MIRROR + j + 1], w, &Vm[(j + 1) * STRIDE_MIRROR]);
 	}
 
 	/*Hm[m * STRIDE_MIRROR] = 3.0 / 1e-8;

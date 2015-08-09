@@ -180,7 +180,7 @@ int main (int argc, char *argv[])
 #ifdef IGN
     bool ign_flag = false;
     // ignition delay time, units [s]
-    double t_ign = ZERO;
+    double t_ign = 0.0;
     double T0 = y_host[0];
 #endif
 
@@ -280,7 +280,7 @@ int main (int argc, char *argv[])
 #endif
 #ifdef DEBUG
         // check if within bounds
-        if ((y_host[0] < ZERO) || (y_host[0] > 10000.0))
+        if ((y_host[0] < 0.0) || (y_host[0] > 10000.0))
         {
             printf("Error, out of bounds.\n");
             printf("Time: %e, ind %d val %e\n", t, 0, y_host[0]);

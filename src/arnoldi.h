@@ -74,25 +74,25 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 				*m = j;
 				break;
 			}
-			scale_mult(ONE / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NN]);
+			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NN]);
 		}
 		*m = index_list[index++];
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
 		store = Hm[(*m - 1) * STRIDE + *m];
-		Hm[(*m - 1) * STRIDE + *m] = ZERO;
+		Hm[(*m - 1) * STRIDE + *m] = 0.0;
 
 		//0. fill potentially non-empty memory first
 		memset(&Hm[*m * STRIDE], 0, (*m + 1) * sizeof(double)); 
 
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
-		Hm[(*m) * STRIDE] = ONE;
+		Hm[(*m) * STRIDE] = 1.0;
 		#pragma unroll
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
 			memset(&Hm[(*m + i) * STRIDE], 0, (*m + i + 1) * sizeof(double));
-			Hm[(*m + i) * STRIDE + (*m + i - 1)] = ONE;
+			Hm[(*m + i) * STRIDE + (*m + i - 1)] = 1.0;
 		}
 
 #ifdef RB43
@@ -119,7 +119,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 					{
 						if (ind1 == ind2)
 						{
-							working[ind1 * (*m) + ind2] = ONE - h * scale * Hm[ind1 * STRIDE + ind2];
+							working[ind1 * (*m) + ind2] = 1.0 - h * scale * Hm[ind1 * STRIDE + ind2];
 						}
 						else
 						{
@@ -149,9 +149,9 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		//restore Hm(m, m + 1)
 		Hm[(*m - 1) * STRIDE + *m] = store;
 		//restore real Hm (NOTE: untested in RB43)
-		Hm[(*m) * STRIDE] = ZERO;
+		Hm[(*m) * STRIDE] = 0.0;
 
-	} while (err >= ONE);
+	} while (err >= 1.0);
 
 	return j;
 }

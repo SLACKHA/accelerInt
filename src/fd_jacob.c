@@ -73,7 +73,7 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
     
     #pragma unroll
     for (uint i = 0; i < NN; ++i) {
-      jac[i + NN*j] = ZERO;
+      jac[i + NN*j] = 0.0;
     }
     
     #pragma unroll

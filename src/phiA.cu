@@ -26,7 +26,7 @@ void phiAc (const double * A, const double c, double * phiA) {
 	
 	#pragma unroll
 	for (int i = 0; i < NN * NN; ++i) {
-		phiA[i] = ZERO;
+		phiA[i] = 0.0;
 	}
 	
 	#pragma unroll

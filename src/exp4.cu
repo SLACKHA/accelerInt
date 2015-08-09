@@ -66,13 +66,13 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		dydt (t, pr, y, fy);
 
 		// Jacobian matrix
-		double A[NN * NN] = {ZERO};
+		double A[NN * NN] = {0.0};
 		eval_jacob (t, pr, y, A);
 
-		double Hm[STRIDE * STRIDE] = {ZERO};
-		double Vm[NN * STRIDE] = {ZERO};
-		double phiHm[STRIDE * STRIDE] = {ZERO};
-		double err = ZERO;
+		double Hm[STRIDE * STRIDE] = {0.0};
+		double Vm[NN * STRIDE] = {0.0};
+		double phiHm[STRIDE * STRIDE] = {0.0};
+		double err = 0.0;
 
 		do
 		{
@@ -193,7 +193,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);	
 			
-			if (err <= ONE) {
+			if (err <= 1.0) {
 				memcpy(sc, f_temp, NN * sizeof(double));
 
 				// minimum of classical and Gustafsson step size prediction
@@ -231,7 +231,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				reject = true;
 				h = fmin(h, h_new);
 			}
-		} while(err >= ONE);
+		} while(err >= 1.0);
 
 	} // end while
 }

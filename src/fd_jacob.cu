@@ -55,7 +55,7 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
     
     #pragma unroll
     for (uint i = 0; i < NN; ++i) {
-      jac[INDEX(i + NN*j)] = ZERO;
+      jac[INDEX(i + NN*j)] = 0.0;
     }
     
     #if FD_ORD == 1

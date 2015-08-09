@@ -17,7 +17,7 @@ void phi2Ac_variable(const int m, const int STRIDE, const double* A, const doubl
 	for (int i = 0; i < m; ++i) {
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			phiA[i + j*STRIDE] = ZERO;
+			phiA[i + j*STRIDE] = 0.0;
 		}
 	}
 
@@ -59,7 +59,7 @@ void phiAc_variable(const int m, const int STRIDE, const double* A, const double
 	for (int i = 0; i < m; ++i) {
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			phiA[i + j*STRIDE] = ZERO;
+			phiA[i + j*STRIDE] = 0.0;
 		}
 	}
 
@@ -101,7 +101,7 @@ void expAc_variable(const int m, const int STRIDE, const double* A, const double
 	for (int i = 0; i < m; ++i) {
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			phiA[i + j*STRIDE] = ZERO;
+			phiA[i + j*STRIDE] = 0.0;
 		}
 	}
 

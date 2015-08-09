@@ -86,7 +86,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		dydt (t, pr, y, fy);
 
 		// Jacobian matrix
-		double A[NN * NN] = {ZERO};
+		double A[NN * NN] = {0.0};
 		eval_jacob (t, pr, y, A);
     	double gy[NN];
     	//gy = fy - A * y
@@ -96,10 +96,10 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
     		gy[i] = fy[i] - gy[i];
     	}
 
-		double Hm[STRIDE * STRIDE] = {ZERO};
-		double Vm[NN * STRIDE] = {ZERO};
-		double phiHm[STRIDE * STRIDE] = {ZERO};
- 		double err = ZERO;
+		double Hm[STRIDE * STRIDE] = {0.0};
+		double Vm[NN * STRIDE] = {0.0};
+		double phiHm[STRIDE * STRIDE] = {0.0};
+ 		double err = 0.0;
 		double savedActions[NN * 5];
 		do
 		{
@@ -208,7 +208,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				m2_log[num_integrator_steps] = m2;
 				t_log[num_integrator_steps] = t;
 				h_log[num_integrator_steps] = h;
-				reject_log[num_integrator_steps] = err > ONE;
+				reject_log[num_integrator_steps] = err > 1.0;
 				num_integrator_steps++;
 				if (num_integrator_steps >= MAX_STEPS)
 				{
@@ -218,7 +218,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			}
 #endif
 			
-			if (err <= ONE) {
+			if (err <= 1.0) {
 
 				#pragma unroll
 				for (int i = 0; i < NN; ++i)
@@ -259,7 +259,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				reject = true;
 				h = fmin(h, h_new);
 			}
-		} while(err >= ONE);
+		} while(err >= 1.0);
 
 	} // end while
 	
