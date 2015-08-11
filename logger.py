@@ -19,7 +19,7 @@ def check_reorder(cache_opt, arr, order):
 
 
 #force remake
-subprocess.call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=TRUE', 'LARGE_STEP=TRUE'])
+subprocess.check_call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=TRUE', 'LARGE_STEP=TRUE'])
 
 GPU_CACHE_OPT = False
 with open('src/mechanism.cu') as file:
@@ -70,9 +70,9 @@ for exe in all_exes:
         skip.append(exe)
     print exe
     if 'gpu' in exe:
-        subprocess.call([os.path.join(os.getcwd(), exe), str(NUM_ODES)])
+        subprocess.check_call([os.path.join(os.getcwd(), exe), str(NUM_ODES)])
     else:
-        subprocess.call([os.path.join(os.getcwd(), exe), str(N_THREADS), str(NUM_ODES)])
+        subprocess.check_call([os.path.join(os.getcwd(), exe), str(N_THREADS), str(NUM_ODES)])
 
 files = [f for f in os.listdir('log') if os.path.isfile(os.path.join('log', f)) and f.endswith('.bin') and not any(s in f for s in skip)]
 
