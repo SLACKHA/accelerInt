@@ -45,7 +45,7 @@ typedef unsigned short int usint;
 #define CV_MAX_STEPS 20000 // maximum steps the solver will take in one timestep
 //#define CV_HMAX 0  //upper bound on step size (integrator step, not global timestep)
 //#define CV_HMIN 0 //lower bound on step size (integrator step, not global timestep)
-#define CV_MAX_HNIL 0 //maximum number of t + h = t warnings
+#define CV_MAX_HNIL 1 //maximum number of t + h = t warnings
 #define CV_MAX_ERRTEST_FAILS 5 //maximum number of error test fails before an error is thrown
 
 //#define COMPILE_TESTING_METHODS //comment out to remove unit testing stubs
