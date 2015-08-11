@@ -11,6 +11,7 @@
 */
 
 #include "header.h"
+#include "solver_options.h"
 #include "inverse.cuh"
 #include "complexInverse_NN.cuh"
 #include "solver_options.h"

@@ -11,6 +11,7 @@
 */
 
 #include "header.h"
+#include "solver_options.h"
 #include "dydt.h"
 #include "jacob.h"
 #include <complex.h>

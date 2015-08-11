@@ -8,6 +8,7 @@
  */
 
 #include "header.h"
+#include "solver_options.h"
 #include "cvodes_dydt.h"
 
 #ifdef SUNDIALS_ANALYTIC_JACOBIAN
