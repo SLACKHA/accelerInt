@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "header.h"
+#include "solver_options.h"
 #include "linear-algebra.h"
 
 /** Defined for pi */

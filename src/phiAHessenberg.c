@@ -4,6 +4,7 @@
 #include "header.h"
 //#include "linear-algebra.h"
 #include "complexInverse.h"
+#include "solver_options.h"
 
 extern double complex poles[N_RA];
 extern double complex res[N_RA];

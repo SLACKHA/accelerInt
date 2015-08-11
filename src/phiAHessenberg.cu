@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "header.h"
 #include "solver_options.h"
+#include "solver_props.h"
 //#include "linear-algebra.h"
 #include "complexInverse.cuh"
 
@@ -8,7 +9,7 @@ extern __device__ __constant__ cuDoubleComplex poles[N_RA];
 extern __device__ __constant__ cuDoubleComplex res[N_RA];
 
 __device__
-void phi2Ac_variable(const int m, const int STRIDE, const double* A, const double c, double* phiA) {
+void phi2Ac_variable(const int m, const double* A, const double c, double* phiA) {
 	
 	cuDoubleComplex invA[STRIDE * STRIDE];
 	
@@ -50,7 +51,7 @@ void phi2Ac_variable(const int m, const int STRIDE, const double* A, const doubl
 }
 
 __device__
-void phiAc_variable(const int m, const int STRIDE, const double* A, const double c, double* phiA) {
+void phiAc_variable(const int m, const double* A, const double c, double* phiA) {
 
 	cuDoubleComplex invA[STRIDE * STRIDE];
 	
@@ -92,7 +93,7 @@ void phiAc_variable(const int m, const int STRIDE, const double* A, const double
 }
 
 __device__
-void expAc_variable(const int m, const int STRIDE, const double* A, const double c, double* phiA) {
+void expAc_variable(const int m, const double* A, const double c, double* phiA) {
 
 	cuDoubleComplex invA[STRIDE * STRIDE];
 	

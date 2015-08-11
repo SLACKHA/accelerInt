@@ -11,6 +11,7 @@
 //cf
 #include "header.h"
 #include "cf.h"
+#include "solver_options.h"
 #include <complex.h>
 
 double complex poles[N_RA];
