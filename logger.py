@@ -44,7 +44,7 @@ with open('src/mechanism.cu') as file:
             break
 
 CPU_CACHE_OPT = False
-with open('src/mechanism.cu') as file:
+with open('src/mechanism.c') as file:
     start = False
     for line in file.readlines():
         if 'apply_mask' in line:
