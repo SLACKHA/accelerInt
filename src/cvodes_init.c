@@ -114,6 +114,9 @@ void** integrators;
 	    #ifdef CV_MAX_ERRTEST_FAILS
 	        CVodeSetMaxErrTestFails(integrators[i], CV_MAX_ERRTEST_FAILS);
 	    #endif
+	    #ifdef CV_MAX_HNIL
+	        CVodeSetMaxHnilWarns(integrators[i], CV_MAX_HNIL);
+	    #endif
 	}
  }
 
