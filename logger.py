@@ -4,10 +4,10 @@ import subprocess
 import os, glob
 import sys
 import numpy as np
+import re
 
 NUM_ODES = 1000
 N_THREADS = 12
-NVAR = 56 #t, T, P, 53 mass fractions
 
 def check_reorder(cache_opt, arr, order):
     if cache_opt:
@@ -20,6 +20,16 @@ def check_reorder(cache_opt, arr, order):
 
 #force remake
 subprocess.check_call(['make', '-j24', 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'IGN=TRUE', 'PRINT=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=TRUE', 'LARGE_STEP=TRUE'])
+
+NVAR = None
+with open('src/mechanism.h') as file:
+    for line in file.readlines():
+        match = re.search('^\s*#define\s+NN\s+(\d+)', line)
+        if match:
+            NVAR = int(match.group(1)) + 2 #t, T, P, num_spec
+
+assert NVAR is not None
+
 
 GPU_CACHE_OPT = False
 with open('src/mechanism.cu') as file:
