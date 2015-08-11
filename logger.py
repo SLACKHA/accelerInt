@@ -75,9 +75,9 @@ for file in glob.glob('*-int*'):
 
 skip = []
 for exe in all_exes:
-    if 'exp' in exe:
-    #if 'gpu' in exe and 'exp' in exe:
-        skip.append(exe)
+    #if 'exp' in exe and 'gpu' in exe:
+    #    skip.append(exe)
+    #    continue
     print exe
     if 'gpu' in exe:
         subprocess.check_call([os.path.join(os.getcwd(), exe), str(NUM_ODES)])
