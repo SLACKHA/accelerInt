@@ -263,18 +263,10 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
 		}
 		if (cuCabs(A[i * STRIDE + i]) > 0.0)
 		{
-		#ifdef DOUBLE
 			cuDoubleComplex tau = cuCdiv(A[i * STRIDE + i + 1], A[i * STRIDE + i]);
-		#else
-			cuFloatComplex tau = cuCdivf(A[i * STRIDE + i + 1], A[i * STRIDE + i]);
-		#endif
 			for (int j = i + 1; j < n; j++)
 			{
-			#ifdef DOUBLE
 				A[j * STRIDE + i + 1] = cuCsub(A[j * STRIDE + i + 1], cuCmul(tau, A[j * STRIDE + i]));
-			#else
-				A[j * STRIDE + i + 1] = cuCsubf(A[j * STRIDE + i + 1], cuCmulf(tau, A[j * STRIDE + i]));
-			#endif
 			}
 			A[i * STRIDE + i + 1] = tau;
 		}
