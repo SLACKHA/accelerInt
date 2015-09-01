@@ -34,13 +34,11 @@
 
 .dropbox
 *.ini
-exp-int
 *.obj
-rober/
-rober-testinv/
 Hochbruck/
 derivations/
-FATODE_1.2/
-SuiteSparse-4.4.3/
-fortran_stuff/
-logging_out/
+validation/
+performance/
+
+#this is populated by pyJac, hence we don't want to commit anything
+mechanism/
