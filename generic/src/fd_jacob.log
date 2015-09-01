@@ -1,0 +1,36 @@
+This is METAFONT, Version 2.718281 (TeX Live 2009/Debian) (base=mf 2015.8.19)  1 SEP 2015 13:50
+**fd_jacob.c fd_jacob.cu ../generic/src/
+(fd_jacob.c
+>> #include
+! Isolated expression.
+<to be read again> 
+                   "header.h"
+l.1 #include "header.h"
+                       
+? 
+! Extra tokens will be flushed.
+<to be read again> 
+                   "header.h"
+l.1 #include "header.h"
+                       
+? q
+OK, entering batchmode...
+
+! Interruption.
+l.1 #include "header.h"
+                       
+? 
+>> dydt
+! Isolated expression.
+<to be read again> 
+                   (
+l.11   dydt (
+             t, pres, y, ydot);
+? 
+! Extra tokens will be flushed.
+<to be read again> 
+                   (
+l.11   dydt (
+             t, pres, y, ydot);
+? X
+
