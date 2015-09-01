@@ -11,7 +11,8 @@
 #include <math.h>
 #include <string.h>
 
-#include "head.h"
+#include "header.h"
+#include "solver_options.h"
 #include "linear-algebra.h"
 
 /** Defined for pi */
@@ -63,7 +64,7 @@ void cf ( int n, double* poles_r, double* poles_i, double* res_r, double* res_i 
 	// exp(x) transpl. to [-1,1]
 	fftw_complex *F = fftw_alloc_complex(nf);
 	for (int i = 0; i < nf; ++i) {
-		F[i] = cexp(scl * (t[i] - 1.0) / (t[i] + 1.0 + 1.0e-16));
+		F[i] = cexp(scl * (t[i] - 1.0) / (t[i] + 1.0 + ATOL));
 	}
 	
 	free (t);

@@ -76,6 +76,7 @@ void complexGERU (int n, double complex alpha, double complex* arrX,
 
 ///////////////////////////////////////////////////////////
 
+static inline
 int getComplexLU (int n, double complex* A, int* indPivot) {
 	
 	int info = 0;
@@ -128,7 +129,6 @@ void multiplyComplexUpperMV (int n, double complex* x, int lda, double complex* 
 			x[j] *= A[j + (lda * j)];
 		}
 	}
-	
 }
 
 ///////////////////////////////////////////////////////////
@@ -156,6 +156,7 @@ void complexGEMV (int m, int n, double complex alpha, double complex* A,
 
 ///////////////////////////////////////////////////////////
 
+static inline
 int getComplexInverseLU (int n, double complex* A, int* indPivot, double complex* work) {
 	
 	int info = 0;
@@ -210,28 +211,119 @@ void getComplexInverse (int n, double complex* A) {
 	int info = 0;
 	
 	// first get LU factorization
-	getComplexLU (n, A, ipiv);
+	info = getComplexLU (n, A, ipiv);
 	
+#ifdef DEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexLU failure, info = %d.\n", info);
 		exit (1);
 	}
+#endif
 	
 	// work array
 	double complex* work = (double complex*) calloc (n, sizeof(double complex));
   // memset (work, 0.0, n * sizeof(double complex));
 	
 	// now get inverse
-	getComplexInverseLU (n, A, ipiv, work);
+	info = getComplexInverseLU (n, A, ipiv, work);
 	
 	free (work);
 	free (ipiv);
 	
+#ifdef DEBUG
 	// check for successful exit
 	if (info != 0) {
 		printf ("getComplexInverseLU failure, info = %d.\n", info);
 		exit (1);
 	}
+#endif
+}
+
+//adapted from Matrix Computations
+//Gene H. Golub, Charles F. Van Loan
+static inline
+int getHessenbergLU(const int n, double complex* A, int* indPivot)
+{
+	int last_free = 0;
+	for (int i = 0; i < n - 1; i ++)
+	{
+		if (cabs(A[i * n + i]) < cabs(A[i * n + i + 1]))
+		{
+			//swap rows
+			swapComplex(n - last_free, &A[last_free * n + i], n, &A[last_free * n + i + 1], n);
+			indPivot[i] = i + 1;
+		}
+		else
+		{
+			indPivot[i] = i;
+			last_free = i;
+		}
+		if (cabs(A[i * n + i]) > 0.0)
+		{
+			double complex tau = A[i * n + i + 1] / A[i * n + i];
+			for (int j = i + 1; j < n; j++)
+			{
+				A[j * n + i + 1] -= tau * A[j * n + i];
+			}
+			A[i * n + i + 1] = tau;
+		}
+		else 
+		{
+			return i;
+		}
+	}
+	//last index is not pivoted
+	indPivot[n - 1] = n - 1;
+	return 0;
+}
+
+//#ifdef COMPILE_TESTING_METHODS
+	int getComplexLU_test(const int n, double complex* A, int* indPivot)
+	{
+		return getComplexLU(n, A, indPivot);
+	}
+
+	int getHessenbergLU_test(const int n, double complex* A, int* indPivot)
+	{
+		return getHessenbergLU(n, A, indPivot);
+	}
+//#endif
+
+void getComplexInverseHessenberg (const int n, double complex* A)
+{
+	// pivot indices
+	int* ipiv = (int*) calloc (n, sizeof(int));
 	
+	// output flag
+	int info = 0;
+	
+	// first get LU factorization
+	info = getHessenbergLU (n, A, ipiv);
+
+#ifndef DEBUG
+	if (info != 0)
+	{
+		printf ("getHessenbergLU failure, info = %d.\n", info);
+		exit (1);
+	}
+#endif
+
+	// work array
+	double complex* work = (double complex*) calloc (n, sizeof(double complex));
+  	// memset (work, 0.0, n * sizeof(double complex));
+	
+	// now get inverse
+	info = getComplexInverseLU (n, A, ipiv, work);
+	
+	free (work);
+	free (ipiv);
+	
+#ifdef DEBUG
+	// check for successful exit
+	if (info != 0) {
+		printf ("getComplexInverseLU failure, info = %d.\n", info);
+		exit (1);
+	}
+#endif
 }

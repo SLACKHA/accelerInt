@@ -30,3 +30,17 @@
 
 # Debug files
 *.dSYM/
+
+
+.dropbox
+*.ini
+exp-int
+*.obj
+rober/
+rober-testinv/
+Hochbruck/
+derivations/
+FATODE_1.2/
+SuiteSparse-4.4.3/
+fortran_stuff/
+logging_out/

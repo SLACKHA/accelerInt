@@ -1,8 +1,8 @@
 #ifndef PHIA_HEAD
 #define PHIA_HEAD
 
-#include "head.h"
+#include "header.h"
 
-__device__ void phiAc (const Real*, const Real, Real*);
+__device__ void phiAc (const double*, const double, double*);
 
 #endif
