@@ -16,11 +16,7 @@
 #include "sundials/sundials_nvector.h"
 #include "nvector/nvector_serial.h"
 #include "cvodes/cvodes.h"
-#ifdef SUNDIALS_USE_LAPACK
-    #include "cvodes/cvodes_lapack.h"
-#else
-    #include "cvodes/cvodes_dense.h"
-#endif
+#include "cvodes/cvodes_lapack.h"
 
 extern N_Vector *y_locals;
 extern double* y_local_vectors;

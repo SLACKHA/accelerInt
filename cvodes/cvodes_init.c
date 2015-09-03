@@ -21,11 +21,7 @@
 #include "sundials/sundials_nvector.h"
 #include "nvector/nvector_serial.h"
 #include "cvodes/cvodes.h"
-#if defined(USE_MKL) || defined(USE_SYSTEM_LAPACK)
-    #include "cvodes/cvodes_lapack.h"
-#else
-    #include "cvodes/cvodes_dense.h"
-#endif
+#include "cvodes/cvodes_lapack.h"
 
 N_Vector *y_locals;
 double* y_local_vectors;
