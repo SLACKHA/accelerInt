@@ -8,7 +8,7 @@ import sys
 import SCons
 import platform
 
-valid_commands = ('build', 'clean', 'test')
+valid_commands = ('build', 'test')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -51,7 +51,6 @@ compiler_options = [
 opts.AddVariables(*compiler_options)
 opts.Update(env)
 
-opts = Variables('accerlerInt.conf')
 defaults.CCFlags = '-m64 -std=c99'
 defaults.NVCCFLAGS = '-m64'
 defaults.optimizeCCFlags = '-O3 -funroll-loops'
@@ -60,9 +59,9 @@ defaults.debugCCFlags = '-O0 -g -fbounds-check -Wunused-variable -Wunused-parame
 defaults.optimizeNVCCFlags = '-O3'
 defaults.debugNVCCFlags = '-g -G -O0'
 defaults.CCLinkFlags = ['-fPIC']
-defaults.NVCCLinkFlags = ['-fPIC', '-stdc++']
+defaults.NVCCLinkFlags = ['-fPIC']
 defaults.CCLibs = ['m']
-defaults.NVCCLibs = ['cuda', 'cudart']
+defaults.NVCCLibs = ['stdc++', 'cuda', 'cudart']
 defaults.warningFlags = '-Wall'
 defaults.fftwIncDir = os.path.join('usr', 'local', 'include')
 defaults.fftwLibDir = os.path.join('usr', 'local', 'lib')
@@ -402,10 +401,8 @@ target_list.append(
 env = env_save.Clone()
 env['CPPPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
 env['LIBPATH'].append(env['fftw3_lib_dir'])
-env['LIBS'].append(['fftw3'])
-env['NVCCPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
-env['NVCCLIBPATH'] += [env['fftw3_lib_dir']]
-env['NVCCLIBS'] += ['fftw3']
+env['LIBS'].append('fftw3')
+env['NVCCPATH'] += [exp_int_dir, exp4_int_dir]
 env['CPPDEFINES'] = ['EXP4']
 env['NVCCDEFINES'] = ['EXP4']
 Export('env')
@@ -420,10 +417,8 @@ target_list.append(
 env = env_save.Clone()
 env['CPPPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
 env['LIBPATH'].append(env['fftw3_lib_dir'])
-env['LIBS'].append(['fftw3'])
-env['NVCCPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
-env['NVCCLIBPATH'] += [env['fftw3_lib_dir']]
-env['NVCCLIBS'] += ['fftw3']
+env['LIBS'].append('fftw3')
+env['NVCCPATH'] += [exp_int_dir, exprb43_int_dir]
 env['CPPDEFINES'] = ['RB43']
 env['NVCCDEFINES'] = ['RB43']
 Export('env')

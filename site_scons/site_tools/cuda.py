@@ -33,7 +33,7 @@ def CUDAObjCmdDefine(env):
 def CUDAProgCmdDefine(env, dname):
     # create OBJ command
     #NVCC_DLINK_CMD = '$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -dlink -o dlink.o'
-    #NVCC_PROG_CMD = '$NLINK $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -o $TARGET'
+    #NVCC_PROG_CMD = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
     command = '$NVCC $SOURCES'
     if 'NVCCLIBPATH' in env:
         if not isinstance(env['NVCCLIBPATH'], list):
@@ -46,7 +46,12 @@ def CUDAProgCmdDefine(env, dname):
     command += ' -dlink -o ' + dname
     env['NVCC_DLINK_CMD'] = command
 
-    command = '$NLINK $SOURCES ' + dname
+    command = '$NLINK '
+    if 'NVCCLINKFLAGS' in env:
+        if not isinstance(env['NVCCLINKFLAGS'], list):
+            env['NVCCLINKFLAGS'] = [env['NVCCLINKFLAGS']]
+        command += ' ' + ' '.join(['{}'.format(f) for f in env['NVCCLINKFLAGS']])
+    command += ' $SOURCES ' + dname
     if 'NVCCLIBPATH' in env:
         if not isinstance(env['NVCCLIBPATH'], list):
             env['NVCCLIBPATH'] = [env['NVCCLIBPATH']]
@@ -55,10 +60,14 @@ def CUDAProgCmdDefine(env, dname):
         if not isinstance(env['NVCCLIBS'], list):
             env['NVCCLIBS'] = [env['NVCCLIBS']]
         command += ' ' + ' '.join(['-l{}'.format(f) for f in env['NVCCLIBS']])
-    if 'NVCCLINKFLAGS' in env:
-        if not isinstance(env['NVCCLINKFLAGS'], list):
-            env['NVCCLINKFLAGS'] = [env['NVCCLINKFLAGS']]
-        command += ' ' + ' '.join(['{}'.format(f) for f in env['NVCCLINKFLAGS']])
+    if 'LIBPATH' in env:
+        if not isinstance(env['LIBPATH'], list):
+            env['LIBPATH'] = [env['LIBPATH']]
+        command += ' ' + ' '.join(['-L{}'.format(path) for path in env['LIBPATH']])
+    if 'LIBS' in env:
+        if not isinstance(env['LIBS'], list):
+            env['LIBS'] = [env['LIBS']]
+        command += ' ' + ' '.join(['-l{}'.format(f) for f in env['LIBS']])
     command += ' -o $TARGET'
     env['NVCC_PROG_CMD'] = command
 
@@ -101,6 +110,7 @@ def CUDAProgram(env, target, source, *args, **kw):
     result.append(obj)
     env.Clean(name, [str(s) for s in source])
     obj = _cuda_prog_builder.__call__(env, target, source, **kw)
+    result.append(obj)
     env.Clean(target, [str(s) for s in source])
     return result
 
@@ -120,7 +130,7 @@ def generate(env):
         # default NVCC commands
         env['NVCC_OBJ_CMD'] = '$NVCC $NVCCPATH $NVCCFLAGS $NVCCDEFINES -dc -o $TARGET $SOURCES'
         env['NVCC_DLINK_CMD'] = '$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -dlink -o dlink.o'
-        env['NVCC_PROG_CMD'] = '$NLINK $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -o $TARGET'
+        env['NVCC_PROG_CMD'] = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
 
         # helpers
         home=os.environ.get('HOME', '')
@@ -216,7 +226,7 @@ def generate(env):
 
         # add required libraries
         env.Append(NVCCPATH=[cudaSDKPath + '/common/inc', cudaToolkitPath + '/include'])
-        env.Append(NVCCLIBPATH=[cudaSDKPath + '/lib', cudaSDKPath + '/common/lib' + cudaSDKSubLibDir, cudaToolkitPath + '/lib'])
+        env.Append(NVCCLIBPATH=[cudaSDKPath + '/common/lib/linux/x86_64/' + cudaSDKSubLibDir, cudaToolkitPath + '/lib64'])
         if not 'NVCCLIBS' in env:
             env.Append(NVCCLIBS=['cudart'])
 

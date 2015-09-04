@@ -18,4 +18,6 @@ for src in cuda_src:
 	targ = stub + '_' + name_mod + '.cu.o'
 	cudaObj.append(env.CUDAObject(src, target=targ, variant_dir=env['variant']))
 
+cudaObj.append([x for x in cObj if 'cf_' in str(x) or 'linear-algebra_' in str(x)])
+
 Return ('cObj', 'cudaObj')
