@@ -7,6 +7,7 @@ import re
 import sys
 import SCons
 import platform
+from buildutils import *
 
 valid_commands = ('build', 'test', 'help')
 
@@ -18,22 +19,6 @@ for command in COMMAND_LINE_TARGETS:
 print 'INFO: SCons is using the following Python interpreter:', sys.executable
 
 home = os.getcwd()
-
-def listify(value):
-    """
-    Convert an option specified as a string to a list.  Allow both
-    comma and space as delimiters. Passes lists transparently.
-    """
-    if isinstance(value, str):
-        return value.replace(',', ' ').split()
-    elif isinstance(value, list):
-        out_list = []
-        for val in value:
-            if isinstance(val, list):
-                out_list.extend(listify(val))
-            else:
-                out_list.append(val)
-        return out_list
 
 # ******************************************************
 # *** Set system-dependent defaults for some options ***
