@@ -8,7 +8,7 @@ import sys
 import SCons
 import platform
 
-valid_commands = ('build', 'test')
+valid_commands = ('build', 'test', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
