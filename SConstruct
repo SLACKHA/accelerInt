@@ -9,7 +9,7 @@ import SCons
 import platform
 from buildutils import *
 
-valid_commands = ('build', 'test', 'help')
+valid_commands = ('build', 'test', 'cpu', 'gpu', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -447,4 +447,6 @@ target_list.append(
 
 
 Alias('build', target_list)
+Alias('cpu', [x for x in target_list if not 'gpu' in str(x)])
+Alias('gpu', [x for x in target_list if 'gpu' in str(x)])
 Default(target_list)
