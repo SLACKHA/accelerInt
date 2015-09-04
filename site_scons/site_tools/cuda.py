@@ -30,7 +30,7 @@ def CUDAObjCmdDefine(env):
     command += ' -dc -o $TARGET $SOURCES'
     env['NVCC_OBJ_CMD'] = command
 
-def CUDAProgCmdDefine(env, dname):
+def CUDADLinkCmdDefine(env, dname):
     # create OBJ command
     #NVCC_DLINK_CMD = '$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -dlink -o dlink.o'
     #NVCC_PROG_CMD = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
@@ -46,12 +46,13 @@ def CUDAProgCmdDefine(env, dname):
     command += ' -dlink -o ' + dname
     env['NVCC_DLINK_CMD'] = command
 
+def CUDAProgCmdDefine(env):
     command = '$NLINK '
     if 'NVCCLINKFLAGS' in env:
         if not isinstance(env['NVCCLINKFLAGS'], list):
             env['NVCCLINKFLAGS'] = [env['NVCCLINKFLAGS']]
         command += ' ' + ' '.join(['{}'.format(f) for f in env['NVCCLINKFLAGS']])
-    command += ' $SOURCES ' + dname
+    command += ' $SOURCES '
     if 'NVCCLIBPATH' in env:
         if not isinstance(env['NVCCLIBPATH'], list):
             env['NVCCLIBPATH'] = [env['NVCCLIBPATH']]
@@ -98,9 +99,9 @@ def CUDAObject(env, src, target=None, *args, **kw):
 
     return result
 
-def CUDAProgram(env, target, source, *args, **kw):
+def CUDADLink(env, target, source, *args, **kw):
     name = '{}_dlink.o'.format(target)
-    CUDAProgCmdDefine(env, name)
+    CUDADLinkCmdDefine(env, name)
     if not source:
         source = target[:]
     if not SCons.Util.is_List(source):
@@ -108,7 +109,16 @@ def CUDAProgram(env, target, source, *args, **kw):
     result = []
     obj = _cuda_dlink_builder.__call__(env, name, source, **kw)
     result.append(obj)
-    env.Clean(name, [str(s) for s in source])
+    env.Clean(target, name)
+    return result
+
+def CUDAProgram(env, target, source, *args, **kw):
+    CUDAProgCmdDefine(env)
+    if not source:
+        source = target[:]
+    if not SCons.Util.is_List(source):
+        source = [source]
+    result = []
     obj = _cuda_prog_builder.__call__(env, target, source, **kw)
     result.append(obj)
     env.Clean(target, [str(s) for s in source])
@@ -211,6 +221,7 @@ def generate(env):
         env['CUDA_SDK_PATH'] = cudaSDKPath
 
         env.AddMethod(CUDAObject, 'CUDAObject')
+        env.AddMethod(CUDADLink, 'CUDADLink')
         env.AddMethod(CUDAProgram, 'CUDAProgram')
 
         # cuda libraries

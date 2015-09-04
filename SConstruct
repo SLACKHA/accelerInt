@@ -380,8 +380,10 @@ Export('env')
 rad_c, rad_cuda = SConscript(os.path.join(radau2a_dir, 'SConscript'), variant_dir=os.path.join(radau2a_dir, variant))
 target_list.append(
     env.Program(target='radau2a-int', source=mech_c + gen_c + rad_c, variant_dir=os.path.join(radau2a_dir, variant)))
+dlink = env.CUDADLink(target='radua2a-int-gpu', source=mech_cuda + gen_cuda + rad_cuda, variant_dir=os.path.join(radau2a_dir, variant))
+target_list.append(dlink)
 target_list.append(
-    env.CUDAProgram(target='radau2a-int-gpu', source=mech_cuda + gen_cuda + rad_cuda, variant_dir=os.path.join(radau2a_dir, variant)))
+    env.CUDAProgram(target='radau2a-int-gpu', source=dlink + mech_cuda + gen_cuda + rad_cuda, variant_dir=os.path.join(radau2a_dir, variant)))
 
 env = env_save.Clone()
 env['CPPPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
@@ -396,8 +398,10 @@ exp4_c, exp4_cuda = SConscript(os.path.join(exp4_int_dir, 'SConscript'), variant
 env.Install(os.path.join(exp4_int_dir, variant), exp_c + exp_cuda)
 target_list.append(
     env.Program(target='exp4-int', source=mech_c + gen_c + exp_c + exp4_c, variant_dir=os.path.join(exp4_int_dir, variant)))
+dlink = env.CUDADLink(target='exp4-int-gpu', source=mech_cuda + gen_cuda + exp_cuda + exp4_cuda, variant_dir=os.path.join(exp4_int_dir, variant))
+target_list.append(dlink)
 target_list.append(
-    env.CUDAProgram(target='exp4-int-gpu', source=mech_cuda + gen_cuda + exp_cuda + exp4_cuda, variant_dir=os.path.join(exp4_int_dir, variant)))
+    env.CUDAProgram(target='exp4-int-gpu', source=dlink + mech_cuda + gen_cuda + exp_cuda + exp4_cuda, variant_dir=os.path.join(exp4_int_dir, variant)))
 
 env = env_save.Clone()
 env['CPPPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
@@ -413,8 +417,10 @@ exp_c = env.Install(os.path.join(exprb43_int_dir, variant), exp_c)
 exp_cuda = env.Install(os.path.join(exprb43_int_dir, variant), exp_cuda)
 target_list.append(
     env.Program(target='exprb43-int', source=mech_c + gen_c + exp_c + rb43_c, variant_dir=os.path.join(exprb43_int_dir, variant)))
+dlink = env.CUDADLink(target='exprb43-int-gpu', source=mech_cuda + gen_cuda + exp_cuda + rb43_cuda, variant_dir=os.path.join(exprb43_int_dir, variant))
+target_list.append(dlink)
 target_list.append(
-    env.CUDAProgram(target='exprb43-int-gpu', source=mech_cuda + gen_cuda + exp_cuda + rb43_cuda, variant_dir=os.path.join(exprb43_int_dir, variant)))
+    env.CUDAProgram(target='exprb43-int-gpu', source=dlink + mech_cuda + gen_cuda + exp_cuda + rb43_cuda, variant_dir=os.path.join(exprb43_int_dir, variant)))
 
 env = env_save.Clone()
 env['CPPDEFINES'] = ['CVODES']
