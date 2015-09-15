@@ -11,6 +11,7 @@
  #ifndef SOLVER_H
  #define SOLVER_H
 
+ #include "solver_options.h"
  #include "solver_props.h"
  #include "solver_init.h"
 
