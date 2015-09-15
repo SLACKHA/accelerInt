@@ -247,51 +247,44 @@ else:
 #hooray!
 with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     file.write("""
-        /*
-        solver_options.h
+    /*
+    solver_options.h
 
-        A file that in conjunction with scons to specify the various options
-        to the solvers
+    A file that in conjunction with scons to specify the various options
+    to the solvers
 
-        */
-        #ifndef SOLV_OPT_HEAD
-        #define SOLV_OPT_HEAD
+    */
+    #ifndef SOLV_OPT_HEAD
+    #define SOLV_OPT_HEAD
 
-        /* Tolerances and Timestep */
-        #define ATOL ({})
-        #define RTOL ({})
-        #define t_step ({})
+    /* Tolerances and Timestep */
+    #define ATOL ({})
+    #define RTOL ({})
+    #define t_step ({})
 
-        /** Machine precision constant. */
-        #define EPS DBL_EPSILON
-        #define SMALL DBL_MIN
+    /** Machine precision constant. */
+    #define EPS DBL_EPSILON
+    #define SMALL DBL_MIN
 
-        /** type of rational approximant (n, n) */
-        #define N_RA ({})
+    /** type of rational approximant (n, n) */
+    #define N_RA ({})
 
-        /** Unsigned int typedef. */
-        typedef unsigned int uint;
-        /** Unsigned short int typedef. */
-        typedef unsigned short int usint;
+    /** Unsigned int typedef. */
+    typedef unsigned int uint;
+    /** Unsigned short int typedef. */
+    typedef unsigned short int usint;
 
-        /* CVodes Parameters */
-        //#define CV_MAX_ORD (5) //maximum order for method, default for BDF is 5
-        #define CV_MAX_STEPS (20000) // maximum steps the solver will take in one timestep
-        //#define CV_HMAX (0)  //upper bound on step size (integrator step, not global timestep)
-        //#define CV_HMIN (0) //lower bound on step size (integrator step, not global timestep)
-        #define CV_MAX_HNIL (1) //maximum number of t + h = t warnings
-        #define CV_MAX_ERRTEST_FAILS (5) //maximum number of error test fails before an error is thrown
+    /* CVodes Parameters */
+    //#define CV_MAX_ORD (5) //maximum order for method, default for BDF is 5
+    #define CV_MAX_STEPS (20000) // maximum steps the solver will take in one timestep
+    //#define CV_HMAX (0)  //upper bound on step size (integrator step, not global timestep)
+    //#define CV_HMIN (0) //lower bound on step size (integrator step, not global timestep)
+    #define CV_MAX_HNIL (1) //maximum number of t + h = t warnings
+    #define CV_MAX_ERRTEST_FAILS (5) //maximum number of error test fails before an error is thrown
 
-        //#define COMPILE_TESTING_METHODS //comment out to remove unit testing stubs
-
-        //turn on to log the krylov space and step sizes to log.txt
-        #ifdef DEBUG
-          #if defined(RB43) || defined(EXP4)
-            #define LOG_KRYLOV_AND_STEPSIZES
-          #endif
-        #endif
-        """.format(env['ATOL'], env['RTOL'], env['t_step'], env['N_RA'])
-        )
+    //#define COMPILE_TESTING_METHODS //comment out to remove unit testing stubs
+    """.format(env['ATOL'], env['RTOL'], env['t_step'], env['N_RA'])
+    )
 
     if env['SAME_IC']:
         file.write("""
@@ -330,6 +323,16 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     //log output to file
     #define LOG_OUTPUT
         """)
+
+    file.write("""
+    //turn on to log the krylov space and step sizes to log.txt
+    #ifdef DEBUG
+      #if defined(RB43) || defined(EXP4)
+        #define LOG_KRYLOV_AND_STEPSIZES
+      #endif
+    #endif
+    """)
+
     file.write("""
     #endif
         """)
