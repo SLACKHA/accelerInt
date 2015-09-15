@@ -269,11 +269,6 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     /** type of rational approximant (n, n) */
     #define N_RA ({})
 
-    /** Unsigned int typedef. */
-    typedef unsigned int uint;
-    /** Unsigned short int typedef. */
-    typedef unsigned short int usint;
-
     /* CVodes Parameters */
     //#define CV_MAX_ORD (5) //maximum order for method, default for BDF is 5
     #define CV_MAX_STEPS (20000) // maximum steps the solver will take in one timestep
@@ -297,6 +292,7 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
         file.write("""
     // load same initial conditions for all threads
     #define DEBUG
+    #include <fenv.h>
         """
         )
 
@@ -326,7 +322,7 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
 
     file.write("""
     //turn on to log the krylov space and step sizes to log.txt
-    #ifdef DEBUG
+    #if defined(DEBUG) && defined(LOG_OUTPUT)
       #if defined(RB43) || defined(EXP4)
         #define LOG_KRYLOV_AND_STEPSIZES
       #endif

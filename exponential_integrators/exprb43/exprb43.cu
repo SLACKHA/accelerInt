@@ -92,7 +92,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
     	//gy = fy - A * y
     	sparse_multiplier(A, y, gy);
     	#pragma unroll
-    	for (uint i = 0; i < NN; ++i) {
+    	for (int i = 0; i < NN; ++i) {
     		gy[i] = fy[i] - gy[i];
     	}
 
@@ -131,7 +131,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			sparse_multiplier(A, temp, f_temp);
 
 			#pragma unroll
-			for (uint i = 0; i < NN; ++i) {
+			for (int i = 0; i < NN; ++i) {
 				temp[i] = savedActions[NN + i] - f_temp[i] - gy[i]; 
 			}
 			//temp is now equal to Dn2
@@ -163,7 +163,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			sparse_multiplier(A, temp, f_temp);
 
 			#pragma unroll
-			for (uint i = 0; i < NN; ++i) {
+			for (int i = 0; i < NN; ++i) {
 				temp[i] = savedActions[3 * NN + i] - f_temp[i] - gy[i]; 
 			}
 			//temp is now equal to Dn3
@@ -185,7 +185,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 			//construct y1 and error vector
 			#pragma unroll
-			for (uint i = 0; i < NN; ++i) {
+			for (int i = 0; i < NN; ++i) {
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NN + i] - 48.0 * savedActions[2 * NN + i] + -2.0 * savedActions[3 * NN + i] + 12.0 * savedActions[4 * NN + i];
 				//error vec
@@ -234,7 +234,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				
 				// update y and t
 				#pragma unroll
-				for (uint i = 0; i < NN; ++i) {
+				for (int i = 0; i < NN; ++i) {
 					y[i] = y1[i];
 				}
 				

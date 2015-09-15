@@ -23,11 +23,6 @@
 #include <helper_cuda.h>
 #include <cuComplex.h>
 
-#ifdef DEBUG
-//NAN check
-#include <fenv.h>
-#endif
-
 //our code
 #include "header.h"
 #include "timer.h"

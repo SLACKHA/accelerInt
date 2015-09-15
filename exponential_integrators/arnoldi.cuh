@@ -13,10 +13,11 @@
 #include <string.h>
 
 #include "header.h"
-#include "solver_props.h"
 #include "phiAHessenberg.cuh"
 #include "exponential_linear_algebra.cuh"
 #include "sparse_multiplier.cuh"
+#include "solver_options.h"
+#include "solver_props.h" 
 
 
 __constant__ int index_list[16] = {1, 4, 9, 14, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
@@ -130,7 +131,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 				//get the value for the err (dot product of mth row of working and 1'st col of Hm)
 				double val = 0;
 				#pragma unroll
-				for (uint ind1 = 0; ind1 < *m; ind1++)
+				for (int ind1 = 0; ind1 < *m; ind1++)
 				{
 					val += working[(*m) * ind1 + (*m - 1)] * Hm[ind1];
 				}

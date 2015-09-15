@@ -419,11 +419,11 @@ bool LinearAlgebraTests()
 }
 void matvec (const double * A, const double * v, double * Av) {
 	#pragma unroll
-	for (uint i = 0; i < STRIDE_MIRROR; ++i) {
+	for (int i = 0; i < STRIDE_MIRROR; ++i) {
 		Av[i] = 0.0;
 		
 		#pragma unroll
-		for (uint j = 0; j < STRIDE_MIRROR; ++j) {
+		for (int j = 0; j < STRIDE_MIRROR; ++j) {
 			Av[i] += A[i + (j * STRIDE_MIRROR)] * v[j];
 		}
 	}

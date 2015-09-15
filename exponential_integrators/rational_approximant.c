@@ -27,9 +27,6 @@ void find_poles_and_residuals()
 
     cf (N_RA, poles_r, poles_i, res_r, res_i);
 
-    double complex polesHost[N_RA];
-    double complex resHost[N_RA];
-
     for (int i = 0; i < N_RA; ++i)
     {
         poles[i] = poles_r[i] + poles_i[i] * _Complex_I;

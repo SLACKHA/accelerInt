@@ -36,7 +36,7 @@ to the solvers
 #define N_RA 10
 
 /** Unsigned int typedef. */
-typedef unsigned int uint;
+typedef unsigned int int;
 /** Unsigned short int typedef. */
 typedef unsigned short int usint;
 

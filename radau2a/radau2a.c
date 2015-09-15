@@ -37,14 +37,14 @@
 
 void scale (const double * y0, const double* y, double * sc) {
 	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
+	for (int i = 0; i < NN; ++i) {
 		sc[i] = 1.0 / (ATOL + fmax(fabs(y0[i]), fabs(y[i])) * RTOL);
 	}
 }
 
 void scale_init (const double * y0, double * sc) {
 	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
+	for (int i = 0; i < NN; ++i) {
 		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
 	}
 }

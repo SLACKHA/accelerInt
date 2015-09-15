@@ -17,11 +17,6 @@
 #include <stdbool.h>
 #include <complex.h>
 
-//NAN check
-#ifdef DEBUG
-#include <fenv.h>
-#endif
-
 //our code
 #include "header.h"
 #include "solver.h"

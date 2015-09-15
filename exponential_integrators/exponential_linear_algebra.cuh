@@ -11,6 +11,7 @@
 #define EXPONENTIAL_LINEAR_ALGEBRA_CUH
 
 #include "header.h"
+#include "solver_options.h"
 #include "solver_props.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -259,7 +260,7 @@ void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const do
 __device__
 void scale (const double * y0, const double * y1, double * sc) {
 	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
+	for (int i = 0; i < NN; ++i) {
 		sc[i] = ATOL + fmax(fabs(y0[i]), fabs(y1[i])) * RTOL;
 	}
 }
@@ -274,7 +275,7 @@ void scale (const double * y0, const double * y1, double * sc) {
 __device__
 void scale_init (const double * y0, double * sc) {
 	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
+	for (int i = 0; i < NN; ++i) {
 		sc[i] = ATOL + fabs(y0[i]) * RTOL;
 	}
 }
@@ -292,7 +293,7 @@ double sc_norm (const double * nums, const double * sc) {
 	double norm = 0.0;
 	
 	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
+	for (int i = 0; i < NN; ++i) {
 		norm += nums[i] * nums[i] / (sc[i] * sc[i]);
 	}
 	
@@ -310,7 +311,7 @@ double two_norm(const double* v)
 {
 	double norm = 0.0;
 	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
+	for (int i = 0; i < NN; ++i) {
 		norm += v[i] * v[i];
 	}
 	return sqrt(norm);
@@ -330,7 +331,7 @@ double normalize (const double * v, double* v_out) {
 		norm = 1;
 
 	#pragma unroll
-	for (uint i = 0; i < NN; ++i) {
+	for (int i = 0; i < NN; ++i) {
 		v_out[i] = v[i] / norm;
 	}
 	return norm;
