@@ -532,7 +532,6 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
  */
 __device__ void integrate (const double t_start, const double t_end, const double pr, double* y) {
 	double Hmin = 0;
-	double Hmax = fabs(t_end - t_start);
 	double Hold = 0;
 #ifdef Gustafsson
 	double Hacc = 0;
@@ -666,7 +665,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 #ifndef NEWTON_UNROLL
             if (NewtonDone) break;
 #else //only break if it's at the end of the unroll
-            if(NewtonDone && (NewtonIter + 1) % NewtonIter == 0) break;
+            if(NewtonDone && (NewtonIter + 1) % NEWTON_UNROLL == 0) break;
 #endif
             if (NewtonIter >= NewtonMaxit)
             {
@@ -737,7 +736,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 #ifndef NEWTON_UNROLL
             if (NewtonDone) break;
 #else //only break if it's at the end of the unroll
-            if (NewtonDone && (sNewtonIter + 1) % sNewtonIter == 0) break;
+            if (NewtonDone && (sNewtonIter + 1) % NEWTON_UNROLL == 0) break;
 #endif
         }
         if (!NewtonDone) {
@@ -785,7 +784,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			}
 			scale(y, y0, sc);
 			safe_memcpy(y0, y);
-			Hnew = fmin(fmax(Hnew, Hmin), Hmax);
+			Hnew = fmin(fmax(Hnew, Hmin), t_end - t);
 			if (Reject) {
 				Hnew = fmin(Hnew, H);
 			}
