@@ -320,14 +320,12 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define LOG_OUTPUT
         """)
 
-    file.write("""
-    //turn on to log the krylov space and step sizes to log.txt
-    #if defined(DEBUG) && defined(LOG_OUTPUT)
-      #if defined(RB43) || defined(EXP4)
-        #define LOG_KRYLOV_AND_STEPSIZES
-      #endif
-    #endif
-    """)
+        file.write("""
+        //turn on to log the krylov space and step sizes to log.txt
+        #if defined(RB43) || defined(EXP4)
+            #define LOG_KRYLOV_AND_STEPSIZES
+        #endif
+        """)
 
     file.write("""
     #endif

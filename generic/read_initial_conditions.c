@@ -22,29 +22,29 @@
         fprintf(stderr, "Could not open file: %s\n", filename);
         exit(-1);
     }
-    double buffer[NN + 1];
+    double buffer[NN + 2];
 
     // load temperature and mass fractions for all threads (cells)
     for (int i = 0; i < NUM; ++i)
     {
         // read line from data file
-        int count = fread(buffer, sizeof(double), NN + 1, fp);
-        if (count != (NN + 1))
+        int count = fread(buffer, sizeof(double), NN + 2, fp);
+        if (count != (NN + 2))
         {
             fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", filename, NN + 1, count);
             exit(-1);
         }
         //apply mask if necessary
-        apply_mask(&buffer[2]);
+        apply_mask(&buffer[3]);
         //put into y_host
-        (*y_host)[i] = buffer[0];
+        (*y_host)[i] = buffer[1];
 #ifdef CONP
-        (*variable_host)[i] = buffer[1];
+        (*variable_host)[i] = buffer[2];
 #elif CONV
-        double pres = buffer[1];
+        double pres = buffer[2];
 #endif
-        for (int j = 2; j <= NN; j++)
-            (*y_host)[i + (j - 1) * NUM] = buffer[j];
+        for (int j = 0; j < NN; j++)
+            (*y_host)[i + (j + 1) * NUM] = buffer[j + 3];
 
         // if constant volume, calculate density
 #ifdef CONV
