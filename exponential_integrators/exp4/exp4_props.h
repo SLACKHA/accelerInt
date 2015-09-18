@@ -9,6 +9,8 @@
 #define EXP4_PROPS_H
 
 #include "header.h"
+#include "solver_options.h"
+#include "solver_props.h"
 
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR

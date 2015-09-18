@@ -136,3 +136,10 @@ void** integrators;
 #endif
  	return name;
  }
+
+ void init_solver_log() {
+ 	
+ }
+ void solver_log() {
+ 	
+ }

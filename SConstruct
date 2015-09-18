@@ -374,35 +374,45 @@ def builder(env_save, cobj, cuobj, newdict, mydir, variant,
         else:
             env[key] += value
     Export('env')
-    if cuobj is not None:
-        int_c, int_cuda = SConscript(os.path.join(mydir, 'SConscript'), 
-            variant_dir=os.path.join(mydir, variant))
-        #check for additional sconstructs
-        if additional_sconstructs is not None:
-            for thedir in additional_sconstructs:
-                temp_c, temp_cu = SConscript(os.path.join(thedir, 'SConscript'),
-                    variant_dir=os.path.join(thedir, variant))
-                int_c += temp_c
-                int_cuda += temp_cu
-        if filter_out is not None:
-            int_c = [x for x in int_c if not filter_out in str(x)]
-            int_cuda = [x for x in int_cuda if not filter_out in str(x)] 
+    int_c, int_cuda = SConscript(os.path.join(mydir, 'SConscript'),
+        variant_dir=os.path.join(mydir, variant))
+    #check for additional sconstructs
+    if additional_sconstructs is not None:
+        for thedir in additional_sconstructs:
+            temp_c, temp_cu = SConscript(os.path.join(thedir, 'SConscript'),
+                variant_dir=os.path.join(thedir, variant))
+            int_c += temp_c
+            int_cuda += temp_cu
+    if filter_out is not None:
+        int_c = [x for x in int_c if not filter_out in str(x)]
+        int_cuda = [x for x in int_cuda if not filter_out in str(x)] 
 
-        target_list.append(
-            env.Program(target=target_base,
-                        source=cobj + int_c,
-                        variant_dir=os.path.join(mydir, variant)))
-        dlink = env.CUDADLink(
-            target=target_base+'-gpu', 
-            source=cuobj + int_cuda, 
-            variant_dir=os.path.join(mydir, variant))
-        target_list.append(dlink)
-        target_list.append(
-            env.CUDAProgram(target=target_base+'-gpu',
-             source=cuobj + int_cuda + dlink, 
-             variant_dir=os.path.join(mydir, variant)))
-def cvodes_builder(env_save, cobj, cuobj, newdict, mydir, variant,
-             target_base, target_list, additional_sconstructs=None):
+    target_list.append(
+        env.Program(target=target_base,
+                    source=cobj + int_c,
+                    variant_dir=os.path.join(mydir, variant)))
+    dlink = env.CUDADLink(
+        target=target_base+'-gpu', 
+        source=cuobj + int_cuda, 
+        variant_dir=os.path.join(mydir, variant))
+    target_list.append(dlink)
+    target_list.append(
+        env.CUDAProgram(target=target_base+'-gpu',
+         source=cuobj + int_cuda + dlink, 
+         variant_dir=os.path.join(mydir, variant)))
+
+def cvodes_builder(env_save, cobj, newdict, mydir, variant,
+                 target_list, additional_sconstructs=None):
+    #update the env
+    env = env_save.Clone()
+    for key, value in newdict.iteritems():
+        if not isinstance(value, list):
+            value = list(value)
+        if not key in env:
+            env[key] = value
+        else:
+            env[key] += value
+    Export('env')
     int_c = SConscript(os.path.join(mydir, 'SConscript'), 
         variant_dir=os.path.join(mydir, variant))
     #check for additional sconstructs
@@ -414,13 +424,13 @@ def cvodes_builder(env_save, cobj, cuobj, newdict, mydir, variant,
     fd_c = [x for x in int_c if not 'analytic' in str(x)]
     target_list.append(
         env.Program(target='cvodes-int',
-                    souce=cobj + fd_c,
+                    source=cobj + fd_c,
                     variant_dir=os.path.join(mydir, variant)))
 
     ana_c = [x for x in int_c if not 'cvodes_init' in str(x)]
     target_list.append(
-        env.Program(target='cvodes-analytic-int-int',
-                    souce=cobj + ana_c,
+        env.Program(target='cvodes-analytic-int',
+                    source=cobj + ana_c,
                     variant_dir=os.path.join(mydir, variant)))
 
 
@@ -437,8 +447,8 @@ new_defines['NVCCDEFINES'] = ['RADAU2A']
 new_defines['NVCCPATH'] = [radau2a_dir]
 builder(env_save, mech_c + gen_c, 
     mech_cuda + gen_cuda,
-    new_defines, radau2a_dir, variant,
-    'radau2a-int', target_list)
+    new_defines, radau2a_dir,
+    variant, 'radau2a-int', target_list)
 
 #exp4
 new_defines = {}
@@ -450,8 +460,8 @@ new_defines['CPPDEFINES'] = ['EXP4']
 new_defines['NVCCDEFINES'] = ['EXP4']
 builder(env_save, mech_c + gen_c, 
     mech_cuda + gen_cuda,
-    new_defines, exp4_int_dir, variant,
-    'exp4-int', target_list,
+    new_defines, exp4_int_dir,
+    variant, 'exp4-int', target_list,
     [exp_int_dir])
 
 #exprb43
@@ -464,8 +474,8 @@ new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
 builder(env_save, mech_c + gen_c, 
     mech_cuda + gen_cuda,
-    new_defines, exprb43_int_dir, variant,
-    'exprb43-int', target_list,
+    new_defines, exprb43_int_dir,
+    variant, 'exprb43-int', target_list,
     [exp_int_dir])
 
 #fd cvodes
@@ -475,18 +485,8 @@ new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
 cv_gen_c = [x for x in gen_c if not 'solver_generic' in str(x)]
-builder(env_save, mech_c + cv_gen_c, 
-    None, new_defines,
-    cvodes_dir, variant,
-    'cvodes-int', target_list,
-    None, 'analytic')
-#analytical cvodes
-new_defines['CPPDEFINES'] += ['SUNDIALS_ANALYTIC_JACOBIAN']
-builder(env_save, mech_c + cv_gen_c, 
-    None, new_defines,
-    cvodes_dir, variant,
-    'cvodes-analytic-int', target_list,
-    None, 'cvodes_init')
+cvodes_builder(env_save, mech_c + cv_gen_c, new_defines,
+    cvodes_dir, variant, target_list)
 
 Alias('build', target_list)
 Alias('cpu', [x for x in target_list if not 'gpu' in str(x)])

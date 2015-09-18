@@ -32,18 +32,6 @@
 #include "read_initial_conditions.cuh"
 #include "launch_bounds.cuh"
 
-#ifdef LOG_KRYLOV_AND_STEPSIZES
-    //make logging array definitions
-    __device__ double err_log[MAX_STEPS];
-    __device__ int m_log[MAX_STEPS];
-    __device__ int m1_log[MAX_STEPS];
-    __device__ int m2_log[MAX_STEPS];
-    __device__ double t_log[MAX_STEPS];
-    __device__ double h_log[MAX_STEPS];
-    __device__ bool reject_log[MAX_STEPS];
-    __device__ int num_integrator_steps;
-#endif
-
 void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
 {
     double buffer[NN + 2];
@@ -189,36 +177,10 @@ int main (int argc, char *argv[])
     pFile = fopen(out_name, "wb");
 
     write_log(padded, NUM, 0, y_host, pFile);
+
+    //initialize integrator specific log
+    init_solver_log();
 #endif
-
-
-#ifdef LOG_KRYLOV_AND_STEPSIZES
-    //create host logging arrays
-    double* err_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
-    int* m_log_host = (int*)malloc(MAX_STEPS * sizeof(int));
-    int* m1_log_host = (int*)malloc(MAX_STEPS * sizeof(int));
-    int* m2_log_host = (int*)malloc(MAX_STEPS * sizeof(int));
-    double* t_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
-    double* h_log_host = (double*)malloc(MAX_STEPS * sizeof(double));
-    bool* reject_log_host = (bool*)malloc(MAX_STEPS * sizeof(bool));
-    int num_integrator_steps_host = 0;
-    //open files for krylov logging
-    FILE *logFile;
-    //open and clear
-    const char* f_new_name = solver_name();
-    int len_new = strlen(f_new_name);
-    char out_name_new[len_new + 17];
-    sprintf(out_name_new, "log/%s-kry-log.txt", f_new_name);
-    logFile = fopen(out_name_new, "w");
-
-    char out_reject_name[len_new + 23];
-    sprintf(out_reject_name, "log/%s-kry-reject.txt", f_new_name);    
-    //file for krylov logging
-    FILE *rFile;
-    //open and clear
-    rFile = fopen(out_reject_name, "w");
-#endif
-
 
     //////////////////////////////
     // start timer
@@ -284,38 +246,13 @@ int main (int argc, char *argv[])
 #endif
 #ifdef LOG_OUTPUT
         write_log(padded, NUM, t, y_host, pFile);
+        solver_log();
 #endif
 #ifdef IGN
         // determine if ignition has occurred
         if ((y_host[0] >= (T0 + 400.0)) && !(ign_flag)) {
             ign_flag = true;
             t_ign = t;
-        }
-#endif
-#ifdef LOG_KRYLOV_AND_STEPSIZES
-        //first copy back num steps to make sure we're inbounds
-        cudaErrorCheck( cudaMemcpyFromSymbol(&num_integrator_steps_host, num_integrator_steps, sizeof(int)) );
-        if (num_integrator_steps_host == -1)
-            exit(-1);
-        //otherwise copy back
-        cudaErrorCheck( cudaMemcpyFromSymbol(err_log_host, err_log, num_integrator_steps_host * sizeof(double)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(m_log_host, m_log, num_integrator_steps_host * sizeof(int)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(m1_log_host, m1_log, num_integrator_steps_host * sizeof(int)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(m2_log_host, m2_log, num_integrator_steps_host * sizeof(int)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(t_log_host, t_log, num_integrator_steps_host * sizeof(double)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(h_log_host, h_log, num_integrator_steps_host * sizeof(double)) );
-        cudaErrorCheck( cudaMemcpyFromSymbol(reject_log_host, reject_log, num_integrator_steps_host * sizeof(bool)) );
-        //and print
-        for (int i = 0; i < num_integrator_steps_host; ++i)
-        {
-            if (reject_log_host[i])
-            {
-                fprintf(rFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t_log_host[i], h_log_host[i], err_log_host[i], m_log_host[i], m1_log_host[i], m2_log_host[i]);
-            }
-            else
-            {
-                fprintf(logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t_log_host[i], h_log_host[i], err_log_host[i], m_log_host[i], m1_log_host[i], m2_log_host[i]);
-            }
         }
 #endif
     }
@@ -344,17 +281,6 @@ int main (int argc, char *argv[])
     cudaFreeHost (pres_host);
 #elif CONV
     cudaFreeHost (rho_host);
-#endif
-#ifdef LOG_KRYLOV_AND_STEPSIZES
-    free(err_log_host);
-    free(m_log_host);
-    free(m1_log_host);
-    free(m2_log_host);
-    free(t_log_host);
-    free(h_log_host);
-    free(reject_log_host);
-    fclose(rFile);
-    fclose(logFile);
 #endif
     cleanup_solver();
 

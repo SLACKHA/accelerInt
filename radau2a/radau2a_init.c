@@ -6,7 +6,7 @@
  * \date 03/09/2015
  *
  */
-
+ 
  void initialize_solver() {
  }
 
@@ -17,4 +17,11 @@
 
  void cleanup_solver() {
  	//nothing to do
+ }
+
+ void init_solver_log() {
+ 	
+ }
+ void solver_log() {
+ 	
  }

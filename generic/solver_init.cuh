@@ -11,6 +11,8 @@
  #ifndef SOLVER_INIT_CUH
  #define SOLVER_INIT_CUH
 
+ void init_solver_log();
+ void solver_log();
  void initialize_solver();
  void cleanup_solver();
  const char* solver_name();

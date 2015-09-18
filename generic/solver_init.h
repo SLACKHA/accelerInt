@@ -11,6 +11,8 @@
  #ifndef SOLVER_INIT_H
  #define SOLVER_INIT_H
 
+ void init_solver_log();
+ void solver_log();
  void initialize_solver(int num_threads);
  void cleanup_solver(int num_threads);
  const char* solver_name();

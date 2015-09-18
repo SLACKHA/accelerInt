@@ -7,6 +7,14 @@
  *
  */
 
+ void init_solver_log() {
+ 	
+ }
+
+ void solver_log() {
+ 	
+ }
+
  void initialize_solver() {
  }
 

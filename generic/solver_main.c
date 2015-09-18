@@ -161,23 +161,7 @@ int main (int argc, char *argv[])
     pFile = fopen(out_name, "w");
 
     write_log(NUM, 0, y_host, pFile);
-#endif
-#ifdef LOG_KRYLOV_AND_STEPSIZES
-      //file for krylov logging
-      FILE *logFile;
-      //open and clear
-      const char* f_name = solver_name();
-      int len = strlen(f_name);
-      char out_name[len + 17];
-      sprintf(out_name, "log/%s-kry-log.txt", f_name);
-      logFile = fopen(out_name, "w");
-
-      char out_reject_name[len + 23];
-      sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);    
-      //file for krylov logging
-      FILE *rFile;
-      //open and clear
-      rFile = fopen(out_reject_name, "w");
+    init_solver_log();
 #endif
 
     //////////////////////////////
