@@ -321,10 +321,9 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
         """)
 
         file.write("""
-        //turn on to log the krylov space and step sizes to log.txt
-        #if defined(RB43) || defined(EXP4)
-            #define LOG_KRYLOV_AND_STEPSIZES
-        #endif
+        //turn on to log the krylov space and step sizes
+        #define LOG_KRYLOV_AND_STEPSIZES
+        #define MAX_STEPS 10000
         """)
 
     file.write("""

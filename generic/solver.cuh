@@ -12,7 +12,6 @@
  #define SOLVER_CUH
 
  #include "solver_options.h"
- #include "solver_props.h"
  #include "solver_init.cuh"
 
  __global__ void 

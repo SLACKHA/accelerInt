@@ -9,7 +9,6 @@
 #define EXP4_PROPS_H
 
 #include "header.h"
-#include "solver_options.h"
 
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR
@@ -19,10 +18,5 @@
 #define ORD 3
 #define M_MAX NN
 #define STRIDE (M_MAX + P)
-
-#ifdef LOG_KRYLOV_AND_STEPSIZES
- 	//the size of the logging arrays
- 	#define MAX_STEPS 10000
-#endif
 
 #endif

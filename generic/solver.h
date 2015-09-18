@@ -12,7 +12,6 @@
  #define SOLVER_H
 
  #include "solver_options.h"
- #include "solver_props.h"
  #include "solver_init.h"
 
  void intDriver (const int NUM, const double t, const double t_end, 
