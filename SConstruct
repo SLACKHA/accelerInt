@@ -347,7 +347,7 @@ env['NVCCLINKFLAGS'] = NVCCLinkFlags
 env['NVCCLIBS'] = NVCCLibs
 
 variant = 'release' if not env['DEBUG'] else 'debug'
-env['variant']=variant
+env['variant'] = variant
 
 env['CPPPATH'] = common_dir_list
 env['NVCCPATH'] += common_dir_list
@@ -356,93 +356,141 @@ target_list = []
 
 #copy a good SConscript into the mechanism dir
 import shutil
-env_save = env.Clone()
-Export('env')
 try:
     shutil.copyfile(os.path.join(defaults.mechanism_dir, 'SConscript'), os.path.join(mech_dir, 'SConscript'))
 except shutil.Error:
     pass
 
+def builder(env_save, cobj, cuobj, newdict, mydir, variant,
+             target_base, target_list, additional_sconstructs=None,
+             filter_out=None):
+    #update the env
+    env = env_save.Clone()
+    for key, value in newdict.iteritems():
+        if not isinstance(value, list):
+            value = list(value)
+        if not key in env:
+            env[key] = value
+        else:
+            env[key] += value
+    Export('env')
+    if cuobj is not None:
+        int_c, int_cuda = SConscript(os.path.join(mydir, 'SConscript'), 
+            variant_dir=os.path.join(mydir, variant))
+        #check for additional sconstructs
+        if additional_sconstructs is not None:
+            for thedir in additional_sconstructs:
+                temp_c, temp_cu = SConscript(os.path.join(thedir, 'SConscript'),
+                    variant_dir=os.path.join(thedir, variant))
+                int_c += temp_c
+                int_cuda += temp_cu
+        if filter_out is not None:
+            int_c = [x for x in int_c if not filter_out in str(x)]
+            int_cuda = [x for x in int_cuda if not filter_out in str(x)] 
 
+        target_list.append(
+            env.Program(target=target_base,
+                        source=cobj + int_c,
+                        variant_dir=os.path.join(mydir, variant)))
+        dlink = env.CUDADLink(
+            target=target_base+'-gpu', 
+            source=cuobj + int_cuda, 
+            variant_dir=os.path.join(mydir, variant))
+        target_list.append(dlink)
+        target_list.append(
+            env.CUDAProgram(target=target_base+'-gpu',
+             source=cuobj + int_cuda + dlink, 
+             variant_dir=os.path.join(mydir, variant)))
+def cvodes_builder(env_save, cobj, cuobj, newdict, mydir, variant,
+             target_base, target_list, additional_sconstructs=None):
+    int_c = SConscript(os.path.join(mydir, 'SConscript'), 
+        variant_dir=os.path.join(mydir, variant))
+    #check for additional sconstructs
+    if additional_sconstructs is not None:
+        for thedir in additional_sconstructs:
+            temp_c = SConscript(os.path.join(thedir, 'SConscript'),
+                variant_dir=os.path.join(thedir, variant))
+            int_c += temp_c
+    fd_c = [x for x in int_c if not 'analytic' in str(x)]
+    target_list.append(
+        env.Program(target='cvodes-int',
+                    souce=cobj + fd_c,
+                    variant_dir=os.path.join(mydir, variant)))
+
+    ana_c = [x for x in int_c if not 'cvodes_init' in str(x)]
+    target_list.append(
+        env.Program(target='cvodes-analytic-int-int',
+                    souce=cobj + ana_c,
+                    variant_dir=os.path.join(mydir, variant)))
+
+
+env_save = env.Clone()
+Export('env')
 mech_c, mech_cuda = SConscript(os.path.join(mech_dir, 'SConscript'), variant_dir=os.path.join(mech_dir, variant))
-
 gen_c, gen_cuda = SConscript(os.path.join(generic_dir, 'SConscript'), variant_dir=os.path.join(generic_dir, variant))
 
-env['CPPDEFINES'] = ['RADAU2A']
-env['CPPPATH'] += [radau2a_dir]
-env['NVCCDEFINES'] = ['RADAU2A']
-env['NVCCPATH'] += [radau2a_dir]
-Export('env')
-rad_c, rad_cuda = SConscript(os.path.join(radau2a_dir, 'SConscript'), variant_dir=os.path.join(radau2a_dir, variant))
-target_list.append(
-    env.Program(target='radau2a-int', source=mech_c + gen_c + rad_c, variant_dir=os.path.join(radau2a_dir, variant)))
-dlink = env.CUDADLink(target='radua2a-int-gpu', source=mech_cuda + gen_cuda + rad_cuda, variant_dir=os.path.join(radau2a_dir, variant))
-target_list.append(dlink)
-target_list.append(
-    env.CUDAProgram(target='radau2a-int-gpu', source=dlink + mech_cuda + gen_cuda + rad_cuda, variant_dir=os.path.join(radau2a_dir, variant)))
+#radua
+new_defines = {}
+new_defines['CPPDEFINES'] = ['RADAU2A']
+new_defines['CPPPATH'] = [radau2a_dir]
+new_defines['NVCCDEFINES'] = ['RADAU2A']
+new_defines['NVCCPATH'] = [radau2a_dir]
+builder(env_save, mech_c + gen_c, 
+    mech_cuda + gen_cuda,
+    new_defines, radau2a_dir, variant,
+    'radau2a-int', target_list)
 
-env = env_save.Clone()
-env['CPPPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
-env['LIBPATH'].append(env['fftw3_lib_dir'])
-env['LIBS'].append('fftw3')
-env['NVCCPATH'] += [exp_int_dir, exp4_int_dir]
-env['CPPDEFINES'] = ['EXP4']
-env['NVCCDEFINES'] = ['EXP4']
-Export('env')
-exp_c, exp_cuda = SConscript(os.path.join(exp_int_dir, 'SConscript'), variant_dir=os.path.join(exp_int_dir, variant))
-exp4_c, exp4_cuda = SConscript(os.path.join(exp4_int_dir, 'SConscript'), variant_dir=os.path.join(exp4_int_dir, variant))
-env.Install(os.path.join(exp4_int_dir, variant), exp_c + exp_cuda)
-target_list.append(
-    env.Program(target='exp4-int', source=mech_c + gen_c + exp_c + exp4_c, variant_dir=os.path.join(exp4_int_dir, variant)))
-dlink = env.CUDADLink(target='exp4-int-gpu', source=mech_cuda + gen_cuda + exp_cuda + exp4_cuda, variant_dir=os.path.join(exp4_int_dir, variant))
-target_list.append(dlink)
-target_list.append(
-    env.CUDAProgram(target='exp4-int-gpu', source=dlink + mech_cuda + gen_cuda + exp_cuda + exp4_cuda, variant_dir=os.path.join(exp4_int_dir, variant)))
+#exp4
+new_defines = {}
+new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
+new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
+new_defines['LIBS'] = ['fftw3']
+new_defines['NVCCPATH'] = [exp_int_dir, exp4_int_dir]
+new_defines['CPPDEFINES'] = ['EXP4']
+new_defines['NVCCDEFINES'] = ['EXP4']
+builder(env_save, mech_c + gen_c, 
+    mech_cuda + gen_cuda,
+    new_defines, exp4_int_dir, variant,
+    'exp4-int', target_list,
+    [exp_int_dir])
 
-env = env_save.Clone()
-env['CPPPATH'] += [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
-env['LIBPATH'].append(env['fftw3_lib_dir'])
-env['LIBS'].append('fftw3')
-env['NVCCPATH'] += [exp_int_dir, exprb43_int_dir]
-env['CPPDEFINES'] = ['RB43']
-env['NVCCDEFINES'] = ['RB43']
-Export('env')
-exp_c, exp_cuda = SConscript(os.path.join(exp_int_dir, 'SConscript'), variant_dir=os.path.join(exp_int_dir, variant))
-rb43_c, rb43_cuda = SConscript(os.path.join(exprb43_int_dir, 'SConscript'), variant_dir=os.path.join(exprb43_int_dir, variant))
-exp_c = env.Install(os.path.join(exprb43_int_dir, variant), exp_c)
-exp_cuda = env.Install(os.path.join(exprb43_int_dir, variant), exp_cuda)
-target_list.append(
-    env.Program(target='exprb43-int', source=mech_c + gen_c + exp_c + rb43_c, variant_dir=os.path.join(exprb43_int_dir, variant)))
-dlink = env.CUDADLink(target='exprb43-int-gpu', source=mech_cuda + gen_cuda + exp_cuda + rb43_cuda, variant_dir=os.path.join(exprb43_int_dir, variant))
-target_list.append(dlink)
-target_list.append(
-    env.CUDAProgram(target='exprb43-int-gpu', source=dlink + mech_cuda + gen_cuda + exp_cuda + rb43_cuda, variant_dir=os.path.join(exprb43_int_dir, variant)))
+#exprb43
+new_defines = {}
+new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
+new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
+new_defines['LIBS'] = ['fftw3']
+new_defines['NVCCPATH'] = [exp_int_dir, exprb43_int_dir]
+new_defines['CPPDEFINES'] = ['RB43']
+new_defines['NVCCDEFINES'] = ['RB43']
+builder(env_save, mech_c + gen_c, 
+    mech_cuda + gen_cuda,
+    new_defines, exprb43_int_dir, variant,
+    'exprb43-int', target_list,
+    [exp_int_dir])
 
-env = env_save.Clone()
-env['CPPDEFINES'] = ['CVODES']
-env['CPPPATH'] += [cvodes_dir, env['sundials_inc_dir']]
-env['LIBPATH'] += [env['sundials_lib_dir']]
-env['LIBS'] += ['sundials_cvodes', 'sundials_nvecserial']
-Export('env')
-cvodes_c = SConscript(os.path.join(cvodes_dir, 'SConscript'), variant_dir=os.path.join(cvodes_dir, variant))
-env = env_save.Clone()
-env['CPPDEFINES'] = ['CVODES']
-env['CPPPATH'] += [cvodes_dir, env['sundials_inc_dir']]
-env['LIBPATH'] += [env['sundials_lib_dir']]
-env['LIBS'] += ['sundials_cvodes', 'sundials_nvecserial']
-Export('env')
-fd_cvodes = [x for x in cvodes_c if not 'analytic' in str(x)]
-analytic_cvodes = [x for x in cvodes_c if not 'cvodes_init' in str(x)]
+#fd cvodes
+new_defines = {}
+new_defines['CPPDEFINES'] = ['CVODES']
+new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
+new_defines['LIBPATH'] = [env['sundials_lib_dir']]
+new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
 cv_gen_c = [x for x in gen_c if not 'solver_generic' in str(x)]
-target_list.append(
-    env.Program(target='cvodes-int', source=mech_c + cv_gen_c + fd_cvodes, variant_dir=os.path.join(cvodes_dir, variant)))
-env['CPPDEFINES'] += ['SUNDIALS_ANALYTIC_JACOBIAN']
-Export('env')
-target_list.append(
-    env.Program(target='cvodes-analytic-int', source=mech_c + cv_gen_c + analytic_cvodes, variant_dir=os.path.join(cvodes_dir, variant)))
-
+builder(env_save, mech_c + cv_gen_c, 
+    None, new_defines,
+    cvodes_dir, variant,
+    'cvodes-int', target_list,
+    None, 'analytic')
+#analytical cvodes
+new_defines['CPPDEFINES'] += ['SUNDIALS_ANALYTIC_JACOBIAN']
+builder(env_save, mech_c + cv_gen_c, 
+    None, new_defines,
+    cvodes_dir, variant,
+    'cvodes-analytic-int', target_list,
+    None, 'cvodes_init')
 
 Alias('build', target_list)
 Alias('cpu', [x for x in target_list if not 'gpu' in str(x)])
 Alias('gpu', [x for x in target_list if 'gpu' in str(x)])
+for x in target_list:
+    Alias(str(x), x)
 Default(target_list)
