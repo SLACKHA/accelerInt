@@ -15,7 +15,7 @@
 //max order of the phi functions (i.e. for error estimation)
 #define P 4
 //order of embedded methods
-#define ORD 3
+#define ORD 3.0
 #define M_MAX NN
 #define STRIDE (M_MAX + P)
 
