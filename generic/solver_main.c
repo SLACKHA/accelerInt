@@ -33,7 +33,7 @@ void write_log(int NUM, double t, const double* y_host, FILE* pFile)
         {
             buffer[i + 1] = y_host[NUM * i + j];
         }
-        apply_reverse_mask(&buffer[2])
+        apply_reverse_mask(&buffer[2]);
         fwrite(buffer, sizeof(double), NN + 2, pFile);
     }
 }
