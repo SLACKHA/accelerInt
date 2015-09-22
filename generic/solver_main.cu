@@ -34,16 +34,16 @@
 
 void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
 {
-    double buffer[NN + 2];
+    fwrite(&t, sizeof(double), 1, pFile);
+    double buffer[NN];
     for (int j = 0; j < NUM; j++)
     {
-        buffer[0] = t;
         for (int i = 0; i < NN; ++i)
         {
-            buffer[i + 1] = y_host[padded * i + j];
+            buffer[i] = y_host[NUM * i + j];
         }
-        apply_reverse_mask(&buffer[2]);
-        fwrite(buffer, sizeof(double), NN + 2, pFile);
+        apply_reverse_mask(&buffer[1]);
+        fwrite(buffer, sizeof(double), NN + 1, pFile);
     }
 }
 
