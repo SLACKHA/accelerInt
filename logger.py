@@ -76,6 +76,11 @@ def __execute(builder, num_threads, num_conditions, logger):
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, nvar, outfile):
+        #first compile and run cvodes to get the baseline
+        pyJac.create_jacobian('c', mech, thermo,
+            initial_state=initial_conditions,
+            optimize_cache=False,
+            build_path=build_path)
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=FALSE', 'PRINT=FALSE']
         if initial_conditions is not None:
@@ -129,11 +134,6 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data):
     with Tee(pjoin('log', 'log_results.txt'), 'w') as myTee:
-        #first compile and run cvodes to get the baseline
-        pyJac.create_jacobian('c', mech, thermo, 
-            initial_state=initial_conditions, 
-            optimize_cache=False,
-            build_path=build_path)
         nvar = None
         #get num vars
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
