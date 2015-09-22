@@ -191,7 +191,7 @@ int main (int argc, char *argv[])
         t = t_next;
         t_next += t_step;
 
-#if defined(DEBUG) || defined(PRINT) 
+#if defined(PRINT)
         printf("%.15le\t%.15le\n", t, y_host[0]);
 #endif
 #ifdef DEBUG
