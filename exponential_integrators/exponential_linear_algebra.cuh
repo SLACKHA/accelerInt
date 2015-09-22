@@ -242,7 +242,7 @@ void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const do
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * STRIDE + i] * V[j];
+			Av[i] += A[j * NN + i] * V[j];
 		}
 
 		Av[i] = Av[i] * scale + 2.0 * add[i] - sub[i];
