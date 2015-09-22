@@ -171,18 +171,22 @@ if __name__ == '__main__':
                         help='The initial conditions for same initial condition testing. '
                              'If not supplied, this is skipped.')
     parser.add_argument('-b', '--build_path',
+                        type=str,
                         required=False,
                         default='./out/',
                         help='The folder to generate the mechanism in')
     parser.add_argument('-nt', '--num_threads',
+                        type=int,
                         required=False,
                         default=multiprocessing.cpu_count(),
                         help='The number of threads to run the CPU ode solvers with.')
     parser.add_argument('-nc', '--num_conditions',
+                        type=int,
                         required=False,
                         default=1,
                         help='The number of conditions to test')
     parser.add_argument('-td', '--test_data',
+                        type=str,
                         required=False,
                         default=None,
                         help='A numpy file output generated from the partially_stirred_reactor component '
