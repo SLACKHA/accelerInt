@@ -352,7 +352,7 @@ env['variant'] = variant
 env['CPPPATH'] = common_dir_list
 env['NVCCPATH'] += common_dir_list
 
-target_list = []
+target_list = {}
 
 #copy a good SConscript into the mechanism dir
 import shutil
@@ -387,16 +387,18 @@ def builder(env_save, cobj, cuobj, newdict, mydir, variant,
         int_c = [x for x in int_c if not filter_out in str(x)]
         int_cuda = [x for x in int_cuda if not filter_out in str(x)] 
 
-    target_list.append(
+    target_list[target_base] = []
+    target_list[target_base].append(
         env.Program(target=target_base,
                     source=cobj + int_c,
                     variant_dir=os.path.join(mydir, variant)))
+    target_list[target_base + '-gpu'] = []
     dlink = env.CUDADLink(
         target=target_base+'-gpu', 
         source=cuobj + int_cuda, 
         variant_dir=os.path.join(mydir, variant))
-    target_list.append(dlink)
-    target_list.append(
+    target_list[target_base + '-gpu'].append(dlink)
+    target_list[target_base + '-gpu'].append(
         env.CUDAProgram(target=target_base+'-gpu',
          source=cuobj + int_cuda + dlink, 
          variant_dir=os.path.join(mydir, variant)))
@@ -422,13 +424,15 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
                 variant_dir=os.path.join(thedir, variant))
             int_c += temp_c
     fd_c = [x for x in int_c if not 'analytic' in str(x)]
-    target_list.append(
+    target_list['cvodes-int'] = []
+    target_list['cvodes-int'].append(
         env.Program(target='cvodes-int',
                     source=cobj + fd_c,
                     variant_dir=os.path.join(mydir, variant)))
 
     ana_c = [x for x in int_c if not 'cvodes_init' in str(x)]
-    target_list.append(
+    target_list['cvodes-analytic-int'] = []
+    target_list['cvodes-analytic-int'].append(
         env.Program(target='cvodes-analytic-int',
                     source=cobj + ana_c,
                     variant_dir=os.path.join(mydir, variant)))
@@ -488,9 +492,16 @@ cv_gen_c = [x for x in gen_c if not 'solver_generic' in str(x)]
 cvodes_builder(env_save, mech_c + cv_gen_c, new_defines,
     cvodes_dir, variant, target_list)
 
-Alias('build', target_list)
-Alias('cpu', [x for x in target_list if not 'gpu' in str(x)])
-Alias('gpu', [x for x in target_list if 'gpu' in str(x)])
-for x in target_list:
-    Alias(str(x), x)
-Default(target_list)
+flat_values = []
+cpu_vals = []
+gpu_vals = []
+for key, value in target_list.iteritems():
+    flat_values.extend(value)
+    if not 'gpu' in key:
+        cpu_vals.extend(value)
+    else:
+        gpu_vals.extend(value)
+Alias('build', flat_values)
+Alias('cpu', cpu_vals)
+Alias('gpu', gpu_vals)
+Default(flat_values)
