@@ -40,7 +40,7 @@ void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
     {
         for (int i = 0; i < NN; ++i)
         {
-            buffer[i] = y_host[NUM * i + j];
+            buffer[i] = y_host[padded * i + j];
         }
         apply_reverse_mask(&buffer[1]);
         fwrite(buffer, sizeof(double), NN, pFile);
