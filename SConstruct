@@ -415,7 +415,7 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
         else:
             env[key] += value
     Export('env')
-    int_c = SConscript(os.path.join(mydir, 'SConscript'), 
+    fd_c, ana_c = SConscript(os.path.join(mydir, 'SConscript'), 
         variant_dir=os.path.join(mydir, variant))
     #check for additional sconstructs
     if additional_sconstructs is not None:
@@ -423,14 +423,12 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
             temp_c = SConscript(os.path.join(thedir, 'SConscript'),
                 variant_dir=os.path.join(thedir, variant))
             int_c += temp_c
-    fd_c = [x for x in int_c if not 'analytic' in str(x)]
     target_list['cvodes-int'] = []
     target_list['cvodes-int'].append(
         env.Program(target='cvodes-int',
                     source=cobj + fd_c,
                     variant_dir=os.path.join(mydir, variant)))
 
-    ana_c = [x for x in int_c if not 'cvodes_init' in str(x)]
     target_list['cvodes-analytic-int'] = []
     target_list['cvodes-analytic-int'].append(
         env.Program(target='cvodes-analytic-int',
