@@ -5,6 +5,9 @@ import shutil
 from os.path import join as pjoin
 from os import getcwd as cwd
 from os.path import expanduser
+from os.path import sep
+from os import makedirs
+import errno
 from glob import glob
 import re
 import subprocess
@@ -17,15 +20,24 @@ np.set_printoptions(precision=15)
 
 keyfile = 'cvodes-analytical-int-log.bin'
 
+def create_dir(path):
+    try:
+        makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+def __check_exit(x):
+    if x != 0:
+        sys.exit(x)
+
 class Tee(object):
     def __init__(self, name, mode):
         self.file = open(name, mode)
         self.stdout = sys.stdout
-        sys.stdout = self
     def __enter__(self):
         return self
     def __exit__(self, type, value, traceback):
-        sys.stdout = self.stdout
         self.file.close()
     def write(self, data):
         self.file.write(data)
@@ -75,14 +87,27 @@ def __execute(builder, num_threads, num_conditions, logger):
             subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)])
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
-        num_threads, num_conditions, test_data, nvar, outfile):
+        num_threads, num_conditions, test_data, outfile):
         #first compile and run cvodes to get the baseline
-        pyJac.create_jacobian('c', mech, thermo,
+        __check_exit(pyJac.create_jacobian(lang='c', 
+            mech_name=mech, 
+            therm_name=thermo,
             initial_state=initial_conditions,
             optimize_cache=False,
-            build_path=build_path)
+            build_path=build_path))
+        nvar = None
+        #get num vars
+        with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
+            for line in file.readlines():
+                if 'NN' in line:
+                    match = re.search(r'\b(\d+)$', line.strip())
+                    if match:
+                        nvar = int(match.group(1))
+                        break
+        assert nvar is not None
         arg_list = ['-j{}'.format(num_threads),
-                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=FALSE', 'PRINT=FALSE']
+                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 
+                'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path)]
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
         else:
@@ -93,6 +118,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         #copy to saved data
         shutil.copy(pjoin(cwd(), 'log', keyfile),
                     pjoin(cwd(), 'log', 'valid.bin'))
+
 
         validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
         validator = validator.reshape((-1, 1 + num_conditions * nvar))
@@ -108,12 +134,14 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         outfile.write('\ncache_opt: {}\n'
                                       'shared_mem: {}\n'.format(
                                         cache_opt, shared_mem))
-                        pyJac.create_jacobian(lang, mech, thermo, 
+                        __check_exit(pyJac.create_jacobian(lang=lang, 
+                        mech_name=mech, 
+                        therm_name=thermo, 
                         initial_state=initial_conditions, 
-                        optimize_cache=opt,
+                        optimize_cache=cache_opt,
                         multi_thread=num_threads,
-                        no_shared=not shared_mem,
-                        build_path=build_path)
+                        no_shared=(not shared_mem),
+                        build_path=build_path))
 
                         subprocess.check_call(['scons', builder[lang]] + arg_list)
                         __execute(builder[lang], num_threads, num_conditions, outfile)
@@ -121,11 +149,13 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
                 else:
                     outfile.write('\ncache_opt: {}\n'.format(cache_opt))
-                    pyJac.create_jacobian(lang, mech, thermo, 
+                    __check_exit(pyJac.create_jacobian(lang=lang, 
+                    mech_name=mech, 
+                    therm_name=thermo, 
                     initial_state=initial_conditions, 
-                    optimize_cache=opt,
+                    optimize_cache=cache_opt,
                     multi_thread=num_threads,
-                    build_path=build_path)
+                    build_path=build_path))
 
                     subprocess.check_call(['scons', builder[lang]] + arg_list)
                     __execute(builder[lang], num_threads, num_conditions, outfile)
@@ -134,23 +164,16 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data):
     with Tee(pjoin('log', 'log_results.txt'), 'w') as myTee:
-        nvar = None
-        #get num vars
-        with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
-            for line in file.readlines():
-                if 'NN' in line:
-                    match = re.search(r'\b(\d+)$', line.strip())
-                    if match:
-                        nvar = int(match.group(1))
-                        break
-        assert nvar is not None
         if initial_conditions is not None:
             __run_and_check(mech, thermo, initial_conditions, build_path,
-            num_threads, num_conditions, None, nvar, myTee)
+            num_threads, num_conditions, None, myTee)
         if test_data is not None:
-            shutil.copyfile(test_data, 'ign_data.bin')
+            try:
+                shutil.copyfile(test_data, 'ign_data.bin')
+            except shutil.Error:
+                pass
             __run_and_check(mech, thermo, '', build_path,
-            num_threads, num_conditions, test_data, nvar, myTee)
+            num_threads, num_conditions, test_data, myTee)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -173,7 +196,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--build_path',
                         type=str,
                         required=False,
-                        default='./out/',
+                        default=pjoin(cwd(),'out') + sep,
                         help='The folder to generate the mechanism in')
     parser.add_argument('-nt', '--num_threads',
                         type=int,
@@ -195,6 +218,9 @@ if __name__ == '__main__':
 
     assert not (args.test_data is None and args.initial_conditions is None), \
     "Either a test data file or initial conditions must be specified"
+
+    create_dir(args.build_path)
+    create_dir('./log/')
 
     run_log(args.input, args.thermo, args.initial_conditions, args.build_path,
         args.num_threads, args.num_conditions, args.test_data)
