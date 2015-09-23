@@ -73,11 +73,7 @@ void** integrators;
     	}
 
     	//setup the solver
-	    #if defined(USE_MKL) || defined(USE_SYSTEM_LAPACK)
-	        flag = CVLapackDense(integrators[i], NN);
-	    #else
-	        flag = CVDense(integrators[i], NN);
-	    #endif
+	    flag = CVLapackDense(integrators[i], NN);
 
 	    if (flag != CV_SUCCESS) {
 	    	printf("Error setting up CVODES solver");
