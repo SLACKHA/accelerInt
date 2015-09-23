@@ -9,8 +9,8 @@ for src in c_src:
 	fdObj.append(env.Object(target='fd_' + str(src).replace('.c', '.o'),
 							source=src, 
 							variant_dir=env['variant']))
-	aObj.append(env.Object(target='ana_' + str(src).replace('.c', '.o'),
+	aObj.append(env_clone.Object(target='ana_' + str(src).replace('.c', '.o'),
 							source=src, 
-							variant_dir=env['variant']))
+							variant_dir=env_clone['variant']))
 
 Return ('fdObj', 'aObj')
