@@ -159,7 +159,7 @@ int main (int argc, char *argv[])
     int len = strlen(f_name);
     char out_name[len + 13];
     sprintf(out_name, "log/%s-log.bin", f_name);
-    pFile = fopen(out_name, "w");
+    pFile = fopen(out_name, "wb");
 
     write_log(NUM, 0, y_host, pFile);
     init_solver_log();
