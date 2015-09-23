@@ -149,7 +149,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
             num_threads, num_conditions, None, nvar, myTee)
         if test_data is not None:
             shutil.copyfile(test_data, 'ign_data.bin')
-            __run_and_check(mech, thermo, None, build_path,
+            __run_and_check(mech, thermo, '', build_path,
             num_threads, num_conditions, test_data, nvar, myTee)
 
 if __name__ == '__main__':
