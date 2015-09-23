@@ -43,7 +43,7 @@
 #elif CONV
         double pres = buffer[2];
 #endif
-        for (int j = 0; j < NN; j++)
+        for (int j = 0; j < NSP; j++)
             (*y_host)[i + (j + 1) * NUM] = buffer[j + 3];
 
         // if constant volume, calculate density

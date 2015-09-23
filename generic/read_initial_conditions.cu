@@ -46,8 +46,8 @@
 #elif CONV
         double pres = buffer[2];
 #endif
-        for (int j = 0; j <= NN; j++)
-            (*y_host)[i + (j + 1) * padded] = buffer[j + 2];
+        for (int j = 0; j < NSP; j++)
+            (*y_host)[i + (j + 1) * padded] = buffer[j + 3];
 
         // if constant volume, calculate density
 #ifdef CONV

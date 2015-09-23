@@ -83,7 +83,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             build_path=build_path)
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'SHUFFLE=FALSE', 'PRINT=FALSE']
-        if initial_conditions is not None:
+        if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
         else:
             arg_list.append('SAME_IC=FALSE')
