@@ -31,19 +31,7 @@ def __check_exit(x):
     if x != 0:
         sys.exit(x)
 
-class Tee(object):
-    def __init__(self, name, mode):
-        self.file = open(name, mode)
-        self.stdout = sys.stdout
-    def __enter__(self):
-        return self
-    def __exit__(self, type, value, traceback):
-        self.file.close()
-    def write(self, data):
-        self.file.write(data)
-        self.stdout.write(data)
-
-def __check_error(builder, num_conditions, nvar, validator, outfile):
+def __check_error(builder, num_conditions, nvar, validator):
     globtxt = '*-gpu-log.bin' if builder == 'gpu' else '*-int-log.bin'
     key_arr = validator[:, 1:]
     for f in glob(pjoin('log', globtxt)):
@@ -52,7 +40,7 @@ def __check_error(builder, num_conditions, nvar, validator, outfile):
         array = np.fromfile(f, dtype='float64')
         array = array.reshape((-1, 1 + num_conditions * nvar))
 
-        outfile.write(f + '\n')
+        print f
         data_arr = array[:, 1:]
         #now compare column by column and get max err
         max_err = 0
@@ -70,24 +58,24 @@ def __check_error(builder, num_conditions, nvar, validator, outfile):
         zero_norm_err = np.linalg.norm(err)
 
 
-        outfile.write("max non-zero err: {}\n"
-                      "norm non-zero err: {}\n"
-                      "max zero err: {}\n"
-                      "norm zero err: {}\n".format(max_err, norm_err,
-                        max_zero_err, zero_norm_err))
+        print("max non-zero err: {}\n"
+              "norm non-zero err: {}\n"
+              "max zero err: {}\n"
+              "norm zero err: {}\n".format(max_err, norm_err,
+                max_zero_err, zero_norm_err))
 
-def __execute(builder, num_threads, num_conditions, logger):
+def __execute(builder, num_threads, num_conditions):
     if builder == 'gpu':
         for exe in glob('*-gpu'):
-            logger.write('\n' + exe + '\n')
+            print '\n' + exe
             subprocess.check_call([pjoin(cwd(), exe), str(num_conditions)])
     else:
         for exe in glob('*-int'):
-            logger.write('\n' + exe + '\n')
+            print '\n' + exe
             subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)])
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
-        num_threads, num_conditions, test_data, outfile):
+        num_threads, num_conditions, test_data):
         #first compile and run cvodes to get the baseline
         __check_exit(pyJac.create_jacobian(lang='c', 
             mech_name=mech, 
@@ -131,9 +119,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             for cache_opt in opt:
                 if lang == 'cuda':
                     for shared_mem in smem:
-                        outfile.write('\ncache_opt: {}\n'
-                                      'shared_mem: {}\n'.format(
-                                        cache_opt, shared_mem))
+                        print ('\ncache_opt: {}\n'
+                               'shared_mem: {}'.format(
+                                cache_opt, shared_mem))
                         __check_exit(pyJac.create_jacobian(lang=lang, 
                         mech_name=mech, 
                         therm_name=thermo, 
@@ -144,11 +132,11 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         build_path=build_path))
 
                         subprocess.check_call(['scons', builder[lang]] + arg_list)
-                        __execute(builder[lang], num_threads, num_conditions, outfile)
-                        __check_error(builder[lang], num_conditions, nvar, validator, outfile)
+                        __execute(builder[lang], num_threads, num_conditions)
+                        __check_error(builder[lang], num_conditions, nvar, validator)
 
                 else:
-                    outfile.write('\ncache_opt: {}\n'.format(cache_opt))
+                    print '\ncache_opt: {}'.format(cache_opt)
                     __check_exit(pyJac.create_jacobian(lang=lang, 
                     mech_name=mech, 
                     therm_name=thermo, 
@@ -158,22 +146,23 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     build_path=build_path))
 
                     subprocess.check_call(['scons', builder[lang]] + arg_list)
-                    __execute(builder[lang], num_threads, num_conditions, outfile)
-                    __check_error(builder[lang], num_conditions, nvar, validator, outfile)
+                    __execute(builder[lang], num_threads, num_conditions)
+                    __check_error(builder[lang], num_conditions, nvar, validator)
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data):
-    with Tee(pjoin('log', 'log_results.txt'), 'w') as myTee:
-        if initial_conditions is not None:
-            __run_and_check(mech, thermo, initial_conditions, build_path,
-            num_threads, num_conditions, None, myTee)
-        if test_data is not None:
-            try:
-                shutil.copyfile(test_data, 'ign_data.bin')
-            except shutil.Error:
-                pass
-            __run_and_check(mech, thermo, '', build_path,
-            num_threads, num_conditions, test_data, myTee)
+    if initial_conditions is not None:
+        print 'Running Same ICs'
+        __run_and_check(mech, thermo, initial_conditions, build_path,
+        num_threads, num_conditions, None)
+    if test_data is not None:
+        print 'Running PaSR ICs'
+        try:
+            shutil.copyfile(test_data, 'ign_data.bin')
+        except shutil.Error:
+            pass
+        __run_and_check(mech, thermo, '', build_path,
+        num_threads, num_conditions, test_data)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
