@@ -16,7 +16,9 @@
 #include "linear-algebra.h"
 
 /** Defined for pi */
+#ifndef CUDA
 #define M_PI  4 * atan(1)
+#endif
 
 /** Complex math */
 #include <complex.h>

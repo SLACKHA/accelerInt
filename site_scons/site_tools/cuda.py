@@ -86,13 +86,20 @@ _cuda_obj_builder = SCons.Builder.Builder(
       src_suffix = '$NVCC_SUFFIX')
 
 def CUDAObject(env, src, target=None, *args, **kw):
-    CUDAObjCmdDefine(env)
-    result = []
+    use_env = env
     name = str(src)
+    if name.endswith('.c'):
+        cenv = env.Clone()
+        cenv['NVCCFLAGS'] += ['-Xcompiler -std=c99']
+        CUDAObjCmdDefine(cenv)
+        use_env = cenv
+    
+    CUDAObjCmdDefine(use_env)
+    result = []
     if not target:
-        suff = env.subst('$NVCC_SUFFIX')
+        suff = use_env.subst('$NVCC_SUFFIX')
         target = name[:name.index(suff)]
-    obj = _cuda_obj_builder.__call__(env, target, src, **kw)
+    obj = _cuda_obj_builder.__call__(use_env, target, src, **kw)
     result.extend(obj)
     # Add cleanup files
     env.Clean(obj, name)
