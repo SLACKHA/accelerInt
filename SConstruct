@@ -360,6 +360,9 @@ try:
     shutil.copyfile(os.path.join(defaults.mechanism_dir, 'SConscript'), os.path.join(mech_dir, 'SConscript'))
 except shutil.Error:
     pass
+except IOError, e:
+    if e.errno == 2:
+        pass
 
 def builder(env_save, cobj, cuobj, newdict, mydir, variant,
              target_base, target_list, additional_sconstructs=None,
