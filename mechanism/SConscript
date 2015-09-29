@@ -1,0 +1,35 @@
+Import('env')
+cObj = []
+c_src = Glob('*.c')
+import os
+try:
+	with open(os.path.join('jacobs', 'jac_list_c'), 'r') as file:
+		vals = file.readline().strip().split()
+	c_src.extend([os.path.join('jacobs', val) for val in vals])
+except:
+	pass
+
+for src in c_src:
+	cObj.append(env.Object(src, variant_dir=env['variant']))
+
+cudaObj = []
+cuda_src = Glob('*.cu')
+
+try:
+	with open(os.path.join('jacobs', 'jac_list_cuda'), 'r') as file:
+		vals = file.readline().strip().split()
+	cuda_src.extend([os.path.join('jacobs', val) for val in vals])
+except:
+	pass
+
+for src in cuda_src:
+	cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
+env_2 = env.Clone()
+if not 'CPPDEFINES' in env_2:
+	env_2['CPPDEFINES'] = []
+env_2['CPPDEFINES'] += ['CUDA']
+cudaObj.append(env_2.Object(target='cu_mass_mole.o',
+			   source='mass_mole.c',
+			   variant_dir=env_2['variant']))
+
+Return ('cObj', 'cudaObj')
