@@ -3,7 +3,7 @@
 #include <float.h>
 #include <string.h>
 
-#include "header.h"
+#include "header.cuh"
 #include "solver_props.h"
 
 ///////////////////////////////////////////////////////////

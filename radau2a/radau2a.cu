@@ -10,7 +10,7 @@
 * 
 */
 
-#include "header.h"
+#include "header.cuh"
 #include "solver_options.h"
 #include "inverse.cuh"
 #include "complexInverse_NN.cuh"

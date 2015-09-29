@@ -7,7 +7,7 @@
  *
  */
 
-#include "header.h"
+#include "header.cuh"
 #include "gpu_memory.cuh"
 #include "gpu_macros.cuh"
 #include <stdio.h>

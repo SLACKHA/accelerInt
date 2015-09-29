@@ -1,4 +1,4 @@
-#include "header.h"
+#include "header.cuh"
 #include <math.h>
 #include <float.h>
 #include "dydt.cuh"

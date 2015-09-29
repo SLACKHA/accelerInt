@@ -24,7 +24,7 @@
 #include <cuComplex.h>
 
 //our code
-#include "header.h"
+#include "header.cuh"
 #include "timer.h"
 //get our solver stuff
 #include "solver.cuh"

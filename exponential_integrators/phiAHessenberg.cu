@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "header.h"
+#include "header.cuh"
 #include "solver_options.h"
 #include "solver_props.h"
 //#include "linear-algebra.h"

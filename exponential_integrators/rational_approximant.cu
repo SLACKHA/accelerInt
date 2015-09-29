@@ -10,7 +10,7 @@
 
 //cf
 #include <cuComplex.h>
-#include "header.h"
+#include "header.cuh"
 extern "C" {
 #include "cf.h"
 }

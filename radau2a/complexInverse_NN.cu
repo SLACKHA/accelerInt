@@ -1,4 +1,4 @@
-#include "header.h"
+#include "header.cuh"
 #include "solver_props.h"
 #include <cuComplex.h>
 ///////////////////////////////////////////////////////////

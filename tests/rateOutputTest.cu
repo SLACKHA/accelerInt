@@ -12,7 +12,7 @@ in order to easily compare between different versions of the rates and jacobian 
 #include <cuda_runtime.h>
 #include <helper_cuda.h>
 
-#include "header.h"
+#include "header.cuh"
 
 int main (int argc, char *argv[]) {
 	write_jacobian_and_rates_output(65536);

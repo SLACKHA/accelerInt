@@ -18,7 +18,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "header.h"
+#include "header.cuh"
 #include "dydt.cuh"
 #include "jacob.cuh"
 #include "exprb43_props.h"

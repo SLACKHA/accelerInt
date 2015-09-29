@@ -7,7 +7,7 @@
  *
  */
 
-#include "header.h"
+#include "header.cuh"
 #include "solver.cuh"
 #include "gpu_memory.cuh"
 
