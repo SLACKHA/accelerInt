@@ -258,6 +258,7 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define SOLV_OPT_HEAD
 
     /* Tolerances and Timestep */
+    #include <float.h>
     #define ATOL ({})
     #define RTOL ({})
     #define t_step ({})
