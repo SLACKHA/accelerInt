@@ -98,6 +98,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path)]
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
+            num_conditions = num_threads #they're all the same, so do a reasonable #
         else:
             arg_list.append('SAME_IC=FALSE')
         subprocess.check_call(['scons', 'cpu'] + arg_list)
@@ -113,22 +114,23 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         langs = ['c', 'cuda']
         builder = {'c':'cpu', 'cuda':'gpu'}
         opt = [True, False]
-        smem = [True, False]
+        smem = [False, True]
         #now check for various options
         for lang in langs:
             for cache_opt in opt:
                 if lang == 'cuda':
                     for shared_mem in smem:
+                        subprocess.check_call(['scons', '-c'])
                         print ('\ncache_opt: {}\n'
                                'shared_mem: {}'.format(
-                                cache_opt, shared_mem))
+                                cache_opt, not shared_mem))
                         __check_exit(pyJac.create_jacobian(lang=lang, 
                         mech_name=mech, 
                         therm_name=thermo, 
                         initial_state=initial_conditions, 
                         optimize_cache=cache_opt,
                         multi_thread=num_threads,
-                        no_shared=(not shared_mem),
+                        no_shared=smem,
                         build_path=build_path))
 
                         subprocess.check_call(['scons', builder[lang]] + arg_list)
@@ -136,6 +138,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         __check_error(builder[lang], num_conditions, nvar, validator)
 
                 else:
+                    subprocess.check_call(['scons', '-c'])
                     print '\ncache_opt: {}'.format(cache_opt)
                     __check_exit(pyJac.create_jacobian(lang=lang, 
                     mech_name=mech, 
