@@ -225,6 +225,23 @@ except:
     print 'Could not find register count, skipping CUDA integrators'
 NVCCFlags.append(['-maxrregcount {}'.format(reg_count), '-Xcompiler {}'.format(env['openmp_flags'])])
 
+#extra jacobians
+try:
+    with open(os.path.join(mech_dir, 'jacobs', 'jac_list_c'), 'r') as file:
+        vals = [os.path.join(mech_dir, 'jacobs', x) for x in 
+                file.readline().strip().split()]
+    env['extra_c_jacobs'] = vals
+except:
+    pass
+try:
+    with open(os.path.join(mech_dir, 'jacobs', 'jac_list_cuda'), 'r') as file:
+        vals = [os.path.join(mech_dir, 'jacobs', x) for x in 
+                file.readline().strip().split()]
+    env['extra_cuda_jacobs'] = vals
+except:
+    pass
+
+
 #link lines
 CCLibDirs = [env['blas_lapack_dir']]
 CCLibs += listify(env['blas_lapack_libs'])

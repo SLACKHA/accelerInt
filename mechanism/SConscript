@@ -1,26 +1,17 @@
 Import('env')
 cObj = []
 c_src = Glob('*.c')
+if 'extra_c_jacobs' in env:
+	c_src.extend(env['extra_c_jacobs'])
 import os
-try:
-	with open(os.path.join('jacobs', 'jac_list_c'), 'r') as file:
-		vals = file.readline().strip().split()
-	c_src.extend([os.path.join('jacobs', val) for val in vals])
-except:
-	pass
 
 for src in c_src:
 	cObj.append(env.Object(src, variant_dir=env['variant']))
 
 cudaObj = []
 cuda_src = Glob('*.cu')
-
-try:
-	with open(os.path.join('jacobs', 'jac_list_cuda'), 'r') as file:
-		vals = file.readline().strip().split()
-	cuda_src.extend([os.path.join('jacobs', val) for val in vals])
-except:
-	pass
+if 'extra_cuda_jacobs' in env:
+	cuda_src.extend(env['extra_cuda_jacobs'])
 
 for src in cuda_src:
 	cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
