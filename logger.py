@@ -130,7 +130,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         initial_state=initial_conditions, 
                         optimize_cache=cache_opt,
                         multi_thread=num_threads,
-                        no_shared=smem,
+                        no_shared=shared_mem,
                         build_path=build_path))
 
                         subprocess.check_call(['scons', builder[lang]] + arg_list)
