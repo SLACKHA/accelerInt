@@ -120,7 +120,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             for cache_opt in opt:
                 if lang == 'cuda':
                     for shared_mem in smem:
-                        subprocess.check_call(['scons', '-c'])
+                        #subprocess.check_call(['scons', '-c'])
                         print ('\ncache_opt: {}\n'
                                'shared_mem: {}'.format(
                                 cache_opt, not shared_mem))
@@ -138,7 +138,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         __check_error(builder[lang], num_conditions, nvar, validator)
 
                 else:
-                    subprocess.check_call(['scons', '-c'])
+                    #subprocess.check_call(['scons', '-c'])
                     print '\ncache_opt: {}'.format(cache_opt)
                     __check_exit(pyJac.create_jacobian(lang=lang, 
                     mech_name=mech, 
