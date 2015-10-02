@@ -470,11 +470,14 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
                     source=cobj + ana_c,
                     variant_dir=os.path.join(mydir, variant)))
 
-
 env_save = env.Clone()
 Export('env')
 mech_c, mech_cuda = SConscript(os.path.join(mech_dir, 'SConscript'), variant_dir=os.path.join(mech_dir, variant))
 gen_c, gen_cuda = SConscript(os.path.join(generic_dir, 'SConscript'), variant_dir=os.path.join(generic_dir, variant))
+
+if os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
+    solver_main_cu = [x for x in gen_cuda if 'solver_main' in str(x[0])]
+    Depends(solver_main_cu, os.path.join(mech_dir, 'launch_bounds.cuh'))
 
 #radua
 new_defines = {}
