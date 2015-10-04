@@ -3,7 +3,7 @@
 #include <math.h>
 #include <float.h>
 
-#define FD_ORD 2
+#define FD_ORD 1
 
 void eval_jacob (const double t, const double pres, double * y, double * jac) {
   
@@ -13,8 +13,12 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
   // Finite difference coefficients
   double x_coeffs[FD_ORD];
   double y_coeffs[FD_ORD];
-  
-  if (FD_ORD == 2) {
+
+  if (FD_ORD == 1) {
+    x_coeffs[0] = 1.0;
+    y_coeffs[0] = 
+  }
+  else if (FD_ORD == 2) {
     // 2nd order central difference
     x_coeffs[0] = -1.0;
     x_coeffs[1] = 1.0;
@@ -71,26 +75,35 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
     double yj_orig = y[j];
     double r = fmax(srur * fabs(yj_orig), r0 / ewt[j]);
     
-    #pragma unroll
-    for (int i = 0; i < NN; ++i) {
-      jac[i + NN*j] = 0.0;
-    }
-    
-    #pragma unroll
-    for (int k = 0; k < FD_ORD; ++k) {
-      y[j] = yj_orig + x_coeffs[k] * r;
-      dydt (t, pres, y, ftemp);
-      
+    #if FD_ORD==1
+      y[j] = yj_orig + r;
+      dydt (t, pres, y, f_temp);
+        
       #pragma unroll
       for (int i = 0; i < NN; ++i) {
-        jac[i + NN*j] += y_coeffs[k] * ftemp[i];
+        jac[i + NN*j] = (f_temp[i] - dy[i]) / r;
       }
-    }
+    #else
+      #pragma unroll
+      for (int i = 0; i < NN; ++i) {
+        jac[i + NN*j] = 0.0;
+      }
+      #pragma unroll
+      for (int k = 0; k < FD_ORD; ++k) {
+        y[j] = yj_orig + x_coeffs[k] * r;
+        dydt (t, pres, y, ftemp);
+        
+        #pragma unroll
+        for (int i = 0; i < NN; ++i) {
+          jac[i + NN*j] += y_coeffs[k] * ftemp[i];
+        }
+      }
+      #pragma unroll
+      for (int i = 0; i < NN; ++i) {
+        jac[i + NN*j] /= r;
+      }
     
-    #pragma unroll
-    for (int i = 0; i < NN; ++i) {
-      jac[i + NN*j] /= r;
-    }
+    #endif
     
     y[j] = yj_orig;
   }
