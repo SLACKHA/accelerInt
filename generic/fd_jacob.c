@@ -6,8 +6,10 @@
 
 #define FD_ORD 1
 
-void eval_jacob (const double t, const double pres, double * y, double * jac) {
+void eval_jacob (const double t, const double pres, const double * cy, double * jac) {
   
+  double y[NN];
+  memcpy(y, cy, NN * sizeof(double));
   double dy[NN];
   dydt (t, pres, y, dy);
   
@@ -15,7 +17,6 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
   #if FD_ORD != 1
   double x_coeffs[FD_ORD];
   double y_coeffs[FD_ORD];
-  #endif
 
   if (FD_ORD == 2) {
     // 2nd order central difference
@@ -49,6 +50,7 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
     y_coeffs[4] = -3.0 / 20.0;
     y_coeffs[5] = 1.0 / 60.0;
   }
+  #endif
   
   double ewt[NN];
   #pragma unroll

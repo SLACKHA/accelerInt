@@ -20,16 +20,18 @@
 #endif
 
 __device__
-void eval_jacob (const double t, const double pres, double * y, double * jac) {
+void eval_jacob (const double t, const double pres, const double * cy, double * jac) {
+  double y[NN];
   double dy[NN];
   double error[NN];
-
-  dydt (t, pres, y, dy);
   
   #pragma unroll
   for (int i = 0; i < NN; ++i) {
-    error[i] = ATOL + (RTOL * fabs(y[i]));
+    error[i] = ATOL + (RTOL * fabs(cy[i]));
+    y[i] = cy[i];
   }
+
+  dydt (t, pres, y, dy);
   
   // unit roundoff of machine
   double srur = sqrt(DBL_EPSILON);
@@ -41,10 +43,7 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
   }
   double fac = sqrt(sum / ((double)(NN)));
   double r0 = 1000.0 * RTOL * DBL_EPSILON * ((double)(NN)) * fac;
-  
-#ifndef GLOBAL_MEM
   double f_temp[NN];
-#endif
   
   #pragma unroll
   for (int j = 0; j < NN; ++j) {
