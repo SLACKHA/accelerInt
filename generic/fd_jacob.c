@@ -1,5 +1,6 @@
 #include "header.h"
-#include "derivs.h"
+#include "dydt.h"
+#include "solver_options.h"
 #include <math.h>
 #include <float.h>
 
@@ -7,18 +8,16 @@
 
 void eval_jacob (const double t, const double pres, double * y, double * jac) {
   
-  double ydot[NN];
-  dydt (t, pres, y, ydot);
+  double dy[NN];
+  dydt (t, pres, y, dy);
   
   // Finite difference coefficients
+  #if FD_ORD != 1
   double x_coeffs[FD_ORD];
   double y_coeffs[FD_ORD];
+  #endif
 
-  if (FD_ORD == 1) {
-    x_coeffs[0] = 1.0;
-    y_coeffs[0] = 
-  }
-  else if (FD_ORD == 2) {
+  if (FD_ORD == 2) {
     // 2nd order central difference
     x_coeffs[0] = -1.0;
     x_coeffs[1] = 1.0;
@@ -34,7 +33,7 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
     y_coeffs[1] = -2.0 / 3.0;
     y_coeffs[2] = 2.0 / 3.0;
     y_coeffs[3] = -1.0 / 12.0;
-  } else {
+  } else if (FD_ORD == 6) {
     // 6th order central difference
     x_coeffs[0] = -3.0;
     x_coeffs[1] = -2.0;
@@ -63,7 +62,7 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
   double sum = 0.0;
   #pragma unroll
   for (int i = 0; i < NN; ++i) {
-    sum += (ewt[i] * ydot[i]) * (ewt[i] * ydot[i]);
+    sum += (ewt[i] * dy[i]) * (ewt[i] * dy[i]);
   }
   double fac = sqrt(sum / ((double)(NN)));
   double r0 = 1000.0 * RTOL * DBL_EPSILON * ((double)(NN)) * fac;
@@ -77,11 +76,11 @@ void eval_jacob (const double t, const double pres, double * y, double * jac) {
     
     #if FD_ORD==1
       y[j] = yj_orig + r;
-      dydt (t, pres, y, f_temp);
+      dydt (t, pres, y, ftemp);
         
       #pragma unroll
       for (int i = 0; i < NN; ++i) {
-        jac[i + NN*j] = (f_temp[i] - dy[i]) / r;
+        jac[i + NN*j] = (ftemp[i] - dy[i]) / r;
       }
     #else
       #pragma unroll

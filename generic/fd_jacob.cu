@@ -1,8 +1,9 @@
-#include "header.cuh"
 #include <math.h>
 #include <float.h>
+#include "header.cuh"
 #include "dydt.cuh"
 #include "gpu_macros.cuh"
+#include "solver_options.h"
 
 #define FD_ORD 1
 
