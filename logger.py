@@ -146,7 +146,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     #subprocess.check_call(['scons', '-c'])
                     with open('logfile', 'a') as file:
                         #subprocess.check_call(['scons', '-c'])
-                        file.write('\ncache_opt: {}\n')
+                        file.write('\ncache_opt: {}\n'.format(
+                                    cache_opt))
                         __check_exit(pyJac.create_jacobian(lang=lang, 
                         mech_name=mech, 
                         therm_name=thermo, 
