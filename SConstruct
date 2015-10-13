@@ -228,7 +228,7 @@ NVCCFlags.append(['-maxrregcount {}'.format(reg_count), '-Xcompiler {}'.format(e
 #extra jacobians
 try:
     have_extras = False
-    with open(os.path.join(mech_dir, 'jacob.c'), 'r') as file:
+    with open(os.path.join(mech_dir, 'jacob.h'), 'r') as file:
         for line in file.readlines():
             if "#include \"jacobs/jac_include.h\"" in line:
                 have_extras = True
@@ -242,7 +242,7 @@ except:
     pass
 try:
     have_extras = False
-    with open(os.path.join(mech_dir, 'jacob.cu'), 'r') as file:
+    with open(os.path.join(mech_dir, 'jacob.cuh'), 'r') as file:
         for line in file.readlines():
             if "#include \"jacobs/jac_include.cuh\"" in line:
                 have_extras = True
