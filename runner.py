@@ -6,6 +6,9 @@ import errno
 import sys
 from argparse import ArgumentParser
 import stat
+import cantera as ct
+import numpy as np
+import multiprocessing
 
 def check_dir(dir, force):
     old_files = [file for file in os.listdir(dir) if '.timing' in file and os.path.isfile(os.path.join(dir, file))]
@@ -34,24 +37,36 @@ def get_executables(blacklist, inverse=None):
                     exes.append(filename)
     return exes
 
-def run(force=False, pyjac='', blacklist=None, repeats=5):
-    if blacklist is None:
-        blacklist = []
-
-    mechanism = glob.glob('*.cti')[0]
-    with open('ics.txt', 'r') as file:
-        ic_str = file.readline().strip()
-    with open('num_cond.txt', 'r') as file:
-        num_cond = int(file.readline().strip())
-
-    home = os.getcwd()
-    make_sure_path_exists(os.path.join(home, 'log'))
-    threads = [6, 12]
+def get_powers(num_cond):
     powers = [1]
     while powers[-1] < num_cond:
         powers.append(powers[-1] * 2)
     if powers[-1] != num_cond:
         powers.append(num_cond)
+    return powers
+
+def get_diff_ics_cond(thedir, mechanism):
+    gas = ct.Solution(mechanism)
+    data = np.fromfile(os.path.join(thedir, 'data.bin'), dtype='float64')
+    num_c = data.shape[0] / float(gas.n_species + 3)
+    assert int(num_c) == num_c
+    return int(num_c)
+
+def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
+    jthread = str(multiprocessing.cpu_count())
+
+    mechanism = os.path.join(thedir, glob.glob(os.path.join(thedir, '*.cti'))[0])
+    with open(os.path.join(thedir, 'ics.txt'), 'r') as file:
+        ic_str = file.readline().strip()
+
+    home = os.getcwd()
+    threads = [6, 12]
+    same_powers = get_powers(num_cond)
+    diff_powers = get_powers(get_diff_ics_cond(thedir, mechanism))
+
+    #copy the datafile
+    shutil.copy(os.path.join(thedir, 'data.bin'),
+                os.path.join(home, 'ign_data.bin'))
 
     #generate mechanisms
     cache_opt = [True, False]
@@ -59,13 +74,13 @@ def run(force=False, pyjac='', blacklist=None, repeats=5):
     same_ics = [True, False]
     for opt in cache_opt:
         mech_dir = 'cpu_{}'.format('co' if cache_opt else 'nco')
-        mech_dir = os.path.join(home, mech_dir)
+        mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
         make_sure_path_exists(mech_dir)
-        args = ['python2.7', os.path.join(pyjac, 'pyJac.py'), '-lc', '-i{}'.format(mechanism)]
+        args = ['python2.7', os.path.join(pyjac, 'pyJac.py'), '-l', 'c', '-i', mechanism]
         if not opt:
             args.append('-nco')
-        args.append('-ic{}'.format(ic_str))
-        args.append('-b{}'.format(mech_dir))
+        args.extend(['-ic', ic_str])
+        args.extend(['-b', mech_dir])
         subprocess.check_call(args)
 
         for smem in use_smem:
@@ -76,45 +91,31 @@ def run(force=False, pyjac='', blacklist=None, repeats=5):
                 #copy the pickle from the cpu folder
                 shutil.copy(os.path.join(mech_dir, 'optimized.pickle'), 
                     os.path.join(gpu_mech_dir, 'optimized.pickle'))
-            args = ['python2.7', os.path.join(pyjac, 'pyJac.py'), '-lc', '-i{}'.format(mechanism)]
+            args = ['python2.7', os.path.join(pyjac, 'pyJac.py'), '-l', 'cuda', '-i', mechanism]
             if not opt:
                 args.append('-nco')
             if not smem:
                 args.append('-nosmem')
-            args.append('-ic{}'.format(ic_str))
-            args.append('-b{}'.format(mech_dir))
+            args.extend(['-ic', ic_str])
+            args.extend(['-b', mech_dir])
             subprocess.check_call(args)
 
     #now build and run
     for same in same_ics:
+        thepow = same_powers if same else diff_powers
         for opt in cache_opt:
             mech_dir = 'cpu_{}'.format('co' if cache_opt else 'nco')
-            mech_dir = os.path.join(home, mech_dir)
-            args = ['scons', 'cpu', 'mech_dir={}'.format(mech_dir)]
-            if same:
-                args.append('SAME_IC=True')
-                log_dir = 'cpu_{}_{}'.format('same' if same else 'diff',
-                'co' if cache_opt else 'nco')
-                subprocess.check_call(args + ['LOG_OUTPUT=True'])
-                #get all executables
-                run_me = get_executables(blacklist + ['gpu'])
-                #run log
-                for exe in run_me:
-                    subprocess.check_call([exe, '1', '1'])
-                #move log files
-                make_sure_path_exists(log_dir)
-                for f in glob.glob(os.path.join(home, 'log', '*.txt')):
-                    try:
-                        shutil.move(os.path.join(home, 'log', f), os.path.join(home, log_dir, f))
-                    except shutil.Error, e:
-                        pass
-
+            mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
+            args = ['scons', 'cpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
+                 'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
+                 'PRINT=FALSE', 'mechanism_dir={}'.format(mech_dir)]
+            args.append('SAME_IC={}'.format(same))
             #rebuild for performance
             subprocess.check_call(args)
             #run with repeats
             for exe in run_me:
                 for thread in threads:
-                    for cond in powers:
+                    for cond in thepow:
                         with open(exe + '_{}_{}_{}.txt'.format(cond, thread, 
                             'co' if cache_opt else 'nco'), 'a') as file:
                             for repeat in range(repeats):
@@ -123,29 +124,14 @@ def run(force=False, pyjac='', blacklist=None, repeats=5):
             for smem in use_smem:
                 gpu_mech_dir = 'gpu_{}_{}'.format('co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')
                 gpu_mech_dir = os.path.join(home, gpu_mech_dir)
-                log_dir = 'gpu_{}_{}_{}'.format('same' if same else 'diff',
-                'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')
-                args = ['scons', 'gpu', 'mech_dir={}'.format(gpu_mech_dir)]
-                if same:
-                    args.append('SAME_IC=True')
-                    subprocess.check_call(args)
-                    #get all executables
-                    run_me = get_executables(blacklist, ['gpu'])
-                    #run log
-                    for exe in run_me:
-                        subprocess.check_call([exe, '1'])
-                    #move log files
-                    make_sure_path_exists(log_dir)
-                    for f in glob.glob(os.path.join(home, 'log', '*.txt')):
-                        try:
-                            shutil.move(os.path.join(home, 'log', f), os.path.join(home, log_dir, f))
-                        except shutil.Error, e:
-                            pass
-                #rebuild for performance
+                args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
+                 'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
+                 'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir)]
+                args.append('SAME_IC={}'.format(same))
                 subprocess.check_call(args)
                 #run with repeats
                 for exe in run_me:
-                    for cond in powers:
+                    for cond in thepow:
                         with open(exe + '{}_{}_{}.txt'.format(cond,
                             'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem'), 'a') as file:
                             for repeat in range(repeats):
@@ -169,8 +155,18 @@ if __name__ == '__main__':
                         help='The base directory of pyJac')
     parser.add_argument('-s', '--solver_blacklist',
                         required=False,
-                        default='exp4-int,exp4-int-gpu,exprb43-int-gpu',
+                        default='',
                         help='The solvers to not run')
+    parser.add_argument('-n', '--num_cond',
+                        type=int,
+                        required=False,
+                        default=131072,
+                        help='The number of conditions to run for the same ics')
+    parser.add_argument('-r', '--repeats',
+                        required=False,
+                        type=int,
+                        default=5,
+                        help='The number of timing repeats to run')
     args = parser.parse_args()
 
     home = os.getcwd()
@@ -178,7 +174,10 @@ if __name__ == '__main__':
     dir_list = sorted([os.path.join(a_dir, name) for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))])
 
+    run_me = get_executables(args.solver_blacklist.split(','))
     for d in dir_list:
-        os.chdir(d)
-        run(force=args.force, pyjac=args.pyjac_dir, blacklist=args.solver_blacklist.split(','))
+        run(d, run_me, force=args.force, 
+            pyjac=os.path.expanduser(args.pyjac_dir), 
+            num_cond=args.num_cond,
+            repeats=args.repeats)
         os.chdir(home)
