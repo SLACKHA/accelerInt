@@ -21,12 +21,12 @@
 
 __device__
 void eval_jacob (const double t, const double pres, const double * cy, double * jac) {
-  double y[NN];
-  double dy[NN];
-  double error[NN];
+  double y[NSP];
+  double dy[NSP];
+  double ewt[NSP];
   
   #pragma unroll
-  for (int i = 0; i < NN; ++i) {
+  for (int i = 0; i < NSP; ++i) {
     error[i] = ATOL + (RTOL * fabs(cy[i]));
     y[i] = cy[i];
   }
@@ -38,15 +38,15 @@ void eval_jacob (const double t, const double pres, const double * cy, double * 
   
   double sum = 0.0;
   #pragma unroll
-  for (int i = 0; i < NN; ++i) {
+  for (int i = 0; i < NSP; ++i) {
     sum += (error[i] * dy[i]) * (error[i] * dy[i]);
   }
-  double fac = sqrt(sum / ((double)(NN)));
-  double r0 = 1000.0 * RTOL * DBL_EPSILON * ((double)(NN)) * fac;
-  double f_temp[NN];
+  double fac = sqrt(sum / ((double)(NSP)));
+  double r0 = 1000.0 * RTOL * DBL_EPSILON * ((double)(NSP)) * fac;
+  double f_temp[NSP];
   
   #pragma unroll
-  for (int j = 0; j < NN; ++j) {
+  for (int j = 0; j < NSP; ++j) {
     double yj_orig = y[j];
     double r = fmax(srur * fabs(yj_orig), r0 / error[j]);
     
@@ -55,13 +55,13 @@ void eval_jacob (const double t, const double pres, const double * cy, double * 
       dydt (t, pres, y, f_temp);
         
       #pragma unroll
-      for (int i = 0; i < NN; ++i) {
-        jac[i + NN*j] = (f_temp[i] - dy[i]) / r;
+      for (int i = 0; i < NSP; ++i) {
+        jac[i + NSP*j] = (f_temp[i] - dy[i]) / r;
       }
     #else
       #pragma unroll
-      for (int i = 0; i < NN; ++i) {
-        jac[i + NN*j] = 0.0;
+      for (int i = 0; i < NSP; ++i) {
+        jac[i + NSP*j] = 0.0;
       }
       #pragma unroll
       for (int k = 0; k < FD_ORD; ++k) {
@@ -69,13 +69,13 @@ void eval_jacob (const double t, const double pres, const double * cy, double * 
         dydt (t, pres, y, f_temp);
         
         #pragma unroll
-        for (int i = 0; i < NN; ++i) {
-          jac[i + NN*j] += y_coeffs[k] * f_temp[i];
+        for (int i = 0; i < NSP; ++i) {
+          jac[i + NSP*j] += y_coeffs[k] * f_temp[i];
         }
       }
       #pragma unroll
-      for (int i = 0; i < NN; ++i) {
-        jac[i + NN*j] /= r;
+      for (int i = 0; i < NSP; ++i) {
+        jac[i + NSP*j] /= r;
       }
     #endif
     

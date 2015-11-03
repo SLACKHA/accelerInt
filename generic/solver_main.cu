@@ -38,10 +38,13 @@ void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
     double buffer[NN];
     for (int j = 0; j < NUM; j++)
     {
-        for (int i = 0; i < NN; ++i)
+        double Y_N = 1.0;
+        for (int i = 0; i < NSP; ++i)
         {
             buffer[i] = y_host[padded * i + j];
+            Y_N -= buffer[i];
         }
+        buffer[NSP] = Y_N;
         apply_reverse_mask(&buffer[1]);
         fwrite(buffer, sizeof(double), NN, pFile);
     }
@@ -205,7 +208,7 @@ int main (int argc, char *argv[])
     {
         numSteps++;
         // transfer memory to GPU
-        cudaErrorCheck( cudaMemcpy (y_device, y_host, padded * NN * sizeof(double), cudaMemcpyHostToDevice) );
+        cudaErrorCheck( cudaMemcpy (y_device, y_host, padded * NSP * sizeof(double), cudaMemcpyHostToDevice) );
 
 #if defined(CONP)
         // constant pressure case
@@ -219,7 +222,7 @@ int main (int argc, char *argv[])
         cudaErrorCheck( cudaDeviceSynchronize() );
 #endif
         // transfer memory back to CPU
-        cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NN * sizeof(double), cudaMemcpyDeviceToHost) );
+        cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NSP * sizeof(double), cudaMemcpyDeviceToHost) );
 
         t = t_next;
         t_next += t_step;

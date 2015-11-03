@@ -17,7 +17,7 @@
 
  int read_initial_conditions(const char* filename, int NUM, int block_size, int grid_size, double** y_host, double** y_device, double** variable_host, double** variable_device) {
     int padded = initialize_gpu_memory(NUM, block_size, grid_size, y_device, variable_device);
-    (*y_host) = (double*)malloc(padded * NN * sizeof(double));
+    (*y_host) = (double*)malloc(padded * NSP * sizeof(double));
     (*variable_host) = (double*)malloc(padded * sizeof(double));
     FILE *fp = fopen (filename, "rb");
     if (fp == NULL)
@@ -46,17 +46,17 @@
 #elif CONV
         double pres = buffer[2];
 #endif
-        for (int j = 0; j < NSP; j++)
+        for (int j = 0; j < NSP - 1; j++)
             (*y_host)[i + (j + 1) * padded] = buffer[j + 3];
 
         // if constant volume, calculate density
 #ifdef CONV
-        double Yi[NSP];
-        double Xi[NSP];
+        double Yi[NSP - 1];
+        double Xi[NSP - 1];
 
-        for (int j = 1; j < NN; ++j)
+        for (int j = 0; j < NSP - 1; ++j)
         {
-            Yi[j - 1] = (*y_host)[i + j * padded];
+            Yi[j] = (*y_host)[i + (j + 1) * padded];
         }
 
         mass2mole (Yi, Xi);

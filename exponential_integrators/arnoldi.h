@@ -43,7 +43,7 @@ static inline
 int arnoldi(int* m, const double scale, const int p, const double h, const double* A, const double* v, const double* sc, double* beta, double* Vm, double* Hm, double* phiHm)
 {
 	//the temporary work array
-	double w[NN];
+	double w[NSP];
 
 	//first place A*fy in the Vm matrix
 	*beta = normalize(v, Vm);
@@ -62,11 +62,11 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		#pragma unroll
 		for (; j < index_list[index]; j++)
 		{
-			sparse_multiplier(A, &Vm[j * NN], w);
+			sparse_multiplier(A, &Vm[j * NSP], w);
 			for (int i = 0; i <= j; i++)
 			{
-				Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * NN]);
-				scale_subtract(Hm[j * STRIDE + i], &Vm[i * NN], w);
+				Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * NSP]);
+				scale_subtract(Hm[j * STRIDE + i], &Vm[i * NSP], w);
 			}
 			Hm[j * STRIDE + j + 1] = two_norm(w);
 			if (fabs(Hm[j * STRIDE + j + 1]) < ATOL)
@@ -75,7 +75,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 				*m = j;
 				break;
 			}
-			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NN]);
+			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NSP]);
 		}
 		*m = index_list[index++];
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
@@ -136,15 +136,15 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 				{
 					val += working[(*m) * ind1 + (*m - 1)] * Hm[ind1];
 				}
-				err = h * (*beta) * fabs(store * val) * sc_norm(&Vm[(*m) * NN], sc);
+				err = h * (*beta) * fabs(store * val) * sc_norm(&Vm[(*m) * NSP], sc);
 				free(working);
 			}
 			else
 			{
-				err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NN], sc);
+				err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NSP], sc);
 			}
 		#else
-			err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NN], sc);
+			err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NSP], sc);
 		#endif
 
 		//restore Hm(m, m + 1)

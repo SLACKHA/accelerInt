@@ -38,7 +38,7 @@ void intDriver (const int NUM, const double t, const double t_end,
         // load local array with initial values from global array
         double* y_local = NV_DATA_S(fill);
         #pragma unroll
-        for (int i = 0; i < NN; i++)
+        for (int i = 0; i < NSP; i++)
         {
             y_local[i] = y_global[tid + i * NUM];
         }
@@ -69,7 +69,7 @@ void intDriver (const int NUM, const double t, const double t_end,
             if (flag != CV_SUCCESS)
             {
                 printf("%d\t%d\n", index, NUM);
-                for (int i = 0; i < NN; i++)
+                for (int i = 0; i < NSP; i++)
                     printf("%le\t%le\n", y_local[i], y_global[tid + NUM * i]);
                 printf("Error on integration step: %d", flag);
                 exit(-1);
@@ -83,7 +83,7 @@ void intDriver (const int NUM, const double t, const double t_end,
 
         // update global array with integrated values
         #pragma unroll
-        for (int i = 0; i < NN; i++)
+        for (int i = 0; i < NSP; i++)
         {
             y_global[tid + i * NUM] = y_local[i];
         }

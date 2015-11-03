@@ -18,12 +18,12 @@ void intDriver (const int NUM, const double t, const double t_end,
     for (tid = 0; tid < NUM; ++tid) {
 
         // local array with initial values
-        double y_local[NN];
+        double y_local[NSP];
         double pr_local = pr_global[tid];
 
         // load local array with initial values from global array
 #pragma unroll
-        for (int i = 0; i < NN; i++)
+        for (int i = 0; i < NSP; i++)
         {
             y_local[i] = y_global[tid + i * NUM];
         }
@@ -33,7 +33,7 @@ void intDriver (const int NUM, const double t, const double t_end,
 
         // update global array with integrated values
 #pragma unroll
-        for (int i = 0; i < NN; i++)
+        for (int i = 0; i < NSP; i++)
         {
             y_global[tid + i * NUM] = y_local[i];
         }

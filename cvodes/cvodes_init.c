@@ -29,13 +29,13 @@ void** integrators;
 
  void initialize_solver(int num_threads) {
  	y_locals = (N_Vector*)malloc(num_threads * sizeof(N_Vector));
- 	y_local_vectors = (double*)calloc(num_threads * NN, sizeof(double));
+ 	y_local_vectors = (double*)calloc(num_threads * NSP, sizeof(double));
  	integrators = (void**)malloc(num_threads * sizeof(void*));
 
  	for (int i = 0; i < num_threads; i++)
 	{
 		integrators[i] = CVodeCreate(CV_BDF, CV_NEWTON);
-		y_locals[i] = N_VMake_Serial(NN, &y_local_vectors[i * NN]);
+		y_locals[i] = N_VMake_Serial(NSP, &y_local_vectors[i * NSP]);
 		if (integrators[i] == NULL)
 		{
 			printf("Error creating CVodes Integrator");
@@ -73,7 +73,7 @@ void** integrators;
     	}
 
     	//setup the solver
-	    flag = CVLapackDense(integrators[i], NN);
+	    flag = CVLapackDense(integrators[i], NSP);
 
 	    if (flag != CV_SUCCESS) {
 	    	printf("Error setting up CVODES solver");

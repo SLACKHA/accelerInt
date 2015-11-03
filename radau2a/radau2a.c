@@ -37,14 +37,14 @@
 
 void scale (const double * y0, const double* y, double * sc) {
 	#pragma unroll
-	for (int i = 0; i < NN; ++i) {
+	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fmax(fabs(y0[i]), fabs(y[i])) * RTOL);
 	}
 }
 
 void scale_init (const double * y0, double * sc) {
 	#pragma unroll
-	for (int i = 0; i < NN; ++i) {
+	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
 	}
 }
@@ -190,7 +190,7 @@ extern void zgetrs_ (char* trans, int* n, int* nrhs, double complex* A, int* LDA
 //dummy size variable
 static char TRANS = 'N';
 static int NRHS = 1;
-static int ARRSIZE = NN;
+static int ARRSIZE = NSP;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -201,16 +201,16 @@ static void RK_Decomp(double H, double* E1, double complex* E2, const double* Ja
 	double complex temp2 = rkAlpha/H + I * rkBeta/H;
 	double temp1 = rkGamma / H;
 	#pragma unroll
-	for (int i = 0; i < NN; i++)
+	for (int i = 0; i < NSP; i++)
 	{
 		#pragma unroll
-		for(int j = 0; j < NN; j++)
+		for(int j = 0; j < NSP; j++)
 		{
-			E1[i + j * NN] = -Jac[i + j * NN];
-			E2[i + j * NN] = -Jac[i + j * NN] + 0 * I;
+			E1[i + j * NSP] = -Jac[i + j * NSP];
+			E2[i + j * NSP] = -Jac[i + j * NSP] + 0 * I;
 		}
-		E1[i + i * NN] += temp1;
-		E2[i + i * NN] += temp2; 
+		E1[i + i * NSP] += temp1;
+		E2[i + i * NSP] += temp2; 
 	}
 	dgetrf_(&ARRSIZE, &ARRSIZE, E1, &ARRSIZE, ipiv1, info);
 	if (*info != 0) {
@@ -222,14 +222,14 @@ static void RK_Decomp(double H, double* E1, double complex* E2, const double* Ja
 static void RK_Make_Interpolate(const double* Z1, const double* Z2, const double* Z3, double* CONT) {
 	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]); 
 	#pragma unroll
-	for (int i = 0; i < NN; i++) {
+	for (int i = 0; i < NSP; i++) {
 		CONT[i] = ((-rkC[2] * rkC[2] * rkC[1] * Z1[i] + Z3[i] * rkC[1]* rkC[0] * rkC[0]
                     + rkC[1] * rkC[1] * rkC[2] * Z1[i] - rkC[1] * rkC[1] * rkC[0] * Z3[i] 
                     + rkC[2] * rkC[2] * rkC[0] * Z2[i] - Z2[i] * rkC[2] * rkC[0] * rkC[0])
                     /den)-Z3[i];
-        CONT[NN + i] = -( rkC[0] * rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * rkC[1] * (Z1[i] - Z3[i]) 
+        CONT[NSP + i] = -( rkC[0] * rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * rkC[1] * (Z1[i] - Z3[i]) 
         				 + rkC[2] * rkC[2] * (Z2[i] - Z1[i]) )/den;
-        CONT[NN + NN + i] = ( rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * (Z1[i] - Z3[i]) 
+        CONT[NSP + NSP + i] = ( rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * (Z1[i] - Z3[i]) 
                            + rkC[2] * (Z2[i] - Z1[i]) ) / den;
 	}
 }
@@ -240,17 +240,17 @@ static void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, double
 	double x2 = 1.0 + rkC[1] * r;
 	double x3 = 1.0 + rkC[2] * r;
 	#pragma unroll
-	for (int i = 0; i < NN; i++) {
-		Z1[i] = CONT[i] + x1 * (CONT[NN + i] + x1 * CONT[NN + NN + i]);
-		Z2[i] = CONT[i] + x2 * (CONT[NN + i] + x2 * CONT[NN + NN + i]);
-		Z3[i] = CONT[i] + x2 * (CONT[NN + i] + x3 * CONT[NN + NN + i]);
+	for (int i = 0; i < NSP; i++) {
+		Z1[i] = CONT[i] + x1 * (CONT[NSP + i] + x1 * CONT[NSP + NSP + i]);
+		Z2[i] = CONT[i] + x2 * (CONT[NSP + i] + x2 * CONT[NSP + NSP + i]);
+		Z3[i] = CONT[i] + x2 * (CONT[NSP + i] + x3 * CONT[NSP + NSP + i]);
 	}
 }
 
 
 static void WADD(const  double* X, const double* Y, double* Z) {
 	#pragma unroll
-	for (int i = 0; i < NN; i++)
+	for (int i = 0; i < NSP; i++)
 	{
 		Z[i] = X[i] + Y[i];
 	}
@@ -258,7 +258,7 @@ static void WADD(const  double* X, const double* Y, double* Z) {
 
 static void DAXPY3(double DA1, double DA2, double DA3, const double* DX, double* DY1, double* DY2, double* DY3) {
 	#pragma unroll
-	for (int i = 0; i < NN; i++) {
+	for (int i = 0; i < NSP; i++) {
 		DY1[i] += DA1 * DX[i];
 		DY2[i] += DA2 * DX[i];
 		DY3[i] += DA3 * DX[i];
@@ -270,10 +270,10 @@ static void DAXPY3(double DA1, double DA2, double DA3, const double* DX, double*
 *     R = Z - hA * F
 */
 void RK_PrepareRHS(double t, double pr, double H, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* R1, double* R2, double* R3) {
-	double TMP[NN];
-	double F[NN];
+	double TMP[NSP];
+	double F[NSP];
 	#pragma unroll
-	for (int i = 0; i < NN; i++) {
+	for (int i = 0; i < NSP; i++) {
 		R1[i] = Z1[i];
 		R2[i] = Z2[i];
 		R3[i] = Z3[i];
@@ -301,7 +301,7 @@ void RK_PrepareRHS(double t, double pr, double H, double* Y, double* F0, double*
 void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, double* R3, int* ipiv1, int* ipiv2) {
 	// Z = (1/h) T^(-1) A^(-1) * Z
 	#pragma unroll
-	for(int i = 0; i < NN; i++)
+	for(int i = 0; i < NSP; i++)
 	{
 		double x1 = R1[i] / H;
 		double x2 = R2[i] / H;
@@ -316,9 +316,9 @@ void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, 
 		printf("Error in back-substitution\n");
 		exit(-1);
 	}
-	double complex temp[NN];
+	double complex temp[NSP];
 	#pragma unroll
-	for (int i = 0; i < NN; ++i)
+	for (int i = 0; i < NSP; ++i)
 	{
 		temp[i] = R2[i] + I * R3[i];
 	}
@@ -328,7 +328,7 @@ void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, 
 		exit(-1);
 	}
 	#pragma unroll
-	for (int i = 0; i < NN; ++i)
+	for (int i = 0; i < NSP; ++i)
 	{
 		R2[i] = creal(temp[i]);
 		R3[i] = cimag(temp[i]);
@@ -336,7 +336,7 @@ void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, 
 
 	// Z = T * Z
 	#pragma unroll
-	for (int i = 0; i < NN; ++i) {
+	for (int i = 0; i < NSP; ++i) {
 		double x1 = R1[i];
 		double x2 = R2[i];
 		double x3 = R3[i];
@@ -348,7 +348,7 @@ void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, 
 
 double RK_ErrorNorm(double* scale, double* DY) {
 	double sums[UNROLL] = {0.0};
-	int start = NN % UNROLL;
+	int start = NSP % UNROLL;
 	//take care of mod part
 	if (start != 0) {
 		for (int i = 0; i < start; i++)
@@ -358,7 +358,7 @@ double RK_ErrorNorm(double* scale, double* DY) {
 	}
 	//unrolled summer
 	#pragma unroll
-	for (int i = start; i < NN; i += UNROLL)
+	for (int i = start; i < NSP; i += UNROLL)
 	{
 		#pragma unroll
 		for (int j = 0; j < UNROLL; ++j) {
@@ -371,7 +371,7 @@ double RK_ErrorNorm(double* scale, double* DY) {
 	for (int i = 0; i <= UNROLL; ++i) {
 		sum += sums[i];
 	}
-	return fmax(sqrt(sum / ((double)NN)), 1e-10);
+	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
 
 double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* scale, double* E1, int* ipiv1, bool FirstStep, bool Reject) {
@@ -379,15 +379,15 @@ double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, do
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
 
-    double F1[NN];
-    double F2[NN];
-    double TMP[NN];
+    double F1[NSP];
+    double F2[NSP];
+    double TMP[NSP];
     #pragma unroll
-    for (int i = 0; i < NN; ++i) {
+    for (int i = 0; i < NSP; ++i) {
     	F2[i] = HrkE1 * Z1[i] + HrkE2 * Z2[i] + HrkE3 * Z3[i];
     }
     #pragma unroll
-    for (int i = 0; i < NN; ++i) {
+    for (int i = 0; i < NSP; ++i) {
     	TMP[i] = rkE[0] * F0[i] + F2[i];
     }
     int info = 0;
@@ -399,12 +399,12 @@ double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, do
     double Err = RK_ErrorNorm(scale, TMP);
     if (Err >= 1.0 && (FirstStep || Reject)) {
         #pragma unroll
-    	for (int i = 0; i < NN; i++) {
+    	for (int i = 0; i < NSP; i++) {
         	TMP[i] += Y[i];
         }
     	dydt(t, pr, TMP, F1);
     	#pragma unroll
-    	for (int i = 0; i < NN; i++) {
+    	for (int i = 0; i < NSP; i++) {
         	TMP[i] = F1[i] + F2[i];
         }
        	dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, TMP, &ARRSIZE, &info);
@@ -435,29 +435,29 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	bool FirstStep = true;
 	bool SkipJac = false;
 	bool SkipLU = false;
-	double sc[NN];
-	double A[NN * NN] = {0.0};
-	double E1[NN * NN];
-	double complex E2[NN * NN];
-	int ipiv1[NN];
-	int ipiv2[NN];
-	double Z1[NN];
-	double Z2[NN];
-	double Z3[NN];
+	double sc[NSP];
+	double A[NSP * NSP] = {0.0};
+	double E1[NSP * NSP];
+	double complex E2[NSP * NSP];
+	int ipiv1[NSP];
+	int ipiv2[NSP];
+	double Z1[NSP];
+	double Z2[NSP];
+	double Z3[NSP];
 #ifdef SDIRK_ERROR
-	double Z4[NN];
-	double DZ4[NN];
-	double G[NN];
-	double TMP[NN];
+	double Z4[NSP];
+	double DZ4[NSP];
+	double G[NSP];
+	double TMP[NSP];
 #endif
-	double DZ1[NN];
-	double DZ2[NN];
-	double DZ3[NN];
-	double CONT[NN * 3];
+	double DZ1[NSP];
+	double DZ2[NSP];
+	double DZ3[NSP];
+	double CONT[NSP * 3];
 	scale_init(y, sc);
-	double y0[NN];
-	memcpy(y0, y, NN * sizeof(double));
-	double F0[NN];
+	double y0[NSP];
+	memcpy(y0, y, NSP * sizeof(double));
+	double F0[NSP];
 	int info = 0;
 	int Nconsecutive = 0;
 	int Nsteps = 0;
@@ -502,9 +502,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			exit(-1);
 		}
 		if (FirstStep || !StartNewton) {
-			memset(Z1, 0, NN * sizeof(double));
-			memset(Z2, 0, NN * sizeof(double));
-			memset(Z3, 0, NN * sizeof(double));
+			memset(Z1, 0, NSP * sizeof(double));
+			memset(Z2, 0, NSP * sizeof(double));
+			memset(Z3, 0, NSP * sizeof(double));
 		} else {
 			RK_Interpolate(H, Hold, Z1, Z2, Z3, CONT);
 		}
@@ -549,7 +549,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			NewtonIncrementOld = fmax(NewtonIncrement, Roundoff);
             // Update solution
             #pragma unroll
-            for (int i = 0; i < NN; i++)
+            for (int i = 0; i < NSP; i++)
             {
             	Z1[i] -= DZ1[i];
             	Z2[i] -= DZ2[i];
@@ -575,7 +575,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		//!~~~>   Prepare the loop-independent part of the right-hand side
 		//!       G = H*rkBgam(0)*F0 + rkTheta(1)*Z1 + rkTheta(2)*Z2 + rkTheta(3)*Z3
 		#pragma unroll
-		for (int i = 0; i < NN; i++) {
+		for (int i = 0; i < NSP; i++) {
 			Z4[i] = Z3[i];
 			G[i] = rkBgam[0]*F0[i]*H + rkTheta[0] * Z1[i] + rkTheta[1] * Z2[i] + rkTheta[2] * Z3[i];
 		}
@@ -587,7 +587,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
         	WADD(y, Z4, TMP);
         	dydt(t + H, pr, TMP, DZ4);
         	#pragma unroll
-        	for(int i = 0; i < NN; i++){
+        	for(int i = 0; i < NSP; i++){
         		DZ4[i] += (rkGamma / H) * (G[i] - Z4[i]);
         	}
         	//Solve the linear system
@@ -622,7 +622,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
             NewtonIncrementOld = NewtonIncrement;
             //! Update solution: Z4 <-- Z4 + DZ4
             #pragma unroll
-            for (int i = 0; i < NN; i++) {
+            for (int i = 0; i < NSP; i++) {
             	Z4[i] += DZ4[i];
             }
 
@@ -639,7 +639,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 #endif
 #ifdef SDIRK_ERROR
 		#pragma unroll
-		for (int i = 0; i < NN; i++) {
+		for (int i = 0; i < NSP; i++) {
 			DZ4[i] = Z3[i] - Z4[i];
 		}
 		double Err = RK_ErrorNorm(sc, DZ4);
@@ -665,7 +665,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			Hold = H;
 			t += H;
 			#pragma unroll
-			for (int i = 0; i < NN; i++) {
+			for (int i = 0; i < NSP; i++) {
 				y[i] += Z3[i];
 			}
 			// Construct the solution quadratic interpolant Q(c_i) = Z_i, i=1:3
@@ -673,7 +673,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				RK_Make_Interpolate(Z1, Z2, Z3, CONT);
 			}
 			scale(y, y0, sc);
-			memcpy(y0, y, NN * sizeof(double));
+			memcpy(y0, y, NSP * sizeof(double));
 			Hnew = fmin(fmax(Hnew, Hmin), t_end - t);
 			if (Reject) {
 				Hnew = fmin(Hnew, H);

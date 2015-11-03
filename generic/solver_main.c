@@ -29,10 +29,13 @@ void write_log(int NUM, double t, const double* y_host, FILE* pFile)
     double buffer[NN];
     for (int j = 0; j < NUM; j++)
     {
-        for (int i = 0; i < NN; ++i)
+        double Y_N = 1.0;
+        for (int i = 0; i < NSP; ++i)
         {
             buffer[i] = y_host[NUM * i + j];
+            Y_N -= buffer[i];
         }
+        buffer[NSP] = Y_N;
         apply_reverse_mask(&buffer[1]);
         fwrite(buffer, sizeof(double), NN, pFile);
     }

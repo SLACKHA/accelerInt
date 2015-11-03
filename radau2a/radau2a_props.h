@@ -8,6 +8,6 @@
 #ifndef RADAU2A_PROPS_H
 #define RADAU2A_PROPS_H
 
-#define STRIDE (NN)
+#define STRIDE (NSP)
 
 #endif

@@ -47,7 +47,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double t = t_start;
 
 	// get scaling for weighted norm
-	double sc[NN];
+	double sc[NSP];
 	scale_init(y, sc);
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
@@ -74,22 +74,22 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		int m, m1, m2;
 
 		// temporary arrays
-		double temp[NN];
-		double f_temp[NN];
-		double y1[NN];
+		double temp[NSP];
+		double f_temp[NSP];
+		double y1[NSP];
 		
 		h_max = t_end - t;
 	
 		// source vector
-		double fy[NN];
+		double fy[NSP];
 		dydt (t, pr, y, fy);
 
 		// Jacobian matrix
-		double A[NN * NN] = {0.0};
+		double A[NSP * NSP] = {0.0};
 		eval_jacob (t, pr, y, A);
 
 		double Hm[STRIDE * STRIDE] = {0.0};
-		double Vm[NN * STRIDE] = {0.0};
+		double Vm[NSP * STRIDE] = {0.0};
 		double phiHm[STRIDE * STRIDE] = {0.0};
 		double err = 0.0;
 
@@ -103,13 +103,13 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			}
 
 			// k1
-			double k1[NN];
+			double k1[NSP];
 			//k1 is partially in the first column of phiHm
 			//k1 = beta * Vm * phiHm(:, 1)
 			matvec_n_by_m_scale(m, beta, Vm, phiHm, k1);
 		
 			// k2
-			double k2[NN];
+			double k2[NSP];
 			//computing phi(2h * A)
 			matvec_m_by_m (m, phiHm, phiHm, temp);
 			//note: f_temp will contain hm * phi * phi * e1 for later use
@@ -117,16 +117,16 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			matvec_n_by_m_scale_add(m, beta * (h / 6.0), Vm, f_temp, k2, k1);
 		
 			// k3
-			double k3[NN];
+			double k3[NSP];
 			//use the stored hm * phi * phi * e1 to get phi(3h * A)
 			matvec_m_by_m (m, phiHm, f_temp, temp);
 			matvec_m_by_m (m, Hm, temp, f_temp);
 			matvec_n_by_m_scale_add_subtract(m, beta * (h * h / 27.0), Vm, f_temp, k3, k2, k1);
 				
 			// d4
-			double k4[NN];
+			double k4[NSP];
 			#pragma unroll
-			for (int i = 0; i < NN; ++i) {
+			for (int i = 0; i < NSP; ++i) {
 				// f4
 				f_temp[i] = h * ((-7.0 / 300.0) * k1[i] + (97.0 / 150.0) * k2[i] - (37.0 / 300.0) * k3[i]);
 			
@@ -137,7 +137,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			sparse_multiplier (A, f_temp, k4);
 		
 			#pragma unroll
-			for (int i = 0; i < NN; ++i) {
+			for (int i = 0; i < NSP; ++i) {
 				k4[i] = temp[i] - fy[i] - k4[i];
 			}
 
@@ -147,7 +147,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			matvec_n_by_m_scale(m1, beta, Vm, phiHm, k4);
 		
 			// k5
-			double k5[NN];
+			double k5[NSP];
 			//computing phi(2h * A)
 			matvec_m_by_m (m1, phiHm, phiHm, temp);
 			//note: f_temp will contain hm * phi * phi * e1 for later use
@@ -155,16 +155,16 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			matvec_n_by_m_scale_add(m1, beta * (h / 6.0), Vm, f_temp, k5, k4);
 				
 			// k6
-			double k6[NN];
+			double k6[NSP];
 			//use the stored hm * phi * phi * e1 to get phi(3h * A)
 			matvec_m_by_m (m1, phiHm, f_temp, temp);
 			matvec_m_by_m (m1, Hm, temp, f_temp);
 			matvec_n_by_m_scale_add_subtract(m1, beta * (h * h / 27.0), Vm, f_temp, k6, k5, k4);
 				
 			// k7
-			double k7[NN];
+			double k7[NSP];
 			#pragma unroll
-			for (int i = 0; i < NN; ++i) {
+			for (int i = 0; i < NSP; ++i) {
 				// f7
 				f_temp[i] = h * ((59.0 / 300.0) * k1[i] - (7.0 / 75.0) * k2[i] + (269.0 / 300.0) * k3[i] + (2.0 / 3.0) * (k4[i] + k5[i] + k6[i]));
 			
@@ -175,7 +175,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			sparse_multiplier (A, f_temp, k7);
 		
 			#pragma unroll
-			for (int i = 0; i < NN; ++i) {
+			for (int i = 0; i < NSP; ++i) {
 				k7[i] = temp[i] - fy[i] - k7[i];
 			}
 		
@@ -185,7 +185,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 					
 			// y_n+1
 			#pragma unroll
-			for (int i = 0; i < NN; ++i) {
+			for (int i = 0; i < NSP; ++i) {
 				y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
 			}
 			
@@ -197,14 +197,14 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		
 			// error of embedded order 3 method
 			#pragma unroll
-			for (int i = 0; i < NN; ++i) {
+			for (int i = 0; i < NSP; ++i) {
 				temp[i] = k3[i] - (2.0 / 3.0) * k5[i] + 0.5 * (k6[i] + k7[i] - k4[i]) - (y1[i] - y[i]) / h;
 			}	
 			err = h * sc_norm(temp, f_temp);
 			
 			// error of embedded W method
 			#pragma unroll
-			for (int i = 0; i < NN; ++i) {
+			for (int i = 0; i < NSP; ++i) {
 				temp[i] = -k1[i] + 2.0 * k2[i] - k4[i] + k7[i] - (y1[i] - y[i]) / h;
 			}
 			//double err_W = h * sc_norm(temp, sc);
@@ -219,7 +219,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 					fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
 	  			#endif
 
-				memcpy(sc, f_temp, NN * sizeof(double));
+				memcpy(sc, f_temp, NSP * sizeof(double));
 				
 				// minimum of classical and Gustafsson step size prediction
 				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
@@ -230,7 +230,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				
 				// update y and t
 				#pragma unroll
-				for (int i = 0; i < NN; ++i) {
+				for (int i = 0; i < NSP; ++i) {
 					y[i] = y1[i];
 				}
 				
