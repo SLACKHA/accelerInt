@@ -27,7 +27,7 @@ def get_executables(blacklist, inverse=None):
     if inverse is None:
         inverse = []
     executable = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
-    for filename in os.listdir('.'):
+    for filename in os.listdir(os.getcwd()):
         if os.path.isfile(filename):
             st = os.stat(filename)
             mode = st.st_mode
@@ -85,7 +85,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
 
         for smem in use_smem:
             gpu_mech_dir = 'gpu_{}_{}'.format('co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')
-            gpu_mech_dir = os.path.join(home, gpu_mech_dir)
+            gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
             make_sure_path_exists(gpu_mech_dir)
             if opt:
                 #copy the pickle from the cpu folder
@@ -123,7 +123,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
 
             for smem in use_smem:
                 gpu_mech_dir = 'gpu_{}_{}'.format('co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')
-                gpu_mech_dir = os.path.join(home, gpu_mech_dir)
+                gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
                 args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
                  'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
                  'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir)]
@@ -180,4 +180,3 @@ if __name__ == '__main__':
             pyjac=os.path.expanduser(args.pyjac_dir), 
             num_cond=args.num_cond,
             repeats=args.repeats)
-        os.chdir(home)
