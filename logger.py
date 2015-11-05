@@ -117,7 +117,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         validator = validator.reshape((-1, 1 + num_conditions * nvar))
         langs = ['c', 'cuda']
         builder = {'c':'cpu', 'cuda':'gpu'}
-        opt = [True, False]
+        opt = [False]#[True, False]
         smem = [False, True]
         #now check for various options
         for lang in langs:
