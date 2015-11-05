@@ -21,7 +21,6 @@ intDriver (const int NUM, const double t, const double t_end,
     if (T_ID < NUM)
     {
 
-#ifndef GLOBAL_MEM
         // local array with initial values
         double y_local[NSP];
         double pr_local = pr_global[T_ID];
@@ -32,18 +31,15 @@ intDriver (const int NUM, const double t, const double t_end,
         {
             y_local[i] = y_global[T_ID + i * GRID_SIZE];
         }
-#endif
         // call integrator for one time step
         integrate (t, t_end, pr_local, y_local);
 
-#ifndef GLOBAL_MEM
         // update global array with integrated values
 #pragma unroll
         for (int i = 0; i < NSP; i++)
         {
             y_global[T_ID + i * GRID_SIZE] = y_local[i];
         }
-#endif
 
     }
 
