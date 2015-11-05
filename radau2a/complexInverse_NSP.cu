@@ -76,23 +76,23 @@ __device__
 void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 	
 	#pragma unroll
-	for (int j = 0; j < NN; ++j) {
+	for (int j = 0; j < NSP; ++j) {
 		
 		// find pivot and test for singularity
 		
-		int jp = j + getComplexMax (NN - j, &A[j + (NN * j)]);
+		int jp = j + getComplexMax (NSP - j, &A[j + (NSP * j)]);
 		indPivot[j] = jp;
 
-    	if (cuCabs(A[jp + (NN * j)]) > 0.0) {
+		if (cuCabs(A[jp + (NSP * j)]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swapComplex (NN, &A[j], NN, &A[jp], NN);
+				swapComplex (NSP, &A[j], NSP, &A[jp], NSP);
 			
 			// compute elements j+1:m-1 of the jth column
 			
-			if (j < NN - 1)
-				scaleComplex (NN - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (NN * j)]), &A[j + 1 + (NN * j)]);
+			if (j < NSP - 1)
+				scaleComplex (NSP - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (NSP * j)]), &A[j + 1 + (NSP * j)]);
 			
 		} else if (*info == 0) {
 			*info = j;
@@ -100,8 +100,8 @@ void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 		}
 		
 		// update trailing submatrix
-		if (j < NN - 1)
-			complexGERU (NN - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[j + 1 + (NN * j)], &A[j + NN * (j + 1)], NN, &A[j + 1 + NN * (j + 1)], NN);
+		if (j < NSP - 1)
+			complexGERU (NSP - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[j + 1 + (NSP * j)], &A[j + NSP * (j + 1)], NSP, &A[j + 1 + NSP * (j + 1)], NSP);
 		
 	}
 }
