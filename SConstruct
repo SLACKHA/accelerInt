@@ -38,6 +38,7 @@ opts.Update(env)
 
 defaults.CCFlags = '-m64 -std=c99'
 defaults.NVCCFLAGS = '-m64'
+defaults.NVCCArch = 'sm_20'
 defaults.optimizeCCFlags = '-O3 -funroll-loops'
 defaults.debugCCFlags = '-O0 -g -fbounds-check -Wunused-variable -Wunused-parameter' \
                        ' -Wall -ftree-vrp'
@@ -114,7 +115,7 @@ config_options = [
      '-fopenmp'),
     ('compute_level',
      'The CUDA compute level of your GPUs',
-     'sm_20'),
+     defaults.NVCCArch),
     ('sundials_inc_dir',
      'The directory where the sundials headers are located',
      defaults.sundialsIncDir),
@@ -189,6 +190,7 @@ for arg in ARGUMENTS:
 
 CCFlags = listify(env['CCFLAGS'])
 NVCCFlags = listify(env['NVCCFLAGS'])
+NVCCFlags += ['-arch={}'.format(env['compute_level'])]
 CCLibs = listify(defaults.CCLibs)
 CCLinkFlags = listify(defaults.CCLinkFlags)
 NVCCLibs = listify(defaults.NVCCLibs)
