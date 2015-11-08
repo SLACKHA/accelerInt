@@ -121,8 +121,8 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
             for exe in run_me:
                 for thread in threads:
                     for cond in thepow:
-                        with open(os.path.join(thedir, 'output', exe + '_{}_{}_{}.txt'.format(cond, thread, 
-                            'co' if opt else 'nco')), 'a') as file:
+                        with open(os.path.join(thedir, 'output', exe + '_{}_{}_{}_{}.txt'.format(cond, thread, 
+                            'co' if opt else 'nco', 'sameic' if same else 'psric')), 'a') as file:
                             for repeat in range(repeats):
                                 subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
 
@@ -138,8 +138,9 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
                 run_me = get_executables(blacklist, inverse=['gpu'])
                 for exe in run_me:
                     for cond in thepow:
-                        with open(os.path.join(thedir, 'output', exe + '{}_{}_{}.txt'.format(cond,
-                            'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')), 'a') as file:
+                        with open(os.path.join(thedir, 'output', exe + '{}_{}_{}_{}.txt'.format(cond,
+                            'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem',
+                            'sameic' if same else 'psric')), 'a') as file:
                             for repeat in range(repeats):
                                 subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
 
