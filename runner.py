@@ -52,7 +52,7 @@ def get_diff_ics_cond(thedir, mechanism):
     assert int(num_c) == num_c
     return int(num_c)
 
-def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
+def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072):
     jthread = str(multiprocessing.cpu_count())
 
     mechanism = os.path.join(thedir, glob.glob(os.path.join(thedir, '*.cti'))[0])
@@ -114,6 +114,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
             #rebuild for performance
             subprocess.check_call(args)
             #run with repeats
+            run_me = get_executables(blacklist + ['gpu'])
             for exe in run_me:
                 for thread in threads:
                     for cond in thepow:
@@ -131,6 +132,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
                 args.append('SAME_IC={}'.format(same))
                 subprocess.check_call(args)
                 #run with repeats
+                run_me = get_executables(blacklist, inverse=['gpu'])
                 for exe in run_me:
                     for cond in thepow:
                         with open(exe + '{}_{}_{}.txt'.format(cond,
@@ -175,9 +177,8 @@ if __name__ == '__main__':
     dir_list = sorted([os.path.join(a_dir, name) for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))])
 
-    run_me = get_executables(args.solver_blacklist.split(','))
     for d in dir_list:
-        run(d, run_me, force=args.force, 
+        run(d, blacklist=[x.strip() for x in args.solver_blacklist.split(',')], force=args.force, 
             pyjac=os.path.expanduser(args.pyjac_dir), 
             num_cond=args.num_cond,
             repeats=args.repeats)
