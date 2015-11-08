@@ -97,7 +97,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
             if not smem:
                 args.append('-nosmem')
             args.extend(['-ic', ic_str])
-            args.extend(['-b', mech_dir])
+            args.extend(['-b', gpu_mech_dir])
             subprocess.check_call(args)
 
     #now build and run
