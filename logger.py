@@ -77,6 +77,8 @@ def __execute(builder, num_threads, num_conditions):
                 subprocess.check_call([pjoin(cwd(), exe), str(num_conditions)], stdout=file)
         else:
             for exe in glob('*-int'):
+                if exe in keyfile:
+                    continue
                 file.write('\n' + exe + '\n')
                 subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
 
