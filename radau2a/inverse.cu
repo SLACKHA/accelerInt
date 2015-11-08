@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "header.cuh"
-#include "solver_props.h"
+#include "solver_props.cuh"
 
 ///////////////////////////////////////////////////////////
 

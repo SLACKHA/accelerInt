@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "header.cuh"
 #include "solver_options.h"
-#include "solver_props.h"
+#include "solver_props.cuh"
 //#include "linear-algebra.h"
 #include "complexInverse.cuh"
 

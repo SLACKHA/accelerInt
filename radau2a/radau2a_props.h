@@ -8,6 +8,8 @@
 #ifndef RADAU2A_PROPS_H
 #define RADAU2A_PROPS_H
 
+#include "header.h"
+ 
 #define STRIDE (NSP)
 
 #endif

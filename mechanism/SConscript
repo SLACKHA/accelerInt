@@ -19,8 +19,5 @@ env_2 = env.Clone()
 if not 'CPPDEFINES' in env_2:
 	env_2['CPPDEFINES'] = []
 env_2['CPPDEFINES'] += ['CUDA']
-cudaObj.append(env_2.Object(target='cu_mass_mole.o',
-			   source='mass_mole.c',
-			   variant_dir=env_2['variant']))
 
 Return ('cObj', 'cudaObj')

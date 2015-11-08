@@ -10,9 +10,9 @@
 #ifndef EXPONENTIAL_LINEAR_ALGEBRA_CUH
 #define EXPONENTIAL_LINEAR_ALGEBRA_CUH
 
-#include "header.h"
+#include "header.cuh"
 #include "solver_options.h"
-#include "solver_props.h"
+#include "solver_props.cuh"
 
 ///////////////////////////////////////////////////////////////////////////////
 

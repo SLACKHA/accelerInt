@@ -100,6 +100,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
             args.extend(['-b', gpu_mech_dir])
             subprocess.check_call(args)
 
+
     #now build and run
     for same in same_ics:
         thepow = same_powers if same else diff_powers
