@@ -69,11 +69,11 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
                 os.path.join(home, 'ign_data.bin'))
 
     #generate mechanisms
-    cache_opt = [True, False]
+    cache_opt = [False]#[True, False]
     use_smem = [True, False]
     same_ics = [True, False]
     for opt in cache_opt:
-        mech_dir = 'cpu_{}'.format('co' if cache_opt else 'nco')
+        mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
         mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
         make_sure_path_exists(mech_dir)
         args = ['python2.7', os.path.join(pyjac, 'pyJac.py'), '-l', 'c', '-i', mechanism]
@@ -84,7 +84,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
         subprocess.check_call(args)
 
         for smem in use_smem:
-            gpu_mech_dir = 'gpu_{}_{}'.format('co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')
+            gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
             gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
             make_sure_path_exists(gpu_mech_dir)
             if opt:
@@ -104,7 +104,7 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
     for same in same_ics:
         thepow = same_powers if same else diff_powers
         for opt in cache_opt:
-            mech_dir = 'cpu_{}'.format('co' if cache_opt else 'nco')
+            mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
             mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
             args = ['scons', 'cpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
                  'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
@@ -117,12 +117,12 @@ def run(thedir, run_me, force=False, pyjac='', repeats=5, num_cond=131072):
                 for thread in threads:
                     for cond in thepow:
                         with open(exe + '_{}_{}_{}.txt'.format(cond, thread, 
-                            'co' if cache_opt else 'nco'), 'a') as file:
+                            'co' if opt else 'nco'), 'a') as file:
                             for repeat in range(repeats):
                                 subprocess.check_call([exe, str(thread), str(cond)], stdout=file)
 
             for smem in use_smem:
-                gpu_mech_dir = 'gpu_{}_{}'.format('co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')
+                gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
                 gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
                 args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
                  'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',

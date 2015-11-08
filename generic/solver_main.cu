@@ -134,11 +134,7 @@ int main (int argc, char *argv[])
 
     // time span
     double t_start = 0.0;
-#ifdef SAME_IC
-    double t_end = 1000 * t_step;
-#else
     double t_end = 10 * t_step;
-#endif
 
     double* y_device;
     double* y_host;
