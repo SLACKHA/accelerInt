@@ -1,6 +1,6 @@
-/*rb43_props.h
+/*rb43_props.cuh
  *Various macros controlling behaviour of RB43 algorithm
- * \file rb43_props.h
+ * \file rb43_props.cuh
  * \author Nicholas Curtis
  * \date 03/10/2015
  */

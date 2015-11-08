@@ -21,7 +21,7 @@
 #include "header.cuh"
 #include "dydt.cuh"
 #include "jacob.cuh"
-#include "exprb43_props.h"
+#include "exprb43_props.cuh"
 #include "arnoldi.cuh"
 #include "exponential_linear_algebra.cuh"
 #include "solver_init.cuh"
