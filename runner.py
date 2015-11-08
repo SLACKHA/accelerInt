@@ -28,7 +28,8 @@ def get_executables(blacklist, inverse=None):
         inverse = []
     executable = stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH
     for filename in os.listdir(os.getcwd()):
-        if os.path.isfile(filename):
+        if os.path.isfile(filename) and \
+            not filename.endswith('.py'):
             st = os.stat(filename)
             mode = st.st_mode
             if mode & executable:
@@ -54,6 +55,8 @@ def get_diff_ics_cond(thedir, mechanism):
 
 def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072):
     jthread = str(multiprocessing.cpu_count())
+
+    make_sure_path_exists(os.path.join(thedir, 'output'))
 
     mechanism = os.path.join(thedir, glob.glob(os.path.join(thedir, '*.cti'))[0])
     with open(os.path.join(thedir, 'ics.txt'), 'r') as file:
@@ -118,10 +121,10 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
             for exe in run_me:
                 for thread in threads:
                     for cond in thepow:
-                        with open(exe + '_{}_{}_{}.txt'.format(cond, thread, 
-                            'co' if opt else 'nco'), 'a') as file:
+                        with open(os.path.join(thedir, 'output', exe + '_{}_{}_{}.txt'.format(cond, thread, 
+                            'co' if opt else 'nco')), 'a') as file:
                             for repeat in range(repeats):
-                                subprocess.check_call([exe, str(thread), str(cond)], stdout=file)
+                                subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
 
             for smem in use_smem:
                 gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
@@ -135,10 +138,10 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
                 run_me = get_executables(blacklist, inverse=['gpu'])
                 for exe in run_me:
                     for cond in thepow:
-                        with open(exe + '{}_{}_{}.txt'.format(cond,
-                            'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem'), 'a') as file:
+                        with open(os.path.join(thedir, 'output', exe + '{}_{}_{}.txt'.format(cond,
+                            'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem')), 'a') as file:
                             for repeat in range(repeats):
-                                subprocess.check_call([exe, str(cond)], stdout=file)
+                                subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
 
 
 if __name__ == '__main__':
@@ -178,7 +181,9 @@ if __name__ == '__main__':
             if os.path.isdir(os.path.join(a_dir, name))])
 
     for d in dir_list:
-        run(d, blacklist=[x.strip() for x in args.solver_blacklist.split(',')], force=args.force, 
+        run(d, blacklist=[x.strip() for x in 
+                    args.solver_blacklist.split(',') if x.strip()], 
+            force=args.force, 
             pyjac=os.path.expanduser(args.pyjac_dir), 
             num_cond=args.num_cond,
             repeats=args.repeats)
