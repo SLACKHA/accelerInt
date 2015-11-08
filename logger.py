@@ -44,21 +44,25 @@ def __check_error(builder, num_conditions, nvar, validator):
             file.write(f + '\n')
             data_arr = array[:, 1:]
             #now compare column by column and get max err
-            max_err = 0
-            max_zero_err = 0
             
-            rnz, cnz = np.where(np.abs(key_arr) > 1e-30)
-            err = 100. * np.abs((key_arr[rnz, cnz] - data_arr[rnz, cnz]) / key_arr[rnz, cnz])
+            #integrate the error
+            int_diff = np.zeros((num_conditions * nvar))
+            int_val = np.zeros((num_conditions * nvar))
+            for i in range(1, array.shape[0]):
+                int_diff += (array[i, 0] - array[i - 1, 0]) * np.abs(array[i - 1, 1:] - key_arr[i - 1, :])
+                int_val += (array[i, 0] - array[i - 1, 0]) * np.abs(key_arr[i - 1, :])
+
+            cnz = np.where(int_val > 1e-15)
+            err = 100. * np.abs(int_diff[cnz] / int_val[cnz])
             #print err
             max_err =  np.max(err)
             norm_err = np.linalg.norm(err)
 
-            rz, cz = np.where(np.abs(key_arr) <= 1e-30)
-            err = 100. * np.abs((key_arr[rz, cz] - data_arr[rz, cz]))
+            cz = np.where(int_val <= 1e-15)
+            err = 100. *np.abs(int_diff[cz])
             max_zero_err =  np.max(err)
             zero_norm_err = np.linalg.norm(err)
-
-
+            
             file.write("max non-zero err: {}\n"
                   "norm non-zero err: {}\n"
                   "max zero err: {}\n"
