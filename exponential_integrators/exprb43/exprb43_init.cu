@@ -9,7 +9,7 @@
 
 #include "rational_approximant.cuh"
 #include "solver_options.h"
-#include "solver_props.h"
+#include "solver_props.cuh"
 #include "gpu_macros.cuh"
 
  void initialize_solver() {
