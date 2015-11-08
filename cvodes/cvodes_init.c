@@ -126,7 +126,7 @@ void** integrators;
 
  const char* solver_name() {
 #ifdef SUNDIALS_ANALYTIC_JACOBIAN
- 	const char* name = "cvodes-analytical-int";
+ 	const char* name = "cvodes-analytic-int";
 #else
  	const char* name = "cvodes-int";
 #endif

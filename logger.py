@@ -18,7 +18,7 @@ sys.path.append(pjoin(expanduser('~'),
 import pyJac
 np.set_printoptions(precision=15)
 
-keyfile = 'cvodes-analytical-int-log.bin'
+keyfile = 'cvodes-analytic-int-log.bin'
 
 def create_dir(path):
     try:
