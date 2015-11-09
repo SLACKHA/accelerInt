@@ -9,6 +9,7 @@ import stat
 import cantera as ct
 import numpy as np
 import multiprocessing
+import re
 
 def check_dir(dir, force):
     old_files = [file for file in os.listdir(dir) if '.timing' in file and os.path.isfile(os.path.join(dir, file))]
@@ -52,6 +53,16 @@ def get_diff_ics_cond(thedir, mechanism):
     num_c = data.shape[0] / float(gas.n_species + 3)
     assert int(num_c) == num_c
     return int(num_c)
+
+def check_file(filename):
+    count = 0
+    if not os.path.isfile(filename):
+        return count
+    with open(filename, 'r') as file:
+        for line in file.readlines():
+            if re.search(r'^Time: \d\.\d+e[+-]\d+ sec$', line):
+                count += 1
+    return count
 
 def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072):
     jthread = str(multiprocessing.cpu_count())
@@ -117,13 +128,15 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
             #rebuild for performance
             subprocess.check_call(args)
             #run with repeats
-            run_me = get_executables(blacklist + ['gpu'])
+            run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
             for exe in run_me:
                 for thread in threads:
                     for cond in thepow:
-                        with open(os.path.join(thedir, 'output', exe + '_{}_{}_{}_{}.txt'.format(cond, thread, 
-                            'co' if opt else 'nco', 'sameic' if same else 'psric')), 'a') as file:
-                            for repeat in range(repeats):
+                        filename = os.path.join(thedir, 'output', exe + '_{}_{}_{}_{}.txt'.format(cond, thread, 
+                            'co' if opt else 'nco', 'sameic' if same else 'psric'))
+                        my_repeats = repeats - check_file(filename)
+                        with open(filename, 'a') as file:
+                            for repeat in range(my_repeats):
                                 subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
 
             for smem in use_smem:
@@ -135,13 +148,15 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
                 args.append('SAME_IC={}'.format(same))
                 subprocess.check_call(args)
                 #run with repeats
-                run_me = get_executables(blacklist, inverse=['gpu'])
+                run_me = get_executables(blacklist, inverse=['int-gpu'])
                 for exe in run_me:
                     for cond in thepow:
-                        with open(os.path.join(thedir, 'output', exe + '{}_{}_{}_{}.txt'.format(cond,
+                        filename = os.path.join(thedir, 'output', exe + '{}_{}_{}_{}.txt'.format(cond,
                             'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem',
-                            'sameic' if same else 'psric')), 'a') as file:
-                            for repeat in range(repeats):
+                            'sameic' if same else 'psric'))
+                        my_repeats = repeats - check_file(filename)
+                        with open(filename, 'a') as file:
+                            for repeat in range(my_repeats):
                                 subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
 
 
