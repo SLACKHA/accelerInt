@@ -41,7 +41,7 @@ def get_executables(blacklist, inverse=None):
 
 def get_powers(num_cond):
     powers = [1]
-    while powers[-1] < num_cond:
+    while powers[-1] * 2 < num_cond:
         powers.append(powers[-1] * 2)
     if powers[-1] != num_cond:
         powers.append(num_cond)
