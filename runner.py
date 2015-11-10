@@ -85,7 +85,8 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
     #generate mechanisms
     cache_opt = [False]#[True, False]
     use_smem = [True, False]
-    same_ics = [True, False]
+    time_steps = [1e-6, 1e-4]
+    same_ics = [False]#[True, False]
     for opt in cache_opt:
         mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
         mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
@@ -116,48 +117,54 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
 
 
     #now build and run
-    for same in same_ics:
-        thepow = same_powers if same else diff_powers
-        for opt in cache_opt:
-            mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
-            mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
-            args = ['scons', 'cpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
-                 'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
-                 'PRINT=FALSE', 'mechanism_dir={}'.format(mech_dir)]
-            args.append('SAME_IC={}'.format(same))
-            #rebuild for performance
-            subprocess.check_call(args)
-            #run with repeats
-            run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
-            for exe in run_me:
-                for thread in threads:
-                    for cond in thepow:
-                        filename = os.path.join(thedir, 'output', exe + '_{}_{}_{}_{}.txt'.format(cond, thread, 
-                            'co' if opt else 'nco', 'sameic' if same else 'psric'))
-                        my_repeats = repeats - check_file(filename)
-                        with open(filename, 'a') as file:
-                            for repeat in range(my_repeats):
-                                subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
-
-            for smem in use_smem:
-                gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
-                gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
-                args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
-                 'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
-                 'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir)]
+    for t_step in time_steps:
+        for same in same_ics:
+            thepow = same_powers if same else diff_powers
+            for opt in cache_opt:
+                mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
+                mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
+                args = ['scons', 'cpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
+                     'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
+                     'PRINT=FALSE', 'mechanism_dir={}'.format(mech_dir),
+                     't_step={}'.format(t_step)]
                 args.append('SAME_IC={}'.format(same))
+                #rebuild for performance
                 subprocess.check_call(args)
                 #run with repeats
-                run_me = get_executables(blacklist, inverse=['int-gpu'])
+                run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
                 for exe in run_me:
-                    for cond in thepow:
-                        filename = os.path.join(thedir, 'output', exe + '{}_{}_{}_{}.txt'.format(cond,
-                            'co' if cache_opt else 'nco', 'smem' if smem else 'nosmem',
-                            'sameic' if same else 'psric'))
-                        my_repeats = repeats - check_file(filename)
-                        with open(filename, 'a') as file:
-                            for repeat in range(my_repeats):
-                                subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
+                    for thread in threads:
+                        for cond in thepow:
+                            filename = os.path.join(thedir, 'output',
+                                exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                                thread, 'co' if opt else 'nco',
+                                'sameic' if same else 'psric', t_step))
+                            my_repeats = repeats - check_file(filename)
+                            with open(filename, 'a') as file:
+                                for repeat in range(my_repeats):
+                                    subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
+
+                for smem in use_smem:
+                    gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
+                    gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
+                    args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
+                     'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
+                     'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
+                     't_step={}'.format(t_step)]
+                    args.append('SAME_IC={}'.format(same))
+                    subprocess.check_call(args)
+                    #run with repeats
+                    run_me = get_executables(blacklist, inverse=['int-gpu'])
+                    for exe in run_me:
+                        for cond in thepow:
+                            filename = os.path.join(thedir, 'output',
+                                exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                                'co' if opt else 'nco', 'smem' if smem else 'nosmem',
+                                'sameic' if same else 'psric', t_step))
+                            my_repeats = repeats - check_file(filename)
+                            with open(filename, 'a') as file:
+                                for repeat in range(my_repeats):
+                                    subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
 
 
 if __name__ == '__main__':
