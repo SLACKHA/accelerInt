@@ -121,6 +121,7 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
         for same in same_ics:
             thepow = same_powers if same else diff_powers
             for opt in cache_opt:
+                cpu_built = False
                 mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
                 mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
                 args = ['scons', 'cpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
@@ -128,8 +129,7 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
                      'PRINT=FALSE', 'mechanism_dir={}'.format(mech_dir),
                      't_step={}'.format(t_step)]
                 args.append('SAME_IC={}'.format(same))
-                #rebuild for performance
-                subprocess.check_call(args)
+
                 #run with repeats
                 run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
                 for exe in run_me:
@@ -140,11 +140,15 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
                                 thread, 'co' if opt else 'nco',
                                 'sameic' if same else 'psric', t_step))
                             my_repeats = repeats - check_file(filename)
+                            if my_repeats and not cpu_built:
+                                subprocess.check_call(args)
+                                cpu_built = True
                             with open(filename, 'a') as file:
                                 for repeat in range(my_repeats):
                                     subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
 
                 for smem in use_smem:
+                    gpu_built = False
                     gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
                     gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
                     args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
@@ -152,7 +156,6 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
                      'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
                      't_step={}'.format(t_step)]
                     args.append('SAME_IC={}'.format(same))
-                    subprocess.check_call(args)
                     #run with repeats
                     run_me = get_executables(blacklist, inverse=['int-gpu'])
                     for exe in run_me:
@@ -162,6 +165,9 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072)
                                 'co' if opt else 'nco', 'smem' if smem else 'nosmem',
                                 'sameic' if same else 'psric', t_step))
                             my_repeats = repeats - check_file(filename)
+                            if my_repeats and not gpu_built:
+                                subprocess.check_call(args)
+                                gpu_built = True
                             with open(filename, 'a') as file:
                                 for repeat in range(my_repeats):
                                     subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
