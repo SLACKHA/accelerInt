@@ -14,7 +14,7 @@
 #include <sys/time.h>
 
  void read_initial_conditions(const char* filename, int NUM, double** y_host, double** variable_host) {
-    (*y_host) = (double*)malloc(NUM * NN * sizeof(double));
+    (*y_host) = (double*)malloc(NUM * NSP * sizeof(double));
     (*variable_host) = (double*)malloc(NUM * sizeof(double));
     FILE *fp = fopen (filename, "rb");
     if (fp == NULL)
