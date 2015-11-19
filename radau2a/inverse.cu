@@ -80,7 +80,6 @@ void GERU (const int n, const double alpha, const double* arrX,
 __device__
 void getLU (double* A, int* indPivot, int* info) {
 	
-	#pragma unroll
 	for (int j = 0; j < NSP; ++j) {
 		
 		// find pivot and test for singularity

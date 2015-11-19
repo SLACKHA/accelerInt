@@ -75,7 +75,6 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 __device__
 void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 	
-	#pragma unroll
 	for (int j = 0; j < NSP; ++j) {
 		
 		// find pivot and test for singularity
