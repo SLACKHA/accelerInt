@@ -20,7 +20,7 @@
 #include <cuComplex.h>
 
 #ifdef NEWTON_UNROLL
-	#define NEWTON_UNROLLER	#pragma unroll 1 NEWTON_UNROLL
+	#define NEWTON_UNROLLER	#pragma unroll NEWTON_UNROLL
 #else
 	#define NEWTON_UNROLLER #pragma unroll 1
 #endif
