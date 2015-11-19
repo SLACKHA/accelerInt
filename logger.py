@@ -52,13 +52,14 @@ def __check_error(builder, num_conditions, nvar, validator):
                 int_diff += (array[i, 0] - array[i - 1, 0]) * np.abs(array[i - 1, 1:] - key_arr[i - 1, :])
                 int_val += (array[i, 0] - array[i - 1, 0]) * np.abs(key_arr[i - 1, :])
 
-            cnz = np.where(int_val > 1e-15)
+            avg_val = int_val / np.abs(array[-1, 0] - array[0, 0])
+            cnz = np.where(avg_val > 1e-15)
             err = 100. * np.abs(int_diff[cnz] / int_val[cnz])
             #print err
             max_err =  np.max(err)
             norm_err = np.linalg.norm(err)
 
-            cz = np.where(int_val <= 1e-15)
+            cz = np.where(avg_val <= 1e-15)
             err = 100. *np.abs(int_diff[cz])
             max_zero_err =  np.max(err)
             zero_norm_err = np.linalg.norm(err)
