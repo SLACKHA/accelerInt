@@ -91,7 +91,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
     	double gy[NSP];
     	//gy = fy - A * y
     	sparse_multiplier(A, y, gy);
-    	#pragma unroll
+    	#pragma unroll 1
     	for (int i = 0; i < NSP; ++i) {
     		gy[i] = fy[i] - gy[i];
     	}
@@ -130,7 +130,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			dydt(t, pr, temp, &savedActions[NSP]);
 			sparse_multiplier(A, temp, f_temp);
 
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				temp[i] = savedActions[NSP + i] - f_temp[i] - gy[i]; 
 			}
@@ -162,7 +162,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			dydt(t, pr, temp, &savedActions[3 * NSP]);
 			sparse_multiplier(A, temp, f_temp);
 
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				temp[i] = savedActions[3 * NSP + i] - f_temp[i] - gy[i]; 
 			}
@@ -184,7 +184,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			matvec_n_by_m_scale_special2(m2, scale_vec, Vm, in, out);
 
 			//construct y1 and error vector
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NSP + i] - 48.0 * savedActions[2 * NSP + i] + -2.0 * savedActions[3 * NSP + i] + 12.0 * savedActions[4 * NSP + i];
@@ -220,7 +220,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			
 			if (err <= 1.0) {
 
-				#pragma unroll
+				#pragma unroll 1
 				for (int i = 0; i < NSP; ++i)
 					sc[i] = f_temp[i];
 				//memcpy(sc, f_temp, NSP * sizeof(double));
@@ -233,7 +233,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				h_new = fmin(h_new, h_max);
 				
 				// update y and t
-				#pragma unroll
+				#pragma unroll 1
 				for (int i = 0; i < NSP; ++i) {
 					y[i] = y1[i];
 				}

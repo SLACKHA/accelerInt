@@ -28,12 +28,12 @@
 __device__
 void matvec_m_by_m (const int m, const double * A, const double * V, double * Av) {
 	//for each row
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < m; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		#pragma unroll 1
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * STRIDE + i] * V[j];
 		}
@@ -56,12 +56,12 @@ void matvec_m_by_m (const int m, const double * A, const double * V, double * Av
 __device__ void matvec_m_by_m_plusequal (const int m, const double * A, const double * V, double * Av)
 {
 	//for each row
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < m; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		#pragma unroll 1
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * STRIDE + i] * V[j];
 		}
@@ -83,12 +83,12 @@ __device__ void matvec_m_by_m_plusequal (const int m, const double * A, const do
 __device__
 void matvec_n_by_m_scale (const int m, const double scale, const double * A, const double * V, double * Av) {
 	//for each row
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		#pragma unroll 1
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * NSP + i] * V[j];
 		}
@@ -116,25 +116,25 @@ void matvec_n_by_m_scale (const int m, const double scale, const double * A, con
 __device__
 void matvec_n_by_m_scale_special (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
 	//for each row
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = 0; k < 3; k++)
 		{
 			Av[k][i] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		#pragma unroll 1
 		for (int j = 0; j < m; ++j) {
-			#pragma unroll
+			#pragma unroll 1
 			for (int k = 0; k < 3; k++)
 			{
 				Av[k][i] += A[j * NSP + i] * V[k][j];
 			}
 		}
 
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = 0; k < 3; k++)
 		{
 			Av[k][i] *= scale[k];
@@ -161,25 +161,25 @@ void matvec_n_by_m_scale_special (const int m, const double scale[], const doubl
 __device__
 void matvec_n_by_m_scale_special2 (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
 	//for each row
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = 0; k < 2; k++)
 		{
 			Av[k][i] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		#pragma unroll 1
 		for (int j = 0; j < m; ++j) {
-			#pragma unroll
+			#pragma unroll 1
 			for (int k = 0; k < 2; k++)
 			{
 				Av[k][i] += A[j * NSP + i] * V[k][j];
 			}
 		}
 
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = 0; k < 2; k++)
 		{
 			Av[k][i] *= scale[k];
@@ -203,12 +203,12 @@ void matvec_n_by_m_scale_special2 (const int m, const double scale[], const doub
 __device__
 void matvec_n_by_m_scale_add (const int m, const double scale, const double * A, const double * V, double * Av, const double* add) {
 	//for each row
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		#pragma unroll 1
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * NSP + i] * V[j];
 		}
@@ -235,12 +235,12 @@ void matvec_n_by_m_scale_add (const int m, const double scale, const double * A,
 __device__
 void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const double * A, const double * V, double * Av, const double* add, const double * sub) {
 	//for each row
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		#pragma unroll 1
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * NSP + i] * V[j];
 		}
@@ -259,7 +259,7 @@ void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const do
  */
 __device__
 void scale (const double * y0, const double * y1, double * sc) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = ATOL + fmax(fabs(y0[i]), fabs(y1[i])) * RTOL;
 	}
@@ -274,7 +274,7 @@ void scale (const double * y0, const double * y1, double * sc) {
  */
 __device__
 void scale_init (const double * y0, double * sc) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = ATOL + fabs(y0[i]) * RTOL;
 	}
@@ -292,7 +292,7 @@ __device__
 double sc_norm (const double * nums, const double * sc) {
 	double norm = 0.0;
 	
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		norm += nums[i] * nums[i] / (sc[i] * sc[i]);
 	}
@@ -308,7 +308,7 @@ __device__
 double two_norm(const double* v)
 {
 	double norm = 0.0;
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		norm += v[i] * v[i];
 	}
@@ -330,7 +330,7 @@ double normalize (const double * v, double* v_out) {
 
 	double m_norm = 1.0 / norm;
 
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		v_out[i] = v[i] * m_norm;
 	}
@@ -348,7 +348,7 @@ __device__
 double dotproduct(const double* w, const double* Vm)
 {
 	double sum = 0;
-	#pragma unroll
+	#pragma unroll 1
 	for(int i = 0; i < NSP; i++)
 	{
 		sum += w[i] * Vm[i];
@@ -364,7 +364,7 @@ double dotproduct(const double* w, const double* Vm)
  */
 __device__ void scale_subtract(const double s, const double* Vm, double* w)
 {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++)
 	{
 		w[i] -= s * Vm[i];
@@ -380,7 +380,7 @@ __device__ void scale_subtract(const double s, const double* Vm, double* w)
  */
 __device__ void scale_mult(const double s, const double* w, double* Vm)
 {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++)
 	{
 		Vm[i] = w[i] * s;

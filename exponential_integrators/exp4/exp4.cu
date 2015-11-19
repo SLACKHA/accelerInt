@@ -105,7 +105,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				
 			// d4
 			double k4[NSP];
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				// f4
 				f_temp[i] = h * ((-7.0 / 300.0) * k1[i] + (97.0 / 150.0) * k2[i] - (37.0 / 300.0) * k3[i]);
@@ -116,7 +116,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			dydt (t, pr, k4, temp);
 			sparse_multiplier (A, f_temp, k4);
 		
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				k4[i] = temp[i] - fy[i] - k4[i];
 			}
@@ -143,7 +143,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				
 			// k7
 			double k7[NSP];
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				// f7
 				f_temp[i] = h * ((59.0 / 300.0) * k1[i] - (7.0 / 75.0) * k2[i] + (269.0 / 300.0) * k3[i] + (2.0 / 3.0) * (k4[i] + k5[i] + k6[i]));
@@ -154,7 +154,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			dydt (t, pr, k7, temp);
 			sparse_multiplier (A, f_temp, k7);
 		
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				k7[i] = temp[i] - fy[i] - k7[i];
 			}
@@ -164,7 +164,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			matvec_n_by_m_scale(m2, beta / (h / 3.0), Vm, &phiHm[m2 * STRIDE], k7);
 					
 			// y_n+1
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
 			}
@@ -176,14 +176,14 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			///////////////////
 		
 			// error of embedded order 3 method
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				temp[i] = k3[i] - (2.0 / 3.0) * k5[i] + 0.5 * (k6[i] + k7[i] - k4[i]) - (y1[i] - y[i]) / h;
 			}	
 			err = h * sc_norm(temp, f_temp);
 			
 			// error of embedded W method
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; ++i) {
 				temp[i] = -k1[i] + 2.0 * k2[i] - k4[i] + k7[i] - (y1[i] - y[i]) / h;
 			}
@@ -204,7 +204,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				h_new = fmin(h_new, h_max);
 				
 				// update y and t
-				#pragma unroll
+				#pragma unroll 1
 				for (int i = 0; i < NSP; ++i) {
 					y[i] = y1[i];
 				}
