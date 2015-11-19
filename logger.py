@@ -107,9 +107,11 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path)]
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
+            arg_list.append('num_steps=1000')
             num_conditions = num_threads #they're all the same, so do a reasonable #
         else:
             arg_list.append('SAME_IC=FALSE')
+            arg_list.append('num_steps=10')
         with open('logfile', 'a') as file:
             subprocess.check_call(['scons', 'cpu'] + arg_list, stdout=file)
             #run
