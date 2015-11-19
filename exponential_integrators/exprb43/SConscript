@@ -8,7 +8,8 @@ for src in c_src:
 cudaObj = []
 cuda_src = Glob('*.cu')
 
-for src in cuda_src:
-	cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
+if env['build_cuda']:
+	for src in cuda_src:
+		cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
 
 Return ('cObj', 'cudaObj')

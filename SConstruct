@@ -25,11 +25,15 @@ home = os.getcwd()
 # ******************************************************
 
 opts = Variables('accelerInt.conf')
-try:
-    env = Environment(tools=['default', 'cuda'])
-except:
+build_cuda = True
+if 'gpu' not in COMMAND_LINE_TARGETS  and\
+    'build' not in COMMAND_LINE_TARGETS and\
+            COMMAND_LINE_TARGETS != []:
     print 'CUDA not found; skipping cuda builds'
+    build_cuda = False
     env = Environment(tools=['default'])
+else:
+    env = Environment(tools=['default', 'cuda'])
 
 class defaults: pass
 
@@ -223,13 +227,13 @@ cvodes_dir = os.path.join(home, 'cvodes')
 common_dir_list = [generic_dir, mech_dir]
 
 reg_count = ''
-build_cuda = True
-try:
-    with open(os.path.join(mech_dir, 'regcount'), 'r') as file:
-        reg_count = file.readline().strip()
-except:
-    build_cuda = False
-    print 'Could not find register count, skipping CUDA integrators'
+if build_cuda:
+    try:
+        with open(os.path.join(mech_dir, 'regcount'), 'r') as file:
+            reg_count = file.readline().strip()
+    except:
+        print('Register count not found, skipping cuda integrators')
+        build_cuda = False
 NVCCFlags.append(['-maxrregcount {}'.format(reg_count), '-Xcompiler {}'.format(env['openmp_flags'])])
 
 #extra jacobians
@@ -266,7 +270,8 @@ except:
 #link lines
 CCLibDirs = [env['blas_lapack_dir']]
 CCLibs += listify(env['blas_lapack_libs'])
-NVCCLinkFlags.append([env['openmp_flags'], '-Xlinker -rpath {}/lib64'.format(env['CUDA_TOOLKIT_PATH'])])
+if build_cuda:
+    NVCCLinkFlags.append([env['openmp_flags'], '-Xlinker -rpath {}/lib64'.format(env['CUDA_TOOLKIT_PATH'])])
 
 #options
 if not env['FAST_MATH']:
@@ -435,16 +440,17 @@ def builder(env_save, cobj, cuobj, newdict, mydir, variant,
         env.Program(target=target_base,
                     source=cobj + int_c,
                     variant_dir=os.path.join(mydir, variant)))
-    target_list[target_base + '-gpu'] = []
-    dlink = env.CUDADLink(
-        target=target_base+'-gpu', 
-        source=cuobj + int_cuda, 
-        variant_dir=os.path.join(mydir, variant))
-    target_list[target_base + '-gpu'].append(dlink)
-    target_list[target_base + '-gpu'].append(
-        env.CUDAProgram(target=target_base+'-gpu',
-         source=cuobj + int_cuda + dlink, 
-         variant_dir=os.path.join(mydir, variant)))
+    if env['build_cuda']:
+        target_list[target_base + '-gpu'] = []
+        dlink = env.CUDADLink(
+            target=target_base+'-gpu', 
+            source=cuobj + int_cuda, 
+            variant_dir=os.path.join(mydir, variant))
+        target_list[target_base + '-gpu'].append(dlink)
+        target_list[target_base + '-gpu'].append(
+            env.CUDAProgram(target=target_base+'-gpu',
+             source=cuobj + int_cuda + dlink, 
+             variant_dir=os.path.join(mydir, variant)))
 
 def cvodes_builder(env_save, cobj, newdict, mydir, variant,
                  target_list, additional_sconstructs=None):
@@ -478,12 +484,14 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
                     source=cobj + ana_c,
                     variant_dir=os.path.join(mydir, variant)))
 
+env['build_cuda'] = build_cuda
 env_save = env.Clone()
 Export('env')
+
 mech_c, mech_cuda = SConscript(os.path.join(mech_dir, 'SConscript'), variant_dir=os.path.join(mech_dir, variant))
 gen_c, gen_cuda = SConscript(os.path.join(generic_dir, 'SConscript'), variant_dir=os.path.join(generic_dir, variant))
 
-if os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
+if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
     solver_main_cu = [x for x in gen_cuda if 'solver_main' in str(x[0])]
     Depends(solver_main_cu, os.path.join(mech_dir, 'launch_bounds.cuh'))
     Depends(solver_main_cu, os.path.join(generic_dir, 'solver_options.h'))
@@ -495,7 +503,7 @@ new_defines['CPPPATH'] = [radau2a_dir]
 new_defines['NVCCDEFINES'] = ['RADAU2A']
 new_defines['NVCCPATH'] = [radau2a_dir]
 builder(env_save, mech_c + gen_c, 
-    mech_cuda + gen_cuda,
+    mech_cuda + gen_cuda if build_cuda else None,
     new_defines, radau2a_dir,
     variant, 'radau2a-int', target_list)
 
