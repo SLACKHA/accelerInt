@@ -395,7 +395,8 @@ variant = 'release' if not env['DEBUG'] else 'debug'
 env['variant'] = variant
 
 env['CPPPATH'] = common_dir_list
-env['NVCCPATH'] += common_dir_list
+if build_cuda:
+    env['NVCCPATH'] += common_dir_list
 
 target_list = {}
 

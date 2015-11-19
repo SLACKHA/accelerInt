@@ -11,7 +11,8 @@ cudaObj = []
 cuda_src = Glob('*.cu')
 cuda_src = [x for x in cuda_src if not any(b in str(x) for b in blacklist)]
 
-for src in cuda_src:
-	cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
+if env['build_cuda']:
+	for src in cuda_src:
+		cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
 
 Return ('cObj', 'cudaObj')
