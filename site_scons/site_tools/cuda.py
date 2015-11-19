@@ -191,7 +191,7 @@ def generate(env):
                                 cudaToolkitPath = path
                                 break
                 if not pathFound:
-                        sys.exit("Cannot find the CUDA Toolkit path. Please modify your SConscript or add the path in cudaenv.py")
+                    raise Exception("Cannot find the CUDA Toolkit path. Please modify your SConscript or add the path in cudaenv.py")
         env['CUDA_TOOLKIT_PATH'] = cudaToolkitPath
 
         # find CUDA SDK path and set CUDA_SDK_PATH
@@ -224,7 +224,7 @@ def generate(env):
                                 cudaSDKPath = path
                                 break
                 if not pathFound:
-                        sys.exit("Cannot find the CUDA SDK path. Please set env['CUDA_SDK_PATH'] to point to your SDK path")
+                    raise Exception("Cannot find the CUDA SDK path. Please set env['CUDA_SDK_PATH'] to point to your SDK path")
         env['CUDA_SDK_PATH'] = cudaSDKPath
 
         env.AddMethod(CUDAObject, 'CUDAObject')

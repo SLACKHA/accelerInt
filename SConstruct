@@ -25,7 +25,11 @@ home = os.getcwd()
 # ******************************************************
 
 opts = Variables('accelerInt.conf')
-env = Environment(tools=['default', 'cuda'])
+try:
+    env = Environment(tools=['default', 'cuda'])
+except:
+    print 'CUDA not found; skipping cuda builds'
+    env = Environment(tools=['default'])
 
 class defaults: pass
 
