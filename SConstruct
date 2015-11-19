@@ -26,10 +26,7 @@ home = os.getcwd()
 
 opts = Variables('accelerInt.conf')
 build_cuda = True
-if 'gpu' not in COMMAND_LINE_TARGETS  and\
-    'build' not in COMMAND_LINE_TARGETS and\
-            COMMAND_LINE_TARGETS != []:
-    print 'CUDA not found; skipping cuda builds'
+if 'cpu' in COMMAND_LINE_TARGETS:
     build_cuda = False
     env = Environment(tools=['default'])
 else:
