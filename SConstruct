@@ -26,11 +26,12 @@ home = os.getcwd()
 
 opts = Variables('accelerInt.conf')
 build_cuda = True
-if 'cpu' in COMMAND_LINE_TARGETS:
-    build_cuda = False
-    env = Environment(tools=['default'])
-else:
+try:
     env = Environment(tools=['default', 'cuda'])
+except:
+    env = Environment(tools=['default'])
+    print 'CUDA not found, no GPU integrators will be built'
+    build_cuda = False
 
 class defaults: pass
 
