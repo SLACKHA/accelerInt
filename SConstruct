@@ -512,7 +512,7 @@ if 'extra_c_jacobs' in env or 'extra_cuda_jacobs' in env:
         variant_dir=os.path.join(mech_dir, 'jacobs', variant))
     
     mech_c += cJacs
-    cudaJacs += cudaJacs
+    mech_cuda += cudaJacs
 
 gen_c, gen_cuda = SConscript(os.path.join(generic_dir, 'SConscript'), variant_dir=os.path.join(generic_dir, variant))
 
