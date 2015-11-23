@@ -44,7 +44,7 @@ opts.AddVariables(*compiler_options)
 opts.Update(env)
 
 defaults.CCFlags = '-m64 -std=c99'
-defaults.NVCCFLAGS = '-m64'
+defaults.NVCCFLAGS = '-m64 -Xptxas -v'
 defaults.NVCCArch = 'sm_20'
 defaults.optimizeCCFlags = '-O3 -funroll-loops'
 defaults.debugCCFlags = '-O0 -g -fbounds-check -Wunused-variable -Wunused-parameter' \

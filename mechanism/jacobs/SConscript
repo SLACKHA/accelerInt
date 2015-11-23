@@ -5,11 +5,11 @@ import os
 cObj = []
 if 'extra_c_jacobs' in env:
 	for src in env['extra_c_jacobs']:
-		cObj.append(env.Object(src))
+		cObj.append(env.Object(src, variant_dir=env['variant']))
 
 cudaObj = []
 if 'extra_cuda_jacobs' in env and env['build_cuda']:
 	for src in env['extra_cuda_jacobs']:
-		cudaObj.append(env.CUDAObject(src))
+		cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
 
 Return ('cObj', 'cudaObj')
