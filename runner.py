@@ -64,17 +64,21 @@ def check_file(filename):
                 count += 1
     return count
 
-def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072):
+def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
+        threads=[6, 12]):
     jthread = str(multiprocessing.cpu_count())
 
     make_sure_path_exists(os.path.join(thedir, 'output'))
 
-    mechanism = os.path.join(thedir, glob.glob(os.path.join(thedir, '*.cti'))[0])
-    with open(os.path.join(thedir, 'ics.txt'), 'r') as file:
-        ic_str = file.readline().strip()
+    try:
+        mechanism = os.path.join(thedir, glob.glob(os.path.join(thedir, '*.cti'))[0])
+        with open(os.path.join(thedir, 'ics.txt'), 'r') as file:
+            ic_str = file.readline().strip()
+    except:
+        print "Mechanism file not found in {}, skipping...".format(thedir)
+        return
 
     home = os.getcwd()
-    threads = [6, 12]
     same_powers = get_powers(num_cond)
     diff_powers = get_powers(get_diff_ics_cond(thedir, mechanism))
 
@@ -192,7 +196,7 @@ if __name__ == '__main__':
                         required=False,
                         default='',
                         help='The solvers to not run')
-    parser.add_argument('-n', '--num_cond',
+    parser.add_argument('-nc', '--num_cond',
                         type=int,
                         required=False,
                         default=131072,
@@ -202,8 +206,14 @@ if __name__ == '__main__':
                         type=int,
                         default=5,
                         help='The number of timing repeats to run')
+    parser.add_argument('-nt', '--num_threads',
+                        type=str,
+                        required=False,
+                        default='6,12',
+                        help='Comma separated list of # of threads to test with for CPU integrators')
     args = parser.parse_args()
 
+    num_threads = [int(x) for x in args.num_threads.split(',')]
     home = os.getcwd()
     a_dir = os.path.join(os.getcwd(), args.base_dir)
     dir_list = sorted([os.path.join(a_dir, name) for name in os.listdir(a_dir)
@@ -215,4 +225,5 @@ if __name__ == '__main__':
             force=args.force, 
             pyjac=os.path.expanduser(args.pyjac_dir), 
             num_cond=args.num_cond,
-            repeats=args.repeats)
+            repeats=args.repeats,
+            threads=num_threads)
