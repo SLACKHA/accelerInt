@@ -1,24 +1,17 @@
 Import('env')
 cObj = []
 c_src = Glob('*.c')
-if 'extra_c_jacobs' in env:
-	c_src.extend(env['extra_c_jacobs'])
 import os
 
 for src in c_src:
 	cObj.append(env.Object(src, variant_dir=env['variant']))
 
+
 cudaObj = []
 if env['build_cuda']:
 	cuda_src = Glob('*.cu')
-	if 'extra_cuda_jacobs' in env:
-		cuda_src.extend(env['extra_cuda_jacobs'])
 
 	for src in cuda_src:
 		cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
-	env_2 = env.Clone()
-	if not 'CPPDEFINES' in env_2:
-		env_2['CPPDEFINES'] = []
-	env_2['CPPDEFINES'] += ['CUDA']
 
 Return ('cObj', 'cudaObj')

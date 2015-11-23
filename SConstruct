@@ -8,6 +8,7 @@ import sys
 import SCons
 import platform
 from buildutils import *
+import shutil
 
 valid_commands = ('build', 'test', 'cpu', 'gpu', 'help')
 
@@ -247,6 +248,16 @@ try:
             vals = [os.path.join(mech_dir, 'jacobs', x) for x in 
                     file.readline().strip().split()]
         env['extra_c_jacobs'] = vals
+
+        #copy a good SConscript into the mechanism dir
+        try:
+            shutil.copyfile(os.path.join(defaults.mechanism_dir, 'jacobs', 'SConscript'),
+                                os.path.join(mech_dir, 'jacobs', 'SConscript'))
+        except shutil.Error:
+            pass
+        except IOError, e:
+            if e.errno == 2:
+                pass
 except:
     pass
 try:
@@ -261,6 +272,15 @@ try:
             vals = [os.path.join(mech_dir, 'jacobs', x) for x in 
                     file.readline().strip().split()]
         env['extra_cuda_jacobs'] = vals
+        #copy a good SConscript into the mechanism dir
+        try:
+            shutil.copyfile(os.path.join(defaults.mechanism_dir, 'jacobs', 'SConscript'),
+                                os.path.join(mech_dir, 'jacobs', 'SConscript'))
+        except shutil.Error:
+            pass
+        except IOError, e:
+            if e.errno == 2:
+                pass
 except:
     pass
 
@@ -399,7 +419,6 @@ if build_cuda:
 target_list = {}
 
 #copy a good SConscript into the mechanism dir
-import shutil
 try:
     shutil.copyfile(os.path.join(defaults.mechanism_dir, 'SConscript'), os.path.join(mech_dir, 'SConscript'))
 except shutil.Error:
@@ -488,6 +507,13 @@ env_save = env.Clone()
 Export('env')
 
 mech_c, mech_cuda = SConscript(os.path.join(mech_dir, 'SConscript'), variant_dir=os.path.join(mech_dir, variant))
+if 'extra_c_jacobs' in env or 'extra_cuda_jacobs' in env:
+    cJacs, cudaJacs = SConscript(os.path.join(mech_dir, 'jacobs', 'SConscript'), 
+        variant_dir=os.path.join(mech_dir, 'jacobs', variant))
+    
+    mech_c += cJacs
+    cudaJacs += cudaJacs
+
 gen_c, gen_cuda = SConscript(os.path.join(generic_dir, 'SConscript'), variant_dir=os.path.join(generic_dir, variant))
 
 if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
