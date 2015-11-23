@@ -84,7 +84,7 @@ def __execute(builder, num_threads, num_conditions):
                 subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
-        num_threads, num_conditions, test_data, skip_cuda):
+        num_threads, num_conditions, test_data, skip_c, skip_cuda):
         #first compile and run cvodes to get the baseline
         __check_exit(pyJac.create_jacobian(lang='c', 
             mech_name=mech, 
@@ -124,7 +124,13 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
         validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
         validator = validator.reshape((-1, 1 + num_conditions * nvar))
-        langs = ['c', 'cuda'] if not skip_cuda else ['c']
+        langs = []
+        if not skip_c:
+            langs += ['c']
+        if not skip_cuda:
+            langs += ['cuda']
+        if langs == []:
+            raise Exception('No languages to test specified')
         builder = {'c':'cpu', 'cuda':'gpu'}
         opt = [False]#[True, False]
         smem = [False, True]
@@ -170,14 +176,14 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     __check_error(builder[lang], num_conditions, nvar, validator)
 
 def run_log(mech, thermo, initial_conditions, build_path,
-        num_threads, num_conditions, test_data, skip_cuda):
+        num_threads, num_conditions, test_data, skip_c, skip_cuda):
     with open('logfile', 'w') as file:
         pass
     if initial_conditions is not None:
         with open('logfile', 'a') as file:
             file.write('Running Same ICs\n')
         __run_and_check(mech, thermo, initial_conditions, build_path, 
-            num_threads, num_conditions, None, skip_cuda)
+            num_threads, num_conditions, None, skip_c, skip_cuda)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -186,7 +192,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
         except shutil.Error:
             pass
         __run_and_check(mech, thermo, '', build_path,
-        num_threads, num_conditions, test_data, skip_cuda)
+        num_threads, num_conditions, test_data, skip_c, skip_cuda)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -227,7 +233,12 @@ if __name__ == '__main__':
                         default=None,
                         help='A numpy file output generated from the partially_stirred_reactor component '
                              'of pyJac.  Used for testing if supplied.')
-    parser.add_argument('-sc', '--skip_cuda',
+    parser.add_argument('-sc', '--skip_c',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help='Use to skip C testing. Note baseline is still calculated using CVODES')
+    parser.add_argument('-scu', '--skip_cuda',
                         required=False,
                         default=False,
                         action='store_true',
@@ -241,4 +252,5 @@ if __name__ == '__main__':
     create_dir('./log/')
 
     run_log(args.input, args.thermo, args.initial_conditions, args.build_path,
-        args.num_threads, args.num_conditions, args.test_data, args.skip_cuda)
+        args.num_threads, args.num_conditions, args.test_data,
+        args.skip_c, args.skip_cuda)
