@@ -31,10 +31,13 @@ def __check_exit(x):
     if x != 0:
         sys.exit(x)
 
-def __check_error(builder, num_conditions, nvar, validator):
+def __check_error(builder, num_conditions, nvar, t):
     globtxt = '*-gpu-log.bin' if builder == 'gpu' else '*-int-log.bin'
+    validator = np.fromfile(pjoin('log', 'valid_{}.bin'.format(t)), dtype='float64')
+    validator = validator.reshape((-1, 1 + num_conditions * nvar))
     key_arr = validator[:, 1:]
     with open('logfile', 'a') as file:
+        file.write('t={}\n'.format(t))
         for f in glob(pjoin('log', globtxt)):
             if keyfile in f:
                 continue
@@ -45,30 +48,24 @@ def __check_error(builder, num_conditions, nvar, validator):
             data_arr = array[:, 1:]
             #now compare column by column and get max err
             
+            tdiff = array[1, 0] - array[0, 0]
             #integrate the error
             int_diff = np.zeros((num_conditions * nvar))
             int_val = np.zeros((num_conditions * nvar))
-            for i in range(1, array.shape[0]):
-                int_diff += (array[i, 0] - array[i - 1, 0]) * np.abs(array[i - 1, 1:] - key_arr[i - 1, :])
-                int_val += (array[i, 0] - array[i - 1, 0]) * np.abs(key_arr[i - 1, :])
-
+            for i in range(array.shape[0]):
+                if i < array.shape[0] and i > 0:
+                    assert array[i, 0] - array[i - 1, 0] == tdiff
+                int_diff += tdiff * np.abs(array[i - 1, 1:] - key_arr[i - 1, :])
+                int_val += tdiff * np.abs(key_arr[i - 1, :])
             avg_val = int_val / np.abs(array[-1, 0] - array[0, 0])
+
             cnz = np.where(avg_val > 1e-15)
             err = 100. * np.abs(int_diff[cnz] / int_val[cnz])
             #print err
             max_err =  np.max(err)
             norm_err = np.linalg.norm(err)
-
-            cz = np.where(avg_val <= 1e-15)
-            err = 100. *np.abs(int_diff[cz])
-            max_zero_err =  np.max(err)
-            zero_norm_err = np.linalg.norm(err)
             
-            file.write("max non-zero err: {}\n"
-                  "norm non-zero err: {}\n"
-                  "max zero err: {}\n"
-                  "norm zero err: {}\n".format(max_err, norm_err,
-                    max_zero_err, zero_norm_err))
+            file.write("{}\t{}\t\n".format(max_err, norm_err))
 
 def __execute(builder, num_threads, num_conditions):
     with open('logfile', 'a') as file:
@@ -92,6 +89,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
+        t_step = range(-2, -9, -1)
+        t_step = np.array([np.power(10., i) for i in t_step])
         nvar = None
         #get num vars
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
@@ -104,26 +103,25 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         assert nvar is not None
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 
-                'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path)]
+                'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path),
+                'num_steps=1']
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
-            arg_list.append('num_steps=1000')
             num_conditions = num_threads #they're all the same, so do a reasonable #
         else:
             arg_list.append('SAME_IC=FALSE')
-            arg_list.append('num_steps=10')
         with open('logfile', 'a') as file:
-            subprocess.check_call(['scons', 'cpu'] + arg_list, stdout=file)
-            #run
-            subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), str(num_threads), str(num_conditions)],
-             stdout=file)
-        #copy to saved data
-        shutil.copy(pjoin(cwd(), 'log', keyfile),
-                    pjoin(cwd(), 'log', 'valid.bin'))
+            for t in t_step:
+                subprocess.check_call(['scons', 'cpu'] + arg_list +
+                            ['t_step={}'.format(t)], stdout=file)
+                #run
+                subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
+                    str(num_threads), str(num_conditions)],
+                    stdout=file)
+                #copy to saved data
+                shutil.copy(pjoin(cwd(), 'log', keyfile),
+                            pjoin(cwd(), 'log', 'valid_{}.bin'.format(t)))
 
-
-        validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
-        validator = validator.reshape((-1, 1 + num_conditions * nvar))
         langs = []
         if not skip_c:
             langs += ['c']
@@ -139,41 +137,43 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             for cache_opt in opt:
                 if lang == 'cuda':
                     for shared_mem in smem:
+                        for t in t_step:
+                            with open('logfile', 'a') as file:
+                                #subprocess.check_call(['scons', '-c'])
+                                file.write('\ncache_opt: {}\n'
+                                       'shared_mem: {}\n'.format(
+                                        cache_opt, not shared_mem))
+                                __check_exit(pyJac.create_jacobian(lang=lang, 
+                                mech_name=mech, 
+                                therm_name=thermo, 
+                                initial_state=initial_conditions, 
+                                optimize_cache=cache_opt,
+                                multi_thread=num_threads,
+                                no_shared=shared_mem,
+                                build_path=build_path))
+
+                                subprocess.check_call(['scons', builder[lang]] + arg_list + 
+                                        ['t_step={}'.format(t)], stdout=file)
+                                __execute(builder[lang], num_threads, num_conditions)
+                                __check_error(builder[lang], num_conditions, nvar, t)
+
+                else:
+                    for t in t_step:
                         with open('logfile', 'a') as file:
-                            #subprocess.check_call(['scons', '-c'])
-                            file.write('\ncache_opt: {}\n'
-                                   'shared_mem: {}\n'.format(
-                                    cache_opt, not shared_mem))
+                            file.write('\ncache_opt: {}\n'.format(
+                                        cache_opt))
                             __check_exit(pyJac.create_jacobian(lang=lang, 
                             mech_name=mech, 
                             therm_name=thermo, 
                             initial_state=initial_conditions, 
                             optimize_cache=cache_opt,
                             multi_thread=num_threads,
-                            no_shared=shared_mem,
                             build_path=build_path))
 
-                            subprocess.check_call(['scons', builder[lang]] + arg_list, stdout=file)
-                        __execute(builder[lang], num_threads, num_conditions)
-                        __check_error(builder[lang], num_conditions, nvar, validator)
-
-                else:
-                    #subprocess.check_call(['scons', '-c'])
-                    with open('logfile', 'a') as file:
-                        #subprocess.check_call(['scons', '-c'])
-                        file.write('\ncache_opt: {}\n'.format(
-                                    cache_opt))
-                        __check_exit(pyJac.create_jacobian(lang=lang, 
-                        mech_name=mech, 
-                        therm_name=thermo, 
-                        initial_state=initial_conditions, 
-                        optimize_cache=cache_opt,
-                        multi_thread=num_threads,
-                        build_path=build_path))
-
-                        subprocess.check_call(['scons', builder[lang]] + arg_list, stdout=file)
-                    __execute(builder[lang], num_threads, num_conditions)
-                    __check_error(builder[lang], num_conditions, nvar, validator)
+                            subprocess.check_call(['scons', builder[lang]] + arg_list + 
+                                        ['t_step={}'.format(t)], stdout=file)
+                            __execute(builder[lang], num_threads, num_conditions)
+                            __check_error(builder[lang], num_conditions, nvar, t)
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda):
