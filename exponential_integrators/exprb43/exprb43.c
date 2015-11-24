@@ -35,7 +35,7 @@
 void integrate (const double t_start, const double t_end, const double pr, double* y) {
 	
 	//initial time
-	double h = 1.0e-8;
+	double h = fmin(1.0e-8, t_end - t_start);
 	double h_max, h_new;
 
 	double err_old = 1.0;

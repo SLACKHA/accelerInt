@@ -409,7 +409,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double Hacc = 0;
 	double ErrOld = 0;
 #endif
-	double H = 5e-7;
+	double H = fmin(5e-7, t_end - t_start);
 	double Hnew;
 	double t = t_start;
 	bool Reject = false;
