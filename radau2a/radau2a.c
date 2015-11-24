@@ -347,29 +347,10 @@ void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, 
 }
 
 double RK_ErrorNorm(double* scale, double* DY) {
-	double sums[UNROLL] = {0.0};
-	int start = NSP % UNROLL;
-	//take care of mod part
-	if (start != 0) {
-		for (int i = 0; i < start; i++)
-		{
-			sums[i] += (scale[i] * scale[i] * DY[i] * DY[i]);
-		}
-	}
-	//unrolled summer
 	#pragma unroll
-	for (int i = start; i < NSP; i += UNROLL)
-	{
-		#pragma unroll
-		for (int j = 0; j < UNROLL; ++j) {
-			sums[j] += (scale[i + j] * scale[i + j] * DY[i + j] * DY[i + j]);
-		}
-	}
-	//add sums
 	double sum = 0;
-	#pragma unroll
-	for (int i = 0; i <= UNROLL; ++i) {
-		sum += sums[i];
+	for (int i = 0; i < NSP; ++i){
+		sum += (scale[i] * scale[i] * DY[i] * DY[i]);
 	}
 	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
@@ -379,9 +360,9 @@ double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, do
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
 
-    double F1[NSP];
-    double F2[NSP];
-    double TMP[NSP];
+    double F1[NSP] = {0};
+    double F2[NSP] = {0};
+    double TMP[NSP] = {0};
     #pragma unroll
     for (int i = 0; i < NSP; ++i) {
     	F2[i] = HrkE1 * Z1[i] + HrkE2 * Z2[i] + HrkE3 * Z3[i];
@@ -437,23 +418,23 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	bool SkipLU = false;
 	double sc[NSP];
 	double A[NSP * NSP] = {0.0};
-	double E1[NSP * NSP];
-	double complex E2[NSP * NSP];
-	int ipiv1[NSP];
-	int ipiv2[NSP];
-	double Z1[NSP];
-	double Z2[NSP];
-	double Z3[NSP];
+	double E1[NSP * NSP] = {0};
+	double complex E2[NSP * NSP] = {0};
+	int ipiv1[NSP] = {0};
+	int ipiv2[NSP] = {0};
+	double Z1[NSP] = {0};
+	double Z2[NSP] = {0};
+	double Z3[NSP] = {0};
 #ifdef SDIRK_ERROR
-	double Z4[NSP];
-	double DZ4[NSP];
-	double G[NSP];
-	double TMP[NSP];
+	double Z4[NSP] = {0};
+	double DZ4[NSP] = {0};
+	double G[NSP] = {0};
+	double TMP[NSP] = {0};
 #endif
-	double DZ1[NSP];
-	double DZ2[NSP];
-	double DZ3[NSP];
-	double CONT[NSP * 3];
+	double DZ1[NSP] = {0};
+	double DZ2[NSP] = {0};
+	double DZ3[NSP] = {0};
+	double CONT[NSP * 3] = {0};
 	scale_init(y, sc);
 	double y0[NSP];
 	memcpy(y0, y, NSP * sizeof(double));
