@@ -156,11 +156,11 @@ config_options = [
     BoolVariable(
         'LOG_OUTPUT', 'Log output to file.', False),
     BoolVariable(
+        'LOG_END_ONLY', 'Log only beginning and end states to file.', False),
+    BoolVariable(
         'IGN', 'Log ignition time.', False),
     BoolVariable(
         'FAST_MATH', 'Compile with Fast Math.', False),
-    ('log_steps', 
-        'Comma separated list of step numbers where the output should be logged', '')
 ]
 
 opts.AddVariables(*config_options)
@@ -325,7 +325,7 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define ATOL ({})
     #define RTOL ({})
     #define t_step ({})
-    #define t_end ({})
+    #define end_time ({})
 
     /** Machine precision constant. */
     #define EPS DBL_EPSILON
@@ -379,7 +379,7 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define IGN
         """)
 
-    if env['LOG_OUTPUT'] or env['log_steps']:
+    if env['LOG_OUTPUT'] or env['LOG_END_ONLY']:
         file.write("""
     //log output to file
     #define LOG_OUTPUT
@@ -390,15 +390,11 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define LOG_KRYLOV_AND_STEPSIZES
     #define MAX_STEPS 10000
     """)
-        if env['log_steps']:
+        if env['LOG_END_ONLY']:
             file.write("""
-    //used to only log output on specific steps
-    #define LOG_ONLY_SPECIFIC_STEPS
+    //used to only log output on end step
+    #define LOG_END_ONLY
     """)
-            import numpy
-            arr = [int(x) for x in env['log_steps'].split(',')]
-            arr = numpy.array([len(arr)] + arr)
-            arr.tofile('log_steps.bin')
 
     file.write("""
     #endif

@@ -106,9 +106,10 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         break
         assert nvar is not None
         arg_list = ['-j{}'.format(num_threads),
-                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 
+                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE, LOG_END_ONLY=TRUE', 
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path),
-                'ATOL={}'.format(atol), 'RTOL={}'.format(rtol)]
+                't_end={}'.format(t_end)]
+
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
             num_conditions = 1 #they're all the same
@@ -121,8 +122,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                 num_steps = int(np.round(t_end / small_step))
                 subprocess.check_call(['scons', 'cpu'] + arg_list +
                             ['t_step={}'.format(small_step),
-                             't_end={}'.format(t_end),
-                             'log_steps={}'.format(str(num_steps)))],
+                            'ATOL={}'.format(1e-20), 'RTOL={}'.format(1e-10)]
                               stdout=file)
                 #run
                 subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
@@ -135,8 +135,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
             validator = validator.reshape((-1, 1 + num_conditions * nvar))
 
+        arg_list += ['ATOL={}'.format(atol), 'RTOL={}'.format(rtol)]
         langs = []
-        if not skip_c:t_end
+        if not skip_c:
             langs += ['c']
         if not skip_cuda:
             langs += ['cuda']
@@ -166,8 +167,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                                 build_path=build_path))
 
                                 subprocess.check_call(['scons', builder[lang]] + arg_list + 
-                                        ['t_step={}'.format(t),
-                                         't_end={}'.format(t_end)], stdout=file)
+                                        ['t_step={}'.format(t)], stdout=file)
                                 __execute(builder[lang], num_threads, num_conditions)
                                 __check_error(builder[lang], num_conditions, nvar, t,
                                                 validator, atol, rtol)
@@ -187,8 +187,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
                             sigfig = np.log10(t_end / num_steps)
                             subprocess.check_call(['scons', builder[lang]] + arg_list + 
-                                        ['t_step={}'.format(t),
-                                         't_end={}'.format(t_end)], stdout=file)
+                                        ['t_step={}'.format(t)], stdout=file)
                             __execute(builder[lang], num_threads, num_conditions)
                             __check_error(builder[lang], num_conditions, nvar, t,
                                             validator, atol, rtol)
