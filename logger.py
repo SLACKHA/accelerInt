@@ -7,15 +7,13 @@ from os import getcwd as cwd
 from os.path import expanduser
 from os.path import sep
 from os import makedirs
+from os.path import isfile as isfile
 import errno
 from glob import glob
 import re
 import subprocess
 import multiprocessing
 from argparse import ArgumentParser
-sys.path.append(pjoin(expanduser('~'),
-                         'pyJac'))
-import pyJac
 np.set_printoptions(precision=15)
 
 keyfile = 'cvodes-analytic-int-log.bin'
@@ -73,9 +71,19 @@ def __execute(builder, num_threads, num_conditions):
                 file.write('\n' + exe + '\n')
                 subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
 
+def __check_valid(nvar, num_conditions, num_steps):
+    if not isfile(pjoin('log', 'valid.bin')):
+        return None
+    validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
+    if validator.shape[0] == nvar * (num_conditions + 1) * num_steps:
+        validator = validator.reshape((-1, 1 + num_conditions * nvar))
+        return validator
+    return None
+
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol):
+        import pyJac
         #first compile and run cvodes to get the baseline
         __check_exit(pyJac.create_jacobian(lang='c', 
             mech_name=mech, 
@@ -84,7 +92,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             optimize_cache=False,
             build_path=build_path))
         small_step = atol
-        t_step = np.linspace(-10, -3)
+        t_step = np.logspace(-10, -2, num=10)
         t_step = np.array([10.**x for x in t_step])
         nvar = None
         #get num vars
@@ -102,23 +110,27 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                 'ATOL={}'.format(atol), 'RTOL={}'.format(rtol)]
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
-            num_conditions = num_threads #they're all the same, so do a reasonable #
+            num_conditions = 1 #they're all the same
         else:
             arg_list.append('SAME_IC=FALSE')
-        with open('logfile', 'a') as file:
-            subprocess.check_call(['scons', 'cpu'] + arg_list +
-                        ['t_step={}'.format(small_step),
-                         'num_steps={}'.format(int(t_step[-1]/small_step))], stdout=file)
-            #run
-            subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
-                str(num_threads), str(num_conditions)],
-                stdout=file)
-            #copy to saved data
-            shutil.copy(pjoin(cwd(), 'log', keyfile),
-                        pjoin(cwd(), 'log', 'valid.bin'))
 
-        validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
-        validator = validator.reshape((-1, 1 + num_conditions * nvar))
+        small_step_count = int(t_step[-1]/small_step)
+        validator = __check_valid(nvar, num_conditions, small_step_count)
+        if validator is None:
+            with open('logfile', 'a') as file:
+                subprocess.check_call(['scons', 'cpu'] + arg_list +
+                            ['t_step={}'.format(small_step),
+                             'num_steps={}'.format(small_step_count)], stdout=file)
+                #run
+                subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
+                    str(num_threads), str(num_conditions)],
+                    stdout=file)
+                #copy to saved data
+                shutil.copy(pjoin(cwd(), 'log', keyfile),
+                            pjoin(cwd(), 'log', 'valid.bin'))
+
+            validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
+            validator = validator.reshape((-1, 1 + num_conditions * nvar))
 
         arg_list.append('num_steps=1')
         langs = []
@@ -257,8 +269,14 @@ if __name__ == '__main__':
                         type=float,
                         default=1e-8,
                         help='The relative tolerance to use during integration')
+    parser.add_argument('-pjd', '--pyjac_directory',
+                        required=False,
+                        type=str,
+                        default=pjoin(expanduser('~'), 'pyJac'),
+                        help='The relative tolerance to use during integration')
     args = parser.parse_args()
 
+    sys.path.append(args.pyjac_directory)
     assert not (args.test_data is None and args.initial_conditions is None), \
     "Either a test data file or initial conditions must be specified"
 
