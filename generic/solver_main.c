@@ -108,9 +108,6 @@ int main (int argc, char *argv[])
 
     initialize_solver(num_threads);
 
-    // time span
-    double t_start = 0.0;
-
     /////////////////////////////////////////////////
     // arrays
     /////////////////////////////////////////////////
@@ -169,8 +166,8 @@ int main (int argc, char *argv[])
     //////////////////////////////
 
     // set initial time
-    double t = t_start;
-    double t_next = t + t_step;
+    double t = 0;
+    double t_next = t_step;
     int numSteps = 0;
 
     // time integration loop
@@ -186,11 +183,11 @@ int main (int argc, char *argv[])
         intDriver (NUM, t, t_next, rho_host, y_host);
 #endif
 
-        t = t_next;
-        t_next += t_step;
+        t = (numSteps - 1) * t_step;
+        t_next = fmin(numSteps * t_step, end_time);
 
 #if defined(PRINT)
-        printf("%.15le\t%.15le\t%d\t%d\n", t, y_host[0], numSteps, step_list[step_index]);
+        printf("%.15le\t%.15le\n", t, y_host[0]);
 #endif
 #ifdef DEBUG
         // check if within bounds
