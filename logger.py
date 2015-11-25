@@ -31,11 +31,14 @@ def __check_exit(x):
     if x != 0:
         sys.exit(x)
 
-def __check_error(builder, num_conditions, nvar, t):
+def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
     globtxt = '*-gpu-log.bin' if builder == 'gpu' else '*-int-log.bin'
-    validator = np.fromfile(pjoin('log', 'valid_{}.bin'.format(t)), dtype='float64')
-    validator = validator.reshape((-1, 1 + num_conditions * nvar))
-    key_arr = validator[:, 1:]
+    match = np.where(np.isclose(validator[:, 0], t, atol=atol))
+    print match, validator[match, 0]
+    print validator[:, 0]
+    key_arr = validator[match, 1:]
+    non_zero = np.where(key_arr != 0)
+    kview = key_arr[non_zero]
     with open('logfile', 'a') as file:
         file.write('t={}\n'.format(t))
         for f in glob(pjoin('log', globtxt)):
@@ -45,27 +48,17 @@ def __check_error(builder, num_conditions, nvar, t):
             array = array.reshape((-1, 1 + num_conditions * nvar))
 
             file.write(f + '\n')
-            data_arr = array[:, 1:]
+            data_arr = array[1:, 1:]
             #now compare column by column and get max err
-            
-            tdiff = array[1, 0] - array[0, 0]
-            #integrate the error
-            int_diff = np.zeros((num_conditions * nvar))
-            int_val = np.zeros((num_conditions * nvar))
-            for i in range(array.shape[0]):
-                if i < array.shape[0] and i > 0:
-                    assert array[i, 0] - array[i - 1, 0] == tdiff
-                int_diff += tdiff * np.abs(array[i - 1, 1:] - key_arr[i - 1, :])
-                int_val += tdiff * np.abs(key_arr[i - 1, :])
-            avg_val = int_val / np.abs(array[-1, 0] - array[0, 0])
 
-            cnz = np.where(avg_val > 1e-15)
-            err = 100. * np.abs(int_diff[cnz] / int_val[cnz])
-            #print err
-            max_err =  np.max(err)
-            norm_err = np.linalg.norm(err)
+            aview = data_arr[non_zero]
+
+            err = np.abs(aview - kview) / kview
+            err = np.sum(np.abs(err)**2)
+            err = np.sum(err)
+            norm_err = np.sqrt(err) / float(nvar * (num_conditions - 1))
             
-            file.write("{}\t{}\t\n".format(max_err, norm_err))
+            file.write("{:.16e}\t{:.16e}\t\n".format(max_err, norm_err))
 
 def __execute(builder, num_threads, num_conditions):
     with open('logfile', 'a') as file:
@@ -81,7 +74,8 @@ def __execute(builder, num_threads, num_conditions):
                 subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
-        num_threads, num_conditions, test_data, skip_c, skip_cuda):
+        num_threads, num_conditions, test_data, skip_c, skip_cuda,
+        atol, rtol):
         #first compile and run cvodes to get the baseline
         __check_exit(pyJac.create_jacobian(lang='c', 
             mech_name=mech, 
@@ -89,8 +83,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        t_step = range(-2, -9, -1)
-        t_step = np.array([np.power(10., i) for i in t_step])
+        small_step = atol
+        t_step = np.linspace(-10, -3)
+        t_step = np.array([10.**x for x in t_step])
         nvar = None
         #get num vars
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
@@ -104,24 +99,28 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path),
-                'num_steps=1']
+                'ATOL={}'.format(atol), 'RTOL={}'.format(rtol)]
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
             num_conditions = num_threads #they're all the same, so do a reasonable #
         else:
             arg_list.append('SAME_IC=FALSE')
         with open('logfile', 'a') as file:
-            for t in t_step:
-                subprocess.check_call(['scons', 'cpu'] + arg_list +
-                            ['t_step={}'.format(t)], stdout=file)
-                #run
-                subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
-                    str(num_threads), str(num_conditions)],
-                    stdout=file)
-                #copy to saved data
-                shutil.copy(pjoin(cwd(), 'log', keyfile),
-                            pjoin(cwd(), 'log', 'valid_{}.bin'.format(t)))
+            subprocess.check_call(['scons', 'cpu'] + arg_list +
+                        ['t_step={}'.format(small_step),
+                         'num_steps={}'.format(int(t_step[-1]/small_step))], stdout=file)
+            #run
+            subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
+                str(num_threads), str(num_conditions)],
+                stdout=file)
+            #copy to saved data
+            shutil.copy(pjoin(cwd(), 'log', keyfile),
+                        pjoin(cwd(), 'log', 'valid.bin'))
 
+        validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
+        validator = validator.reshape((-1, 1 + num_conditions * nvar))
+
+        arg_list.append('num_steps=1')
         langs = []
         if not skip_c:
             langs += ['c']
@@ -155,7 +154,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                                 subprocess.check_call(['scons', builder[lang]] + arg_list + 
                                         ['t_step={}'.format(t)], stdout=file)
                                 __execute(builder[lang], num_threads, num_conditions)
-                                __check_error(builder[lang], num_conditions, nvar, t)
+                                __check_error(builder[lang], num_conditions, nvar, t,
+                                                validator, atol, rtol)
 
                 else:
                     for t in t_step:
@@ -173,17 +173,20 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                             subprocess.check_call(['scons', builder[lang]] + arg_list + 
                                         ['t_step={}'.format(t)], stdout=file)
                             __execute(builder[lang], num_threads, num_conditions)
-                            __check_error(builder[lang], num_conditions, nvar, t)
+                            __check_error(builder[lang], num_conditions, nvar, t,
+                                            validator, atol, rtol)
 
 def run_log(mech, thermo, initial_conditions, build_path,
-        num_threads, num_conditions, test_data, skip_c, skip_cuda):
+        num_threads, num_conditions, test_data, skip_c, skip_cuda,
+        atol, rtol):
     with open('logfile', 'w') as file:
         pass
     if initial_conditions is not None:
         with open('logfile', 'a') as file:
             file.write('Running Same ICs\n')
         __run_and_check(mech, thermo, initial_conditions, build_path, 
-            num_threads, num_conditions, None, skip_c, skip_cuda)
+            num_threads, num_conditions, None, skip_c, skip_cuda,
+            atol, rtol)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -192,7 +195,8 @@ def run_log(mech, thermo, initial_conditions, build_path,
         except shutil.Error:
             pass
         __run_and_check(mech, thermo, '', build_path,
-        num_threads, num_conditions, test_data, skip_c, skip_cuda)
+        num_threads, num_conditions, test_data, skip_c, skip_cuda,
+        atol, rtol)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -243,6 +247,16 @@ if __name__ == '__main__':
                         default=False,
                         action='store_true',
                         help='Use to skip CUDA testing.')
+    parser.add_argument('-atol', '--abs_tolerance',
+                        required=False,
+                        type=float,
+                        default=1e-15,
+                        help='The absolute tolerance to use during integration')
+    parser.add_argument('-rtol', '--rel_tolerance',
+                        required=False,
+                        type=float,
+                        default=1e-8,
+                        help='The relative tolerance to use during integration')
     args = parser.parse_args()
 
     assert not (args.test_data is None and args.initial_conditions is None), \
@@ -253,4 +267,4 @@ if __name__ == '__main__':
 
     run_log(args.input, args.thermo, args.initial_conditions, args.build_path,
         args.num_threads, args.num_conditions, args.test_data,
-        args.skip_c, args.skip_cuda)
+        args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance)
