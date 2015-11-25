@@ -159,6 +159,8 @@ config_options = [
         'IGN', 'Log ignition time.', False),
     BoolVariable(
         'FAST_MATH', 'Compile with Fast Math.', False)
+    Variable(
+        'log_steps', 'Comma separated list of step numbers where the output should be logged', None)
 ]
 
 opts.AddVariables(*config_options)
@@ -377,17 +379,26 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define IGN
         """)
 
-    if env['LOG_OUTPUT']:
+    if env['LOG_OUTPUT'] or env['log_steps']:
         file.write("""
     //log output to file
     #define LOG_OUTPUT
         """)
 
         file.write("""
-        //turn on to log the krylov space and step sizes
-        #define LOG_KRYLOV_AND_STEPSIZES
-        #define MAX_STEPS 10000
-        """)
+    //turn on to log the krylov space and step sizes
+    #define LOG_KRYLOV_AND_STEPSIZES
+    #define MAX_STEPS 10000
+    """)
+        if env['log_steps']:
+            file.write("""
+    //used to only log output on specific steps
+    #define LOG_ONLY_SPECIFIC_STEPS
+    """)
+            with open('log_steps.bin', 'wb') as f:
+                for x in env['log_steps'].split(','):
+                    b = bytearray(int(x))
+                    f.write(b)
 
     file.write("""
     #endif

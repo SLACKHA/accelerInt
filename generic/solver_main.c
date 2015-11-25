@@ -162,6 +162,33 @@ int main (int argc, char *argv[])
 
     write_log(NUM, 0, y_host, pFile);
     init_solver_log();
+#ifdef LOG_ONLY_SPECIFIC_STEPS
+    //used when the stepsize is very small for validation
+    //read in the total number of times the state should be logged
+    //and then the integer step numbers on which the state should be looged
+    FILE *stepFile;
+    stepFile = fopen("log_steps.bin", "r");
+    int* step_list;
+    int num_output = 0;
+    int count = fread(&num_output, sizeof(int), 1, stepFile);
+    if (count != 1)
+    {
+        fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", "log_steps.bin", 1, count);
+        exit(-1);
+    }
+
+    step_list = (int*)calloc(num_output, sizeof(int));
+    for (int i = 0; i < num_output; ++i)
+    {
+        int count = fread(&step_list[i], sizeof(int), 1, stepFile);
+        if (count != 1)
+        {
+            fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", "log_steps.bin", 1, count);
+            exit(-1);
+        }
+    }
+    int step_index = 0;
+#endif
 #endif
 
     //////////////////////////////
@@ -203,7 +230,16 @@ int main (int argc, char *argv[])
         }
 #endif
 #ifdef LOG_OUTPUT
-        write_log(NUM, t, y_host, pFile);
+#ifdef LOG_ONLY_SPECIFIC_STEPS
+    if (numSteps == step_list[step_index])
+    {
+#endif
+            write_log(padded, NUM, t, y_host, pFile);
+            solver_log();
+#ifdef LOG_ONLY_SPECIFIC_STEPS
+            step_index++;
+    }
+#endif
 #endif
 #ifdef IGN
         // determine if ignition has occurred
