@@ -71,12 +71,12 @@ def __execute(builder, num_threads, num_conditions):
                 file.write('\n' + exe + '\n')
                 subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
 
-def __check_valid(nvar, num_conditions, num_steps):
+def __check_valid(nvar, num_conditions, step_list):
     if not isfile(pjoin('log', 'valid.bin')):
         return None
     validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
-    if validator.shape[0] == nvar * (num_conditions + 1) * num_steps:
-        validator = validator.reshape((-1, 1 + num_conditions * nvar))
+    validator = validator.reshape((-1, 1 + num_conditions * nvar))
+    if np.all(x in validator[:, 0] for x in step_list)
         return validator
     return None
 
@@ -92,7 +92,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             optimize_cache=False,
             build_path=build_path))
         small_step = atol
-        t_step = np.logspace(-10, -2, num=10)
+        t_step = range(-10, -1)
         t_step = np.array([10.**x for x in t_step])
         nvar = None
         #get num vars
@@ -114,13 +114,16 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         else:
             arg_list.append('SAME_IC=FALSE')
 
-        small_step_count = int(t_step[-1]/small_step)
-        validator = __check_valid(nvar, num_conditions, small_step_count)
+        log_step_list = np.array([int(x) for x in t_step / small_step])
+        small_step_count = log_step_list[-1]
+        validator = __check_valid(nvar, num_conditions, t_step)
         if validator is None:
             with open('logfile', 'a') as file:
                 subprocess.check_call(['scons', 'cpu'] + arg_list +
                             ['t_step={}'.format(small_step),
-                             'num_steps={}'.format(small_step_count)], stdout=file)
+                             'num_steps={}'.format(small_step_count),
+                             'log_steps={}'.format(','.join([str(x) for x in log_step_list]))],
+                              stdout=file)
                 #run
                 subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
                     str(num_threads), str(num_conditions)],
