@@ -158,9 +158,9 @@ config_options = [
     BoolVariable(
         'IGN', 'Log ignition time.', False),
     BoolVariable(
-        'FAST_MATH', 'Compile with Fast Math.', False)
-    Variable(
-        'log_steps', 'Comma separated list of step numbers where the output should be logged', None)
+        'FAST_MATH', 'Compile with Fast Math.', False),
+    ('log_steps', 
+        'Comma separated list of step numbers where the output should be logged', '')
 ]
 
 opts.AddVariables(*config_options)
@@ -395,10 +395,10 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     //used to only log output on specific steps
     #define LOG_ONLY_SPECIFIC_STEPS
     """)
-            with open('log_steps.bin', 'wb') as f:
-                for x in env['log_steps'].split(','):
-                    b = bytearray(int(x))
-                    f.write(b)
+            import numpy
+            arr = [int(x) for x in env['log_steps'].split(',')]
+            arr = numpy.array([len(arr)] + arr)
+            arr.tofile('log_steps.bin')
 
     file.write("""
     #endif

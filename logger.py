@@ -51,12 +51,12 @@ def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
 
             aview = data_arr[non_zero]
 
-            err = np.abs(aview - kview) / kview
+            err = np.abs(aview - kview) / (atol + kview * rtol)
             err = np.sum(np.abs(err)**2)
             err = np.sum(err)
-            norm_err = np.sqrt(err) / float(nvar * (num_conditions - 1))
+            norm_err = np.sqrt(err)
             
-            file.write("{:.16e}\t{:.16e}\t\n".format(max_err, norm_err))
+            file.write("{:.16e}\n".format(norm_err))
 
 def __execute(builder, num_threads, num_conditions):
     with open('logfile', 'a') as file:
@@ -76,7 +76,7 @@ def __check_valid(nvar, num_conditions, step_list):
         return None
     validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
     validator = validator.reshape((-1, 1 + num_conditions * nvar))
-    if np.all(x in validator[:, 0] for x in step_list)
+    if np.all(x in validator[:, 0] for x in step_list):
         return validator
     return None
 
@@ -91,8 +91,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        small_step = atol
-        t_step = range(-10, -1)
+        small_step = 1e-10
+        t_step = range(-8, -3)
         t_step = np.array([10.**x for x in t_step])
         nvar = None
         #get num vars
@@ -114,7 +114,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         else:
             arg_list.append('SAME_IC=FALSE')
 
-        log_step_list = np.array([int(x) for x in t_step / small_step])
+        log_step_list = np.array([int(np.round(x)) for x in t_step / small_step])
         small_step_count = log_step_list[-1]
         validator = __check_valid(nvar, num_conditions, t_step)
         if validator is None:

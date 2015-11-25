@@ -173,7 +173,7 @@ int main (int argc, char *argv[])
     int count = fread(&num_output, sizeof(int), 1, stepFile);
     if (count != 1)
     {
-        fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", "log_steps.bin", 1, count);
+        fprintf(stderr, "File (%s) is incorrectly formatted, %d ints were expected but only %d were read.\n", "log_steps.bin", 1, count);
         exit(-1);
     }
 
@@ -183,7 +183,7 @@ int main (int argc, char *argv[])
         int count = fread(&step_list[i], sizeof(int), 1, stepFile);
         if (count != 1)
         {
-            fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", "log_steps.bin", 1, count);
+            fprintf(stderr, "File (%s) is incorrectly formatted, %d ints were expected but only %d were read.\n", "log_steps.bin", 1, count);
             exit(-1);
         }
     }
@@ -234,7 +234,7 @@ int main (int argc, char *argv[])
     if (numSteps == step_list[step_index])
     {
 #endif
-            write_log(padded, NUM, t, y_host, pFile);
+            write_log(NUM, t, y_host, pFile);
             solver_log();
 #ifdef LOG_ONLY_SPECIFIC_STEPS
             step_index++;
