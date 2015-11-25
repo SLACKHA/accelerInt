@@ -143,7 +143,7 @@ config_options = [
     ('ATOL', 'Absolute Tolerance for integrators', '1e-15'),
     ('RTOL', 'Relative Tolerance for integrators', '1e-8'),
     ('t_step', 'Step size for integrator', '1e-6'),
-    ('num_steps', 'Total number of integrator steps to take', '1'),
+    ('t_end', 'End time of the integrator', '1e-6'),
     ('N_RA', 'The size of the Rational Approximant for the Exponential Integrators.', '10'),
     BoolVariable(
         'SAME_IC', 'Use the same initial conditions (specified during mechanism creation) during integration.', False),
@@ -325,7 +325,7 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define ATOL ({})
     #define RTOL ({})
     #define t_step ({})
-    #define num_steps ({})
+    #define t_end ({})
 
     /** Machine precision constant. */
     #define EPS DBL_EPSILON
@@ -343,7 +343,7 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define CV_MAX_ERRTEST_FAILS (5) //maximum number of error test fails before an error is thrown
 
     //#define COMPILE_TESTING_METHODS //comment out to remove unit testing stubs
-    """.format(env['ATOL'], env['RTOL'], env['t_step'], env['num_steps'], env['N_RA'])
+    """.format(env['ATOL'], env['RTOL'], env['t_step'], env['t_end'], env['N_RA'])
     )
 
     if env['SAME_IC']:

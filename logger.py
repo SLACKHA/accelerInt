@@ -71,13 +71,14 @@ def __execute(builder, num_threads, num_conditions):
                 file.write('\n' + exe + '\n')
                 subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
 
-def __check_valid(nvar, num_conditions, step_list):
+def __check_valid(nvar, num_conditions, t_end, t_step):
     if not isfile(pjoin('log', 'valid.bin')):
         return None
     validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
-    validator = validator.reshape((-1, 1 + num_conditions * nvar))
-    if np.all(x in validator[:, 0] for x in step_list):
-        return validator
+    if validator.shape[0] % (1 + num_conditions * nvar) == 0:
+        validator = validator.reshape((-1, 1 + num_conditions * nvar))
+        if np.any(np.isclose(validator[:, 0], t_end, atol=t_step/10.)):
+            return validator
     return None
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
@@ -92,8 +93,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             optimize_cache=False,
             build_path=build_path))
         small_step = 1e-10
-        t_step = range(-8, -3)
-        t_step = np.array([10.**x for x in t_step])
+        t_end = 1e-4 #ms
+        t_step = [1e-8, 5e-8, 1e-7, 5e-7, 1e-6, 5e-6, 1e-5]
         nvar = None
         #get num vars
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
@@ -114,15 +115,14 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         else:
             arg_list.append('SAME_IC=FALSE')
 
-        log_step_list = np.array([int(np.round(x)) for x in t_step / small_step])
-        small_step_count = log_step_list[-1]
-        validator = __check_valid(nvar, num_conditions, t_step)
+        validator = __check_valid(nvar, num_conditions, t_end, small_step)
         if validator is None:
             with open('logfile', 'a') as file:
+                num_steps = int(np.round(t_end / small_step))
                 subprocess.check_call(['scons', 'cpu'] + arg_list +
                             ['t_step={}'.format(small_step),
-                             'num_steps={}'.format(small_step_count),
-                             'log_steps={}'.format(','.join([str(x) for x in log_step_list]))],
+                             't_end={}'.format(t_end),
+                             'log_steps={}'.format(str(num_steps)))],
                               stdout=file)
                 #run
                 subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
@@ -135,9 +135,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
             validator = validator.reshape((-1, 1 + num_conditions * nvar))
 
-        arg_list.append('num_steps=1')
         langs = []
-        if not skip_c:
+        if not skip_c:t_end
             langs += ['c']
         if not skip_cuda:
             langs += ['cuda']
@@ -167,7 +166,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                                 build_path=build_path))
 
                                 subprocess.check_call(['scons', builder[lang]] + arg_list + 
-                                        ['t_step={}'.format(t)], stdout=file)
+                                        ['t_step={}'.format(t),
+                                         't_end={}'.format(t_end)], stdout=file)
                                 __execute(builder[lang], num_threads, num_conditions)
                                 __check_error(builder[lang], num_conditions, nvar, t,
                                                 validator, atol, rtol)
@@ -185,8 +185,10 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                             multi_thread=num_threads,
                             build_path=build_path))
 
+                            sigfig = np.log10(t_end / num_steps)
                             subprocess.check_call(['scons', builder[lang]] + arg_list + 
-                                        ['t_step={}'.format(t)], stdout=file)
+                                        ['t_step={}'.format(t),
+                                         't_end={}'.format(t_end)], stdout=file)
                             __execute(builder[lang], num_threads, num_conditions)
                             __check_error(builder[lang], num_conditions, nvar, t,
                                             validator, atol, rtol)

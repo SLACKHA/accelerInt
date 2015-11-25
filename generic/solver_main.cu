@@ -134,7 +134,6 @@ int main (int argc, char *argv[])
 
     // time span
     double t_start = 0.0;
-    double t_end = num_steps * t_step;
 
     double* y_device;
     double* y_host;
