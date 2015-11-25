@@ -22,16 +22,15 @@ for i in range(len(lines)):
 			solver = match.group(1)
 			if not solver in data:
 				data[solver] = []
-			max_err, norm_err = [float(x) for x in lines[i + 1].split()]
-			data[solver].append((tstep, max_err, norm_err))
+			norm_err = float(lines[i + 1])
+			data[solver].append((tstep, norm_err))
 			i += 2
 
 for solver in data:
 	data[solver] = sorted(data[solver], key=lambda x: x[0])
 	data[solver] = zip(*data[solver])
 	data[solver] = [np.array(x) for x in data[solver]]
-	print solver, np.min(data[solver][0]), np.min(data[solver][2])
-	plt.loglog(1. / data[solver][0], data[solver][2], label=solver)
+	plt.loglog(1. / data[solver][0], data[solver][1], label=solver)
 
 plt.legend(loc=0, fontsize=8)
 plt.savefig('error.pdf')

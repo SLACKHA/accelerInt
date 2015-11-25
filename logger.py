@@ -31,12 +31,7 @@ def __check_exit(x):
 
 def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
     globtxt = '*-gpu-log.bin' if builder == 'gpu' else '*-int-log.bin'
-    match = np.where(np.isclose(validator[:, 0], t, atol=atol))
-    print match, validator[match, 0]
-    print validator[:, 0]
-    key_arr = validator[match, 1:]
-    non_zero = np.where(key_arr != 0)
-    kview = key_arr[non_zero]
+    key_arr = validator[-1, 1:]
     with open('logfile', 'a') as file:
         file.write('t={}\n'.format(t))
         for f in glob(pjoin('log', globtxt)):
@@ -46,12 +41,9 @@ def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
             array = array.reshape((-1, 1 + num_conditions * nvar))
 
             file.write(f + '\n')
-            data_arr = array[1:, 1:]
+            data_arr = array[-1, 1:]
             #now compare column by column and get max err
-
-            aview = data_arr[non_zero]
-
-            err = np.abs(aview - kview) / (atol + kview * rtol)
+            err = np.abs(data_arr - key_arr) / (atol + key_arr * rtol)
             err = np.sum(np.abs(err)**2)
             err = np.sum(err)
             norm_err = np.sqrt(err)
@@ -92,7 +84,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        small_step = 1e-10
+        small_step = 1e-12
         t_end = 1e-4 #ms
         t_step = [1e-8, 5e-8, 1e-7, 5e-7, 1e-6, 5e-6, 1e-5]
         nvar = None
@@ -106,8 +98,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         break
         assert nvar is not None
         arg_list = ['-j{}'.format(num_threads),
-                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE, LOG_END_ONLY=TRUE', 
+                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE', 
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path),
+                'ATOL={}'.format(atol), 'RTOL={}'.format(rtol),
                 't_end={}'.format(t_end)]
 
         if initial_conditions:
@@ -121,8 +114,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             with open('logfile', 'a') as file:
                 num_steps = int(np.round(t_end / small_step))
                 subprocess.check_call(['scons', 'cpu'] + arg_list +
-                            ['t_step={}'.format(small_step),
-                            'ATOL={}'.format(1e-20), 'RTOL={}'.format(1e-10)]
+                            ['t_step={}'.format(small_step)],
                               stdout=file)
                 #run
                 subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
@@ -135,7 +127,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
             validator = validator.reshape((-1, 1 + num_conditions * nvar))
 
-        arg_list += ['ATOL={}'.format(atol), 'RTOL={}'.format(rtol)]
+        arg_list += []
         langs = []
         if not skip_c:
             langs += ['c']
@@ -185,7 +177,6 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                             multi_thread=num_threads,
                             build_path=build_path))
 
-                            sigfig = np.log10(t_end / num_steps)
                             subprocess.check_call(['scons', builder[lang]] + arg_list + 
                                         ['t_step={}'.format(t)], stdout=file)
                             __execute(builder[lang], num_threads, num_conditions)
