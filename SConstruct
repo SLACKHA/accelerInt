@@ -226,6 +226,7 @@ exp_int_dir = os.path.join(home, 'exponential_integrators')
 exp4_int_dir = os.path.join(home, 'exponential_integrators', 'exp4')
 exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
 cvodes_dir = os.path.join(home, 'cvodes')
+runge_kutta_dir = os.path.join(home, 'runge_kutta')
 
 common_dir_list = [generic_dir, mech_dir]
 
@@ -473,7 +474,7 @@ def builder(env_save, cobj, cuobj, newdict, mydir, variant,
         env.Program(target=target_base,
                     source=cobj + int_c,
                     variant_dir=os.path.join(mydir, variant)))
-    if env['build_cuda']:
+    if env['build_cuda'] and cu_obj:
         target_list[target_base + '-gpu'] = []
         dlink = env.CUDADLink(
             target=target_base+'-gpu', 
@@ -546,6 +547,14 @@ builder(env_save, mech_c + gen_c,
     mech_cuda + gen_cuda if build_cuda else None,
     new_defines, radau2a_dir,
     variant, 'radau2a-int', target_list)
+
+#runge kutta
+new_defines = {}
+new_defines['CPPDEFINES'] = ['RK78']
+new_defines['CPPPATH'] = [runge_kutta_dir]
+builder(env_save, mech_c + gen_c, None,
+    new_defines, runge_kutta_dir,
+    variant, 'rk78-int', target_list)
 
 #exp4
 new_defines = {}

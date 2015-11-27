@@ -16,7 +16,7 @@ import multiprocessing
 from argparse import ArgumentParser
 np.set_printoptions(precision=15)
 
-keyfile = 'cvodes-analytic-int-log.bin'
+keyfile = 'rk78-int-log.bin'
 
 def create_dir(path):
     try:
@@ -84,9 +84,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        small_step = 1e-8
+        small_step = 1e-12
         t_end = 1e-4 #ms
-        t_step = [1e-8, 5e-8, 1e-7, 5e-7, 1e-6, 5e-6, 1e-5]
+        t_step = [1e-9, 1e-8, 5e-8, 1e-7, 5e-7, 1e-6, 5e-6, 1e-5]
         nvar = None
         #get num vars
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
@@ -117,7 +117,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                             ['t_step={}'.format(small_step)],
                               stdout=file)
                 #run
-                subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
+                subprocess.check_call([pjoin(cwd(), 'rk78-int'), 
                     str(num_threads), str(num_conditions)],
                     stdout=file)
                 #copy to saved data
