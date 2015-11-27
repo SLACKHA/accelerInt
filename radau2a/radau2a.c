@@ -443,6 +443,10 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	int Nconsecutive = 0;
 	int Nsteps = 0;
 	double NewtonRate = pow(2.0, 1.25);
+#ifdef FIXED_TIMESTEP
+	H = t_end - t_start;
+#endif
+
 	while (t + Roundoff < t_end) {
 		if (!Reject) {
 			dydt (t, pr, y, F0);
@@ -540,11 +544,21 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
             if (NewtonDone) break;
             if (NewtonIter == NewtonMaxit - 1) {
+#ifndef FIXED_TIMESTEP
             	//todo implement return codes
 				y[0] = logf(-1);
 				return;
+#endif
             }
 		}
+#ifdef FIXED_TIMESTEP
+		t = t_end;
+		#pragma unroll
+		for (int i = 0; i < NSP; i++) {
+			y[i] += Z3[i];
+		}
+		continue;
+#endif
 		if (!NewtonDone) {
 			H = Fac * H;
 			Reject = true;

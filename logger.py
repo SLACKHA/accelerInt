@@ -84,7 +84,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        small_step = 1e-12
+        small_step = 1e-8
         t_end = 1e-4 #ms
         t_step = [1e-8, 5e-8, 1e-7, 5e-7, 1e-6, 5e-6, 1e-5]
         nvar = None
@@ -98,8 +98,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                         break
         assert nvar is not None
         arg_list = ['-j{}'.format(num_threads),
-                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE', 
-                'SHUFFLE=FALSE', 'PRINT=FALSE', 'mechanism_dir={}'.format(build_path),
+                'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE',
+                'FIXED_TIMESTEP=TRUE', 'SHUFFLE=FALSE', 'PRINT=FALSE', 
+                'mechanism_dir={}'.format(build_path),
                 'ATOL={}'.format(atol), 'RTOL={}'.format(rtol),
                 't_end={}'.format(t_end)]
 
@@ -112,7 +113,6 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         validator = __check_valid(nvar, num_conditions, t_end, small_step)
         if validator is None:
             with open('logfile', 'a') as file:
-                num_steps = int(np.round(t_end / small_step))
                 subprocess.check_call(['scons', 'cpu'] + arg_list +
                             ['t_step={}'.format(small_step)],
                               stdout=file)
@@ -127,7 +127,6 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
             validator = validator.reshape((-1, 1 + num_conditions * nvar))
 
-        arg_list += []
         langs = []
         if not skip_c:
             langs += ['c']

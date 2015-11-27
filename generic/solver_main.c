@@ -183,8 +183,8 @@ int main (int argc, char *argv[])
         intDriver (NUM, t, t_next, rho_host, y_host);
 #endif
 
-        t = (numSteps - 1) * t_step;
-        t_next = fmin(numSteps * t_step, end_time);
+        t = numSteps * t_step;
+        t_next = fmin((numSteps + 1) * t_step, end_time);
 
 #if defined(PRINT)
         printf("%.15le\t%.15le\n", t, y_host[0]);

@@ -216,8 +216,8 @@ int main (int argc, char *argv[])
         // transfer memory back to CPU
         cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NSP * sizeof(double), cudaMemcpyDeviceToHost) );
 
-        t = (numSteps - 1) * t_step;
-        t_next = fmin(numSteps * t_step, end_time);
+        t = numSteps * t_step;
+        t_next = fmin((numSteps + 1) * t_step, end_time);
 
 
 #if defined(PRINT)

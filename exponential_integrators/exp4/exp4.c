@@ -67,6 +67,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	//open and clear
 	rFile = fopen(out_reject_name, "a");
 #endif
+#ifdef FIXED_TIMESTEP
+	h = t_end - t_start;
+#endif
 	
 	double beta = 0;
 	while ((t < t_end) && (t + h > t)) {
@@ -98,8 +101,11 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			//do arnoldi
 			if (arnoldi(&m, 1.0 / 3.0, P, h, A, fy, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
 			{
+#ifndef FIXED_TIMESTEP
+				//need to reduce h and try again
 				h /= 3;
 				continue;
+#endif
 			}
 
 			// k1
@@ -190,6 +196,15 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			}
 			
 			scale (y, y1, f_temp);	
+
+#ifdef FIXED_TIMESTEP
+			t = t_end;
+			#pragma unroll
+			for (int i = 0; i < NSP; ++i) {
+				y[i] = y1[i];
+			}
+			break;
+#endif			
 			
 			///////////////////
 			// calculate errors
