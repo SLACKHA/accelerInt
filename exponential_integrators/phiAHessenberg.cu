@@ -13,15 +13,15 @@ void phi2Ac_variable(const int m, const double* A, const double c, double* phiA)
 	
 	cuDoubleComplex invA[STRIDE * STRIDE];
 	
-	#pragma unroll 1
+	#pragma unroll
 	for (int i = 0; i < m; ++i) {
-		#pragma unroll 1
+		#pragma unroll
 		for (int j = 0; j < m; ++j) {
 			phiA[i + j*STRIDE] = 0.0;
 		}
 	}
 
-	#pragma unroll 1
+	#pragma unroll
 	for (int q = 0; q < N_RA; q += 2) {
 		
 		// compute transpose and multiply with constant
@@ -40,9 +40,9 @@ void phi2Ac_variable(const int m, const double* A, const double c, double* phiA)
 		//getInverseComplex (NN, invA);
 		getComplexInverseHessenberg (m, invA);
 		
-		#pragma unroll 1
+		#pragma unroll
 		for (int i = 0; i < m; ++i) {
-			#pragma unroll 1
+			#pragma unroll
 			for (int j = 0; j < m; ++j) {
 				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( cuCdiv(res[q], cuCmul(poles[q], poles[q])), invA[i + j*STRIDE]) );
 			}
@@ -55,15 +55,15 @@ void phiAc_variable(const int m, const double* A, const double c, double* phiA) 
 
 	cuDoubleComplex invA[STRIDE * STRIDE];
 	
-	#pragma unroll 1
+	#pragma unroll
 	for (int i = 0; i < m; ++i) {
-		#pragma unroll 1
+		#pragma unroll
 		for (int j = 0; j < m; ++j) {
 			phiA[i + j*STRIDE] = 0.0;
 		}
 	}
 
-	#pragma unroll 1
+	#pragma unroll
 	for (int q = 0; q < N_RA; q += 2) {
 		
 		// compute transpose and multiply with constant
@@ -82,9 +82,9 @@ void phiAc_variable(const int m, const double* A, const double c, double* phiA) 
 		//getInverseComplex (NN, invA);
 		getComplexInverseHessenberg (m, invA);
 		
-		#pragma unroll 1
+		#pragma unroll
 		for (int i = 0; i < m; ++i) {
-			#pragma unroll 1
+			#pragma unroll
 			for (int j = 0; j < m; ++j) {
 				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( cuCdiv(res[q], poles[q]), invA[i + j*STRIDE]) );
 			}
@@ -97,15 +97,15 @@ void expAc_variable(const int m, const double* A, const double c, double* phiA) 
 
 	cuDoubleComplex invA[STRIDE * STRIDE];
 	
-	#pragma unroll 1
+	#pragma unroll
 	for (int i = 0; i < m; ++i) {
-		#pragma unroll 1
+		#pragma unroll
 		for (int j = 0; j < m; ++j) {
 			phiA[i + j*STRIDE] = 0.0;
 		}
 	}
 
-	#pragma unroll 1
+	#pragma unroll
 	for (int q = 0; q < N_RA; q += 2) {
 		
 		// compute transpose and multiply with constant
@@ -124,9 +124,9 @@ void expAc_variable(const int m, const double* A, const double c, double* phiA) 
 		//getInverseComplex (NN, invA);
 		getComplexInverseHessenberg (m, invA);
 		
-		#pragma unroll 1
+		#pragma unroll
 		for (int i = 0; i < m; ++i) {
-			#pragma unroll 1
+			#pragma unroll
 			for (int j = 0; j < m; ++j) {
 				phiA[i + j*STRIDE] += 2.0 * cuCreal( cuCmul( res[q], invA[i + j*STRIDE]) );
 			}

@@ -84,7 +84,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
 		Hm[(*m) * STRIDE] = 1.0;
-		#pragma unroll 1
+		#pragma unroll
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
@@ -110,10 +110,10 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 
 				//setup I - h*Hm
 				double* working = (double*)malloc((*m) * (*m) * sizeof(double));
-				#pragma unroll 1
+				#pragma unroll
 				for (int ind1 = 0; ind1 < *m; ind1++)
 				{
-					#pragma unroll 1
+					#pragma unroll
 					for (int ind2 = 0; ind2 < *m; ind2++)
 					{
 						if (ind1 == ind2)
@@ -129,7 +129,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 				getInverseHessenberg(*m, working);
 				//get the value for the err (dot product of mth row of working and 1'st col of Hm)
 				double val = 0;
-				#pragma unroll 1
+				#pragma unroll
 				for (int ind1 = 0; ind1 < *m; ind1++)
 				{
 					val += working[(*m) * ind1 + (*m - 1)] * Hm[ind1];
