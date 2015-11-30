@@ -65,7 +65,7 @@ def check_file(filename):
     return count
 
 def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
-        threads=[6, 12]):
+        threads=[6, 12], langs=['c', 'cuda']):
     jthread = str(multiprocessing.cpu_count())
 
     make_sure_path_exists(os.path.join(thedir, 'output'))
@@ -135,46 +135,48 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                 args.append('SAME_IC={}'.format(same))
 
                 #run with repeats
-                run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
-                for exe in run_me:
-                    for thread in threads:
-                        for cond in thepow:
-                            filename = os.path.join(thedir, 'output',
-                                exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
-                                thread, 'co' if opt else 'nco',
-                                'sameic' if same else 'psric', t_step))
-                            my_repeats = repeats - check_file(filename)
-                            if my_repeats and not cpu_built:
-                                subprocess.check_call(args)
-                                cpu_built = True
-                            with open(filename, 'a') as file:
-                                for repeat in range(my_repeats):
-                                    subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
+                if 'c' in langs:
+                    run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
+                    for exe in run_me:
+                        for thread in threads:
+                            for cond in thepow:
+                                filename = os.path.join(thedir, 'output',
+                                    exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                                    thread, 'co' if opt else 'nco',
+                                    'sameic' if same else 'psric', t_step))
+                                my_repeats = repeats - check_file(filename)
+                                if my_repeats and not cpu_built:
+                                    subprocess.check_call(args)
+                                    cpu_built = True
+                                with open(filename, 'a') as file:
+                                    for repeat in range(my_repeats):
+                                        subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
 
                 for smem in use_smem:
-                    gpu_built = False
-                    gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
-                    gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
-                    args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
-                     'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
-                     'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
-                     't_step={}'.format(t_step)]
-                    args.append('SAME_IC={}'.format(same))
-                    #run with repeats
-                    run_me = get_executables(blacklist, inverse=['int-gpu'])
-                    for exe in run_me:
-                        for cond in thepow:
-                            filename = os.path.join(thedir, 'output',
-                                exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
-                                'co' if opt else 'nco', 'smem' if smem else 'nosmem',
-                                'sameic' if same else 'psric', t_step))
-                            my_repeats = repeats - check_file(filename)
-                            if my_repeats and not gpu_built:
-                                subprocess.check_call(args)
-                                gpu_built = True
-                            with open(filename, 'a') as file:
-                                for repeat in range(my_repeats):
-                                    subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
+                    if 'cuda' in langs:
+                        gpu_built = False
+                        gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
+                        gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
+                        args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
+                         'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
+                         'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
+                         't_step={}'.format(t_step)]
+                        args.append('SAME_IC={}'.format(same))
+                        #run with repeats
+                        run_me = get_executables(blacklist, inverse=['int-gpu'])
+                        for exe in run_me:
+                            for cond in thepow:
+                                filename = os.path.join(thedir, 'output',
+                                    exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                                    'co' if opt else 'nco', 'smem' if smem else 'nosmem',
+                                    'sameic' if same else 'psric', t_step))
+                                my_repeats = repeats - check_file(filename)
+                                if my_repeats and not gpu_built:
+                                    subprocess.check_call(args)
+                                    gpu_built = True
+                                with open(filename, 'a') as file:
+                                    for repeat in range(my_repeats):
+                                        subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
 
 
 if __name__ == '__main__':
@@ -211,6 +213,11 @@ if __name__ == '__main__':
                         required=False,
                         default='6,12',
                         help='Comma separated list of # of threads to test with for CPU integrators')
+    parser.add_argument('-l', '--langs',
+                        type=str,
+                        required=False,
+                        default='c,cuda',
+                        help='Comma separated list of languages to test.')
     args = parser.parse_args()
 
     num_threads = [int(x) for x in args.num_threads.split(',')]
@@ -226,4 +233,6 @@ if __name__ == '__main__':
             pyjac=os.path.expanduser(args.pyjac_dir), 
             num_cond=args.num_cond,
             repeats=args.repeats,
-            threads=num_threads)
+            threads=num_threads,
+            langs=[x.strip() for x in 
+                    args.langs.split(',') if x.strip()])
