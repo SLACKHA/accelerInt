@@ -194,11 +194,13 @@ int main (int argc, char *argv[])
     double t = 0;
     double t_next = t_step;
     int numSteps = 0;
+    int max_steps = (int)rint(t_end / t_step);
 
     // time integration loop
-    while (t < end_time)
+    while (numSteps < max_steps)
     {
         numSteps++;
+
         // transfer memory to GPU
         cudaErrorCheck( cudaMemcpy (y_device, y_host, padded * NSP * sizeof(double), cudaMemcpyHostToDevice) );
 
