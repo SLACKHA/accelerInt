@@ -168,7 +168,7 @@ int main (int argc, char *argv[])
     // set initial time
     double t = 0;
     double t_next = t_step;
-    int max_steps = (int)rint(t_end / t_step);
+    int max_steps = (int)ceil(t_end / t_step);
 
     // time integration loop
     while (numSteps < max_steps)
