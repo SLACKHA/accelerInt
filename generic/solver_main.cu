@@ -192,15 +192,14 @@ int main (int argc, char *argv[])
 
     // set initial time
     double t = 0;
-    double t_next = t_step;
+    double t_next = fmin(end_time, t_step);
     int numSteps = 0;
-    int max_steps = (int)rint(t_end / t_step);
+    int max_steps = (int)ceil(end_time / t_step);
 
     // time integration loop
     while (numSteps < max_steps)
     {
         numSteps++;
-
         // transfer memory to GPU
         cudaErrorCheck( cudaMemcpy (y_device, y_host, padded * NSP * sizeof(double), cudaMemcpyHostToDevice) );
 
@@ -218,7 +217,7 @@ int main (int argc, char *argv[])
         // transfer memory back to CPU
         cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NSP * sizeof(double), cudaMemcpyDeviceToHost) );
 
-        t = numSteps * t_step;
+        t = t_next;
         t_next = fmin((numSteps + 1) * t_step, end_time);
 
 

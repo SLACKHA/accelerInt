@@ -167,8 +167,9 @@ int main (int argc, char *argv[])
 
     // set initial time
     double t = 0;
-    double t_next = t_step;
-    int max_steps = (int)rint(t_end / t_step);
+    double t_next = fmin(end_time, t_step);
+    int numSteps = 0;
+    int max_steps = (int)ceil(end_time / t_step);
 
     // time integration loop
     while (numSteps < max_steps)
@@ -182,8 +183,7 @@ int main (int argc, char *argv[])
         // constant volume case
         intDriver (NUM, t, t_next, rho_host, y_host);
 #endif
-
-        t = numSteps * t_step;
+        t = t_next;
         t_next = fmin((numSteps + 1) * t_step, end_time);
 
 #if defined(PRINT)
