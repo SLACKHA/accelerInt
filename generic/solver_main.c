@@ -169,10 +169,9 @@ int main (int argc, char *argv[])
     double t = 0;
     double t_next = fmin(end_time, t_step);
     int numSteps = 0;
-    int max_steps = (int)ceil(end_time / t_step);
 
     // time integration loop
-    while (numSteps < max_steps)
+    while (t + EPS < end_time)
     {
         numSteps++;
 
@@ -184,7 +183,7 @@ int main (int argc, char *argv[])
         intDriver (NUM, t, t_next, rho_host, y_host);
 #endif
         t = t_next;
-        t_next = fmin((numSteps + 1) * t_step, end_time);
+        t_next = fmin(end_time, (numSteps + 1) * t_step);
 
 #if defined(PRINT)
         printf("%.15le\t%.15le\n", t, y_host[0]);
