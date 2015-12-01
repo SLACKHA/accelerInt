@@ -132,7 +132,8 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                      'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
                      'PRINT=FALSE', 'mechanism_dir={}'.format(mech_dir),
                      't_step={}'.format(t_step),
-                     't_end={}'.format(t_step)]
+                     't_end={}'.format(t_step),
+                     'DIVERGENCE_WARP=0']
                 args.append('SAME_IC={}'.format(same))
 
                 #run with repeats
@@ -162,7 +163,8 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                          'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
                          'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
                          't_step={}'.format(t_step),
-                         't_end={}'.format(t_step)]
+                         't_end={}'.format(t_step),
+                         'DIVERGENCE_WARP=0']
                         args.append('SAME_IC={}'.format(same))
                         #run with repeats
                         run_me = get_executables(blacklist + ['rk78'], inverse=['int-gpu'])

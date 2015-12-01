@@ -45,6 +45,10 @@
 #define Qmin (1.0)
 #define Qmax (1.2)
 #define UNROLL (8)
+#define T_ID (threadIdx.x + blockIdx.x * blockDim.x)
+#ifdef DIVERGENCE_TEST
+ 	extern __device__ int integrator_steps[DIVERGENCE_TEST];
+#endif
 //#define SDIRK_ERROR
 
 __device__
@@ -553,6 +557,9 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	int Nsteps = 0;
 	double NewtonRate = pow(2.0, 1.25);
 	while (t + Roundoff < t_end) {
+		#ifdef DIVERGENCE_TEST
+		integrator_steps[T_ID]++;
+		#endif
 		if(!Reject) {
 			dydt (t, pr, y, F0);
 		}

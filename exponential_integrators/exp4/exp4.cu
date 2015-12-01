@@ -25,6 +25,20 @@
 #include "exponential_linear_algebra.cuh"
 #include "solver_init.cuh"
 
+#define T_ID (threadIdx.x + blockIdx.x * blockDim.x)
+#ifdef LOG_KRYLOV_AND_STEPSIZES
+ 	extern __device__ double err_log[MAX_STEPS];
+ 	extern __device__ int m_log[MAX_STEPS];
+ 	extern __device__ int m1_log[MAX_STEPS];
+ 	extern __device__ int m2_log[MAX_STEPS];
+ 	extern __device__ double t_log[MAX_STEPS];
+ 	extern __device__ double h_log[MAX_STEPS];
+ 	extern __device__ bool reject_log[MAX_STEPS];
+ 	extern __device__ int num_integrator_steps;
+#endif
+#ifdef DIVERGENCE_TEST
+ 	extern __device__ int integrator_steps[DIVERGENCE_TEST];
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 
 /** 4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation
@@ -76,6 +90,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 
 		do
 		{
+			#ifdef DIVERGENCE_TEST
+			integrator_steps[T_ID]++;
+			#endif
 			if (arnoldi(&m, 1.0 / 3.0, P, h, A, fy, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
 			{
 				h /= 3;

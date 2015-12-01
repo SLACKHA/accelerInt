@@ -32,6 +32,11 @@
 #include "read_initial_conditions.cuh"
 #include "launch_bounds.cuh"
 
+#ifdef DIVERGENCE_TEST
+    #include <assert.h>
+    __device__ int integrator_steps[DIVERGENCE_TEST] = {0};
+#endif
+
 void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
 {
     fwrite(&t, sizeof(double), 1, pFile);
@@ -112,6 +117,10 @@ int main (int argc, char *argv[])
         }
         cudaErrorCheck (cudaGetDeviceProperties(&devProp, id));
     }
+    #ifdef DIVERGENCE_TEST
+        NUM = DIVERGENCE_TEST;
+        assert(NUM % 32 == 0);
+    #endif
     //bump up shared mem bank size
     cudaErrorCheck(cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte));
     //and L1 size
@@ -258,6 +267,34 @@ int main (int argc, char *argv[])
     double runtime = GetTimer();
     /////////////////////////////////
 
+    #ifdef DIVERGENCE_TEST
+    int host_integrator_steps[DIVERGENCE_TEST];
+    cudaErrorCheck( cudaMemcpyFromSymbol(host_integrator_steps, integrator_steps, DIVERGENCE_TEST * sizeof(int)) );
+    int warps = NUM / 32;
+
+    FILE *dFile;
+    const char* f_name = solver_name();
+    int len = strlen(f_name);
+    char out_name[len + 13];
+    sprintf(out_name, "log/%s-div.txt", f_name);
+    dFile = fopen(out_name, "w");
+    int index = 0;
+    for (int i = 0; i < warps; ++i)
+    {
+        double d = 0;
+        int max = 0;
+        for (int j = 0; j < 32; ++j)
+        {
+            int steps = host_integrator_steps[index];
+            d += steps;
+            max = steps > max ? steps : max;
+            index++;
+        }
+        d /= (32.0 * max);
+        fprintf(dFile, "%.15e\n", d);
+    }
+    fclose(dFile);
+    #endif
 
     runtime /= 1000.0;
     printf ("Time: %e sec\n", runtime);

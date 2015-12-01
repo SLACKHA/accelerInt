@@ -163,6 +163,7 @@ config_options = [
         'IGN', 'Log ignition time.', False),
     BoolVariable(
         'FAST_MATH', 'Compile with Fast Math.', False),
+    ('DIVERGENCE_WARPS', 'If specified, measure divergence in that many warps', '0')
 ]
 
 opts.AddVariables(*config_options)
@@ -405,6 +406,12 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     #define FIXED_TIMESTEP
     """)
 
+    if int(env['DIVERGENCE_WARPS']) > 0:
+        file.write("""
+    //measure the divergence for this many initial conditions
+    #define DIVERGENCE_TEST ({})
+    """.format(int(float(env['DIVERGENCE_WARPS']) * 32)))
+
     file.write("""
     #endif
         """)
@@ -485,6 +492,7 @@ def builder(env_save, cobj, cuobj, newdict, mydir, variant,
             env.CUDAProgram(target=target_base+'-gpu',
              source=cuobj + int_cuda + dlink, 
              variant_dir=os.path.join(mydir, variant)))
+    return int_c, int_cuda 
 
 def cvodes_builder(env_save, cobj, newdict, mydir, variant,
                  target_list, additional_sconstructs=None):
@@ -543,10 +551,14 @@ new_defines['CPPDEFINES'] = ['RADAU2A']
 new_defines['CPPPATH'] = [radau2a_dir]
 new_defines['NVCCDEFINES'] = ['RADAU2A']
 new_defines['NVCCPATH'] = [radau2a_dir]
-builder(env_save, mech_c + gen_c, 
+radau_c, radau_cuda = builder(env_save, mech_c + gen_c, 
     mech_cuda + gen_cuda if build_cuda else None,
     new_defines, radau2a_dir,
     variant, 'radau2a-int', target_list)
+
+if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
+    radau_cu = [x for x in radau_cuda if 'radau2a.cu' in str(x[0])]
+    Depends(radau_cu, os.path.join(generic_dir, 'solver_options.h'))
 
 #runge kutta
 new_defines = {}
@@ -564,11 +576,15 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCCPATH'] = [exp_int_dir, exp4_int_dir]
 new_defines['CPPDEFINES'] = ['EXP4']
 new_defines['NVCCDEFINES'] = ['EXP4']
-builder(env_save, mech_c + gen_c, 
+exp4_c, exp4_cuda = builder(env_save, mech_c + gen_c, 
     mech_cuda + gen_cuda,
     new_defines, exp4_int_dir,
     variant, 'exp4-int', target_list,
     [exp_int_dir])
+
+if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
+    exp4_cu = [x for x in exp4_cuda if 'exp4.cu' in str(x[0])]
+    Depends(exp4_cu, os.path.join(generic_dir, 'solver_options.h'))
 
 #exprb43
 new_defines = {}
@@ -578,11 +594,15 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCCPATH'] = [exp_int_dir, exprb43_int_dir]
 new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
-builder(env_save, mech_c + gen_c, 
+rb43c, rb43cu = builder(env_save, mech_c + gen_c, 
     mech_cuda + gen_cuda,
     new_defines, exprb43_int_dir,
     variant, 'exprb43-int', target_list,
     [exp_int_dir])
+
+if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
+    exprb43_cu = [x for x in rb43cu if 'exprb43.cu' in str(x[0])]
+    Depends(exprb43_cu, os.path.join(generic_dir, 'solver_options.h'))
 
 #fd cvodes
 new_defines = {}
