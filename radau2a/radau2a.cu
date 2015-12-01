@@ -49,7 +49,7 @@
 
 __device__
 void scale (const double * y0, const double* y, double * sc) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fmax(fabs(y0[i]), fabs(y[i])) * RTOL);
 	}
@@ -57,7 +57,7 @@ void scale (const double * y0, const double* y, double * sc) {
 
 __device__
 void scale_init (const double * y0, double * sc) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
 	}
@@ -66,7 +66,7 @@ void scale_init (const double * y0, double * sc) {
 __device__
 void safe_memcpy(double* dest, const double* source)
 {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++)
 	{
 		dest[i] = source[i];
@@ -75,7 +75,7 @@ void safe_memcpy(double* dest, const double* source)
 __device__
 void safe_memset3(double* dest1, double* dest2, double* dest3, const double val)
 {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++)
 	{
 		dest1[i] = val;
@@ -223,10 +223,10 @@ __constant__ double rkELO = 4;
 */
 __device__ void RK_Decomp(double H, double* E1, cuDoubleComplex* E2, const double* Jac, int* ipiv1, int* ipiv2, int* info) {
 	cuDoubleComplex temp = make_cuDoubleComplex(rkAlpha/H, rkBeta/H);
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++)
 	{
-		#pragma unroll
+		#pragma unroll 1
 		for(int j = 0; j < NSP; j++)
 		{
 			E1[i + j * NSP] = -Jac[i + j * NSP];
@@ -244,7 +244,7 @@ __device__ void RK_Decomp(double H, double* E1, cuDoubleComplex* E2, const doubl
 
 __device__ void RK_Make_Interpolate(const double* Z1, const double* Z2, const double* Z3, double* CONT) {
 	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]); 
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++) {
 		CONT[i] = ((-rkC[2] * rkC[2] * rkC[1] * Z1[i] + Z3[i] * rkC[1]* rkC[0] * rkC[0]
                     + rkC[1] * rkC[1] * rkC[2] * Z1[i] - rkC[1] * rkC[1] * rkC[0] * Z3[i] 
@@ -262,7 +262,7 @@ __device__ void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, do
 	register double x1 = 1.0 + rkC[0] * r;
 	register double x2 = 1.0 + rkC[1] * r;
 	register double x3 = 1.0 + rkC[2] * r;
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++) {
 		Z1[i] = CONT[i] + x1 * (CONT[NSP + i] + x1 * CONT[NSP + NSP + i]);
 		Z2[i] = CONT[i] + x2 * (CONT[NSP + i] + x2 * CONT[NSP + NSP + i]);
@@ -272,7 +272,7 @@ __device__ void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, do
 
 
 __device__ void WADD(const double* X, const double* Y, double* Z) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++)
 	{
 		Z[i] = X[i] + Y[i];
@@ -280,7 +280,7 @@ __device__ void WADD(const double* X, const double* Y, double* Z) {
 }
 
 __device__ void DAXPY3(double DA1, double DA2, double DA3, const double* DX, double* DY1, double* DY2, double* DY3) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++) {
 		DY1[i] += DA1 * DX[i];
 		DY2[i] += DA2 * DX[i];
@@ -295,7 +295,7 @@ __device__ void DAXPY3(double DA1, double DA2, double DA3, const double* DX, dou
 __device__ void RK_PrepareRHS(double t, double pr, double H, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* R1, double* R2, double* R3) {
 	double TMP[NSP];
 	double F[NSP];
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++) {
 		R1[i] = Z1[i];
 		R2[i] = Z2[i];
@@ -322,7 +322,7 @@ __device__ void RK_PrepareRHS(double t, double pr, double H, double* Y, double* 
 }
 
 __device__ void dlaswp(double* A, int* ipiv) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++) {
 		int ip = ipiv[i];
 		if (ip != i) {
@@ -337,13 +337,13 @@ __device__ void dlaswp(double* A, int* ipiv) {
 //upper == 'u' -> upper = true
 __device__ void dtrsm(bool upper, bool nounit, double* A, double* b) {
 	if (upper) {
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = NSP - 1; k >= 0; --k)
 		{
 			if (nounit) {
 				b[k] /= A[k + k * NSP];
 			}
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < k; i++)
 			{
 				b[i] -= b[k] * A[i + k * NSP];
@@ -351,13 +351,13 @@ __device__ void dtrsm(bool upper, bool nounit, double* A, double* b) {
 		}
 	}
 	else{
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = 0; k < NSP; k++) {
 			if (fabs(b[k]) > 0) {
 				if (nounit) {
 					b[k] /= A[k + k * NSP];
 				}
-				#pragma unroll
+				#pragma unroll 1
 				for (int i = k + 1; i < NSP; i++)
 				{
 					b[i] -= b[k] * A[i + k * NSP];
@@ -374,7 +374,7 @@ __device__ void dgetrs(double* A, double* B, int* ipiv) {
 }
 
 __device__ void zlaswp(cuDoubleComplex* A, int* ipiv) {
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; i++) {
 		int ip = ipiv[i];
 		if (ip != i) {
@@ -389,13 +389,13 @@ __device__ void zlaswp(cuDoubleComplex* A, int* ipiv) {
 //upper == 'u' -> upper = true
 __device__ void ztrsm(bool upper, bool nounit, cuDoubleComplex* A, cuDoubleComplex* b) {
 	if (upper) {
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = NSP - 1; k >= 0; --k)
 		{
 			if (nounit) {
 				b[k] = cuCdiv(b[k], A[k + k * NSP]);
 			}
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < k; i++)
 			{
 				b[i] = cuCsub(b[i], cuCmul(b[k], A[i + k * NSP]));
@@ -403,13 +403,13 @@ __device__ void ztrsm(bool upper, bool nounit, cuDoubleComplex* A, cuDoubleCompl
 		}
 	}
 	else{
-		#pragma unroll
+		#pragma unroll 1
 		for (int k = 0; k < NSP; k++) {
 			if (cuCabs(b[k]) > 0) {
 				if (nounit) {
 					b[k] = cuCdiv(b[k], A[k + k * NSP]);
 				}
-				#pragma unroll
+				#pragma unroll 1
 				for (int i = k + 1; i < NSP; i++)
 				{
 					b[i] = cuCsub(b[i], cuCmul(b[k], A[i + k * NSP]));
@@ -427,7 +427,7 @@ __device__ void zgetrs(cuDoubleComplex* A, cuDoubleComplex* B, int* ipiv) {
 
 __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, double* R2, double* R3, int* ipiv1, int* ipiv2) {
 	// Z = (1/h) T^(-1) A^(-1) * Z
-	#pragma unroll
+	#pragma unroll 1
 	for(int i = 0; i < NSP; i++)
 	{
 		double x1 = R1[i] / H;
@@ -439,13 +439,13 @@ __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, 
 	}
 	dgetrs(E1, R1, ipiv1);
 	cuDoubleComplex temp[NSP];
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i)
 	{
 		temp[i] = make_cuDoubleComplex(R2[i], R3[i]);
 	}
 	zgetrs(E2, temp, ipiv2);
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i)
 	{
 		R2[i] = cuCreal(temp[i]);
@@ -453,7 +453,7 @@ __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, 
 	}
 
 	// Z = T * Z
-	#pragma unroll
+	#pragma unroll 1
 	for (int i = 0; i < NSP; ++i) {
 		double x1 = R1[i];
 		double x2 = R2[i];
@@ -465,29 +465,10 @@ __device__ void RK_Solve(double H, double* E1, cuDoubleComplex* E2, double* R1, 
 }
 
 __device__ double RK_ErrorNorm(double* scale, double* DY) {
-	double sums[UNROLL] = {0.0};
-	int start = NSP % UNROLL;
-	//take care of mod part
-	if (start != 0) {
-		for (int i = 0; i < start; i++)
-		{
-			sums[i] += (scale[i] * scale[i] * DY[i] * DY[i]);
-		}
-	}
-	//unrolled summer
-	#pragma unroll
-	for (int i = start; i < NSP; i += UNROLL)
-	{
-		#pragma unroll
-		for (int j = 0; j < UNROLL; ++j) {
-			sums[j] += (scale[i + j] * scale[i + j] * DY[i + j] * DY[i + j]);
-		}
-	}
-	//add sums
 	double sum = 0;
-	#pragma unroll
-	for (int i = 0; i <= UNROLL; ++i) {
-		sum += sums[i];
+	#pragma unroll 1
+	for (int i = 0; i < NSP; ++i){
+		sum += (scale[i] * scale[i] * DY[i] * DY[i]);
 	}
 	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
@@ -500,23 +481,23 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* Y, dou
     double F1[NSP];
     double F2[NSP];
     double TMP[NSP];
-    #pragma unroll
+    #pragma unroll 1
     for (int i = 0; i < NSP; ++i) {
     	F2[i] = HrkE1 * Z1[i] + HrkE2 * Z2[i] + HrkE3 * Z3[i];
     }
-    #pragma unroll
+    #pragma unroll 1
     for (int i = 0; i < NSP; ++i) {
     	TMP[i] = rkE[0] * F0[i] + F2[i];
     }
     dgetrs(E1, TMP, ipiv1);
     double Err = RK_ErrorNorm(scale, TMP);
     if (Err >= 1.0 && (FirstStep || Reject)) {
-        #pragma unroll
+        #pragma unroll 1
     	for (int i = 0; i < NSP; i++) {
         	TMP[i] += Y[i];
         }
     	dydt(t, pr, TMP, F1);
-    	#pragma unroll
+    	#pragma unroll 1
     	for (int i = 0; i < NSP; i++) {
         	TMP[i] = F1[i] + F2[i];
         }
@@ -537,7 +518,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double Hacc = 0;
 	double ErrOld = 0;
 #endif
-	double H = fmin(5e-7, t_end - t_start)
+	double H = fmin(5e-7, t_end - t_start);
 	double Hnew;
 	double t = t_start;
 	bool Reject = false;
@@ -653,7 +634,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 			NewtonIncrementOld = fmax(NewtonIncrement, Roundoff);
             // Update solution
-            #pragma unroll
+            #pragma unroll 1
             for (int i = 0; i < NSP; i++)
             {
             	Z1[i] -= DZ1[i];
@@ -683,7 +664,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 #ifdef SDIRK_ERROR
 		//!~~~>   Prepare the loop-independent part of the right-hand side
 		//!       G = H*rkBgam(0)*F0 + rkTheta(1)*Z1 + rkTheta(2)*Z2 + rkTheta(3)*Z3
-		#pragma unroll
+		#pragma unroll 1
 		for (int i = 0; i < NSP; i++) {
 			Z4[i] = Z3[i];
 			G[i] = rkBgam[0]*F0[i]*H + rkTheta[0] * Z1[i] + rkTheta[1] * Z2[i] + rkTheta[2] * Z3[i];
@@ -697,7 +678,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
         	//!~~~>   Prepare the loop-dependent part of the right-hand side
         	WADD(y, Z4, TMP);
         	dydt(t + H, pr, TMP, DZ4);
-        	#pragma unroll
+        	#pragma unroll 1
         	for(int i = 0; i < NSP; i++){
         		DZ4[i] += (rkGamma / H) * (G[i] - Z4[i]);
         	}
@@ -728,7 +709,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
             }
             NewtonIncrementOld = NewtonIncrement;
             //! Update solution: Z4 <-- Z4 + DZ4
-            #pragma unroll
+            #pragma unroll 1
             for (int i = 0; i < NSP; i++) {
             	Z4[i] += DZ4[i];
             }
@@ -748,7 +729,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		}
 #endif
 #ifdef SDIRK_ERROR
-		#pragma unroll
+		#pragma unroll 1
 		for (int i = 0; i < NSP; i++) {
 			DZ4[i] = Z3[i] - Z4[i];
 		}
@@ -774,7 +755,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			FirstStep = false;
 			Hold = H;
 			t += H;
-			#pragma unroll
+			#pragma unroll 1
 			for (int i = 0; i < NSP; i++) {
 				y[i] += Z3[i];
 			}

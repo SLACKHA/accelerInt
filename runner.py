@@ -131,12 +131,13 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                 args = ['scons', 'cpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
                      'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
                      'PRINT=FALSE', 'mechanism_dir={}'.format(mech_dir),
-                     't_step={}'.format(t_step)]
+                     't_step={}'.format(t_step),
+                     't_end={}'.format(t_step)]
                 args.append('SAME_IC={}'.format(same))
 
                 #run with repeats
                 if 'c' in langs:
-                    run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
+                    run_me = get_executables(blacklist + ['gpu', 'rk78'], inverse=['int'])
                     for exe in run_me:
                         for thread in threads:
                             for cond in thepow:
@@ -160,10 +161,11 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                         args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
                          'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
                          'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
-                         't_step={}'.format(t_step)]
+                         't_step={}'.format(t_step),
+                         't_end={}'.format(t_step)]
                         args.append('SAME_IC={}'.format(same))
                         #run with repeats
-                        run_me = get_executables(blacklist, inverse=['int-gpu'])
+                        run_me = get_executables(blacklist + ['rk78'], inverse=['int-gpu'])
                         for exe in run_me:
                             for cond in thepow:
                                 filename = os.path.join(thedir, 'output',
@@ -224,7 +226,7 @@ if __name__ == '__main__':
     home = os.getcwd()
     a_dir = os.path.join(os.getcwd(), args.base_dir)
     dir_list = sorted([os.path.join(a_dir, name) for name in os.listdir(a_dir)
-            if os.path.isdir(os.path.join(a_dir, name))])
+            if os.path.isdir(os.path.join(a_dir, name))], key=lambda x:0 if 'H2' in x else 1)
 
     for d in dir_list:
         run(d, blacklist=[x.strip() for x in 

@@ -474,7 +474,7 @@ def builder(env_save, cobj, cuobj, newdict, mydir, variant,
         env.Program(target=target_base,
                     source=cobj + int_c,
                     variant_dir=os.path.join(mydir, variant)))
-    if env['build_cuda'] and cu_obj:
+    if env['build_cuda'] and cuobj:
         target_list[target_base + '-gpu'] = []
         dlink = env.CUDADLink(
             target=target_base+'-gpu', 
