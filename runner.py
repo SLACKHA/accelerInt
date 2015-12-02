@@ -64,8 +64,10 @@ def check_file(filename):
                 count += 1
     return count
 
-def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
-        threads=[6, 12], langs=['c', 'cuda']):
+def run(thedir, blacklist=[], force=False, pyjac='', 
+        repeats=5, num_cond=131072,
+        threads=[6, 12], langs=['c', 'cuda'],
+        hybrid_mode=False):
     jthread = str(multiprocessing.cpu_count())
 
     make_sure_path_exists(os.path.join(thedir, 'output'))
@@ -89,7 +91,10 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
     #generate mechanisms
     cache_opt = [False]#[True, False]
     use_smem = [True, False]
-    time_steps = [1e-6, 1e-4]
+    if hybrid_mode:
+        time_steps = [1e-4]
+    else:
+        time_steps = [1e-6, 1e-4]
     same_ics = [False]#[True, False]
     for opt in cache_opt:
         mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
@@ -137,7 +142,7 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                 args.append('SAME_IC={}'.format(same))
 
                 #run with repeats
-                if 'c' in langs:
+                if 'c' in langs and not hybrid_mode:
                     run_me = get_executables(blacklist + ['gpu', 'rk78'], inverse=['int'])
                     for exe in run_me:
                         for thread in threads:
@@ -162,7 +167,7 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                         args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
                          'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
                          'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
-                         't_step={}'.format(t_step),
+                         't_step={}'.format(t_step / 100. if hybrid_mode else t_step),
                          't_end={}'.format(t_step),
                          'DIVERGENCE_WARPS=0']
                         args.append('SAME_IC={}'.format(same))
@@ -171,6 +176,7 @@ def run(thedir, blacklist=[], force=False, pyjac='', repeats=5, num_cond=131072,
                         for exe in run_me:
                             for cond in thepow:
                                 filename = os.path.join(thedir, 'output',
+                                    ('h' if hybrid_mode else '') +
                                     exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
                                     'co' if opt else 'nco', 'smem' if smem else 'nosmem',
                                     'sameic' if same else 'psric', t_step))
@@ -222,6 +228,11 @@ if __name__ == '__main__':
                         required=False,
                         default='c,cuda',
                         help='Comma separated list of languages to test.')
+    parser.add_argument('-hy', '--hybrid_mode',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help='Specify to turn on hybrid timestepping mode.')
     args = parser.parse_args()
 
     num_threads = [int(x) for x in args.num_threads.split(',')]
@@ -239,4 +250,5 @@ if __name__ == '__main__':
             repeats=args.repeats,
             threads=num_threads,
             langs=[x.strip() for x in 
-                    args.langs.split(',') if x.strip()])
+                    args.langs.split(',') if x.strip()],
+            hybrid_mode=args.hybrid_mode)
