@@ -239,7 +239,7 @@ if __name__ == '__main__':
     home = os.getcwd()
     a_dir = os.path.join(os.getcwd(), args.base_dir)
     dir_list = sorted([os.path.join(a_dir, name) for name in os.listdir(a_dir)
-            if os.path.isdir(os.path.join(a_dir, name))], key=lambda x:0 if 'H2' in x else 1)
+            if os.path.isdir(os.path.join(a_dir, name))])
 
     for d in dir_list:
         run(d, blacklist=[x.strip() for x in 
