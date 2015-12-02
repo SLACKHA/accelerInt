@@ -43,6 +43,8 @@ for dt in dt_list:
         def name_fun(x):
             return x.name + (' - gpu' if x.gpu else '')
 
+        cutoff = 1024
+        print mech
         for i, s in enumerate(series):
             if any(s.name == x for x in blacklist):
                 continue
@@ -54,11 +56,24 @@ for dt in dt_list:
                 s.set_clear_marker(marker=marker_dict[s.name], color=get_color(s),
                                     size=17)
             s.plot(ax, name_fun)
+            perc = 100. * s.z / s.y
+            mycut = cutoff
+            if 'cvodes' in s.name or 'radau2a' in s.name:
+                mycut = 65536
+            if not s.gpu or s.smem:
+                name = s.name[:min(7, len(s.name))]
+                print "{}\t{}\t{}\t{}\t{}\t{}\t{}".format(name, s.gpu, s.dt, np.mean(perc), np.std(perc), np.mean(perc[np.where(s.x > mycut)]), np.std(perc[np.where(s.x > mycut)]))
+        print
 
         real_x = radau_gpu.x
+        x = np.where(real_x > cutoff)
         ydiff = radau_gpu.y / cvode.y
-        x = np.where(real_x > 1024)
-        print mech, dt, np.mean(ydiff[x]), np.std(ydiff[x]), np.min(ydiff)
+        faster = np.mean(ydiff[x]) < 1
+        best = np.min(ydiff)
+        if faster:
+            ydiff = cvode.y / radau_gpu.y
+            best = np.max(ydiff)
+        #print faster, mech, dt, np.mean(ydiff[x]), np.std(ydiff[x]), best
 
         artists = []
         labels = []
