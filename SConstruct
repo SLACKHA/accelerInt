@@ -544,6 +544,7 @@ if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
     solver_main_cu = [x for x in gen_cuda if 'solver_main' in str(x[0])]
     Depends(solver_main_cu, os.path.join(mech_dir, 'launch_bounds.cuh'))
     Depends(solver_main_cu, os.path.join(generic_dir, 'solver_options.h'))
+    Depends(solver_main_cu, os.path.join(mech_dir, 'mechanism.cuh'))
 
 #radua
 new_defines = {}
