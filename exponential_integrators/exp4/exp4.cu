@@ -107,13 +107,11 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		}
 
 		// k1
-		double k1[NSP];
 		//k1 is partially in the first column of phiHm
 		//k1 = beta * Vm * phiHm(:, 1)
 		matvec_n_by_m_scale(m, beta, Vm, phiHm, k1);
 	
 		// k2
-		double k2[NSP];
 		//computing phi(2h * A)
 		matvec_m_by_m (m, phiHm, phiHm, temp);
 		//note: f_temp will contain hm * phi * phi * e1 for later use
@@ -121,14 +119,12 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		matvec_n_by_m_scale_add(m, beta * (h / 6.0), Vm, f_temp, k2, k1);
 	
 		// k3
-		double k3[NSP];
 		//use the stored hm * phi * phi * e1 to get phi(3h * A)
 		matvec_m_by_m (m, phiHm, f_temp, temp);
 		matvec_m_by_m (m, Hm, temp, f_temp);
 		matvec_n_by_m_scale_add_subtract(m, beta * (h * h / 27.0), Vm, f_temp, k3, k2, k1);
 			
 		// d4
-		double k4[NSP];
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
 			// f4
@@ -151,7 +147,6 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		matvec_n_by_m_scale(m1, beta, Vm, phiHm, k4);
 	
 		// k5
-		double k5[NSP];
 		//computing phi(2h * A)
 		matvec_m_by_m (m1, phiHm, phiHm, temp);
 		//note: f_temp will contain hm * phi * phi * e1 for later use
@@ -159,14 +154,12 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		matvec_n_by_m_scale_add(m1, beta * (h / 6.0), Vm, f_temp, k5, k4);
 			
 		// k6
-		double k6[NSP];
 		//use the stored hm * phi * phi * e1 to get phi(3h * A)
 		matvec_m_by_m (m1, phiHm, f_temp, temp);
 		matvec_m_by_m (m1, Hm, temp, f_temp);
 		matvec_n_by_m_scale_add_subtract(m1, beta * (h * h / 27.0), Vm, f_temp, k6, k5, k4);
 			
 		// k7
-		double k7[NSP];
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
 			// f7
