@@ -53,6 +53,8 @@ class data_series(object):
 			self.kwargs['marker'] = marker
 		if color is not None:
 			self.kwargs['markerfacecolor'] = color
+			self.kwargs['markeredgecolor'] = color
+			self.kwargs['markeredgewidth'] = 1
 		if size is not None:
 			self.kwargs['markersize'] = size
 
