@@ -211,7 +211,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			h_new = pow(err, -1.0 / ORD);	
 			
 			if (err <= 1.0) {
-				memcpy(sc, f_temp, NSP * sizeof(double));
+				#pragma unroll
+				for (int i = 0; i < NSP; ++i)
+					sc[i] = f_temp[i];
 
 				// minimum of classical and Gustafsson step size prediction
 				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
