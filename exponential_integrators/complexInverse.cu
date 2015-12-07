@@ -242,8 +242,8 @@ void getComplexInverse (int n, cuDoubleComplex* A) {
 	
 }
 
-//adapted from Matrix Computations
-//Gene H. Golub, Charles F. Van Loan
+//Matrix Algorithms: Volume 1: Basic Decompositions
+//By G. W. Stewart
 __device__
 void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
 {

@@ -240,8 +240,8 @@ void getComplexInverse (int n, double complex* A) {
 #endif
 }
 
-//adapted from Matrix Computations
-//Gene H. Golub, Charles F. Van Loan
+//Matrix Algorithms: Volume 1: Basic Decompositions
+//By G. W. Stewart
 static inline
 int getHessenbergLU(const int n, double complex* A, int* indPivot)
 {
