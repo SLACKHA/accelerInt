@@ -292,7 +292,7 @@ except:
 
 
 #link lines
-CCLibDirs = [env['blas_lapack_dir']]
+CCLibDirs = listify(env['blas_lapack_dir'])
 CCLibs += listify(env['blas_lapack_libs'])
 if build_cuda:
     NVCCLinkFlags.append([env['openmp_flags'], '-Xlinker -rpath {}/lib64'.format(env['CUDA_TOOLKIT_PATH'])])
