@@ -9,7 +9,31 @@
 #define RADAU2A_PROPS_CUH
 
 #include "header.cuh"
+#include <cuComplex.h>
 
 #define STRIDE (NSP)
+
+struct solver_memory
+{
+	double* E1;
+	cuDoubleComplex* E2;
+	int* ipiv1;
+	int* ipiv2;
+	double* Z1;
+	double* Z2;
+	double* Z3;
+	double* DZ1;
+	double* DZ2;
+	double* DZ3;
+	double* CONT;
+	double* y0;
+	double* F0;
+	double* work1;
+	double* work2;
+	double* work3;
+	cuDoubleComplex* work4;
+	double* result;
+};
+
 
 #endif

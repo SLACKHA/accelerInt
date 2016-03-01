@@ -15,11 +15,11 @@ int getMax (const int n, const double *Arr) {
 	if (n == 1)
 		return maxInd;
 	
-	double maxVal = fabs(Arr[0]);
+	double maxVal = fabs(Arr[INDEX(0)]);
 	for (int i = 1; i < n; ++i) {
-		if (fabs(Arr[i]) > maxVal) {
+		if (fabs(Arr[INDEX(i)]) > maxVal) {
 			maxInd = i;
-			maxVal = fabs(Arr[i]);
+			maxVal = fabs(Arr[INDEX(i)]);
 		}
 	}
 	
@@ -32,7 +32,7 @@ __device__
 void scale (const int n, const double val, double* arrX) {
 	
 	for (int i = 0; i < n; ++i) {
-		arrX[i] *= val;
+		arrX[INDEX(i)] *= val;
 	}
 	
 }
@@ -46,9 +46,9 @@ void swap (const int n, double* arrX, const int incX, double* arrY, const int in
 	int iy = 0;
 	
 	for (int i = 0; i < n; ++i) {
-		double temp = arrX[ix];
-		arrX[ix] = arrY[iy];
-		arrY[iy] = temp;
+		double temp = arrX[INDEX(ix)];
+		arrX[INDEX(ix)] = arrY[INDEX(iy)];
+		arrY[INDEX(iy)] = temp;
 		ix += incX;
 		iy += incY;
 	}
@@ -62,12 +62,12 @@ void GERU (const int n, const double alpha, const double* arrX,
 									const double* arrY, const int incY, double* A, const int lda) {
 	
 	for (int j = 0; j < n; ++j) {
-    	if (fabs(arrY[j * incY]) > 0.0) {
+    	if (fabs(arrY[INDEX(j * incY)]) > 0.0) {
       
-			double temp = alpha * arrY[j * incY];
+			double temp = alpha * arrY[INDEX(j * incY)];
       
 			for (int i = 0; i < n; ++i) {
-				A[i + (lda * j)] += arrX[i] * temp;
+				A[INDEX(i + (lda * j))] += arrX[INDEX(i)] * temp;
 			}
       
 		}    
@@ -84,19 +84,19 @@ void getLU (double* A, int* indPivot, int* info) {
 		
 		// find pivot and test for singularity
 		
-		int jp = j + getMax (NSP - j, &A[j + (NSP * j)]);
-		indPivot[j] = jp;
+		int jp = j + getMax (NSP - j, &A[INDEX(j + (NSP * j))]);
+		indPivot[INDEX(j)] = jp;
 
-    	if (fabs(A[jp + (NSP * j)]) > 0.0) {
+    	if (fabs(A[INDEX(jp + (NSP * j))]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swap(NSP, &A[j], NSP, &A[jp], NSP);
+				swap(NSP, &A[INDEX(j)], NSP, &A[INDEX(jp)], NSP);
 			
 			// compute elements j+1:m-1 of the jth column
 			
 			if (j < NSP - 1)
-				scale(NSP - j - 1, 1.0 / A[j + (NSP * j)], &A[j + 1 + (NSP * j)]);
+				scale(NSP - j - 1, 1.0 / A[INDEX(j + (NSP * j))], &A[INDEX(j + 1 + (NSP * j))]);
 			
 		} else if (*info == 0) {
 			*info = j;
@@ -105,6 +105,6 @@ void getLU (double* A, int* indPivot, int* info) {
 		
 		// update trailing submatrix
 		if (j < NSP - 1)
-			GERU (NSP - j - 1, -1.0, &A[j + 1 + (NSP * j)], &A[j + NSP * (j + 1)], NSP, &A[j + 1 + NSP * (j + 1)], NSP);	
+			GERU (NSP - j - 1, -1.0, &A[INDEX(j + 1 + (NSP * j))], &A[INDEX(j + NSP * (j + 1))], NSP, &A[INDEX(j + 1 + NSP * (j + 1))], NSP);	
 	}
 }

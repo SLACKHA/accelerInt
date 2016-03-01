@@ -10,11 +10,11 @@ int getComplexMax (const int n, const cuDoubleComplex *complexArr) {
 	if (n == 1)
 		return maxInd;
 	
-	double maxVal = cuCabs(complexArr[0]);
+	double maxVal = cuCabs(complexArr[INDEX(0)]);
 	for (int i = 1; i < n; ++i) {
-		if (cuCabs(complexArr[i]) > maxVal) {
+		if (cuCabs(complexArr[INDEX(i)]) > maxVal) {
 			maxInd = i;
-			maxVal = cuCabs(complexArr[i]);
+			maxVal = cuCabs(complexArr[INDEX(i)]);
 		}
 	}
 	
@@ -27,7 +27,7 @@ __device__
 void scaleComplex (const int n, const cuDoubleComplex val, cuDoubleComplex* arrX) {
 	
 	for (int i = 0; i < n; ++i) {
-		arrX[i] = cuCmul(arrX[i], val);
+		arrX[INDEX(i)] = cuCmul(arrX[INDEX(i)], val);
 	}
 	
 }
@@ -41,9 +41,9 @@ void swapComplex (const int n, cuDoubleComplex* arrX, const int incX, cuDoubleCo
 	int iy = 0;
 	
 	for (int i = 0; i < n; ++i) {
-		cuDoubleComplex temp = arrX[ix];
-		arrX[ix] = arrY[iy];
-		arrY[iy] = temp;
+		cuDoubleComplex temp = arrX[INDEX(ix)];
+		arrX[INDEX(ix)] = arrY[INDEX(iy)];
+		arrY[INDEX(iy)] = temp;
 		ix += incX;
 		iy += incY;
 	}
@@ -57,12 +57,12 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 									const cuDoubleComplex* arrY, const int incY, cuDoubleComplex* A, const int lda) {
 	
 	for (int j = 0; j < n; ++j) {
-    	if (cuCabs(arrY[j * incY]) > 0.0) {
+    	if (cuCabs(arrY[INDEX(j * incY)]) > 0.0) {
       
-			cuDoubleComplex temp = cuCmul(alpha, arrY[j * incY]);
+			cuDoubleComplex temp = cuCmul(alpha, arrY[INDEX(j * incY)]);
       
 			for (int i = 0; i < n; ++i) {
-				A[i + (lda * j)] = cuCfma(arrX[i], temp, A[i + (lda * j)]);
+				A[INDEX(i + (lda * j))] = cuCfma(arrX[INDEX(i)], temp, A[INDEX(i + (lda * j))]);
 			}
       
 		}    
@@ -79,19 +79,19 @@ void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 		
 		// find pivot and test for singularity
 		
-		int jp = j + getComplexMax (NSP - j, &A[j + (NSP * j)]);
-		indPivot[j] = jp;
+		int jp = j + getComplexMax (NSP - j, &A[INDEX(j + (NSP * j))]);
+		indPivot[INDEX(j)] = jp;
 
-		if (cuCabs(A[jp + (NSP * j)]) > 0.0) {
+		if (cuCabs(A[INDEX(jp + (NSP * j))]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swapComplex (NSP, &A[j], NSP, &A[jp], NSP);
+				swapComplex (NSP, &A[INDEX(j)], NSP, &A[INDEX(jp)], NSP);
 			
 			// compute elements j+1:m-1 of the jth column
 			
 			if (j < NSP - 1)
-				scaleComplex (NSP - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (NSP * j)]), &A[j + 1 + (NSP * j)]);
+				scaleComplex (NSP - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[INDEX(j + (NSP * j))]), &A[INDEX(j + 1 + (NSP * j))]);
 			
 		} else if (*info == 0) {
 			*info = j;
@@ -100,7 +100,7 @@ void getComplexLU (cuDoubleComplex* A, int* indPivot, int* info) {
 		
 		// update trailing submatrix
 		if (j < NSP - 1)
-			complexGERU (NSP - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[j + 1 + (NSP * j)], &A[j + NSP * (j + 1)], NSP, &A[j + 1 + NSP * (j + 1)], NSP);
+			complexGERU (NSP - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[INDEX(j + 1 + (NSP * j))], &A[INDEX(j + NSP * (j + 1))], NSP, &A[INDEX(j + 1 + NSP * (j + 1))], NSP);
 		
 	}
 }
