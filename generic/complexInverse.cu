@@ -173,7 +173,7 @@ void getComplexInverse (const int n, cuDoubleComplex* __restrict__ A,
 //Matrix Algorithms: Volume 1: Basic Decompositions
 //By G. W. Stewart
 __device__
-void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
+void getHessenbergLU(const int n, cuDoubleComplex* A, int* __restrict__ indPivot, int* __restrict__ info)
 {
 	int last_free = 0;
 	for (int i = 0; i < n - 1; i ++)
@@ -198,6 +198,11 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
 			}
 			A[INDEX(i * STRIDE + i + 1)] = tau;
 		}
+		else
+		{
+			*info = i;
+			return;
+		}
 	}
 	//last index is not pivoted
 	indPivot[INDEX(n - 1)] = n - 1;
@@ -205,10 +210,11 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* indPivot)
 
 __device__
 void getComplexInverseHessenberg (const int n, cuDoubleComplex* __restrict__ A,
-									int* __restrict__ ipiv, cuDoubleComplex* __restrict__ work)
+									int* __restrict__ ipiv, int* __restrict__ info,
+									cuDoubleComplex* __restrict__ work)
 {
 	// first get LU factorization
-	getHessenbergLU (n, A, ipiv);
+	getHessenbergLU (n, A, ipiv, info);
 	
 	// now get inverse
 	getComplexInverseLU (n, A, ipiv, work);

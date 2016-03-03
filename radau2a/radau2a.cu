@@ -218,11 +218,11 @@ __device__ void RK_Decomp(double H, double* __restrict__ E1, cuDoubleComplex* __
 		E1[INDEX(i + i * NSP)] += rkGamma / H;
 		E2[INDEX(i + i * NSP)] = cuCadd(E2[INDEX(i + i * NSP)], temp); 
 	}
-	getLU(E1, ipiv1, info);
+	getLU(NSP, E1, ipiv1, info);
 	if (*info != 0) {
 		return;
 	}
-	getComplexLU(E2, ipiv2, info);
+	getComplexLU(NSP, E2, ipiv2, info);
 }
 
 __device__ void RK_Make_Interpolate(const double* __restrict__ Z1, const double* __restrict__ Z2,
