@@ -538,11 +538,12 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				safe_memset_jac(solver->E1, mech);
 				eval_jacob (t, var[T_ID], y, solver->E1, mech);
 			}
-			RK_Decomp(H, solver->E1, solver->E2, solver->ipiv1, solver->ipiv2, solver->result);
-			if(solver->result[T_ID] != 0) {
+			RK_Decomp(H, solver->E1, solver->E2, solver->ipiv1, solver->ipiv2, &info);
+			if(info != 0) {
 				Nconsecutive += 1;
 				if (Nconsecutive >= 5)
 				{
+					result[T_ID] = errorCodes.err_consecutive_steps;
 					return;
 				}
 				H *= 0.5;
@@ -559,12 +560,12 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		Nsteps += 1;
 		if (Nsteps >= Max_no_steps)
 		{
-			y[0] = logf(-1);
+			result[T_ID] = errorCodes.max_steps_exceeded;
 			return;
 		}
 		if (0.1 * fabs(H) <= fabs(t) * Roundoff)
 		{
-			y[0] = logf(-1);
+			result[T_ID] = errorCodes.h_plus_t_equals_h;
 			return;
 		}
 		if (FirstStep || !StartNewton) {
@@ -582,7 +583,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		NewtonRate = pow(fmax(NewtonRate, EPS), 0.8);
 
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
-			RK_PrepareRHS(t, pr, H, y, solver->Z1, solver->Z2, solver->Z3,
+			RK_PrepareRHS(t, var[T_ID], H, y, solver->Z1, solver->Z2, solver->Z3,
 							solver->DZ1, solver->DZ2, solver->DZ3, solver->work1,
 							solver->work2);
 			RK_Solve(H, solver->E1, solver->E2, solver->DZ1, solver->DZ2, solver->DZ3,
@@ -623,7 +624,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
             if (NewtonIter >= NewtonMaxit)
             {
-				y[0] = logf(-1);
+				result[T_ID] = errorCodes.newton_max_iterations_exceeded;
 				return;
 			}
 		}
@@ -634,6 +635,13 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			SkipLU = false;
 			continue;
 		}
+
+		double Err = RK_ErrorEstimate(H, t, var[T_ID], y, 
+						solver->F0, solver->Z1, solver->Z2, 
+						solver->Z3, solver->sc, solver->E1, solver->ipiv1, 
+						FirstStep, Reject, solver->work1, solver->work2,
+						solver->work3);
+
 		//!~~~> Computation of new step size Hnew
 		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
@@ -689,4 +697,5 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			SkipLU = false;
 		}
 	}
+	result[T_ID] = errorCodes.success;
 }

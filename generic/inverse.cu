@@ -9,7 +9,7 @@
 ///////////////////////////////////////////////////////////
 
 __device__
-int getMax (const int n, const double *Arr) {
+int getMax (const int n, const double * __restrict__ Arr) {
 	
 	int maxInd = 0;
 	if (n == 1)
@@ -29,7 +29,7 @@ int getMax (const int n, const double *Arr) {
 ///////////////////////////////////////////////////////////
 
 __device__
-void scale (const int n, const double val, double* arrX) {
+void scale (const int n, const double val, double* __restrict__ arrX) {
 	
 	for (int i = 0; i < n; ++i) {
 		arrX[INDEX(i)] *= val;
@@ -40,7 +40,7 @@ void scale (const int n, const double val, double* arrX) {
 ///////////////////////////////////////////////////////////
 
 __device__
-void swap (const int n, double* arrX, const int incX, double* arrY, const int incY) {
+void swap (const int n, double* __restrict__ arrX, const int incX, double* __restrict__ arrY, const int incY) {
 	
 	int ix = 0;
 	int iy = 0;
@@ -58,8 +58,8 @@ void swap (const int n, double* arrX, const int incX, double* arrY, const int in
 ///////////////////////////////////////////////////////////
 
 __device__
-void GERU (const int n, const double alpha, const double* arrX,
-									const double* arrY, const int incY, double* A, const int lda) {
+void GERU (const int n, const double alpha, const double* __restrict__ arrX,
+				const double* __restrict__ arrY, const int incY, double* __restrict__ A, const int lda) {
 	
 	for (int j = 0; j < n; ++j) {
     	if (fabs(arrY[INDEX(j * incY)]) > 0.0) {
@@ -78,25 +78,25 @@ void GERU (const int n, const double alpha, const double* arrX,
 ///////////////////////////////////////////////////////////
 
 __device__
-void getLU (double* A, int* indPivot, int* info) {
+void getLU (const int n, double* __restrict__ A, int* __restrict__ indPivot, int* __restrict__ info) {
 	
-	for (int j = 0; j < NSP; ++j) {
+	for (int j = 0; j < n; ++j) {
 		
 		// find pivot and test for singularity
 		
-		int jp = j + getMax (NSP - j, &A[INDEX(j + (NSP * j))]);
+		int jp = j + getMax (n - j, &A[GRID_DIM * (j + (STRIDE * j))]);
 		indPivot[INDEX(j)] = jp;
 
-    	if (fabs(A[INDEX(jp + (NSP * j))]) > 0.0) {
+    	if (fabs(A[INDEX(jp + (STRIDE * j))]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swap(NSP, &A[INDEX(j)], NSP, &A[INDEX(jp)], NSP);
+				swap(n, &A[GRID_DIM * (j)], STRIDE, &A[GRID_DIM * (jp)], STRIDE);
 			
 			// compute elements j+1:m-1 of the jth column
 			
-			if (j < NSP - 1)
-				scale(NSP - j - 1, 1.0 / A[INDEX(j + (NSP * j))], &A[INDEX(j + 1 + (NSP * j))]);
+			if (j < n - 1)
+				scale(n - j - 1, 1.0 / A[INDEX(j + (STRIDE * j))], &A[GRID_DIM * (j + 1 + (STRIDE * j))]);
 			
 		} else if (*info == 0) {
 			*info = j;
@@ -104,7 +104,7 @@ void getLU (double* A, int* indPivot, int* info) {
 		}
 		
 		// update trailing submatrix
-		if (j < NSP - 1)
-			GERU (NSP - j - 1, -1.0, &A[INDEX(j + 1 + (NSP * j))], &A[INDEX(j + NSP * (j + 1))], NSP, &A[INDEX(j + 1 + NSP * (j + 1))], NSP);	
+		if (j < n - 1)
+			GERU (n - j - 1, -1.0, &A[GRID_DIM * (j + 1 + (STRIDE * j))], &A[GRID_DIM * (j + STRIDE * (j + 1))], STRIDE, &A[GRID_DIM * (j + 1 + STRIDE * (j + 1))], STRIDE);	
 	}
 }

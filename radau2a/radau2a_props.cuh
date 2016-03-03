@@ -35,5 +35,13 @@ struct solver_memory
 	double* result;
 };
 
+enum errorCodes {
+	success = 0,
+	err_consecutive_steps = 1,
+	max_steps_exceeded = 2,
+	h_plus_t_equals_h = 3,
+	newton_max_iterations_exceeded = 4
+};
+
 
 #endif
