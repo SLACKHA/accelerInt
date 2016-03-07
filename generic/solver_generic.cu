@@ -23,7 +23,7 @@ intDriver (const int NUM, const double t, const double t_end,
     if (T_ID < NUM)
     {
         // call integrator for one time step
-        integrate (t, t_end, pr_global[T_ID], y_local, d_mem, s_mem);
+        integrate (t, t_end, pr_global[T_ID], d_mem->y, d_mem, s_mem);
     }
 
 } // end intDriver

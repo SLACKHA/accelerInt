@@ -77,6 +77,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	int m, m1, m2;
 
 	//arrays
+	double const * __restrict__ sc = solver->sc;
 	double const * __restrict__ work1 = solver->work1;
 	double const * __restrict__ work2 = solver->work2; 
 	double const * __restrict__ y1 = solver->work3;
@@ -87,6 +88,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double const * __restrict__ phiHm = solver->phiHm;
 	double const * __restrict__ savedActions = solver->savedActions;
 	double const * __restrict__ gy = solver->gy;
+	int const * __restrict__ result = solver->result;
 
 	//vectors for scaling operations
 	double const * in[5] = {0, 0, 0, savedActions, y};
@@ -95,11 +97,15 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 #ifndef FORCE_ZERO
 	#pragma unroll
-	for(int i = 0; i < NSP * NSP; ++i)
+	for (int i = 0; i < NSP; ++i)
 	{
-		if (i < NSP)
-			fy[i] = 0;
-		A[0] = 0;
+		fy[INDEX(i)] = 0;
+		A[INDEX(i)] = 0;
+	}
+	#pragma unroll
+	for(int i = NSP; i < NSP * NSP; ++i)
+	{
+		A[INDEX(i)] = 0;
 	}
 #endif
 
@@ -127,7 +133,11 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		
 		if (!reject) {
 			dydt (t, pr, y, fy);
-			eval_jacob (t, pr, y, A);
+		#ifdef FINITE_DIFFERENCE
+			eval_jacob (t, pr, y, A, mech, work1, work2);
+		#elif
+			eval_jacob (t, pr, y, A, mech);
+		#endif
 			//gy = fy - A * y
 			sparse_multiplier(A, y, gy);
 			#pragma unroll
@@ -139,9 +149,10 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		#ifdef DIVERGENCE_TEST
 		integrator_steps[T_ID]++;
 		#endif
-		//do arnoldi
-		if (arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		int info = arnoldi(&m, 0.5, 1, h, solver, fy, &beta, work2);
+		if (info >= M_MAX || info < 0)
 		{
+			//failure: too many krylov vectors required or singular matrix encountered
 			//need to reduce h and try again
 			h /= 5.0;
 			failures += 1;
@@ -178,7 +189,8 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 		//now we need the action of the exponential on Dn2
-		if (arnoldi(&m1, 1.0, 4, h, A, work1, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		info = arnoldi(&m1, 1.0, 4, h, solver, work1, &beta, work2) >= M_MAX)
+		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
@@ -213,7 +225,8 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//work1 is now equal to Dn3
 
 		//finally we need the action of the exponential on Dn3
-		if (arnoldi(&m2, 1.0, 4, h, A, work1, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		info = arnoldi(&m2, 1.0, 4, h, solver, &beta, work1, work2) >= M_MAX)
+		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;

@@ -22,7 +22,7 @@
 
 struct solver_memory
 {
-	double* A;
+	double* sc;
 	double* work1;
 	double* work2;
 	double* work3;

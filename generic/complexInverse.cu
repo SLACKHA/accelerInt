@@ -216,6 +216,9 @@ void getComplexInverseHessenberg (const int n, cuDoubleComplex* __restrict__ A,
 	// first get LU factorization
 	getHessenbergLU (n, A, ipiv, info);
 	
+	if (*info != 0)
+		return;
+
 	// now get inverse
 	getComplexInverseLU (n, A, ipiv, work);
 }

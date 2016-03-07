@@ -12,8 +12,33 @@
 #include "solver_props.cuh"
 #include "gpu_macros.cuh"
 
- void initialize_solver() {
+ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
     find_poles_and_residuals();
+    // Allocate storage for the device struct
+    cudaErrorCheck( cudaMalloc(d_mem, sizeof(solver_memory)) );
+    //allocate the device arrays on the host pointer
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->sc), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->work1), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->work2), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->work3), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->gy), NSP * padded * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->Hm), STRIDE * STRIDE * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->phiHm), STRIDE * STRIDE * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->Vm), NSP * STRIDE * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->savedActions), 5 * NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->ipiv), NSP * sizeof(int)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->invA), STRIDE * STRIDE * padded * sizeof(cuDoubleComplex)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->result), padded * sizeof(int)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->k1), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->k2), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->k3), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->k4), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->k5), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->k6), NSP * padded * sizeof(double)) );
+    cudaErrorCheck( cudaMalloc(&((*h_mem)->k7), NSP * padded * sizeof(double)) );
+
+    //copy host struct to device
+    cudaErrorCheck( cudaMemcpy(*d_mem, *h_mem, sizeof(solver_memory), cudaMemcpyHostToDevice) );
  }
 
  const char* solver_name() {
@@ -91,10 +116,30 @@
  #endif
  }
 
- void cleanup_solver() {
+ void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem {
  #ifdef LOG_OUTPUT
     //close files
     fclose(rFile);
     fclose(logFile);
  #endif
+    cudaErrorCheck( cudaFree(h_mem->sc) );
+    cudaErrorCheck( cudaFree(h_mem->work1) );
+    cudaErrorCheck( cudaFree(h_mem->work2) );
+    cudaErrorCheck( cudaFree(h_mem->work3) );
+    cudaErrorCheck( cudaFree(h_mem->gy) );
+    cudaErrorCheck( cudaFree(h_mem->Hm) );
+    cudaErrorCheck( cudaFree(h_mem->phiHm) );
+    cudaErrorCheck( cudaFree(h_mem->Vm) );
+    cudaErrorCheck( cudaFree(h_mem->savedActions) );
+    cudaErrorCheck( cudaFree(h_mem->ipiv) );
+    cudaErrorCheck( cudaFree(h_mem->invA) );
+    cudaErrorCheck( cudaFree(h_mem->result) );
+    cudaErrorCheck( cudaFree(h_mem->k1) );
+    cudaErrorCheck( cudaFree(h_mem->k2) );
+    cudaErrorCheck( cudaFree(h_mem->k3) );
+    cudaErrorCheck( cudaFree(h_mem->k4) );
+    cudaErrorCheck( cudaFree(h_mem->k5) );
+    cudaErrorCheck( cudaFree(h_mem->k6) );
+    cudaErrorCheck( cudaFree(h_mem->k7) );
+    cudaErrorCheck( cudaFree(d_mem) );
  }

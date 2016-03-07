@@ -114,9 +114,11 @@
  }
 
 void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
+  find_poles_and_residuals();
   // Allocate storage for the device struct
   cudaErrorCheck( cudaMalloc(d_mem, sizeof(solver_memory)) );
   //allocate the device arrays on the host pointer
+  cudaErrorCheck( cudaMalloc(&((*h_mem)->sc), NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->work1), NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->work2), NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->work3), NSP * padded * sizeof(double)) );
@@ -139,6 +141,7 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
     fclose(rFile);
     fclose(logFile);
  #endif
+    cudaErrorCheck( cudaFree(h_mem->sc) );
     cudaErrorCheck( cudaFree(h_mem->work1) );
     cudaErrorCheck( cudaFree(h_mem->work2) );
     cudaErrorCheck( cudaFree(h_mem->work3) );
@@ -150,4 +153,5 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
     cudaErrorCheck( cudaFree(h_mem->ipiv) );
     cudaErrorCheck( cudaFree(h_mem->invA) );
     cudaErrorCheck( cudaFree(h_mem->result) );
+    cudaErrorCheck( cudaFree(d_mem) );
  }

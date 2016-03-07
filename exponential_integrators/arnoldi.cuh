@@ -43,16 +43,14 @@ __device__
 int arnoldi(int* m, const double scale,
 			const int p, const double h,
 			const solver_memory* __restrict__ solver,
-			const double* __restrict__ v, double* __restrict__ beta)
+			const double* __restrict__ v, double* __restrict__ beta,
+			double * __restrict__ work)
 {
 	const double* __restrict__ A = solver->A;
 	const double* __restrict__ sc = solver->sc;
 	double* __restrict__ Vm = solver->Vm;
 	double* __restrict__ Hm = solver->Hm;
 	double* __restrict__ phiHm = solver->phiHm;
-
-	//the temporary work array
-	double* __restrict__ work = solver->work;
 
 	//first place A*fy in the Vm matrix
 	*beta = normalize(v, Vm);
@@ -61,16 +59,17 @@ int arnoldi(int* m, const double scale,
 	int index = 0;
 	int j = 0;
 	double err = 2.0;
+	int info = 0;
 
 	while (err >= 1.0 && j + p < M_MAX)
 	{
 		for (; j < index_list[index]; j++)
 		{
-			sparse_multiplier(A, &Vm[GRID_DIM * (j * NSP)], w);
+			sparse_multiplier(A, &Vm[GRID_DIM * (j * NSP)], work);
 			for (int i = 0; i <= j; i++)
 			{
 				Hm[INDEX(j * STRIDE + i)] = dotproduct(w, &Vm[GRID_DIM * (i * NSP)]);
-				scale_subtract(Hm[INDEX(j * STRIDE + i)], &Vm[GRID_DIM * (i * NSP)], w);
+				scale_subtract(Hm[INDEX(j * STRIDE + i)], &Vm[GRID_DIM * (i * NSP)], work);
 			}
 			Hm[INDEX(j * STRIDE + j + 1)] = two_norm(w);
 			if (fabs(Hm[index(j * STRIDE + j + 1)]) < ATOL)
@@ -105,11 +104,13 @@ int arnoldi(int* m, const double scale,
 
 #ifdef RB43
 		//2. Get phiHm
-		expAc_variable (*m + p, Hm, h * scale, phiHm);
+		info = expAc_variable (*m + p, Hm, h * scale, phiHm, solver, work);
 #elif EXP4
 		//2. Get phiHm
-		phiAc_variable (*m + p, Hm, h * scale, phiHm);
+		info = phiAc_variable (*m + p, Hm, h * scale, phiHm, solver, work);
 #endif
+		if (info != 0)
+			return -info;
 
 		//3. Get error
 		err = h * (*beta) * fabs(store * phiHm[INDEX((*m) * STRIDE + (*m) - 1)]) * sc_norm(&Vm[GRID_DIM * ((*m) * NSP)], sc);

@@ -19,4 +19,32 @@
 #define M_MAX NSP
 #define STRIDE (M_MAX + P)
 
+struct solver_memory
+{
+	double* sc;
+	double* work1;
+	double* work2;
+	double* work3;
+	double* Hm;
+	double* phiHm;
+	double* Vm;
+	double* k1;
+	double* k2;
+	double* k3;
+	double* k4;
+	double* k5;
+	double* k6;
+	double* k7;
+	int* ipiv;
+	cuDoubleComplex* invA;
+	int* result;
+};
+
+enum errorCodes {
+	success = 0,
+	err_consecutive_steps = 1,
+	max_steps_exceeded = 2,
+	h_plus_t_equals_h = 3
+};
+
 #endif
