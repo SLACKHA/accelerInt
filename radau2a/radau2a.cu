@@ -501,8 +501,8 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* __rest
  *  5th-order Radau2A implementation
  * 
  */
-__device__ void integrate (const double t_start, const double t_end, const double* var, double* y,
-							const mechanism_memory* mech, const solver_memory* solver) {
+__device__ void integrate (const double t_start, const double t_end, const double var, double* __restrict__ y,
+							const mechanism_memory* __restrict__ mech, const solver_memory* __restrict__ solver) {
 	double Hmin = 0;
 	double Hold = 0;
 #ifdef Gustafsson
@@ -530,13 +530,17 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			integrator_steps[T_ID]++;
 		#endif
 		if(!Reject) {
-			dydt (t, var[T_ID], y, mech->dy, solver->F0);
+			dydt (t, var, y, mech->dy, solver->F0);
 		}
 		if(!SkipLU) { 
 			//need to update Jac/LU
 			if(!SkipJac) {
 				safe_memset_jac(solver->E1, mech);
-				eval_jacob (t, var[T_ID], y, solver->E1, mech);
+#ifndef FINITE_DIFF
+				eval_jacob (t, var, y, solver->E1, mech);
+#else
+				eval_jacob (t, var, y, solver->E1, mech, solver->work1, solver->work2);
+#endif
 			}
 			RK_Decomp(H, solver->E1, solver->E2, solver->ipiv1, solver->ipiv2, &info);
 			if(info != 0) {
@@ -583,7 +587,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		NewtonRate = pow(fmax(NewtonRate, EPS), 0.8);
 
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
-			RK_PrepareRHS(t, var[T_ID], H, y, solver->Z1, solver->Z2, solver->Z3,
+			RK_PrepareRHS(t, var, H, y, solver->Z1, solver->Z2, solver->Z3,
 							solver->DZ1, solver->DZ2, solver->DZ3, solver->work1,
 							solver->work2);
 			RK_Solve(H, solver->E1, solver->E2, solver->DZ1, solver->DZ2, solver->DZ3,
@@ -636,7 +640,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			continue;
 		}
 
-		double Err = RK_ErrorEstimate(H, t, var[T_ID], y, 
+		double Err = RK_ErrorEstimate(H, t, var, y, 
 						solver->F0, solver->Z1, solver->Z2, 
 						solver->Z3, solver->sc, solver->E1, solver->ipiv1, 
 						FirstStep, Reject, solver->work1, solver->work2,

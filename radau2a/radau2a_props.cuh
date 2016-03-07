@@ -32,7 +32,7 @@ struct solver_memory
 	double* work2;
 	double* work3;
 	cuDoubleComplex* work4;
-	double* result;
+	int* result;
 };
 
 enum errorCodes {

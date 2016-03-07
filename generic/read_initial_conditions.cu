@@ -1,12 +1,3 @@
-/* read_initial_conditions.c
- * the generic initial condition reader
- * \file read_initial_conditions
- *
- * \author Nicholas Curtis
- * \date 03/10/2015
- *
- */
-
 #include "header.cuh"
 #include "gpu_memory.cuh"
 #include "gpu_macros.cuh"
@@ -15,15 +6,15 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
- int read_initial_conditions(const char* filename, int NUM, int block_size, int grid_size, double** y_host, double** y_device, double** variable_host, double** variable_device) {
-    int padded = initialize_gpu_memory(NUM, block_size, grid_size, y_device, variable_device);
-    (*y_host) = (double*)malloc(padded * NSP * sizeof(double));
-    (*variable_host) = (double*)malloc(padded * sizeof(double));
+ void read_initial_conditions(const char* filename, int NUM, double** y_host, double** variable_host)
+ {    
+    (*y_host) = (double*)malloc(NUM * NN * sizeof(double));
+    (*variable_host) = (double*)malloc(NUM * sizeof(double));
     FILE *fp = fopen (filename, "rb");
     if (fp == NULL)
     {
-        fprintf(stderr, "Could not open file: %s\n", filename);
-        exit(-1);
+        fprintf(stderr, "Could not open file: %s\\n", filename);
+        exit(1);
     }
     double buffer[NN + 2];
 
@@ -34,7 +25,7 @@
         int count = fread(buffer, sizeof(double), NN + 2, fp);
         if (count != (NN + 2))
         {
-            fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\n", filename, NN + 1, count);
+            fprintf(stderr, "File (%s) is incorrectly formatted, %d doubles were expected but only %d were read.\\n", filename, NN + 1, count);
             exit(-1);
         }
         //apply mask if necessary
@@ -46,17 +37,17 @@
 #elif CONV
         double pres = buffer[2];
 #endif
-        for (int j = 0; j < NSP - 1; j++)
-            (*y_host)[i + (j + 1) * padded] = buffer[j + 3];
+        for (int j = 0; j < NSP; j++)
+            (*y_host)[i + (j + 1) * NUM] = buffer[j + 3];
 
         // if constant volume, calculate density
 #ifdef CONV
-        double Yi[NSP - 1];
-        double Xi[NSP - 1];
+        double Yi[NSP];
+        double Xi[NSP];
 
-        for (int j = 0; j < NSP - 1; ++j)
+        for (int j = 1; j < NN; ++j)
         {
-            Yi[j] = (*y_host)[i + (j + 1) * padded];
+            Yi[j - 1] = (*y_host)[i + j * NUM];
         }
 
         mass2mole (Yi, Xi);
@@ -64,5 +55,4 @@
 #endif
     }
     fclose (fp);
-    return padded;
 }

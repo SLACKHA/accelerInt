@@ -22,14 +22,13 @@
 __device__
 void eval_jacob (const double t, const double pres, const double * __restrict__ cy,
                     double * __restrict__ jac, const mechanism_memory* __restrict__ d_mem,
-                    double* __restrict__ y_temp) {
+                    double* __restrict__ y_temp, double* __restrict__* ewt) {
   double* dy = d_mem->dy;
-  double ewt[NSP];
   
   #pragma unroll
   for (int i = 0; i < NSP; ++i) {
     y_temp[INDEX(i)] = cy[INDEX(i)];
-    ewt[i] = ATOL + (RTOL * fabs(cy[INDEX(i)]));
+    ewt[INDEX(i)] = ATOL + (RTOL * fabs(cy[INDEX(i)]));
   }
 
   dydt (t, pres, cy, dy, d_mem);
@@ -49,7 +48,7 @@ void eval_jacob (const double t, const double pres, const double * __restrict__ 
   double sum = 0.0;
   #pragma unroll
   for (int i = 0; i < NSP; ++i) {
-    sum += (ewt[i] * dy[INDEX(i)]) * (ewt[i] * dy[INDEX(i)]);
+    sum += (ewt[INDEX(i)] * dy[INDEX(i)]) * (ewt[INDEX(i)] * dy[INDEX(i)]);
   }
   double fac = sqrt(sum / ((double)(NSP)));
   double r0 = 1000.0 * RTOL * DBL_EPSILON * ((double)(NSP)) * fac;
@@ -58,7 +57,7 @@ void eval_jacob (const double t, const double pres, const double * __restrict__ 
   #pragma unroll
   for (int j = 0; j < NSP; ++j) {
     double yj_orig = y_temp[INDEX(j)];
-    double r = fmax(srur * fabs(yj_orig), r0 / ewt[j]);
+    double r = fmax(srur * fabs(yj_orig), r0 / ewt[INDEX(i)]);
     
     #if FD_ORD == 1
       y_temp[INDEX(j)] = yj_orig + r;

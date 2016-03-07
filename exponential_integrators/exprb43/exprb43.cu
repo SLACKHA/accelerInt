@@ -46,7 +46,9 @@
  * 
  * 
  */
-__device__ void integrate (const double t_start, const double t_end, const double pr, double* y) {
+__device__ void integrate (const double t_start, const double t_end, const double pr,
+							double* __restrict__ y, const mechanism_memory* __restrict__ mech,
+							const solver_memory* __restrict__ solver) {
 	
 	//initial time
 	double h = fmin(1.0e-8, t_end - t_start);
@@ -60,7 +62,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double t = t_start;
 
 	// get scaling for weighted norm
-	double sc[NSP];
+	double const * __restrict__ sc = solver->sc; 
 	scale_init(y, sc);
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
@@ -74,26 +76,54 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	//initial krylov subspace sizes
 	int m, m1, m2;
 
-	// temporary arrays
-	double temp[NSP];
-	double f_temp[NSP];
-	double y1[NSP];
+	//arrays
+	double const * __restrict__ work1 = solver->work1;
+	double const * __restrict__ work2 = solver->work2; 
+	double const * __restrict__ y1 = solver->work3;
+	double const * __restrict__ fy = solver->dy;
+	double const * __restrict__ A = mech->jac;
+	double const * __restrict__ Hm = solver->Hm;
+	double const * __restrict__ Vm = solver->Vm;
+	double const * __restrict__ phiHm = solver->phiHm;
+	double const * __restrict__ savedActions = solver->savedActions;
+	double const * __restrict__ gy = solver->gy;
 
-	// source vector
-	double fy[NSP];
-	dydt (t, pr, y, fy);
+	//vectors for scaling operations
+	double const * in[5] = {0, 0, 0, savedActions, y};
+	double const * out[3] = {0, 0, work1};
+	double scale_vec[3] = {0, 0, 0};
 
-	// Jacobian matrix
-	double A[NSP * NSP] = {0.0};
-	eval_jacob (t, pr, y, A);
-	double gy[NSP];
+#ifndef FORCE_ZERO
+	#pragma unroll
+	for(int i = 0; i < NSP * NSP; ++i)
+	{
+		if (i < NSP)
+			fy[i] = 0;
+		A[0] = 0;
+	}
+#endif
 
-	double Hm[STRIDE * STRIDE];
-	double Vm[NSP * STRIDE];
-	double phiHm[STRIDE * STRIDE];
 	double err = 0.0;
-	double savedActions[NSP * 5];
-	while ((t < t_end) && (t + h > t)) {
+	int failures = 0;
+	int steps = 0;
+	while (t < t_end) {
+
+		//error checking
+		if (failures >= 5)
+		{
+			result[T_ID] = error_codes.err_consecutive_steps;
+			return;
+		}
+		if (steps++ >= MAX_STEPS)
+		{
+			result[T_ID] = error_codes.max_steps_exceeded;
+			return;
+		}
+		if (t + h <= t)
+		{
+			result[T_ID] = error_codes.h_plus_t_equals_h;
+			return;
+		}
 		
 		if (!reject) {
 			dydt (t, pr, y, fy);
@@ -102,7 +132,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			sparse_multiplier(A, y, gy);
 			#pragma unroll
 			for (int i = 0; i < NSP; ++i) {
-				gy[i] = fy[i] - gy[i];
+				gy[INDEX(i)] = fy[INDEX(i)] - gy[INDEX(i)];
 			}
 		}
 
@@ -113,95 +143,104 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		if (arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
 		{
 			//need to reduce h and try again
-			h /= 3;
+			h /= 5.0;
+			failures += 1;
 			continue;
 		}
 
-		// Un2 to be stored in temp
+		// Un2 to be stored in work1
 		//Un2 is partially in the mth column of phiHm
 		//Un2 = y + ** 0.5 * h * phi_1(0.5 * h * A)*fy **
 		//Un2 = y + ** beta * Vm * phiHm(:, m) **
 
 		//store h * beta * Vm * phi_1(h * Hm) * e1 in savedActions
-		matvec_m_by_m_plusequal(m, phiHm, &phiHm[m * STRIDE], temp);
-		matvec_n_by_m_scale(m, beta, Vm, temp, savedActions);
+		matvec_m_by_m_plusequal(m, phiHm, &phiHm[GRID_DIM * (m * STRIDE)], work1);
+		matvec_n_by_m_scale(m, beta, Vm, work1, savedActions);
 
-		//store 0.5 * h *  beta * Vm * phi_1(0.5 * h * Hm) * fy + y in temp
-		matvec_n_by_m_scale_add(m, beta, Vm, &phiHm[m * STRIDE], temp, y);
-		//temp is now equal to Un2
+		//store 0.5 * h *  beta * Vm * phi_1(0.5 * h * Hm) * fy + y in work1
+		matvec_n_by_m_scale_add(m, beta, Vm, &phiHm[GRID_DIM * (m * STRIDE)], work1, y);
+		//work1 is now equal to Un2
 
 		//next compute Dn2
 		//Dn2 = (F(Un2) - Jn * Un2) - gy
 
-		dydt(t, pr, temp, &savedActions[NSP]);
-		sparse_multiplier(A, temp, f_temp);
+		dydt(t, pr, work1, &savedActions[GRID_DIM * NSP]);
+		sparse_multiplier(A, work1, work2);
 
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
-			temp[i] = savedActions[NSP + i] - f_temp[i] - gy[i]; 
+			work1[INDEX(i)] = savedActions[INDEX(NSP + i)] - work2[INDEX(i)] - gy[INDEX(i)]; 
 		}
-		//temp is now equal to Dn2
+		//work1 is now equal to Dn2
 
 		//partially compute Un3 as:
 		//Un3 = y + ** h * phi_1(hA) * fy ** + h * phi_1(hA) * Dn2
 		//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 		//now we need the action of the exponential on Dn2
-		if (arnoldi(&m1, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		if (arnoldi(&m1, 1.0, 4, h, A, work1, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
 		{
 			//need to reduce h and try again
-			h /= 3;
+			h /= 5.0;
+			failures += 1;
 			continue;
 		}
 
 		//save Phi3(h * A) * Dn2 to savedActions[0]
 		//save Phi4(h * A) * Dn2 to savedActions[NSP]
 		//add the action of phi_1 on Dn2 to y and hn * phi_1(hA) * fy to get Un3
-		const double* in[5] = {&phiHm[(m1 + 2) * STRIDE], &phiHm[(m1 + 3) * STRIDE], &phiHm[m1 * STRIDE], savedActions, y};
-		double* out[3] = {&savedActions[NSP], &savedActions[2 * NSP], temp};
-		double scale_vec[3] = {beta / (h * h), beta / (h * h * h), beta};
+		in[0] = &phiHm[GRID_DIM * ((m1 + 2) * STRIDE)];
+		in[1] = &phiHm[GRID_DIM * ((m1 + 3) * STRIDE)];
+		in[2] = &phiHm[GRID_DIM * ((m1) * STRIDE)];
+		in[3] = &phiHm[GRID_DIM * ((m1 + 2) * STRIDE)];
+		out[0] = &savedActions[GRID_DIM * NSP]
+		out[1] = &savedActions[GRID_DIM * 2 * NSP]
+		scale_vec[0] = beta / (h * h);
+		scale_vec[1] = beta / (h * h * h);
+		scale_vec[3] = beta;
 		matvec_n_by_m_scale_special(m1, scale_vec, Vm, in, out);
-		//Un3 is now in temp
+		//Un3 is now in work1
 
 		//next compute Dn3
 		//Dn3 = F(Un3) - A * Un3 - gy
-		dydt(t, pr, temp, &savedActions[3 * NSP]);
-		sparse_multiplier(A, temp, f_temp);
+		dydt(t, pr, work1, &savedActions[GRID_DIM * 3 * NSP]);
+		sparse_multiplier(A, work1, work2);
 
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
-			temp[i] = savedActions[3 * NSP + i] - f_temp[i] - gy[i]; 
+			work1[INDEX(i)] = savedActions[INDEX(3 * NSP + i)] - work2[INDEX(i)] - gy[INDEX(i)]; 
 		}
-		//temp is now equal to Dn3
+		//work1 is now equal to Dn3
 
 		//finally we need the action of the exponential on Dn3
-		if (arnoldi(&m2, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		if (arnoldi(&m2, 1.0, 4, h, A, work1, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
 		{
 			//need to reduce h and try again
-			h /= 3;
+			h /= 5.0;
+			failures += 1;
 			continue;
 		}
-		out[0] = &savedActions[3 * NSP];
-		out[1] = &savedActions[4 * NSP];
-		in[0] = &phiHm[(m2 + 2) * STRIDE];
-		in[1] = &phiHm[(m2 + 3) * STRIDE];
-		scale_vec[0] = beta / (h * h);
-		scale_vec[1] = beta / (h * h * h);
+		out[0] = &savedActions[GRID_DIM * 3 * NSP];
+		out[1] = &savedActions[GRID_DIM * 4 * NSP];
+		in[0] = &phiHm[GRID_DIM * (m2 + 2) * STRIDE];
+		in[1] = &phiHm[GRID_DIM * (m2 + 3) * STRIDE];
+		//scale_vec[0] = beta / (h * h);
+		//scale_vec[1] = beta / (h * h * h);
 		matvec_n_by_m_scale_special2(m2, scale_vec, Vm, in, out);
 
 		//construct y1 and error vector
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
 			//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
-			y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NSP + i] - 48.0 * savedActions[2 * NSP + i] + -2.0 * savedActions[3 * NSP + i] + 12.0 * savedActions[4 * NSP + i];
+			work3[INDEX(i)] = y[INDEX(i)] + savedActions[INDEX(i)] + 16.0 * savedActions[INDEX(NSP + i)] - 48.0 * savedActions[INDEX(2 * NSP + i)] + -2.0 * savedActions[INDEX(3 * NSP + i)] + 12.0 * savedActions[INDEX(4 * NSP + i)];
 			//error vec
-			temp[i] = 48.0 * savedActions[2 * NSP + i] - 12.0 * savedActions[4 * NSP + i];
+			work1[INDEX(i)] = 48.0 * savedActions[INDEX(2 * NSP + i)] - 12.0 * savedActions[INDEX(4 * NSP + i)];
 		}
 
 
 		//scale and find err
-		scale (y, y1, f_temp);
-		err = fmax(EPS, sc_norm(temp, f_temp));
+		scale (y, work3, work2);
+		err = fmax(EPS, sc_norm(work1, work2));
 		
 		// classical step size calculation
 		h_new = pow(err, -1.0 / ORD);	
@@ -226,10 +265,15 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		
 		if (err <= 1.0) {
 
+			failures = 0;
+			// update y, scale vector and t
 			#pragma unroll
 			for (int i = 0; i < NSP; ++i)
-				sc[i] = f_temp[i];
-			//memcpy(sc, f_temp, NSP * sizeof(double));
+			{
+				sc[INDEX(i)] = work2[INDEX(i)];
+				y[INDEX(i)] = work3[INDEX(i)];
+			}
+			t += h;
 			
 			// minimum of classical and Gustafsson step size prediction
 			h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
@@ -237,26 +281,19 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 			
-			// update y and t
-			#pragma unroll
-			for (int i = 0; i < NSP; ++i) {
-				y[i] = y1[i];
-			}
-			
-			t += h;
-			
 			// store time step and error
 			err_old = fmax(1.0e-2, err);
 			h_old = h;
 			
+			reject = false;
 			// check if last step rejected
 			if (reject) {
-				reject = false;
 				h_new = fmin(h, h_new);
 			}
 			h = fmin(h_new, t_end - t);
 						
 		} else {
+			failures += 1;
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 			h_new = fmin(h_new, t_end - t);
@@ -266,5 +303,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		}
 
 	} // end while
+
+	result[T_ID] = error_codes.success;
 	
 }

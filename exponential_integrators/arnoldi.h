@@ -105,47 +105,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 #endif
 
 		//3. Get error
-		#ifdef USE_SMOOTHED_ERROR
-			if (*m > 4)
-			{
-				//use the modified err from Hochbruck et al. 
-
-				//setup I - h*Hm
-				double* working = (double*)malloc((*m) * (*m) * sizeof(double));
-				#pragma unroll
-				for (int ind1 = 0; ind1 < *m; ind1++)
-				{
-					#pragma unroll
-					for (int ind2 = 0; ind2 < *m; ind2++)
-					{
-						if (ind1 == ind2)
-						{
-							working[ind1 * (*m) + ind2] = 1.0 - h * scale * Hm[ind1 * STRIDE + ind2];
-						}
-						else
-						{
-							working[ind1 * (*m) + ind2] = -h * scale * Hm[ind1 * STRIDE + ind2];
-						}
-					}
-				}
-				getInverseHessenberg(*m, working);
-				//get the value for the err (dot product of mth row of working and 1'st col of Hm)
-				double val = 0;
-				#pragma unroll
-				for (int ind1 = 0; ind1 < *m; ind1++)
-				{
-					val += working[(*m) * ind1 + (*m - 1)] * Hm[ind1];
-				}
-				err = h * (*beta) * fabs(store * val) * sc_norm(&Vm[(*m) * NSP], sc);
-				free(working);
-			}
-			else
-			{
-				err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NSP], sc);
-			}
-		#else
-			err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NSP], sc);
-		#endif
+		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NSP], sc);
 
 		//restore Hm(m, m + 1)
 		Hm[(*m - 1) * STRIDE + *m] = store;

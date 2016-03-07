@@ -27,8 +27,6 @@
  	size_t num_bytes = 0;
  	//Jacobian (doubles as factorized)
  	num_bytes += NSP * NSP;
- 	//two pivot index arrays
- 	num_bytes += 2 * NSP;
  	//an error scale array
  	num_bytes += NSP;
  	//6 RHS and interpolant arrays
@@ -41,10 +39,12 @@
  	num_bytes += NSP;
  	//3 work arrays
  	num_bytes += 3 * NSP;
-  //result flag
-  num_bytes += 1;
  	//convert to bytes
  	num_bytes *= sizeof(double);
+  //result flag
+  num_bytes += sizeof(int);
+  //two pivot index arrays
+  num_bytes += 2 * NSP * sizeof(int);
  	//and add complex jacobian factorization
  	num_bytes += NSP * NSP * sizeof(cuDoubleComplex);
  }

@@ -16,31 +16,14 @@
 
  __global__ void
 intDriver (const int NUM, const double t, const double t_end,
-                const double *pr_global, double *y_global)
+                const double * __restrict__ pr_global, double * __restrict__ y_global, 
+                const mechanism_memory* __restrict__ d_mem, 
+                const solver_memory* __restrict__ s_mem)
 {
     if (T_ID < NUM)
     {
-
-        // local array with initial values
-        double y_local[NSP];
-        double pr_local = pr_global[T_ID];
-
-        // load local array with initial values from global array
-#pragma unroll
-        for (int i = 0; i < NSP; i++)
-        {
-            y_local[i] = y_global[T_ID + i * GRID_SIZE];
-        }
         // call integrator for one time step
-        integrate (t, t_end, pr_local, y_local);
-
-        // update global array with integrated values
-#pragma unroll
-        for (int i = 0; i < NSP; i++)
-        {
-            y_global[T_ID + i * GRID_SIZE] = y_local[i];
-        }
-
+        integrate (t, t_end, pr_global[T_ID], y_local, d_mem, s_mem);
     }
 
 } // end intDriver

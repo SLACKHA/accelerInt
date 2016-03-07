@@ -18,5 +18,29 @@
 #define ORD 3.0
 #define M_MAX NSP
 #define STRIDE (M_MAX + P)
+#define MAX_STEPS (10000)
+
+struct solver_memory
+{
+	double* A;
+	double* work1;
+	double* work2;
+	double* work3;
+	double* gy;
+	double* Hm;
+	double* phiHm;
+	double* Vm;
+	double* savedActions;
+	int* ipiv;
+	cuDoubleComplex* invA;
+	int* result;
+};
+
+enum errorCodes {
+	success = 0,
+	err_consecutive_steps = 1,
+	max_steps_exceeded = 2,
+	h_plus_t_equals_h = 3
+};
 
 #endif

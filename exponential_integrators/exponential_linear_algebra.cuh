@@ -26,16 +26,16 @@
  * \param[out]		Av		vector that is A * v
  */
 __device__
-void matvec_m_by_m (const int m, const double * A, const double * V, double * Av) {
+void matvec_m_by_m (const int m, const double* __restrict__ A,
+						const double* __restrict__ V, double * __restrict__ Av) {
 	//for each row
-	#pragma unroll
 	for (int i = 0; i < m; ++i) {
-		Av[i] = 0.0;
+		Av[INDEX(i)] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * STRIDE + i] * V[j];
+			Av[INDEX(i)] += A[INDEX(j * STRIDE + i)] * V[INDEX(j)];
 		}
 	}
 }
@@ -58,15 +58,15 @@ __device__ void matvec_m_by_m_plusequal (const int m, const double * A, const do
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < m; ++i) {
-		Av[i] = 0.0;
+		Av[INDEX(i)] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * STRIDE + i] * V[j];
+			Av[INDEX(i)] += A[INDEX(j * STRIDE + i)] * V[INDEX(j)];
 		}
 
-		Av[i] += V[i];
+		Av[INDEX(i)] += V[INDEX(i)];
 	}
 }
 
@@ -85,15 +85,15 @@ void matvec_n_by_m_scale (const int m, const double scale, const double * A, con
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		Av[i] = 0.0;
+		Av[INDEX(i)] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * NSP + i] * V[j];
+			Av[INDEX(i)] += A[INDEX(j * NSP + i)] * V[INDEX(j)];
 		}
 
-		Av[i] *= scale;
+		Av[INDEX(i)] *= scale;
 	}
 }
 
@@ -114,14 +114,14 @@ void matvec_n_by_m_scale (const int m, const double scale, const double * A, con
  * \param[out]		Av		a list of 3 pointers corresponding to Av1, Av2, Av3
  */
 __device__
-void matvec_n_by_m_scale_special (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
+void matvec_n_by_m_scale_special (const int m, const double scale __restrict__ *, const double * __restrict__ A, const double* __restrict__ V[], double* Av[]) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
 		#pragma unroll
 		for (int k = 0; k < 3; k++)
 		{
-			Av[k][i] = 0.0;
+			Av[k][INDEX(i)] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
@@ -130,17 +130,17 @@ void matvec_n_by_m_scale_special (const int m, const double scale[], const doubl
 			#pragma unroll
 			for (int k = 0; k < 3; k++)
 			{
-				Av[k][i] += A[j * NSP + i] * V[k][j];
+				Av[k][INDEX(i)] += A[INDEX(j * NSP + i)] * V[k][INDEX(j)];
 			}
 		}
 
 		#pragma unroll
 		for (int k = 0; k < 3; k++)
 		{
-			Av[k][i] *= scale[k];
+			Av[k][INDEX(i)] *= scale[k];
 		}
-		Av[2][i] += V[3][i];
-		Av[2][i] += V[4][i];
+		Av[2][INDEX(i)] += V[3][INDEX(i)];
+		Av[2][INDEX(i)] += V[4][INDEX(i)];
 	}
 }
 
@@ -159,14 +159,15 @@ void matvec_n_by_m_scale_special (const int m, const double scale[], const doubl
  * \param[out]		Av		a list of 2 pointers corresponding to Av1, Av2
  */
 __device__
-void matvec_n_by_m_scale_special2 (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
+void matvec_n_by_m_scale_special2 (const int m, const double* __restrict__ scale, const double* __restrict__ A,
+										const double** __restrict__ V, double** __restrict__ Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
 		#pragma unroll
 		for (int k = 0; k < 2; k++)
 		{
-			Av[k][i] = 0.0;
+			Av[k][INDEX(i)] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
@@ -175,14 +176,14 @@ void matvec_n_by_m_scale_special2 (const int m, const double scale[], const doub
 			#pragma unroll
 			for (int k = 0; k < 2; k++)
 			{
-				Av[k][i] += A[j * NSP + i] * V[k][j];
+				Av[k][INDEX(i)] += A[INDEX(j * NSP + i)] * V[k][INDEX(j)];
 			}
 		}
 
 		#pragma unroll
 		for (int k = 0; k < 2; k++)
 		{
-			Av[k][i] *= scale[k];
+			Av[k][INDEX(i)] *= scale[k];
 		}
 	}
 }
@@ -201,19 +202,21 @@ void matvec_n_by_m_scale_special2 (const int m, const double scale[], const doub
  * \param[out]		Av		vector that is A * V + add
  */
 __device__
-void matvec_n_by_m_scale_add (const int m, const double scale, const double * A, const double * V, double * Av, const double* add) {
+void matvec_n_by_m_scale_add (const int m, const double scale,
+								const double* __restrict__ A, const double* __restrict__ V,
+								double* __restrict__ Av, const double* __restrict__ add) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		Av[i] = 0.0;
+		Av[INDEX(i)] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * NSP + i] * V[j];
+			Av[INDEX(i)] += A[INDEX(j * NSP + i)] * V[INDEX(j)];
 		}
 
-		Av[i] = Av[i] * scale + add[i];
+		Av[INDEX(i)] = Av[INDEX(i)] * scale + add[INDEX(i)];
 	}
 }
 
@@ -233,19 +236,22 @@ void matvec_n_by_m_scale_add (const int m, const double scale, const double * A,
  * \param[out]		Av		vector that is scale * A * V + 2 * add - sub
  */
 __device__
-void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const double * A, const double * V, double * Av, const double* add, const double * sub) {
+void matvec_n_by_m_scale_add_subtract (const int m, const double scale,
+										const double* __restrict__ A, const double* V,
+										double* __restrict__ Av, const double* __restrict__ add,
+										const double* __restrict__ sub) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		Av[i] = 0.0;
+		Av[INDEX(i)] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
 		#pragma unroll
 		for (int j = 0; j < m; ++j) {
-			Av[i] += A[j * NSP + i] * V[j];
+			Av[INDEX(i)] += A[INDEX(j * NSP + i)] * V[INDEX(j)];
 		}
 
-		Av[i] = Av[i] * scale + 2.0 * add[i] - sub[i];
+		Av[INDEX(i)] = Av[INDEX(i)] * scale + 2.0 * add[INDEX(i)] - sub[INDEX(i)];
 	}
 }
 
@@ -258,10 +264,10 @@ void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const do
  * \param[out]	sc	array of scaling values
  */
 __device__
-void scale (const double * y0, const double * y1, double * sc) {
+void scale (const double* __restrict__ y0, const double* __restrict__ y1, double* __restrict__ sc) {
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		sc[i] = ATOL + fmax(fabs(y0[i]), fabs(y1[i])) * RTOL;
+		sc[INDEX(i)] = ATOL + fmax(fabs(y0[INDEX(i)]), fabs(y1[INDEX(i)])) * RTOL;
 	}
 }
 
@@ -273,10 +279,10 @@ void scale (const double * y0, const double * y1, double * sc) {
  * \param[out]	sc	array of scaling values
  */
 __device__
-void scale_init (const double * y0, double * sc) {
+void scale_init (const double* __restrict__ y0, double* __restrict__ sc) {
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		sc[i] = ATOL + fabs(y0[i]) * RTOL;
+		sc[INDEX(i)] = ATOL + fabs(y0[INDEX(i)]) * RTOL;
 	}
 }
 
@@ -289,12 +295,12 @@ void scale_init (const double * y0, double * sc) {
  * \return			norm	weighted norm
  */
 __device__
-double sc_norm (const double * nums, const double * sc) {
+double sc_norm (const double* __restrict__ nums, const double* __restrict__ sc) {
 	double norm = 0.0;
 	
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		norm += nums[i] * nums[i] / (sc[i] * sc[i]);
+		norm += nums[INDEX(i)] * nums[INDEX(i)] / (sc[INDEX(i)] * sc[INDEX(i)]);
 	}
 	
 	return sqrt(norm / NSP);
@@ -305,12 +311,12 @@ double sc_norm (const double * nums, const double * sc) {
  *	\param[in]		v 		the vector
  */
 __device__
-double two_norm(const double* v)
+double two_norm(const double* __restrict__ v)
 {
 	double norm = 0.0;
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		norm += v[i] * v[i];
+		norm += v[INDEX(i)] * v[INDEX(i)];
 	}
 	return sqrt(norm);
 }
@@ -321,18 +327,19 @@ double two_norm(const double* v)
  * \param[out]		v_out	where to stick the normalized part of v (in a column)
  */
 __device__
-double normalize (const double * v, double* v_out) {
+double normalize (const double* __restrict__ v, double* __restrict__ v_out) {
 	
 	double norm = two_norm(v);
 
-	if (norm == 0)
-		norm = 1;
+	//unlikely to happen, if so, we still need to copy
+	if (norm == 0.0)
+		norm = 1.0;
 
 	double m_norm = 1.0 / norm;
 
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
-		v_out[i] = v[i] * m_norm;
+		v_out[INDEX(i)] = v[INDEX(i)] * m_norm;
 	}
 	return norm;
 }
@@ -345,13 +352,13 @@ double normalize (const double * v, double* v_out) {
  * \out						the dot product of the specified vectors
  */
 __device__
-double dotproduct(const double* w, const double* Vm)
+double dotproduct(const double* __restrict__ w, const double* __restrict__ Vm)
 {
 	double sum = 0;
 	#pragma unroll
 	for(int i = 0; i < NSP; i++)
 	{
-		sum += w[i] * Vm[i];
+		sum += w[INDEX(i)] * Vm[INDEX(i)];
 	}
 	return sum;
 }
@@ -362,12 +369,12 @@ double dotproduct(const double* w, const double* Vm)
  * \param[in]		Vm		the subspace matrix
  * \param[out]		w 		the vector to subtract from
  */
-__device__ void scale_subtract(const double s, const double* Vm, double* w)
+__device__ void scale_subtract(const double s, const double* __restrict__ Vm, double* __restrict__ w)
 {
 	#pragma unroll
 	for (int i = 0; i < NSP; i++)
 	{
-		w[i] -= s * Vm[i];
+		w[INDEX(i)] -= s * Vm[INDEX(i)];
 	}
 }
 
@@ -378,12 +385,12 @@ __device__ void scale_subtract(const double s, const double* Vm, double* w)
  * \param[in]		w 		the vector to use as a base
  * \param[out]		Vm		the subspace matrix to set
  */
-__device__ void scale_mult(const double s, const double* w, double* Vm)
+__device__ void scale_mult(const double s, const double* __restrict__ w, double* __restrict__ Vm)
 {
 	#pragma unroll
 	for (int i = 0; i < NSP; i++)
 	{
-		Vm[i] = w[i] * s;
+		Vm[INDEX(i)] = w[INDEX(i)] * s;
 	}
 }
 
