@@ -22,7 +22,7 @@
  	return name;
  }
 
- void calculate_required_size() {
+ void required_solver_size() {
  	//return the size (in bytes), needed per cuda thread
  	size_t num_bytes = 0;
  	//an error scale array

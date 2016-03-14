@@ -55,6 +55,26 @@ void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
     }
 }
 
+inline void memcpy2D_in(double* dst, const int pitch_dst, double const * src, const int pitch_src,
+                                     const int offset, const size_t width, const int height) {
+    for (int i = 0; i < height; ++i)
+    {
+        memcpy(dst, &src[offset], width);
+        dst += pitch_dst;
+        src += pitch_src;
+    }
+}
+
+inline void memcpy2D_out(double* dst, const int pitch_dst, double const * src, const int pitch_src,
+                                      const int offset, const size_t width, const int height) {
+    for (int i = 0; i < height; ++i)
+    {
+        memcpy(&dst[offset], src, width);
+        dst += pitch_dst;
+        src += pitch_src;
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 /** Main function
@@ -126,11 +146,25 @@ int main (int argc, char *argv[])
     //and L1 size
     cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
 
-    initialize_solver();
+    size_t size_per_thread = required_mechanism_size() + required_solver_size();
+    size_t free_mem = 0;
+    size_t total_mem = 0;
+    cudaErrorCheck( cudaMemGetInfo (&free_mem, &total_mem) );
 
-    int g_num = (int)ceil(((double)NUM) / ((double)TARGET_BLOCK_SIZE));
-    if (g_num == 0)
-        g_num = 1;
+    //conservatively estimate the maximum allowable threads
+    int max_threads = int(floor(0.8 * ((double)free_mem) / ((double)mech_size)));
+    int padded = min(NUM, max_threads);
+    if (padded == 0)
+    {
+        printf("Mechanism is too large to fit into global CUDA memory... exiting.");
+        exit(-1);
+    }
+
+    solver_memory* host_solver, *device_solver;
+    mechanism_memory* host_mech, *device_mech;
+
+    initialize_gpu_memory(padded, &host_mech, &device_mech)
+    initialize_solver(padded, &host_solver, &device_solver);
 
     // print number of threads and block size
     printf ("# threads: %d \t block size: %d\n", NUM, TARGET_BLOCK_SIZE);
@@ -141,24 +175,12 @@ int main (int argc, char *argv[])
     const char* filename = "ign_data.bin";
 #endif
 
-    double* y_device;
     double* y_host;
-#ifdef CONP
-    double* pres_device;
-    double* pres_host;
+    double* var_host;
 #ifdef SAME_IC
-    int padded = set_same_initial_conditions(NUM, &y_host, &y_device, &pres_host, &pres_device);
+    set_same_initial_conditions(NUM, &y_host, &var_host);
 #else
-    int padded = read_initial_conditions(filename, NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &pres_host, &pres_device);
-#endif
-#elif CONV
-    double* rho_device;
-    double* rho_host;
-#ifdef SAME_IC
-    int padded = set_same_initial_conditions(NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
-#else
-    int padded = read_initial_conditions(filename, NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &y_device, &rho_host, &rho_device);
-#endif
+    read_initial_conditions(filename, NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &pres_host);
 #endif
 
     dim3 dimGrid (g_num, 1 );
@@ -187,17 +209,14 @@ int main (int argc, char *argv[])
     init_solver_log();
 #endif
 
+    double* y_temp = 0;
+    if (padded < NUM)
+        y_temp = (double*)malloc(padded * NSP * sizeof(double));
+
     //////////////////////////////
     // start timer
     StartTimer();
     //////////////////////////////
-
-    //begin memory copy
-#ifdef CONP
-    cudaErrorCheck( cudaMemcpy (pres_device, pres_host, padded * sizeof(double), cudaMemcpyHostToDevice));
-#elif CONV
-    cudaErrorCheck( cudaMemcpy (rho_device, rho_host, padded * sizeof(double), cudaMemcpyHostToDevice));
-#endif
 
     // set initial time
     double t = 0;
@@ -208,52 +227,67 @@ int main (int argc, char *argv[])
     while (t + EPS < end_time)
     {
         numSteps++;
-        // transfer memory to GPU
-        cudaErrorCheck( cudaMemcpy (y_device, y_host, padded * NSP * sizeof(double), cudaMemcpyHostToDevice) );
 
-#if defined(CONP)
-        // constant pressure case
-        intDriver <<< dimGrid, dimBlock, SHARED_SIZE >>> (NUM, t, t_next, pres_device, y_device);
-#elif defined(CONV)
-        // constant volume case
-        intDriver <<< dimGrid, dimBlock, SHARED_SIZE>>> (NUM, t, t_next, rho_device, y_device);
-#endif
-#ifdef DEBUG
-        cudaErrorCheck( cudaPeekAtLastError() );
-        cudaErrorCheck( cudaDeviceSynchronize() );
-#endif
-        // transfer memory back to CPU
-        cudaErrorCheck( cudaMemcpy (y_host, y_device, padded * NSP * sizeof(double), cudaMemcpyDeviceToHost) );
+        int num_solved = 0;
+        while (num_solved < NUM)
+        {
+            int num_cond = min(NUM - num_solved, padded);
+            cudaErrorCheck( cudaMemcpy (host_mech->var, &var_host[num_solved], 
+                                        num_cond * sizeof(double), cudaMemcpyHostToDevice));
+            
+             //copy our memory into y_temp
+            memcpy2D_in(y_temp, padded, y_host, NUM,
+                            num_solved, num_cond * sizeof(double), NSP);
+            // transfer memory to GPU
+            cudaErrorCheck( cudaMemcpy2D (host_mech->y, padded * sizeof(double),
+                                            y_temp, padded * sizeof(double),
+                                            num_cond * sizeof(double), NSP,
+                                            cudaMemcpyHostToDevice) );
+            intDriver <<< dimGrid, dimBlock, SHARED_SIZE >>> (NUM, t, t_next, host_mech->var, host_mech->y, device_mech, device_solver);
+    #ifdef DEBUG
+            cudaErrorCheck( cudaPeekAtLastError() );
+            cudaErrorCheck( cudaDeviceSynchronize() );
+    #endif
+            // transfer memory back to CPU
+            cudaErrorCheck( cudaMemcpy2D (y_temp, padded * sizeof(double),
+                                            host_mech->y, padded * sizeof(double),
+                                            num_cond * sizeof(double), NSP,
+                                            cudaMemcpyHostToDevice) );
+            memcpy2D_out(y_host, NUM, y_temp, padded,
+                            num_solved, num_cond * sizeof(double), NSP);
+
+            num_solved += num_cond;
+
+        }
 
         t = t_next;
         t_next = fmin(end_time, (numSteps + 1) * t_step);
 
-
-#if defined(PRINT)
-        printf("%.15le\t%.15le\n", t, y_host[0]);
-#endif
-#ifdef DEBUG
-        // check if within bounds
-        if ((y_host[0] < 0.0) || (y_host[0] > 10000.0))
-        {
-            printf("Error, out of bounds.\n");
-            printf("Time: %e, ind %d val %e\n", t, 0, y_host[0]);
-            return 1;
-        }
-#endif
-#ifdef LOG_OUTPUT
-        #if !defined(LOG_END_ONLY)
-            write_log(padded, NUM, t, y_host, pFile);
-            solver_log();
-        #endif
-#endif
-#ifdef IGN
-        // determine if ignition has occurred
-        if ((y_host[0] >= (T0 + 400.0)) && !(ign_flag)) {
-            ign_flag = true;
-            t_ign = t;
-        }
-#endif
+    #if defined(PRINT)
+            printf("%.15le\t%.15le\n", t, y_host[0]);
+    #endif
+    #ifdef DEBUG
+            // check if within bounds
+            if ((y_host[0] < 0.0) || (y_host[0] > 10000.0))
+            {
+                printf("Error, out of bounds.\n");
+                printf("Time: %e, ind %d val %e\n", t, 0, y_host[0]);
+                return 1;
+            }
+    #endif
+    #ifdef LOG_OUTPUT
+            #if !defined(LOG_END_ONLY)
+                write_log(padded, NUM, t, y_host, pFile);
+                solver_log();
+            #endif
+    #endif
+    #ifdef IGN
+            // determine if ignition has occurred
+            if ((y_host[0] >= (T0 + 400.0)) && !(ign_flag)) {
+                ign_flag = true;
+                t_ign = t;
+            }
+    #endif
     }
 
 #ifdef LOG_END_ONLY
@@ -308,19 +342,11 @@ int main (int argc, char *argv[])
     fclose (pFile);
 #endif
 
-    cudaFreeHost (y_host);
-#ifdef CONP
-    cudaFreeHost (pres_host);
-#elif CONV
-    cudaFreeHost (rho_host);
-#endif
-    cleanup_solver();
+    if (padded < NUM)
+        free(y_temp);
 
-#ifdef CONP
-    free_gpu_memory(y_device, pres_device);
-#elif CONV
-    free_gpu_memory(y_device, rho_device);
-#endif
+    free_gpu_memory(host_mech, device_mech);
+    cleanup_solver(host_solver, device_solver);
     cudaErrorCheck( cudaDeviceReset() );
 
     return 0;
