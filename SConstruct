@@ -241,55 +241,43 @@ if build_cuda:
         build_cuda = False
 NVCCFlags.append(['-maxrregcount {}'.format(reg_count), '-Xcompiler {}'.format(env['openmp_flags'])])
 
-#extra jacobians
-try:
+def check_extras(lang, subdir, check_str, check_file, list_file):
+    if check_file is None:
+        check_file = os.path.join(mech_dir, subdir + utils.header_ext[lang])
+    else:
+        check_file = os.path.join(mech_dir, check_file)
     have_extras = False
-    with open(os.path.join(mech_dir, 'jacob.h'), 'r') as file:
-        for line in file.readlines():
-            if "#include \"jacobs/jac_include.h\"" in line:
-                have_extras = True
-                break
+    try:
+        with open(check_file, 'r') as file:
+            for line in file.readlines():
+                if "#include \"{}{}\"".format(check_str) in line:
+                    have_extras = True
+                    break
+    except IOError, e:
+        if e.errno == 2:
+            pass
+
     if have_extras:
-        with open(os.path.join(mech_dir, 'jacobs', 'jac_list_c'), 'r') as file:
-            vals = [os.path.join(mech_dir, 'jacobs', x) for x in 
+        with open(os.path.join(mech_dir, subdir, list_file), 'r') as file:
+            vals = [os.path.join(mech_dir, subdir, x) for x in
                     file.readline().strip().split()]
-        env['extra_c_jacobs'] = vals
+        env['extra_{}_{}'.format(lang, subdir)] = vals
 
         #copy a good SConscript into the mechanism dir
         try:
-            shutil.copyfile(os.path.join(defaults.mechanism_dir, 'jacobs', 'SConscript'),
-                                os.path.join(mech_dir, 'jacobs', 'SConscript'))
+            shutil.copyfile(os.path.join(defaults.mechanism_dir, subdir, 'SConscript'),
+                                os.path.join(mech_dir, subdir, 'SConscript'))
         except shutil.Error:
             pass
         except IOError, e:
             if e.errno == 2:
                 pass
-except:
-    pass
-try:
-    have_extras = False
-    with open(os.path.join(mech_dir, 'jacob.cuh'), 'r') as file:
-        for line in file.readlines():
-            if "#include \"jacobs/jac_include.cuh\"" in line:
-                have_extras = True
-                break
-    if have_extras:
-        with open(os.path.join(mech_dir, 'jacobs', 'jac_list_cuda'), 'r') as file:
-            vals = [os.path.join(mech_dir, 'jacobs', x) for x in 
-                    file.readline().strip().split()]
-        env['extra_cuda_jacobs'] = vals
-        #copy a good SConscript into the mechanism dir
-        try:
-            shutil.copyfile(os.path.join(defaults.mechanism_dir, 'jacobs', 'SConscript'),
-                                os.path.join(mech_dir, 'jacobs', 'SConscript'))
-        except shutil.Error:
-            pass
-        except IOError, e:
-            if e.errno == 2:
-                pass
-except:
-    pass
 
+#check for additional files
+check_extras('c', 'jacobs', 'jacobs/jac_include.h', 'jacob.h', 'jac_list_c')
+check_extras('cuda', 'jacobs', 'jacobs/jac_include.cuh', 'jacob.cuh', 'jac_list_cuda')
+check_extras('c', 'rates', 'rates/rates_include.h', 'rates/rxn_rates.c', 'rates_list_c')
+check_extras('cuda', 'rates', 'rates/rates_include.cuh', 'rates/rxn_rates.cu', 'rates_list_cuda')
 
 #link lines
 CCLibDirs = listify(env['blas_lapack_dir'])
