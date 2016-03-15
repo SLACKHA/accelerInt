@@ -11,6 +11,8 @@
  	#include "exp4_props.cuh"
 #elif RADAU2A
  	#include "radau2a_props.cuh"
+#else
+ 	struct solver_memory {};
 #endif
 
 #endif

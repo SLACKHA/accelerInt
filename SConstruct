@@ -438,9 +438,17 @@ except IOError, e:
     if e.errno == 2:
         pass
 
-def builder(env_save, cobj, cuobj, newdict, mydir, variant,
+def fix_depends(cugen):
+    if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
+        solver_main_cu = [x for x in cugen if 'solver_main' in str(x[0])]
+        Depends(solver_main_cu, os.path.join(mech_dir, 'launch_bounds.cuh'))
+        Depends(solver_main_cu, os.path.join(generic_dir, 'solver_options.h'))
+        Depends(solver_main_cu, os.path.join(mech_dir, 'mechanism.cuh'))
+
+def builder(env_save, cmech, cumech, newdict, mydir, variant,
              target_base, target_list, additional_sconstructs=None,
              filter_out=None):
+
     #update the env
     env = env_save.Clone()
     for key, value in newdict.iteritems():
@@ -450,42 +458,56 @@ def builder(env_save, cobj, cuobj, newdict, mydir, variant,
             env[key] = value
         else:
             env[key] += value
+
     Export('env')
-    int_c, int_cuda = SConscript(os.path.join(mydir, 'SConscript'),
-        variant_dir=os.path.join(mydir, variant))
+
+    mygendir = os.path.join(generic_dir, os.path.basename(os.path.normpath(mydir)))
+    cgen, cugen = SConscript(os.path.join(generic_dir, 'SConscript'),
+        variant_dir=os.path.join(mygendir, variant),
+        src_dir=generic_dir)
+
+    if cugen:
+        fix_depends(cugen)
+
+    cint, cuint = SConscript(os.path.join(mydir, 'SConscript'),
+        variant_dir=os.path.join(mydir, variant),
+        src_dir=mydir)
     #check for additional sconstructs
     if additional_sconstructs is not None:
         for thedir in additional_sconstructs:
-            temp_c, temp_cu = SConscript(os.path.join(thedir, 'SConscript'),
-                variant_dir=os.path.join(thedir, variant))
-            int_c += temp_c
-            int_cuda += temp_cu
+            ctemp, cutemp = SConscript(os.path.join(thedir, 'SConscript'),
+                variant_dir=os.path.join(thedir, variant),
+                src_dir=thedir)
+            cint += ctemp
+            cuint += cutemp
     if filter_out is not None:
-        int_c = [x for x in int_c if not filter_out in str(x)]
-        int_cuda = [x for x in int_cuda if not filter_out in str(x)] 
+        cint = [x for x in cint if not filter_out in str(x)]
+        cuint = [x for x in cuint if not filter_out in str(x)] 
 
     target_list[target_base] = []
     target_list[target_base].append(
         env.Program(target=target_base,
-                    source=cobj + int_c,
+                    source=cmech + cgen + cint,
                     variant_dir=os.path.join(mydir, variant)))
-    if env['build_cuda'] and cuobj:
+    if env['build_cuda'] and cumech:
         target_list[target_base + '-gpu'] = []
         dlink = env.CUDADLink(
             target=target_base+'-gpu', 
-            source=cuobj + int_cuda, 
+            source=cumech + cugen + cuint,
             variant_dir=os.path.join(mydir, variant))
         target_list[target_base + '-gpu'].append(dlink)
         target_list[target_base + '-gpu'].append(
             env.CUDAProgram(target=target_base+'-gpu',
-             source=cuobj + int_cuda + dlink, 
+             source=cumech + cugen + cuint + dlink,
              variant_dir=os.path.join(mydir, variant)))
-    return int_c, int_cuda 
+        cuint += dlink
+    return cgen + cint, cugen + cuint
 
 def cvodes_builder(env_save, cobj, newdict, mydir, variant,
-                 target_list, additional_sconstructs=None):
+                 target_list, additional_sconstructs=None, filter_out=None):
     #update the env
     env = env_save.Clone()
+
     for key, value in newdict.iteritems():
         if not isinstance(value, list):
             value = list(value)
@@ -494,6 +516,14 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
         else:
             env[key] += value
     Export('env')
+
+    mygendir = os.path.join(generic_dir, os.path.basename(os.path.normpath(mydir)))
+    cgen, cugen = SConscript(os.path.join(generic_dir, 'SConscript'), 
+        variant_dir=os.path.join(mygendir, variant))
+
+    if filter_out is not None:
+        cgen = [x for x in cgen if any(f in x for f in filter_out)]
+
     fd_c, ana_c = SConscript(os.path.join(mydir, 'SConscript'), 
         variant_dir=os.path.join(mydir, variant))
     #check for additional sconstructs
@@ -526,22 +556,14 @@ if 'extra_c_jacobs' in env or 'extra_cuda_jacobs' in env:
     mech_c += cJacs
     mech_cuda += cudaJacs
 
-gen_c, gen_cuda = SConscript(os.path.join(generic_dir, 'SConscript'), variant_dir=os.path.join(generic_dir, variant))
-
-if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
-    solver_main_cu = [x for x in gen_cuda if 'solver_main' in str(x[0])]
-    Depends(solver_main_cu, os.path.join(mech_dir, 'launch_bounds.cuh'))
-    Depends(solver_main_cu, os.path.join(generic_dir, 'solver_options.h'))
-    Depends(solver_main_cu, os.path.join(mech_dir, 'mechanism.cuh'))
-
 #radua
 new_defines = {}
 new_defines['CPPDEFINES'] = ['RADAU2A']
 new_defines['CPPPATH'] = [radau2a_dir]
 new_defines['NVCCDEFINES'] = ['RADAU2A']
 new_defines['NVCCPATH'] = [radau2a_dir]
-radau_c, radau_cuda = builder(env_save, mech_c + gen_c, 
-    mech_cuda + gen_cuda if build_cuda else None,
+radau_c, radau_cuda = builder(env_save, mech_c, 
+    mech_cuda if build_cuda else None,
     new_defines, radau2a_dir,
     variant, 'radau2a-int', target_list)
 
@@ -553,7 +575,7 @@ if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
 new_defines = {}
 new_defines['CPPDEFINES'] = ['RK78']
 new_defines['CPPPATH'] = [runge_kutta_dir]
-builder(env_save, mech_c + gen_c, None,
+builder(env_save, mech_c, None,
     new_defines, runge_kutta_dir,
     variant, 'rk78-int', target_list)
 
@@ -565,8 +587,7 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCCPATH'] = [exp_int_dir, exp4_int_dir]
 new_defines['CPPDEFINES'] = ['EXP4']
 new_defines['NVCCDEFINES'] = ['EXP4']
-exp4_c, exp4_cuda = builder(env_save, mech_c + gen_c, 
-    mech_cuda + gen_cuda,
+exp4_c, exp4_cuda = builder(env_save, mech_c, mech_cuda,
     new_defines, exp4_int_dir,
     variant, 'exp4-int', target_list,
     [exp_int_dir])
@@ -583,8 +604,7 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCCPATH'] = [exp_int_dir, exprb43_int_dir]
 new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
-rb43c, rb43cu = builder(env_save, mech_c + gen_c, 
-    mech_cuda + gen_cuda,
+rb43c, rb43cu = builder(env_save, mech_c, mech_cuda,
     new_defines, exprb43_int_dir,
     variant, 'exprb43-int', target_list,
     [exp_int_dir])
@@ -593,15 +613,14 @@ if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
     exprb43_cu = [x for x in rb43cu if 'exprb43.cu' in str(x[0])]
     Depends(exprb43_cu, os.path.join(generic_dir, 'solver_options.h'))
 
-#fd cvodes
+#cvodes
 new_defines = {}
 new_defines['CPPDEFINES'] = ['CVODES']
 new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
-cv_gen_c = [x for x in gen_c if not 'solver_generic' in str(x)]
-cvodes_builder(env_save, mech_c + cv_gen_c, new_defines,
-    cvodes_dir, variant, target_list)
+cvodes_builder(env_save, mech_c, new_defines,
+    cvodes_dir, variant, target_list, filter_out=['solver_generic'])
 
 flat_values = []
 cpu_vals = []

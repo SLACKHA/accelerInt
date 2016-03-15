@@ -13,7 +13,7 @@
 
  #include "solver_options.h"
  #include "solver_init.cuh"
-
+ #include "solver_props.cuh"
  #include "header.cuh"
 
  __global__ void 

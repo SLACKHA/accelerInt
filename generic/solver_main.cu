@@ -152,8 +152,10 @@ int main (int argc, char *argv[])
     cudaErrorCheck( cudaMemGetInfo (&free_mem, &total_mem) );
 
     //conservatively estimate the maximum allowable threads
-    int max_threads = int(floor(0.8 * ((double)free_mem) / ((double)mech_size)));
+    int max_threads = int(floor(0.8 * ((double)free_mem) / ((double)size_per_thread)));
     int padded = min(NUM, max_threads);
+    //padded is next factor of block size up
+    padded = int(ceil(padded / float(TARGET_BLOCK_SIZE)) * TARGET_BLOCK_SIZE);
     if (padded == 0)
     {
         printf("Mechanism is too large to fit into global CUDA memory... exiting.");
@@ -183,7 +185,7 @@ int main (int argc, char *argv[])
     read_initial_conditions(filename, NUM, &y_host, &var_host);
 #endif
 
-    dim3 dimGrid (g_num, 1 );
+    dim3 dimGrid (padded, 1 );
     dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
 
 // flag for ignition

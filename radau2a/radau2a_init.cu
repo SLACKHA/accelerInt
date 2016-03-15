@@ -7,7 +7,7 @@
  *
  */
 
- #include "header.cuh"
+ #include "solver_init.cuh"
 
  void init_solver_log() {
  	
@@ -45,7 +45,7 @@
  	num_bytes += NSP * NSP * sizeof(cuDoubleComplex);
  }
 
-void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
+void initialize_solver(const int padded, solver_memory** h_mem, solver_memory** d_mem) {
   // Allocate storage for the device struct
   cudaErrorCheck( cudaMalloc(d_mem, sizeof(solver_memory)) );
   //allocate the device arrays on the host pointer

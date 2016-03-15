@@ -7,10 +7,7 @@
  *
  */
 
-#include "header.cuh"
 #include "solver.cuh"
-#include "gpu_memory.cuh"
-#include "solver_props.cuh"
 
 #define T_ID (threadIdx.x + (blockDim.x * blockIdx.x))
 
