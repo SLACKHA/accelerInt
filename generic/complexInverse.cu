@@ -78,26 +78,26 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 ///////////////////////////////////////////////////////////
 
 __device__
-void getComplexLU (const int n, cuDoubleComplex* __restrict__ A,
+void getComplexLU (const int n, const int LDA, cuDoubleComplex* __restrict__ A,
 					int* __restrict__ indPivot, int* __restrict__ info) {
 	
 	for (int j = 0; j < n; ++j) {
 		
 		// find pivot and test for singularity
 		
-		int jp = j + getComplexMax (n - j, &A[GRID_DIM * (j + (STRIDE * j))]);
+		int jp = j + getComplexMax (n - j, &A[GRID_DIM * (j + (LDA * j))]);
 		indPivot[INDEX(j)] = jp;
 
-		if (cuCabs(A[INDEX(jp + (STRIDE * j))]) > 0.0) {
+		if (cuCabs(A[INDEX(jp + (LDA * j))]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swapComplex (n, &A[GRID_DIM * (j)], STRIDE, &A[GRID_DIM * (jp)], STRIDE);
+				swapComplex (n, &A[GRID_DIM * (j)], LDA, &A[GRID_DIM * (jp)], LDA);
 			
 			// compute elements j+1:m-1 of the jth column
 			
 			if (j < NSP - 1)
-				scaleComplex (n - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[INDEX(j + (STRIDE * j))]), &A[GRID_DIM * (j + 1 + (STRIDE * j))]);
+				scaleComplex (n - j - 1, cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[INDEX(j + (LDA * j))]), &A[GRID_DIM * (j + 1 + (LDA * j))]);
 			
 		} else if (*info == 0) {
 			*info = j;
@@ -106,26 +106,26 @@ void getComplexLU (const int n, cuDoubleComplex* __restrict__ A,
 		
 		// update trailing submatrix
 		if (j < n - 1)
-			complexGERU (n - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[GRID_DIM * (j + 1 + (STRIDE * j))], &A[GRID_DIM * (j + STRIDE * (j + 1))], STRIDE, &A[GRID_DIM * (j + 1 + STRIDE * (j + 1))], STRIDE);
+			complexGERU (n - j - 1, make_cuDoubleComplex(-1.0, 0.0), &A[GRID_DIM * (j + 1 + (LDA * j))], &A[GRID_DIM * (j + LDA * (j + 1))], LDA, &A[GRID_DIM * (j + 1 + LDA * (j + 1))], LDA);
 		
 	}
 }
 
 __device__
-void getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
+void getComplexInverseLU (const int n, const int LDA, cuDoubleComplex* __restrict__ A,
 							const int* __restrict__ indPivot,
 							cuDoubleComplex* __restrict__ work) {
 	
 	// form inv(U)
 	for (int j = 0; j < n; ++j) {
-		A[j + (STRIDE * j)] = cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (STRIDE * j)]);
-		cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[j + (STRIDE * j)]);
+		A[j + (LDA * j)] = cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (LDA * j)]);
+		cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[j + (LDA * j)]);
 		
 		// compute elements 0:j-1 of jth column
-		multiplyComplexUpperMV (j, &A[STRIDE * j], STRIDE, A);
+		multiplyComplexUpperMV (j, &A[LDA * j], LDA, A);
 		
 		// scale
-		scaleComplex (j, Ajj, &A[STRIDE * j]);
+		scaleComplex (j, Ajj, &A[LDA * j]);
 	}
 	
 	// solve equation inv(A)*L = inv(U) for inv(A)
@@ -134,13 +134,13 @@ void getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
 		
 		// copy current column of L to work and replace with 0.0s
 		for (int i = j + 1; i < n; ++i) {
-			work[INDEX(i)] = A[INDEX(i + (STRIDE * j))];
-			A[INDEX(i + (STRIDE * j))] = make_cuDoubleComplex(0.0, 0.0);
+			work[INDEX(i)] = A[INDEX(i + (LDA * j))];
+			A[INDEX(i + (LDA * j))] = make_cuDoubleComplex(0.0, 0.0);
 		}
 		
 		// compute current column of inv(A)
 		if (j < n - 1)
-			complexGEMV (n, n - j, make_cuDoubleComplex(-1.0, 0.0), &A[GRID_DIM * (STRIDE * (j + 1))], &work[GRID_DIM * (j + 1)], &A[GRID_DIM * (STRIDE * j)]);
+			complexGEMV (n, n - j, make_cuDoubleComplex(-1.0, 0.0), &A[GRID_DIM * (LDA * (j + 1))], &work[GRID_DIM * (j + 1)], &A[GRID_DIM * (LDA * j)]);
 		
 	}
 	
@@ -149,17 +149,17 @@ void getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
 	for (int j = n - 2; j >= 0; --j) {
     
 		if (indPivot[INDEX(j)] != j)
-			swapComplex (n, &A[GRID_DIM * (STRIDE * j)], 1, &A[GRID_DIM * (STRIDE * indPivot[INDEX(j)])], 1);
+			swapComplex (n, &A[GRID_DIM * (LDA * j)], 1, &A[GRID_DIM * (LDA * indPivot[INDEX(j)])], 1);
 	}
 }
 
 __device__
-void getComplexInverse (const int n, cuDoubleComplex* __restrict__ A,
+void getComplexInverse (const int n, const int LDA, cuDoubleComplex* __restrict__ A,
 							int* __restrict__ ipiv, int* __restrict__ info,
 							cuDoubleComplex* __restrict__ work) {
 	
 	// first get LU factorization
-	getComplexLU (n, A, ipiv, info);
+	getComplexLU (n, LDA, A, ipiv, info);
 	
 	// check for successful exit
 	if (*info != 0) {
@@ -167,21 +167,21 @@ void getComplexInverse (const int n, cuDoubleComplex* __restrict__ A,
 	}
 	
 	// now get inverse
-	getComplexInverseLU (n, A, ipiv, work);
+	getComplexInverseLU (n, LDA, A, ipiv, work);
 }
 
 //Matrix Algorithms: Volume 1: Basic Decompositions
 //By G. W. Stewart
 __device__
-void getHessenbergLU(const int n, cuDoubleComplex* A, int* __restrict__ indPivot, int* __restrict__ info)
+void getHessenbergLU(const int n, const int LDA, cuDoubleComplex* A, int* __restrict__ indPivot, int* __restrict__ info)
 {
 	int last_free = 0;
 	for (int i = 0; i < n - 1; i ++)
 	{
-		if (cuCabs(A[INDEX(i * STRIDE + i)]) < cuCabs(A[i * STRIDE + i + 1]))
+		if (cuCabs(A[INDEX(i * LDA + i)]) < cuCabs(A[i * LDA + i + 1]))
 		{
 			//swap rows
-			swapComplex(n - last_free, &A[GRID_DIM * (last_free * STRIDE + i)], STRIDE, &A[GRID_DIM * (last_free * STRIDE + i + 1)], STRIDE);
+			swapComplex(n - last_free, &A[GRID_DIM * (last_free * LDA + i)], LDA, &A[GRID_DIM * (last_free * LDA + i + 1)], LDA);
 			indPivot[INDEX(i)] = i + 1;
 		}
 		else
@@ -189,14 +189,14 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* __restrict__ indPivot
 			indPivot[INDEX(i)] = i;
 			last_free = i;
 		}
-		if (cuCabs(A[INDEX(i * STRIDE + i)]) > 0.0)
+		if (cuCabs(A[INDEX(i * LDA + i)]) > 0.0)
 		{
-			cuDoubleComplex tau = cuCdiv(A[INDEX(i * STRIDE + i + 1)], A[INDEX(i * STRIDE + i)]);
+			cuDoubleComplex tau = cuCdiv(A[INDEX(i * LDA + i + 1)], A[INDEX(i * LDA + i)]);
 			for (int j = i + 1; j < n; j++)
 			{
-				A[INDEX(j * STRIDE + i + 1)] = cuCsub(A[INDEX(j * STRIDE + i + 1)], cuCmul(tau, A[INDEX(j * STRIDE + i)]));
+				A[INDEX(j * LDA + i + 1)] = cuCsub(A[INDEX(j * LDA + i + 1)], cuCmul(tau, A[INDEX(j * LDA + i)]));
 			}
-			A[INDEX(i * STRIDE + i + 1)] = tau;
+			A[INDEX(i * LDA + i + 1)] = tau;
 		}
 		else
 		{
@@ -209,16 +209,16 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* __restrict__ indPivot
 }
 
 __device__
-void getComplexInverseHessenberg (const int n, cuDoubleComplex* __restrict__ A,
+void getComplexInverseHessenberg (const int n, const int LDA, cuDoubleComplex* __restrict__ A,
 									int* __restrict__ ipiv, int* __restrict__ info,
 									cuDoubleComplex* __restrict__ work)
 {
 	// first get LU factorization
-	getHessenbergLU (n, A, ipiv, info);
+	getHessenbergLU (n, LDA, A, ipiv, info);
 	
 	if (*info != 0)
 		return;
 
 	// now get inverse
-	getComplexInverseLU (n, A, ipiv, work);
+	getComplexInverseLU (n, LDA, A, ipiv, work);
 }
