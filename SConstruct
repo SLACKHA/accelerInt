@@ -250,7 +250,7 @@ def check_extras(lang, subdir, check_str, check_file, list_file):
     try:
         with open(check_file, 'r') as file:
             for line in file.readlines():
-                if "#include \"{}{}\"".format(check_str) in line:
+                if "#include \"{}\"".format(check_str) in line:
                     have_extras = True
                     break
     except IOError, e:
