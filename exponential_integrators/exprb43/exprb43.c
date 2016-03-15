@@ -100,7 +100,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			eval_jacob (t, pr, y, A);
 			//gy = fy - A * y
 			sparse_multiplier(A, y, gy);
-			#pragma unroll
+			
 			for (int i = 0; i < NSP; ++i) {
 				gy[i] = fy[i] - gy[i];
 			}
@@ -135,7 +135,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		dydt(t, pr, temp, &savedActions[NSP]);
 		sparse_multiplier(A, temp, f_temp);
 
-		#pragma unroll
+		
 		for (int i = 0; i < NSP; ++i) {
 			temp[i] = savedActions[NSP + i] - f_temp[i] - gy[i]; 
 		}
@@ -169,7 +169,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		dydt(t, pr, temp, &savedActions[3 * NSP]);
 		sparse_multiplier(A, temp, f_temp);
 
-		#pragma unroll
+		
 		for (int i = 0; i < NSP; ++i) {
 			temp[i] = savedActions[3 * NSP + i] - f_temp[i] - gy[i]; 
 		}
@@ -193,7 +193,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		matvec_n_by_m_scale_special2(m2, scale_vec, Vm, in, out);
 
 		//construct y1 and error vector
-		#pragma unroll
+		
 		for (int i = 0; i < NSP; ++i) {
 			//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 			y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NSP + i] - 48.0 * savedActions[2 * NSP + i] + -2.0 * savedActions[3 * NSP + i] + 12.0 * savedActions[4 * NSP + i];
@@ -204,7 +204,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 
 #ifdef FIXED_TIMESTEP
 		t = t_end;
-		#pragma unroll
+		
 		for (int i = 0; i < NSP; ++i) {
 			y[i] = y1[i];
 		}
@@ -233,7 +233,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 			
 			// update y and t
-			#pragma unroll
+			
 			for (int i = 0; i < NSP; ++i) {
 				y[i] = y1[i];
 			}

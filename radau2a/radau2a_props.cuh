@@ -15,8 +15,8 @@
 
 struct solver_memory
 {
-	double* E1;
 	cuDoubleComplex* E2;
+	double* scale;
 	int* ipiv1;
 	int* ipiv2;
 	double* Z1;
@@ -35,13 +35,11 @@ struct solver_memory
 	int* result;
 };
 
-enum errorCodes {
-	success = 0,
-	err_consecutive_steps = 1,
-	max_steps_exceeded = 2,
-	h_plus_t_equals_h = 3,
-	newton_max_iterations_exceeded = 4
-};
+#define EC_success (0);
+#define EC_consecutive_steps (1);
+#define EC_max_steps_exceeded (2);
+#define EC_h_plus_t_equals_h (3);
+#define EC_newton_max_iterations_exceeded (4);
 
 
 #endif

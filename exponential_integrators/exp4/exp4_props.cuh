@@ -9,6 +9,7 @@
 #define EXP4_PROPS_CUH
 
 #include "header.cuh"
+#include <cuComplex.h>
  
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR
@@ -18,6 +19,7 @@
 #define ORD 3.0
 #define M_MAX NSP
 #define STRIDE (M_MAX + P)
+#define MAX_STEPS (10000)
 
 struct solver_memory
 {
@@ -25,6 +27,7 @@ struct solver_memory
 	double* work1;
 	double* work2;
 	double* work3;
+	cuDoubleComplex* work4;
 	double* Hm;
 	double* phiHm;
 	double* Vm;
@@ -40,11 +43,9 @@ struct solver_memory
 	int* result;
 };
 
-enum errorCodes {
-	success = 0,
-	err_consecutive_steps = 1,
-	max_steps_exceeded = 2,
-	h_plus_t_equals_h = 3
-};
+#define EC_success (0)
+#define EC_consecutive_steps (1)
+#define EC_max_steps_exceeded (2)
+#define EC_h_plus_t_equals_h (3)
 
 #endif

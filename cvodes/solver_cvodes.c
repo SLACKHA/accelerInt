@@ -37,7 +37,7 @@ void intDriver (const int NUM, const double t, const double t_end,
 
         // load local array with initial values from global array
         double* y_local = NV_DATA_S(fill);
-        #pragma unroll
+        
         for (int i = 0; i < NSP; i++)
         {
             y_local[i] = y_global[tid + i * NUM];
@@ -82,7 +82,7 @@ void intDriver (const int NUM, const double t, const double t_end,
         #endif
 
         // update global array with integrated values
-        #pragma unroll
+        
         for (int i = 0; i < NSP; i++)
         {
             y_global[tid + i * NUM] = y_local[i];

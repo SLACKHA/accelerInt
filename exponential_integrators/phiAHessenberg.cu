@@ -11,10 +11,10 @@ extern __device__ __constant__ cuDoubleComplex res[N_RA];
 __device__
 int phi2Ac_variable(const int m, const double* __restrict__ A, const double c,
 						double* __restrict__ phiA, const solver_memory* __restrict__ solver,
-						double* __restrict__ work) {
+						cuDoubleComplex* __restrict__ work) {
 	
-	cuDoubleComplex const * __restrict__ invA = solver->invA;
-	int const * __restrict__ ipiv = solver->ipiv;
+	cuDoubleComplex * const __restrict__ invA = solver->invA;
+	int * const __restrict__ ipiv = solver->ipiv;
 	int info = 0;
 	
 	#pragma unroll
@@ -41,7 +41,7 @@ int phi2Ac_variable(const int m, const double* __restrict__ A, const double c,
 		}
 		
 		// takes care of (A * c - poles(q) * I)^-1
-		getComplexInverseHessenberg (m, invA, ipiv, &info);
+		getComplexInverseHessenberg (m, invA, ipiv, &info, work);
 
 		if (info != 0)
 			return 0;
@@ -60,10 +60,10 @@ int phi2Ac_variable(const int m, const double* __restrict__ A, const double c,
 __device__
 int phiAc_variable(const int m, const double* __restrict__ A, const double c,
 						double* __restrict__ phiA, const solver_memory* __restrict__ solver,
-						double* __restrict__ work) {
+						cuDoubleComplex* __restrict__ work) {
 	
-	cuDoubleComplex const * __restrict__ invA = solver->invA;
-	int const * __restrict__ ipiv = solver->ipiv;
+	cuDoubleComplex * const __restrict__ invA = solver->invA;
+	int * const __restrict__ ipiv = solver->ipiv;
 	int info = 0;
 
 	#pragma unroll
@@ -90,7 +90,7 @@ int phiAc_variable(const int m, const double* __restrict__ A, const double c,
 		}
 		
 		// takes care of (A * c - poles(q) * I)^-1
-		getComplexInverseHessenberg (m, invA, ipiv, &info);
+		getComplexInverseHessenberg (m, invA, ipiv, &info, work);
 
 		if (info != 0)
 			return info;
@@ -107,12 +107,12 @@ int phiAc_variable(const int m, const double* __restrict__ A, const double c,
 }
 
 __device__
-void expAc_variable(const int m, const double* __restrict__ A, const double c,
+int expAc_variable(const int m, const double* __restrict__ A, const double c,
 						double* __restrict__ phiA, const solver_memory* __restrict__ solver,
-						double* __restrict__ work) {
+						cuDoubleComplex* __restrict__ work) {
 	
-	cuDoubleComplex const * __restrict__ invA = solver->invA;
-	int const * __restrict__ ipiv = solver->ipiv;
+	cuDoubleComplex * const __restrict__ invA = solver->invA;
+	int * const __restrict__ ipiv = solver->ipiv;
 	int info = 0;
 	
 	#pragma unroll
@@ -139,7 +139,7 @@ void expAc_variable(const int m, const double* __restrict__ A, const double c,
 		}
 		
 		// takes care of (A * c - poles(q) * I)^-1
-		getComplexInverseHessenberg (m, invA, ipiv, &info);
+		getComplexInverseHessenberg (m, invA, ipiv, &info, work);
 
 		if (info != 0)
 			return info;

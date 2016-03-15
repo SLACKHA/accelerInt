@@ -17,12 +17,19 @@
  #include "header.cuh"
 
  __global__ void 
- intDriver (const int, const double, const double,
-                const double * __restrict__, double * __restrict__, 
-                const mechanism_memory* __restrict__, 
-                const void* __restrict__);
+ intDriver (const int,
+ 			const double,
+ 			const double,
+            double const * const __restrict__,
+            double * const __restrict__, 
+            mechanism_memory const * const __restrict__, 
+            solver_memory const * const __restrict__);
 
-__device__ void integrate (const double, const double, const double, double* __restrict__,
-							const mechanism_memory* __restrict__, const solver_memory* __restrict__);
+__device__ void integrate (const double,
+						   const double,
+						   const double,
+						   double * const __restrict__,
+						   mechanism_memory const * const __restrict__,
+						   solver_memory const * const __restrict__);
 
  #endif

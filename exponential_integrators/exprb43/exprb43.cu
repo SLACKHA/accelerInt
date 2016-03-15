@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <cuComplex.h>
 
 #include "header.cuh"
 #include "dydt.cuh"
@@ -62,7 +63,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double t = t_start;
 
 	// get scaling for weighted norm
-	double const * __restrict__ sc = solver->sc; 
+	double * const __restrict__ sc = solver->sc; 
 	scale_init(y, sc);
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
@@ -77,22 +78,21 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	int m, m1, m2;
 
 	//arrays
-	double const * __restrict__ sc = solver->sc;
-	double const * __restrict__ work1 = solver->work1;
-	double const * __restrict__ work2 = solver->work2; 
-	double const * __restrict__ y1 = solver->work3;
-	double const * __restrict__ fy = solver->dy;
-	double const * __restrict__ A = mech->jac;
-	double const * __restrict__ Hm = solver->Hm;
-	double const * __restrict__ Vm = solver->Vm;
-	double const * __restrict__ phiHm = solver->phiHm;
-	double const * __restrict__ savedActions = solver->savedActions;
-	double const * __restrict__ gy = solver->gy;
-	int const * __restrict__ result = solver->result;
+	double * const __restrict__ work1 = solver->work1;
+	double * const __restrict__ work2 = solver->work2; 
+	double * const __restrict__ y1 = solver->work3;
+	cuDoubleComplex * const __restrict__ work4 = solver->work4;
+	double * const __restrict__ fy = mech->dy;
+	double * const __restrict__ A = mech->jac;
+	double * const __restrict__ Vm = solver->Vm;
+	double * const __restrict__ phiHm = solver->phiHm;
+	double * const __restrict__ savedActions = solver->savedActions;
+	double * const __restrict__ gy = solver->gy;
+	int * const __restrict__ result = solver->result;
 
 	//vectors for scaling operations
-	double const * in[5] = {0, 0, 0, savedActions, y};
-	double const * out[3] = {0, 0, work1};
+	double * in[5] = {0, 0, 0, savedActions, y};
+	double * out[3] = {0, 0, work1};
 	double scale_vec[3] = {0, 0, 0};
 
 #ifndef FORCE_ZERO
@@ -117,25 +117,25 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//error checking
 		if (failures >= 5)
 		{
-			result[T_ID] = error_codes.err_consecutive_steps;
+			result[T_ID] = EC_consecutive_steps;
 			return;
 		}
 		if (steps++ >= MAX_STEPS)
 		{
-			result[T_ID] = error_codes.max_steps_exceeded;
+			result[T_ID] = EC_max_steps_exceeded;
 			return;
 		}
 		if (t + h <= t)
 		{
-			result[T_ID] = error_codes.h_plus_t_equals_h;
+			result[T_ID] = EC_h_plus_t_equals_h;
 			return;
 		}
 		
 		if (!reject) {
-			dydt (t, pr, y, fy);
+			dydt (t, pr, y, fy, mech);
 		#ifdef FINITE_DIFFERENCE
 			eval_jacob (t, pr, y, A, mech, work1, work2);
-		#elif
+		#else
 			eval_jacob (t, pr, y, A, mech);
 		#endif
 			//gy = fy - A * y
@@ -149,7 +149,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		#ifdef DIVERGENCE_TEST
 		integrator_steps[T_ID]++;
 		#endif
-		int info = arnoldi(&m, 0.5, 1, h, solver, fy, &beta, work2);
+		int info = arnoldi(&m, 0.5, 1, h, A, solver, fy, &beta, work2, work4);
 		if (info >= M_MAX || info < 0)
 		{
 			//failure: too many krylov vectors required or singular matrix encountered
@@ -175,7 +175,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//next compute Dn2
 		//Dn2 = (F(Un2) - Jn * Un2) - gy
 
-		dydt(t, pr, work1, &savedActions[GRID_DIM * NSP]);
+		dydt(t, pr, work1, &savedActions[GRID_DIM * NSP], mech);
 		sparse_multiplier(A, work1, work2);
 
 		#pragma unroll
@@ -189,7 +189,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 		//now we need the action of the exponential on Dn2
-		info = arnoldi(&m1, 1.0, 4, h, solver, work1, &beta, work2) >= M_MAX)
+		info = arnoldi(&m1, 1.0, 4, h, A, solver, work1, &beta, work2, work4);
 		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
@@ -205,17 +205,17 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		in[1] = &phiHm[GRID_DIM * ((m1 + 3) * STRIDE)];
 		in[2] = &phiHm[GRID_DIM * ((m1) * STRIDE)];
 		in[3] = &phiHm[GRID_DIM * ((m1 + 2) * STRIDE)];
-		out[0] = &savedActions[GRID_DIM * NSP]
-		out[1] = &savedActions[GRID_DIM * 2 * NSP]
+		out[0] = &savedActions[GRID_DIM * NSP];
+		out[1] = &savedActions[GRID_DIM * 2 * NSP];
 		scale_vec[0] = beta / (h * h);
 		scale_vec[1] = beta / (h * h * h);
-		scale_vec[3] = beta;
+		scale_vec[2] = beta;
 		matvec_n_by_m_scale_special(m1, scale_vec, Vm, in, out);
 		//Un3 is now in work1
 
 		//next compute Dn3
 		//Dn3 = F(Un3) - A * Un3 - gy
-		dydt(t, pr, work1, &savedActions[GRID_DIM * 3 * NSP]);
+		dydt(t, pr, work1, &savedActions[GRID_DIM * 3 * NSP], mech);
 		sparse_multiplier(A, work1, work2);
 
 		#pragma unroll
@@ -225,7 +225,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//work1 is now equal to Dn3
 
 		//finally we need the action of the exponential on Dn3
-		info = arnoldi(&m2, 1.0, 4, h, solver, &beta, work1, work2) >= M_MAX)
+		info = arnoldi(&m2, 1.0, 4, h, A, solver, &beta, work1, work2, work4);
 		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
@@ -245,14 +245,14 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
 			//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
-			work3[INDEX(i)] = y[INDEX(i)] + savedActions[INDEX(i)] + 16.0 * savedActions[INDEX(NSP + i)] - 48.0 * savedActions[INDEX(2 * NSP + i)] + -2.0 * savedActions[INDEX(3 * NSP + i)] + 12.0 * savedActions[INDEX(4 * NSP + i)];
+			y1[INDEX(i)] = y[INDEX(i)] + savedActions[INDEX(i)] + 16.0 * savedActions[INDEX(NSP + i)] - 48.0 * savedActions[INDEX(2 * NSP + i)] + -2.0 * savedActions[INDEX(3 * NSP + i)] + 12.0 * savedActions[INDEX(4 * NSP + i)];
 			//error vec
 			work1[INDEX(i)] = 48.0 * savedActions[INDEX(2 * NSP + i)] - 12.0 * savedActions[INDEX(4 * NSP + i)];
 		}
 
 
 		//scale and find err
-		scale (y, work3, work2);
+		scale (y, y1, work2);
 		err = fmax(EPS, sc_norm(work1, work2));
 		
 		// classical step size calculation
@@ -284,7 +284,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			for (int i = 0; i < NSP; ++i)
 			{
 				sc[INDEX(i)] = work2[INDEX(i)];
-				y[INDEX(i)] = work3[INDEX(i)];
+				y[INDEX(i)] = y1[INDEX(i)];
 			}
 			t += h;
 			
@@ -317,6 +317,6 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 	} // end while
 
-	result[T_ID] = error_codes.success;
+	result[T_ID] = EC_success;
 	
 }

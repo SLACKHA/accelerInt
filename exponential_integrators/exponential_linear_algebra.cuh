@@ -26,8 +26,9 @@
  * \param[out]		Av		vector that is A * v
  */
 __device__
-void matvec_m_by_m (const int m, const double* __restrict__ A,
-						const double* __restrict__ V, double * __restrict__ Av) {
+void matvec_m_by_m (const int m, const double * const __restrict__ A,
+						const double * const __restrict__ V,
+						double * const __restrict__ Av) {
 	//for each row
 	for (int i = 0; i < m; ++i) {
 		Av[INDEX(i)] = 0.0;
@@ -53,7 +54,8 @@ void matvec_m_by_m (const int m, const double* __restrict__ A,
  * \param[in]		V		vector of size Mx1
  * \param[out]		Av		vector that is (A + I) * v
  */
-__device__ void matvec_m_by_m_plusequal (const int m, const double * A, const double * V, double * Av)
+__device__ void matvec_m_by_m_plusequal (const int m, const double * const __restrict__ A, 
+										 const double * const __restrict__ V, double * const __restrict__ Av)
 {
 	//for each row
 	#pragma unroll
@@ -81,7 +83,10 @@ __device__ void matvec_m_by_m_plusequal (const int m, const double * A, const do
  * \param[out]		Av		vector that is A * V
  */
 __device__
-void matvec_n_by_m_scale (const int m, const double scale, const double * A, const double * V, double * Av) {
+void matvec_n_by_m_scale (const int m, const double scale,
+						  const double * const __restrict__ A,
+						  const double * const __restrict__ V,
+						  double * const __restrict__ Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
@@ -114,7 +119,10 @@ void matvec_n_by_m_scale (const int m, const double scale, const double * A, con
  * \param[out]		Av		a list of 3 pointers corresponding to Av1, Av2, Av3
  */
 __device__
-void matvec_n_by_m_scale_special (const int m, const double scale __restrict__ *, const double * __restrict__ A, const double* __restrict__ V[], double* Av[]) {
+void matvec_n_by_m_scale_special (const int m, const double * __restrict__ scale,
+								  const double * __restrict__ A,
+								  double ** __restrict__ V,
+								  double ** __restrict__ Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
@@ -160,7 +168,7 @@ void matvec_n_by_m_scale_special (const int m, const double scale __restrict__ *
  */
 __device__
 void matvec_n_by_m_scale_special2 (const int m, const double* __restrict__ scale, const double* __restrict__ A,
-										const double** __restrict__ V, double** __restrict__ Av) {
+										double** __restrict__ V, double** __restrict__ Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {

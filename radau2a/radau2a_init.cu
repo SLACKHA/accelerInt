@@ -22,7 +22,7 @@
  	return name;
  }
 
- void required_solver_size() {
+ size_t required_solver_size() {
  	//return the size (in bytes), needed per cuda thread
  	size_t num_bytes = 0;
  	//an error scale array
@@ -43,6 +43,10 @@
   num_bytes += 2 * NSP * sizeof(int);
  	//and add complex jacobian factorization
  	num_bytes += NSP * NSP * sizeof(cuDoubleComplex);
+  //result flag
+  num_bytes += 1 * sizeof(int)
+  
+  return num_bytes;
  }
 
 void initialize_solver(const int padded, solver_memory** h_mem, solver_memory** d_mem) {
@@ -50,9 +54,9 @@ void initialize_solver(const int padded, solver_memory** h_mem, solver_memory** 
   cudaErrorCheck( cudaMalloc(d_mem, sizeof(solver_memory)) );
   //allocate the device arrays on the host pointer
   cudaErrorCheck( cudaMalloc(&((*h_mem)->E2), NSP * NSP * padded * sizeof(cuDoubleComplex)) );
+  cudaErrorCheck( cudaMalloc(&((*h_mem)->scale), NSP * padded * sizeof(cuDoubleComplex)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->ipiv1), NSP * padded * sizeof(int)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->ipiv2), NSP * padded * sizeof(int)) );
-  cudaErrorCheck( cudaMalloc(&((*h_mem)->sc), NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->Z1), NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->Z2), NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->Z3), NSP * padded * sizeof(double)) );
@@ -73,6 +77,7 @@ void initialize_solver(const int padded, solver_memory** h_mem, solver_memory** 
 
  void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem) {
   cudaErrorCheck(cudaFree((*h_mem)->E2));
+  cudaErrorCheck(cudaFree((*h_mem)->scale));
   cudaErrorCheck(cudaFree((*h_mem)->ipiv1));
   cudaErrorCheck(cudaFree((*h_mem)->ipiv2));
   cudaErrorCheck(cudaFree((*h_mem)->Z1));

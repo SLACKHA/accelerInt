@@ -444,6 +444,7 @@ def fix_depends(cugen):
         Depends(solver_main_cu, os.path.join(mech_dir, 'launch_bounds.cuh'))
         Depends(solver_main_cu, os.path.join(generic_dir, 'solver_options.h'))
         Depends(solver_main_cu, os.path.join(mech_dir, 'mechanism.cuh'))
+        Depends(solver_main_cu, os.path.join(generic_dir, 'solver.cuh'))
 
 def builder(env_save, cmech, cumech, newdict, mydir, variant,
              target_base, target_list, additional_sconstructs=None,
@@ -482,7 +483,12 @@ def builder(env_save, cmech, cumech, newdict, mydir, variant,
             cuint += cutemp
     if filter_out is not None:
         cint = [x for x in cint if not filter_out in str(x)]
-        cuint = [x for x in cuint if not filter_out in str(x)] 
+        cmech = [x for x in cmech if not filter_out in str(x)]
+        cgen = [x for x in cgen if not filter_out in str(x)]
+        if cumech is not None:
+            cuint = [x for x in cuint if not filter_out in str(x)]
+            cumech = [x for x in cmech if not filter_out in str(x)]
+            cugen = [x for x in cgen if not filter_out in str(x)]
 
     target_list[target_base] = []
     target_list[target_base].append(
@@ -522,7 +528,7 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
         variant_dir=os.path.join(mygendir, variant))
 
     if filter_out is not None:
-        cgen = [x for x in cgen if any(f in x for f in filter_out)]
+        cgen = [x for x in cgen if not any(f in str(x) for f in filter_out)]
 
     fd_c, ana_c = SConscript(os.path.join(mydir, 'SConscript'), 
         variant_dir=os.path.join(mydir, variant))
@@ -535,13 +541,13 @@ def cvodes_builder(env_save, cobj, newdict, mydir, variant,
     target_list['cvodes-int'] = []
     target_list['cvodes-int'].append(
         env.Program(target='cvodes-int',
-                    source=cobj + fd_c,
+                    source=cobj + fd_c + cgen,
                     variant_dir=os.path.join(mydir, variant)))
 
     target_list['cvodes-analytic-int'] = []
     target_list['cvodes-analytic-int'].append(
         env.Program(target='cvodes-analytic-int',
-                    source=cobj + ana_c,
+                    source=cobj + ana_c + cgen,
                     variant_dir=os.path.join(mydir, variant)))
 
 env['build_cuda'] = build_cuda
@@ -577,7 +583,8 @@ new_defines['CPPDEFINES'] = ['RK78']
 new_defines['CPPPATH'] = [runge_kutta_dir]
 builder(env_save, mech_c, None,
     new_defines, runge_kutta_dir,
-    variant, 'rk78-int', target_list)
+    variant, 'rk78-int', target_list,
+    filter_out='nverse')
 
 #exp4
 new_defines = {}
@@ -620,7 +627,7 @@ new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
 cvodes_builder(env_save, mech_c, new_defines,
-    cvodes_dir, variant, target_list, filter_out=['solver_generic'])
+    cvodes_dir, variant, target_list, filter_out=['solver_generic', 'nverse'])
 
 flat_values = []
 cpu_vals = []

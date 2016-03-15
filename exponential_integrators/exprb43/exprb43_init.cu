@@ -90,11 +90,11 @@
  #endif
  }
 
- void calculate_required_size() {
+ size_t required_solver_size() {
     //return the size (in bytes), needed per cuda thread
     size_t num_bytes = 0;
     //three work arrays
-    num_bytes += 3 * NSP;
+    num_bytes += 3 * STRIDE;
     //gy
     num_bytes += NSP;
     //Hm, phiHm
@@ -109,8 +109,12 @@
     num_bytes += STRIDE * sizeof(int);
     //complex inverse
     num_bytes += STRIDE * STRIDE * sizeof(cuDoubleComplex);
+    //complex work array
+    num_bytes += STRIDE * sizeof(cuDoubleComplex);
     //result flag
-    num_bytes += 1;
+    num_bytes += 1 * sizeof(int);
+    
+    return num_bytes;
  }
 
 void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
@@ -129,6 +133,7 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
   cudaErrorCheck( cudaMalloc(&((*h_mem)->savedActions), 5 * NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->ipiv), NSP * sizeof(int)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->invA), STRIDE * STRIDE * padded * sizeof(cuDoubleComplex)) );
+  cudaErrorCheck( cudaMalloc(&((*h_mem)->work4), NSP * padded * sizeof(double)) );
   cudaErrorCheck( cudaMalloc(&((*h_mem)->result), padded * sizeof(int)) );
 
   //copy host struct to device
@@ -141,17 +146,18 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
     fclose(rFile);
     fclose(logFile);
  #endif
-    cudaErrorCheck( cudaFree(h_mem->sc) );
-    cudaErrorCheck( cudaFree(h_mem->work1) );
-    cudaErrorCheck( cudaFree(h_mem->work2) );
-    cudaErrorCheck( cudaFree(h_mem->work3) );
-    cudaErrorCheck( cudaFree(h_mem->gy) );
-    cudaErrorCheck( cudaFree(h_mem->Hm) );
-    cudaErrorCheck( cudaFree(h_mem->phiHm) );
-    cudaErrorCheck( cudaFree(h_mem->Vm) );
-    cudaErrorCheck( cudaFree(h_mem->savedActions) );
-    cudaErrorCheck( cudaFree(h_mem->ipiv) );
-    cudaErrorCheck( cudaFree(h_mem->invA) );
-    cudaErrorCheck( cudaFree(h_mem->result) );
+    cudaErrorCheck( cudaFree((*h_mem)->sc) );
+    cudaErrorCheck( cudaFree((*h_mem)->work1) );
+    cudaErrorCheck( cudaFree((*h_mem)->work2) );
+    cudaErrorCheck( cudaFree((*h_mem)->work3) );
+    cudaErrorCheck( cudaFree((*h_mem)->gy) );
+    cudaErrorCheck( cudaFree((*h_mem)->Hm) );
+    cudaErrorCheck( cudaFree((*h_mem)->phiHm) );
+    cudaErrorCheck( cudaFree((*h_mem)->Vm) );
+    cudaErrorCheck( cudaFree((*h_mem)->savedActions) );
+    cudaErrorCheck( cudaFree((*h_mem)->ipiv) );
+    cudaErrorCheck( cudaFree((*h_mem)->invA) );
+    cudaErrorCheck( cudaFree((*h_mem)->work4) );
+    cudaErrorCheck( cudaFree((*h_mem)->result) );
     cudaErrorCheck( cudaFree(d_mem) );
  }

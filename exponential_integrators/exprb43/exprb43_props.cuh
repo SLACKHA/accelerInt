@@ -9,6 +9,7 @@
 #define RB43_PROPS_CUH
 
 #include "header.cuh"
+#include <cuComplex.h>
 
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR
@@ -33,14 +34,13 @@ struct solver_memory
 	double* savedActions;
 	int* ipiv;
 	cuDoubleComplex* invA;
+	cuDoubleComplex* work4;
 	int* result;
 };
 
-enum errorCodes {
-	success = 0,
-	err_consecutive_steps = 1,
-	max_steps_exceeded = 2,
-	h_plus_t_equals_h = 3
-};
+#define EC_success (0)
+#define EC_consecutive_steps (1)
+#define EC_max_steps_exceeded (2)
+#define EC_h_plus_t_equals_h (3)
 
 #endif

@@ -7,6 +7,8 @@
 #include "solver_props.h"
 #include "lapack_dfns.h"
 
+static int ARRAYSIZE = STRIDE;
+
 void swapComplex (const int n, double complex* __restrict__ arrX, const int incX,
 					double complex* __restrict__ arrY, const int incY) {
 	

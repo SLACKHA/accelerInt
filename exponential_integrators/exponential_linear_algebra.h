@@ -22,7 +22,7 @@ static inline
 double two_norm(const double* v)
 {
 	double norm = 0.0;
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		norm += v[i] * v[i];
 	}
@@ -44,7 +44,7 @@ double normalize (const double * v, double* v_out) {
 
 	double m_norm = 1.0 / norm;
 
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		v_out[i] = v[i] * m_norm;
 	}
@@ -61,7 +61,7 @@ static inline
 double dotproduct(const double* w, const double* Vm)
 {
 	double sum = 0;
-	#pragma unroll
+	
 	for(int i = 0; i < NSP; i++)
 	{
 		sum += w[i] * Vm[i];
@@ -79,7 +79,7 @@ double dotproduct(const double* w, const double* Vm)
  */
 static inline void scale_mult(const double s, const double* w, double* Vm)
 {
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; i++)
 	{
 		Vm[i] = w[i] * s;
@@ -98,7 +98,7 @@ static inline
 double sc_norm (const double * nums, const double * sc) {
 	double norm = 0.0;
 	
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		norm += nums[i] * nums[i] / (sc[i] * sc[i]);
 	}
@@ -114,7 +114,7 @@ double sc_norm (const double * nums, const double * sc) {
  */
 static inline void scale_subtract(const double s, const double* Vm, double* w)
 {
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; i++)
 	{
 		w[i] -= s * Vm[i];
@@ -135,12 +135,12 @@ static inline void scale_subtract(const double s, const double* Vm, double* w)
 static inline
 void matvec_m_by_m (const int m, const double * A, const double * V, double * Av) {
 	//for each row
-	#pragma unroll
+	
 	for (int i = 0; i < m; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * STRIDE + i] * V[j];
 		}
@@ -163,12 +163,12 @@ void matvec_m_by_m (const int m, const double * A, const double * V, double * Av
 static inline void matvec_m_by_m_plusequal (const int m, const double * A, const double * V, double * Av)
 {
 	//for each row
-	#pragma unroll
+	
 	for (int i = 0; i < m; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * STRIDE + i] * V[j];
 		}
@@ -190,12 +190,12 @@ static inline void matvec_m_by_m_plusequal (const int m, const double * A, const
 static inline
 void matvec_n_by_m_scale (const int m, const double scale, const double * A, const double * V, double * Av) {
 	//for each row
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * NSP + i] * V[j];
 		}
@@ -220,12 +220,12 @@ void matvec_n_by_m_scale (const int m, const double scale, const double * A, con
 static inline
 void matvec_n_by_m_scale_add (const int m, const double scale, const double * A, const double * V, double * Av, const double* add) {
 	//for each row
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * NSP + i] * V[j];
 		}
@@ -252,12 +252,12 @@ void matvec_n_by_m_scale_add (const int m, const double scale, const double * A,
 static inline
 void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const double * A, const double * V, double * Av, const double* add, const double * sub) {
 	//for each row
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		Av[i] = 0.0;
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		
 		for (int j = 0; j < m; ++j) {
 			Av[i] += A[j * NSP + i] * V[j];
 		}
@@ -284,25 +284,25 @@ void matvec_n_by_m_scale_add_subtract (const int m, const double scale, const do
 static inline
 void matvec_n_by_m_scale_special (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
 	//for each row
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
-		#pragma unroll
+		
 		for (int k = 0; k < 3; k++)
 		{
 			Av[k][i] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		
 		for (int j = 0; j < m; ++j) {
-			#pragma unroll
+			
 			for (int k = 0; k < 3; k++)
 			{
 				Av[k][i] += A[j * NSP + i] * V[k][j];
 			}
 		}
 
-		#pragma unroll
+		
 		for (int k = 0; k < 3; k++)
 		{
 			Av[k][i] *= scale[k];
@@ -329,25 +329,25 @@ void matvec_n_by_m_scale_special (const int m, const double scale[], const doubl
 static inline
 void matvec_n_by_m_scale_special2 (const int m, const double scale[], const double * A, const double* V[], double* Av[]) {
 	//for each row
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
-		#pragma unroll
+		
 		for (int k = 0; k < 2; k++)
 		{
 			Av[k][i] = 0.0;
 		}
 		
 		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
+		
 		for (int j = 0; j < m; ++j) {
-			#pragma unroll
+			
 			for (int k = 0; k < 2; k++)
 			{
 				Av[k][i] += A[j * NSP + i] * V[k][j];
 			}
 		}
 
-		#pragma unroll
+		
 		for (int k = 0; k < 2; k++)
 		{
 			Av[k][i] *= scale[k];
@@ -365,7 +365,7 @@ void matvec_n_by_m_scale_special2 (const int m, const double scale[], const doub
  */
 static inline
 void scale (const double * y0, const double * y1, double * sc) {
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = ATOL + fmax(fabs(y0[i]), fabs(y1[i])) * RTOL;
 	}
@@ -380,7 +380,7 @@ void scale (const double * y0, const double * y1, double * sc) {
  */
 static inline
 void scale_init (const double * y0, double * sc) {
-	#pragma unroll
+	
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = ATOL + fabs(y0[i]) * RTOL;
 	}

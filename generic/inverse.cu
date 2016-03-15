@@ -78,25 +78,25 @@ void GERU (const int n, const double alpha, const double* __restrict__ arrX,
 ///////////////////////////////////////////////////////////
 
 __device__
-void getLU (const int n, const int LDA, double* __restrict__ A, int* __restrict__ indPivot, int* __restrict__ info) {
+void getLU (const int n, double* __restrict__ A, int* __restrict__ indPivot, int* __restrict__ info) {
 	
 	for (int j = 0; j < n; ++j) {
 		
 		// find pivot and test for singularity
 		
-		int jp = j + getMax (n - j, &A[GRID_DIM * (j + (LDA * j))]);
+		int jp = j + getMax (n - j, &A[GRID_DIM * (j + (STRIDE * j))]);
 		indPivot[INDEX(j)] = jp;
 
-    	if (fabs(A[INDEX(jp + (LDA * j))]) > 0.0) {
+    	if (fabs(A[INDEX(jp + (STRIDE * j))]) > 0.0) {
 			
 			// apply interchange to columns 1:n-1
 			if (jp != j)
-				swap(n, &A[GRID_DIM * (j)], LDA, &A[GRID_DIM * (jp)], LDA);
+				swap(n, &A[GRID_DIM * (j)], STRIDE, &A[GRID_DIM * (jp)], STRIDE);
 			
 			// compute elements j+1:m-1 of the jth column
 			
 			if (j < n - 1)
-				scale(n - j - 1, 1.0 / A[INDEX(j + (LDA * j))], &A[GRID_DIM * (j + 1 + (LDA * j))]);
+				scale(n - j - 1, 1.0 / A[INDEX(j + (STRIDE * j))], &A[GRID_DIM * (j + 1 + (STRIDE * j))]);
 			
 		} else if (*info == 0) {
 			*info = j;
@@ -105,6 +105,6 @@ void getLU (const int n, const int LDA, double* __restrict__ A, int* __restrict_
 		
 		// update trailing submatrix
 		if (j < n - 1)
-			GERU (n - j - 1, -1.0, &A[GRID_DIM * (j + 1 + (LDA * j))], &A[GRID_DIM * (j + LDA * (j + 1))], LDA, &A[GRID_DIM * (j + 1 + LDA * (j + 1))], LDA);	
+			GERU (n - j - 1, -1.0, &A[GRID_DIM * (j + 1 + (STRIDE * j))], &A[GRID_DIM * (j + STRIDE * (j + 1))], STRIDE, &A[GRID_DIM * (j + 1 + STRIDE * (j + 1))], STRIDE);	
 	}
 }

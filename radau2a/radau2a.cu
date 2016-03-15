@@ -12,14 +12,20 @@
 * 
 */
 
+#include <cuComplex.h>
+
+//various mechanism/solver defns
 #include "header.cuh"
 #include "solver_options.h"
+#include "solver_props.cuh"
+
+//math operations
 #include "inverse.cuh"
-#include "complexInverse_NSP.cuh"
-#include "solver_options.h"
+#include "complexInverse.cuh"
+
+//rate/jacobian subroutines
 #include "jacob.cuh"
 #include "dydt.cuh"
-#include <cuComplex.h>
 
 //#define WARP_VOTING
 #ifdef WARP_VOTING
@@ -50,7 +56,9 @@
 //#define SDIRK_ERROR
 
 __device__
-void scale (const double __restrict__ * y0, const double __restrict__* y, double __restrict__* sc) {
+void scale (double const * const __restrict__ y0,
+			double const * const __restrict__ y,
+			double * const __restrict__ sc) {
 	#pragma unroll 8
 	for (int i = 0; i < NSP; ++i) {
 		sc[INDEX(i)] = 1.0 / (ATOL + fmax(fabs(y0[INDEX(i)]), fabs(y[INDEX(i)])) * RTOL);
@@ -58,7 +66,8 @@ void scale (const double __restrict__ * y0, const double __restrict__* y, double
 }
 
 __device__
-void scale_init (const double __restrict__ * y0, double __restrict__ * sc) {
+void scale_init (double const * const __restrict__ y0,
+				 double * const __restrict__ sc) {
 	#pragma unroll 8
 	for (int i = 0; i < NSP; ++i) {
 		sc[INDEX(i)] = 1.0 / (ATOL + fabs(y0[INDEX(i)]) * RTOL);
@@ -66,7 +75,8 @@ void scale_init (const double __restrict__ * y0, double __restrict__ * sc) {
 }
 
 __device__
-void safe_memcpy(double __restrict__* dest, const double __restrict__ * source)
+void safe_memcpy(double * const __restrict__ dest,
+				 double const * const __restrict__ source)
 {
 	#pragma unroll 8
 	for (int i = 0; i < NSP; i++)
@@ -75,9 +85,9 @@ void safe_memcpy(double __restrict__* dest, const double __restrict__ * source)
 	}
 }
 __device__
-void safe_memset3(double __restrict__ * dest1,
-				  double __restrict__ * dest2,
-				  double __restrict__ * dest3, const double val)
+void safe_memset3(double * const __restrict__ dest1,
+				  double * const __restrict__ dest2,
+				  double * const __restrict__ dest3, const double val)
 {
 	#pragma unroll 8
 	for (int i = 0; i < NSP; i++)
@@ -88,7 +98,7 @@ void safe_memset3(double __restrict__ * dest1,
 	}
 }
 __device__
-void safe_memset(double __restrict__ * dest1, const double val)
+void safe_memset(double * const __restrict__ dest1, const double val)
 {
 	#pragma unroll 8
 	for (int i = 0; i < NSP; i++)
@@ -97,7 +107,7 @@ void safe_memset(double __restrict__ * dest1, const double val)
 	}
 }
 __device__
-void safe_memset_jac(double __restrict__ * dest1, const double val)
+void safe_memset_jac(double * const __restrict__ dest1, const double val)
 {
 	#pragma unroll 8
 	for (int i = 0; i < NSP * NSP; i++)
@@ -196,6 +206,22 @@ __constant__ double rkAinvT[3][3] = {
 -3.050430199247410569426377624787569e0}
 };
 
+// Classical error estimator: 
+// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
+__constant__ double rkE[4] = {
+0.05,
+-10.04880939982741556246032950764708*0.05,
+1.382142733160748895793662840980412*0.05,
+-0.3333333333333333333333333333333333*0.05
+};
+/*
+// H* Sum Bgam_j*f(Z_j) = H*Bgam(0)*f(0) + Sum Theta_j*Z_j
+const static double rkTheta[3] = {
+-1.520677486405081647234271944611547 - 10.04880939982741556246032950764708*0.05,
+2.070455145596436382729929151810376 + 1.382142733160748895793662840980413*0.05,
+-0.3333333333333333333333333333333333*0.05 - 0.3744441479783868387391430179970741
+};*/
+
 __constant__ double rkELO = 4;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,12 +310,12 @@ __device__ void RK_PrepareRHS(double t, double pr, double H, double* Y,
 								const mechanism_memory* __restrict__ mech,
 								double* __restrict__ TMP,
 								double* __restrict__ F) {
-	double const * __restrict__ Z1 = solver->Z1;
-	double const * __restrict__ Z2 = solver->Z1;
-	double const * __restrict__ Z3 = solver->Z1;
-	double const * __restrict__ R1 = solver->DZ1;
-	double const * __restrict__ R2 = solver->DZ1;
-	double const * __restrict__ R3 = solver->DZ1;
+	double const * const __restrict__ Z1 = solver->Z1;
+	double const * const __restrict__ Z2 = solver->Z1;
+	double const * const __restrict__ Z3 = solver->Z1;
+	double * const __restrict__ R1 = solver->DZ1;
+	double * const __restrict__ R2 = solver->DZ1;
+	double * const __restrict__ R3 = solver->DZ1;
 
 	#pragma unroll
 	for (int i = 0; i < NSP; i++) {
@@ -317,7 +343,8 @@ __device__ void RK_PrepareRHS(double t, double pr, double H, double* Y,
 	DAXPY3(-H * rkA[0][2], -H * rkA[1][2], -H * rkA[2][2], F, R1, R2, R3);
 }
 
-__device__ void dlaswp(double* __restrict__ A, int* __restrict__ ipiv) {
+__device__ void dlaswp(double * const __restrict__ A,
+					   int const * const __restrict__ ipiv) {
 	#pragma unroll 8
 	for (int i = 0; i < NSP; i++) {
 		int ip = ipiv[INDEX(i)];
@@ -331,7 +358,9 @@ __device__ void dlaswp(double* __restrict__ A, int* __restrict__ ipiv) {
 
 //diag == 'n' -> nounit = true
 //upper == 'u' -> upper = true
-__device__ void dtrsm(bool upper, bool nounit, double* __restrict__ A, double* __restrict__ b) {
+__device__ void dtrsm(bool upper, bool nounit,
+					  double const * const __restrict__ A,
+					  double * const __restrict__ b) {
 	if (upper) {
 		#pragma unroll 8
 		for (int k = NSP - 1; k >= 0; --k)
@@ -363,13 +392,15 @@ __device__ void dtrsm(bool upper, bool nounit, double* __restrict__ A, double* _
 	}
 }
 
-__device__ void dgetrs(double* __restrict__ A, double* __restrict__ B, int* __restrict__ ipiv) {
+__device__ void dgetrs(double * const __restrict__ A,
+					   double * const __restrict__ B,
+					   int const * const __restrict__ ipiv) {
 	dlaswp(B, ipiv);
 	dtrsm(false, false, A, B);
 	dtrsm(true, true, A, B);
 }
 
-__device__ void zlaswp(cuDoubleComplex* __restrict__ A, int* __restrict__ ipiv) {
+__device__ void zlaswp(cuDoubleComplex * const __restrict__ A, int const * const __restrict__ ipiv) {
 	#pragma unroll 8
 	for (int i = 0; i < NSP; i++) {
 		int ip = ipiv[INDEX(i)];
@@ -383,7 +414,9 @@ __device__ void zlaswp(cuDoubleComplex* __restrict__ A, int* __restrict__ ipiv) 
 
 //diag == 'n' -> nounit = true
 //upper == 'u' -> upper = true
-__device__ void ztrsm(bool upper, bool nounit, cuDoubleComplex* __restrict__ A, cuDoubleComplex* __restrict__ b) {
+__device__ void ztrsm(bool upper, bool nounit,
+					  cuDoubleComplex const * const __restrict__ A,
+					  cuDoubleComplex * const __restrict__ b) {
 	if (upper) {
 		#pragma unroll 8
 		for (int k = NSP - 1; k >= 0; --k)
@@ -415,20 +448,24 @@ __device__ void ztrsm(bool upper, bool nounit, cuDoubleComplex* __restrict__ A, 
 	}
 }
 
-__device__ void zgetrs(cuDoubleComplex* __restrict__ A, cuDoubleComplex* __restrict__ B, int* __restrict__ ipiv) {
+__device__ void zgetrs(cuDoubleComplex * const __restrict__ A,
+					   cuDoubleComplex * const __restrict__ B,
+					   int const * const __restrict__ ipiv) {
 	zlaswp(B, ipiv);
 	ztrsm(false, false, A, B);
 	ztrsm(true, true, A, B);
 }
 
-__device__ void RK_Solve(double H, double* __restrict__ E1, cuDoubleComplex* __restrict__ temp) {
+__device__ void RK_Solve(const double H, double* const __restrict__ E1,
+								solver_memory const * const __restrict__ solver,
+								cuDoubleComplex * const __restrict__ temp) {
 
-	cuDoubleComplex const* __restrict__ E2 = solver->E2;
-	double const* __restrict__ R1 = DZ1;
-	double const* __restrict__ R2 = DZ2;
-	double const* __restrict__ R3 = DZ3;
-	int* __restrict__ ipiv1 = solver->ipiv1;
-	int* __restrict__ ipiv2 = solver->ipiv2;
+	cuDoubleComplex * const __restrict__ E2 = solver->E2;
+	double * const __restrict__ R1 = solver->DZ1;
+	double * const __restrict__ R2 = solver->DZ2;
+	double * const __restrict__ R3 = solver->DZ3;
+	int* const __restrict__ ipiv1 = solver->ipiv1;
+	int* const __restrict__ ipiv2 = solver->ipiv2;
 
 	// Z = (1/h) T^(-1) A^(-1) * Z
 	#pragma unroll 8
@@ -467,7 +504,8 @@ __device__ void RK_Solve(double H, double* __restrict__ E1, cuDoubleComplex* __r
 	}
 }
 
-__device__ double RK_ErrorNorm(double* __restrict__ scale, double* __restrict__ DY) {
+__device__ double RK_ErrorNorm(double const * const __restrict__ scale,
+							   double const * const __restrict__ DY) {
 	double sum = 0;
 	#pragma unroll 8
 	for (int i = 0; i < NSP; ++i){
@@ -476,22 +514,26 @@ __device__ double RK_ErrorNorm(double* __restrict__ scale, double* __restrict__ 
 	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
 
-__device__ double RK_ErrorEstimate(double H, double t, double pr, double* __restrict__ Y,
-											 double* __restrict__ A,
-											 const solver_memory* __restrict__ solver,
-											 const mechanism_memory* __restrict__ mech,
-											 bool FirstStep, bool Reject,
-											 double* __restrict__ F1, double* __restrict__ F2, double* __restrict__ TMP) {
+__device__ double RK_ErrorEstimate(const double H, const double t, 
+											 const double pr, 
+											 double const * const __restrict__ Y,
+											 double * const __restrict__ E1,
+											 solver_memory const * const __restrict__ solver,
+											 mechanism_memory const * const __restrict__ mech,
+											 const bool FirstStep, const bool Reject,
+											 double * const __restrict__ F1,
+											 double * const __restrict__ F2, 
+											 double * const __restrict__ TMP) {
 	double HrkE1  = rkE[1]/H;
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
 
-    const double const * __restrict__ F0 = solver->F0;
-    const double const * __restrict__ Z1 = solver->Z1;
-    const double const * __restrict__ Z2 = solver->Z2;
-    const double const * __restrict__ Z3 = solver->Z3;
-    const int const * __restrict__ ipiv1 = solver->ipiv1;
-    const double const * __restrict__ scale = solver->scale;
+    double const * const __restrict__ F0 = solver->F0;
+    double const * const __restrict__ Z1 = solver->Z1;
+    double const * const __restrict__ Z2 = solver->Z2;
+    double const * const __restrict__ Z3 = solver->Z3;
+    int const * __restrict__ ipiv1 = solver->ipiv1;
+    double const * __restrict__ scale = solver->scale;
 
     #pragma unroll 8
     for (int i = 0; i < NSP; ++i) {
@@ -523,8 +565,12 @@ __device__ double RK_ErrorEstimate(double H, double t, double pr, double* __rest
  *  5th-order Radau2A implementation
  * 
  */
-__device__ void integrate (const double t_start, const double t_end, const double var, double* __restrict__ y,
-							const mechanism_memory* __restrict__ mech, const solver_memory* __restrict__ solver) {
+__device__ void integrate (const double t_start,
+							const double t_end, 
+							const double var,
+							double * const __restrict__ y,
+							mechanism_memory const * const __restrict__ mech,
+							solver_memory const * const __restrict__ solver) {
 	double Hmin = 0;
 	double Hold = 0;
 #ifdef Gustafsson
@@ -539,24 +585,25 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	bool SkipJac = false;
 	bool SkipLU = false;
 
-	double const * __restrict__ A = mech->jac;
-	cuDoubleComplex const * __restrict__ E2 = solver->E2;
-	double const * __restrict__ sc = solver->sc;
-	double const * __restrict__ y0 = solver->y0;
-	double const * __restrict__ F0 = mech->dy;
-	double const * __restrict__ work1 = solver->work1;
-	double const * __restrict__ work2 = solver->work2;
-	cuDoubleComplex const * __restrict__ work3 = solver->work3;
-	double const * __restrict__ work4 = solver->work4;
-	int const * __restrict__ ipiv1 = solver->ipiv1;
-	int const * __restrict__ ipiv2 = solver->ipiv2;
-	double const * __restrict__ Z1 = solver->Z1;
-	double const * __restrict__ Z2 = solver->Z2;
-	double const * __restrict__ Z3 = solver->Z3;
-	double const * __restrict__ DZ1 = solver->DZ1;
-	double const * __restrict__ DZ2 = solver->DZ2;
-	double const * __restrict__ DZ3 = solver->DZ3;
-	double const * __restrict__ CONT = solver->CONT;
+	double * const __restrict__ A = mech->jac;
+	cuDoubleComplex * const __restrict__ E2 = solver->E2;
+	double * const __restrict__ sc = solver->scale;
+	double * const __restrict__ y0 = solver->y0;
+	double * const __restrict__ F0 = mech->dy;
+	double * const __restrict__ work1 = solver->work1;
+	double * const __restrict__ work2 = solver->work2;
+	double * const __restrict__ work3 = solver->work3;
+	cuDoubleComplex * const __restrict__ work4 = solver->work4;
+	int * const __restrict__ ipiv1 = solver->ipiv1;
+	int * const __restrict__ ipiv2 = solver->ipiv2;
+	double * const __restrict__ Z1 = solver->Z1;
+	double * const __restrict__ Z2 = solver->Z2;
+	double * const __restrict__ Z3 = solver->Z3;
+	double * const __restrict__ DZ1 = solver->DZ1;
+	double * const __restrict__ DZ2 = solver->DZ2;
+	double * const __restrict__ DZ3 = solver->DZ3;
+	double * const __restrict__ CONT = solver->CONT;
+	int * const __restrict__ result = solver->result;
 
 	scale_init(y, sc);
 	safe_memcpy(y0, y);
@@ -577,7 +624,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		if(!SkipLU) { 
 			//need to update Jac/LU
 			if(!SkipJac) {
-				safe_memset_jac(A, mech);
+				safe_memset_jac(A, 0.0);
 #ifndef FINITE_DIFF
 				eval_jacob (t, var, y, A, mech);
 #else
@@ -589,7 +636,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				Nconsecutive += 1;
 				if (Nconsecutive >= 5)
 				{
-					result[T_ID] = errorCodes.err_consecutive_steps;
+					result[T_ID] = EC_consecutive_steps;
 					return;
 				}
 				H *= 0.5;
@@ -606,12 +653,12 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		Nsteps += 1;
 		if (Nsteps >= Max_no_steps)
 		{
-			result[T_ID] = errorCodes.max_steps_exceeded;
+			result[T_ID] = EC_max_steps_exceeded;
 			return;
 		}
 		if (0.1 * fabs(H) <= fabs(t) * Roundoff)
 		{
-			result[T_ID] = errorCodes.h_plus_t_equals_h;
+			result[T_ID] = EC_h_plus_t_equals_h;
 			return;
 		}
 		if (FirstStep || !StartNewton) {
@@ -629,7 +676,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		NewtonRate = pow(fmax(NewtonRate, EPS), 0.8);
 
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
-			RK_PrepareRHS(t, var, H, y, solver, work1, work2);
+			RK_PrepareRHS(t, var, H, y, solver, mech, work1, work2);
 			RK_Solve(H, A, solver, work4);
 			double d1 = RK_ErrorNorm(sc, DZ1);
 			double d2 = RK_ErrorNorm(sc, DZ2);
@@ -667,7 +714,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
             if (NewtonIter >= NewtonMaxit)
             {
-				result[T_ID] = errorCodes.newton_max_iterations_exceeded;
+				result[T_ID] = EC_newton_max_iterations_exceeded;
 				return;
 			}
 		}
@@ -680,7 +727,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		}
 
 		double Err = RK_ErrorEstimate(H, t, var, y, A, 
-						solver, FirstStep, Reject,
+						solver, mech, FirstStep, Reject,
 						work1, work2,
 						work3);
 
@@ -710,8 +757,8 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			if (StartNewton) {
 				RK_Make_Interpolate(Z1, Z2, Z3, CONT);
 			}
-			scale(y, solver->y0, solver->sc);
-			safe_memcpy(solver->y0, y);
+			scale(y, y0, sc);
+			safe_memcpy(y0, y);
 			Hnew = fmin(fmax(Hnew, Hmin), t_end - t);
 			if (Reject) {
 				Hnew = fmin(Hnew, H);
@@ -739,5 +786,5 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			SkipLU = false;
 		}
 	}
-	result[T_ID] = errorCodes.success;
+	result[T_ID] = EC_success;
 }

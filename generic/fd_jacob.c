@@ -53,7 +53,7 @@ void eval_jacob (const double t, const double pres, const double * cy, double * 
   #endif
   
   double ewt[NSP];
-  #pragma unroll
+  
   for (int i = 0; i < NSP; ++i) {
     ewt[i] = ATOL + (RTOL * fabs(y[i]));
   }
@@ -62,7 +62,7 @@ void eval_jacob (const double t, const double pres, const double * cy, double * 
   double srur = sqrt(DBL_EPSILON);
   
   double sum = 0.0;
-  #pragma unroll
+  
   for (int i = 0; i < NSP; ++i) {
     sum += (ewt[i] * dy[i]) * (ewt[i] * dy[i]);
   }
@@ -71,7 +71,7 @@ void eval_jacob (const double t, const double pres, const double * cy, double * 
   
   double ftemp[NSP];
   
-  #pragma unroll
+  
   for (int j = 0; j < NSP; ++j) {
     double yj_orig = y[j];
     double r = fmax(srur * fabs(yj_orig), r0 / ewt[j]);
@@ -80,26 +80,26 @@ void eval_jacob (const double t, const double pres, const double * cy, double * 
       y[j] = yj_orig + r;
       dydt (t, pres, y, ftemp);
         
-      #pragma unroll
+      
       for (int i = 0; i < NSP; ++i) {
         jac[i + NSP*j] = (ftemp[i] - dy[i]) / r;
       }
     #else
-      #pragma unroll
+      
       for (int i = 0; i < NSP; ++i) {
         jac[i + NSP*j] = 0.0;
       }
-      #pragma unroll
+      
       for (int k = 0; k < FD_ORD; ++k) {
         y[j] = yj_orig + x_coeffs[k] * r;
         dydt (t, pres, y, ftemp);
         
-        #pragma unroll
+        
         for (int i = 0; i < NSP; ++i) {
           jac[i + NSP*j] += y_coeffs[k] * ftemp[i];
         }
       }
-      #pragma unroll
+      
       for (int i = 0; i < NSP; ++i) {
         jac[i + NSP*j] /= r;
       }

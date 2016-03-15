@@ -59,7 +59,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		{
 			break;
 		}
-		#pragma unroll
+		
 		for (; j < index_list[index]; j++)
 		{
 			sparse_multiplier(A, &Vm[j * NSP], w);
@@ -88,7 +88,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
 		Hm[(*m) * STRIDE] = 1.0;
-		#pragma unroll
+		
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
@@ -98,10 +98,10 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 
 #ifdef RB43
 		//2. Get phiHm
-		expAc_variable (*m + p, STRIDE, Hm, h * scale, phiHm);
+		expAc_variable (*m + p, Hm, h * scale, phiHm);
 #elif EXP4
 		//2. Get phiHm
-		phiAc_variable (*m + p, STRIDE, Hm, h * scale, phiHm);
+		phiAc_variable (*m + p, Hm, h * scale, phiHm);
 #endif
 
 		//3. Get error

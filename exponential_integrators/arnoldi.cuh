@@ -42,11 +42,12 @@ __constant__ int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 3
 __device__
 int arnoldi(int* m, const double scale,
 			const int p, const double h,
+			const double* __restrict__ A,
 			const solver_memory* __restrict__ solver,
 			const double* __restrict__ v, double* __restrict__ beta,
-			double * __restrict__ work)
+			double * __restrict__ work,
+			cuDoubleComplex* __restrict__ work2)
 {
-	const double* __restrict__ A = solver->A;
 	const double* __restrict__ sc = solver->sc;
 	double* __restrict__ Vm = solver->Vm;
 	double* __restrict__ Hm = solver->Hm;
@@ -68,17 +69,17 @@ int arnoldi(int* m, const double scale,
 			sparse_multiplier(A, &Vm[GRID_DIM * (j * NSP)], work);
 			for (int i = 0; i <= j; i++)
 			{
-				Hm[INDEX(j * STRIDE + i)] = dotproduct(w, &Vm[GRID_DIM * (i * NSP)]);
+				Hm[INDEX(j * STRIDE + i)] = dotproduct(work, &Vm[GRID_DIM * (i * NSP)]);
 				scale_subtract(Hm[INDEX(j * STRIDE + i)], &Vm[GRID_DIM * (i * NSP)], work);
 			}
-			Hm[INDEX(j * STRIDE + j + 1)] = two_norm(w);
-			if (fabs(Hm[index(j * STRIDE + j + 1)]) < ATOL)
+			Hm[INDEX(j * STRIDE + j + 1)] = two_norm(work);
+			if (fabs(Hm[INDEX(j * STRIDE + j + 1)]) < ATOL)
 			{
 				//happy breakdown
 				*m = j;
 				break;
 			}
-			scale_mult(1.0 / Hm[INDEX(j * STRIDE + j + 1)], w, &Vm[GRID_DIM * ((j + 1) * NSP)]);
+			scale_mult(1.0 / Hm[INDEX(j * STRIDE + j + 1)], work, &Vm[GRID_DIM * ((j + 1) * NSP)]);
 		}
 		*m = index_list[index++];
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
@@ -104,10 +105,10 @@ int arnoldi(int* m, const double scale,
 
 #ifdef RB43
 		//2. Get phiHm
-		info = expAc_variable (*m + p, Hm, h * scale, phiHm, solver, work);
+		info = expAc_variable (*m + p, Hm, h * scale, phiHm, solver, work2);
 #elif EXP4
 		//2. Get phiHm
-		info = phiAc_variable (*m + p, Hm, h * scale, phiHm, solver, work);
+		info = phiAc_variable (*m + p, Hm, h * scale, phiHm, solver, work2);
 #endif
 		if (info != 0)
 			return -info;

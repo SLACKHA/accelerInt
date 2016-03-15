@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <cuComplex.h>
 
 #include "header.cuh"
 #include "dydt.cuh"
@@ -66,24 +67,24 @@ void integrate (const double t_start, const double t_end, const double pr,
 	double t = t_start;
 
 	//arrays
-	double const * __restrict__ sc = solver->sc;
-	double const * __restrict__ work1 = solver->work1;
-	double const * __restrict__ work2 = solver->work2; 
-	double const * __restrict__ y1 = solver->work3;
-	double const * __restrict__ fy = solver->dy;
-	double const * __restrict__ A = mech->jac;
-	double const * __restrict__ Hm = solver->Hm;
-	double const * __restrict__ Vm = solver->Vm;
-	double const * __restrict__ phiHm = solver->phiHm;
-	double const * __restrict__ savedActions = solver->savedActions;
-	double const * __restrict__ k1 = solver->k1;
-	double const * __restrict__ k2 = solver->k2;
-	double const * __restrict__ k3 = solver->k3;
-	double const * __restrict__ k4 = solver->k4;
-	double const * __restrict__ k5 = solver->k5;
-	double const * __restrict__ k6 = solver->k6;
-	double const * __restrict__ k7 = solver->k7;
-	int const * __restrict__ result = solver->result;
+	double * const __restrict__ sc = solver->sc;
+	double * const __restrict__ work1 = solver->work1;
+	double * const __restrict__ work2 = solver->work2; 
+	double * const __restrict__ y1 = solver->work3;
+	cuDoubleComplex * const __restrict__ work4 = solver->work4;
+	double * const __restrict__ fy = mech->dy;
+	double * const __restrict__ A = mech->jac;
+	double * const __restrict__ Hm = solver->Hm;
+	double * const __restrict__ Vm = solver->Vm;
+	double * const __restrict__ phiHm = solver->phiHm;
+	double * const __restrict__ k1 = solver->k1;
+	double * const __restrict__ k2 = solver->k2;
+	double * const __restrict__ k3 = solver->k3;
+	double * const __restrict__ k4 = solver->k4;
+	double * const __restrict__ k5 = solver->k5;
+	double * const __restrict__ k6 = solver->k6;
+	double * const __restrict__ k7 = solver->k7;
+	int * const __restrict__ result = solver->result;
 
 	// get scaling for weighted norm
 	scale_init(y, sc);
@@ -109,25 +110,25 @@ void integrate (const double t_start, const double t_end, const double pr,
 		//error checking
 		if (failures >= 5)
 		{
-			result[T_ID] = error_codes.err_consecutive_steps;
+			result[T_ID] = EC_consecutive_steps;
 			return;
 		}
 		if (steps++ >= MAX_STEPS)
 		{
-			result[T_ID] = error_codes.max_steps_exceeded;
+			result[T_ID] = EC_max_steps_exceeded;
 			return;
 		}
 		if (t + h <= t)
 		{
-			result[T_ID] = error_codes.h_plus_t_equals_h;
+			result[T_ID] = EC_h_plus_t_equals_h;
 			return;
 		}
 		
 		if (!reject) {
-			dydt (t, pr, y, fy);
+			dydt (t, pr, y, fy, mech);
 		#ifdef FINITE_DIFFERENCE
 			eval_jacob (t, pr, y, A, mech, work1, work2);
-		#elif
+		#else
 			eval_jacob (t, pr, y, A, mech);
 		#endif
 		}
@@ -135,7 +136,7 @@ void integrate (const double t_start, const double t_end, const double pr,
 		#ifdef DIVERGENCE_TEST
 		integrator_steps[T_ID]++;
 		#endif
-		int info = arnoldi(&m, 1.0 / 3.0, P, h, solver, fy, &beta, work1)
+		int info = arnoldi(&m, 1.0 / 3.0, P, h, A, solver, fy, &beta, work1, work4);
 		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
@@ -171,7 +172,7 @@ void integrate (const double t_start, const double t_end, const double pr,
 			k4[INDEX(i)] = y[INDEX(i)] + work2[INDEX(i)];
 		}
 		
-		dydt (t, pr, k4, work1);
+		dydt (t, pr, k4, work1, mech);
 		sparse_multiplier (A, work2, k4);
 	
 		#pragma unroll
@@ -180,7 +181,7 @@ void integrate (const double t_start, const double t_end, const double pr,
 		}
 
 		//do arnoldi
-		info = arnoldi(&m1, 1.0 / 3.0, P, h, A, k4, sc, &beta, Vm, Hm, phiHm);
+		info = arnoldi(&m1, 1.0 / 3.0, P, h, A, solver, k4, &beta, work1, work4);
 		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
@@ -213,7 +214,7 @@ void integrate (const double t_start, const double t_end, const double pr,
 			k7[INDEX(i)] = y[INDEX(i)] + work2[INDEX(i)];
 		}
 	
-		dydt (t, pr, k7, work1);
+		dydt (t, pr, k7, work1, mech);
 		sparse_multiplier (A, work2, k7);
 	
 		#pragma unroll
@@ -221,7 +222,7 @@ void integrate (const double t_start, const double t_end, const double pr,
 			k7[INDEX(i)] = work1[INDEX(i)] - fy[INDEX(i)] - k7[INDEX(i)];
 		}
 	
-		info = arnoldi(&m2, 1.0 / 3.0, P, h, A, k7, sc, &beta, Vm, Hm, phiHm);
+		info = arnoldi(&m2, 1.0 / 3.0, P, h, A, solver, k7, &beta, work1, work4);
 		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
@@ -302,5 +303,5 @@ void integrate (const double t_start, const double t_end, const double pr,
 
 	} // end while
 
-	result[T_ID] = error_codes.success;
+	result[T_ID] = EC_success;
 }
