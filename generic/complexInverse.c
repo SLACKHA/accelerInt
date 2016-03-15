@@ -4,6 +4,7 @@
 #include <float.h>
 #include <complex.h>
 #include <string.h>
+#include "solver_props.h"
 #include "lapack_dfns.h"
 
 void swapComplex (const int n, double complex* __restrict__ arrX, const int incX,
@@ -25,16 +26,16 @@ void swapComplex (const int n, double complex* __restrict__ arrX, const int incX
 //Matrix Algorithms: Volume 1: Basic Decompositions
 //By G. W. Stewart
 static inline
-void getHessenbergLU(const int n, const int LDA, double complex* __restrict__ A,
+void getHessenbergLU(const int n, double complex* __restrict__ A,
 						int* __restrict__ indPivot, int* __restrict__ info)
 {
 	int last_free = 0;
 	for (int i = 0; i < n - 1; i ++)
 	{
-		if (cabs(A[i * LDA + i]) < cabs(A[i * LDA + i + 1]))
+		if (cabs(A[i * STRIDE + i]) < cabs(A[i * STRIDE + i + 1]))
 		{
 			//swap rows
-			swapComplex(n - last_free, &A[last_free * LDA + i], LDA, &A[last_free * LDA + i + 1], LDA);
+			swapComplex(n - last_free, &A[last_free * STRIDE + i], STRIDE, &A[last_free * STRIDE + i + 1], STRIDE);
 			indPivot[i] = i + 1;
 		}
 		else
@@ -42,14 +43,14 @@ void getHessenbergLU(const int n, const int LDA, double complex* __restrict__ A,
 			indPivot[i] = i;
 			last_free = i;
 		}
-		if (cabs(A[i * LDA + i]) > 0.0)
+		if (cabs(A[i * STRIDE + i]) > 0.0)
 		{
-			double complex tau = A[i * LDA + i + 1] / A[i * LDA + i];
+			double complex tau = A[i * STRIDE + i + 1] / A[i * STRIDE + i];
 			for (int j = i + 1; j < n; j++)
 			{
-				A[j * LDA + i + 1] -= tau * A[j * LDA + i];
+				A[j * STRIDE + i + 1] -= tau * A[j * STRIDE + i];
 			}
-			A[i * LDA + i + 1] = tau;
+			A[i * STRIDE + i + 1] = tau;
 		}
 		else 
 		{
@@ -62,17 +63,17 @@ void getHessenbergLU(const int n, const int LDA, double complex* __restrict__ A,
 	*info = 0;
 }
 
-void getComplexInverseHessenberg (const int n, const int LDA, double complex* __restrict__ A,
+void getComplexInverseHessenberg (const int n, double complex* __restrict__ A,
 									int* __restrict__ ipiv, int* __restrict__ info,
 									double complex* __restrict__ work, const int work_size)
 {
 	// first get LU factorization
-	getHessenbergLU (n, LDA, A, ipiv, info);
+	getHessenbergLU (n, A, ipiv, info);
 
 	if (*info != 0)
 		return;
 
 	// now get inverse
-	zgetri_(&n, A, &LDA, ipiv, work, &work_size, info);
+	zgetri_(&n, A, &ARRAYSIZE, ipiv, work, &work_size, info);
 
 }
