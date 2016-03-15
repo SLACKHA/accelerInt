@@ -97,7 +97,7 @@ void multiplyComplexUpperMV (const int n, cuDoubleComplex* x, const int lda, con
 ///////////////////////////////////////////////////////////
 
 __device__
-void complexGEMV (const int m, const int n, const cuDoubleComplex alpha, const cuDoubleComplex* A,
+void complexGEMV (const int m, const int n, const int lda, const cuDoubleComplex alpha, const cuDoubleComplex* A,
                                     const cuDoubleComplex* arrX, cuDoubleComplex* arrY) {
     
     // first: y = beta*y
@@ -111,7 +111,7 @@ void complexGEMV (const int m, const int n, const cuDoubleComplex alpha, const c
             cuDoubleComplex temp = cuCmul(alpha, arrX[INDEX(j)]);
             for (int i = 0; i < m; ++i) {
                 //arrY[i] += temp * A[i + (m * j)];
-                arrY[INDEX(i)] = cuCfma(temp, A[INDEX(i + (STRIDE * j))], arrY[INDEX(i)]);
+                arrY[INDEX(i)] = cuCfma(temp, A[INDEX(i + (lda * j))], arrY[INDEX(i)]);
             }
         }
     }
@@ -183,7 +183,7 @@ void getComplexInverseLU (const int n, const int LDA, cuDoubleComplex* __restric
         
         // compute current column of inv(A)
         if (j < n - 1)
-            complexGEMV (n, n - j, make_cuDoubleComplex(-1.0, 0.0), &A[GRID_DIM * (LDA * (j + 1))], &work[GRID_DIM * (j + 1)], &A[GRID_DIM * (LDA * j)]);
+            complexGEMV (n, n - j, LDA, make_cuDoubleComplex(-1.0, 0.0), &A[GRID_DIM * (LDA * (j + 1))], &work[GRID_DIM * (j + 1)], &A[GRID_DIM * (LDA * j)]);
         
     }
     
