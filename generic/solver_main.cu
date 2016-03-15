@@ -163,7 +163,7 @@ int main (int argc, char *argv[])
     solver_memory* host_solver, *device_solver;
     mechanism_memory* host_mech, *device_mech;
 
-    initialize_gpu_memory(padded, &host_mech, &device_mech)
+    initialize_gpu_memory(padded, &host_mech, &device_mech);
     initialize_solver(padded, &host_solver, &device_solver);
 
     // print number of threads and block size
@@ -180,7 +180,7 @@ int main (int argc, char *argv[])
 #ifdef SAME_IC
     set_same_initial_conditions(NUM, &y_host, &var_host);
 #else
-    read_initial_conditions(filename, NUM, TARGET_BLOCK_SIZE, g_num, &y_host, &pres_host);
+    read_initial_conditions(filename, NUM, &y_host, &var_host);
 #endif
 
     dim3 dimGrid (g_num, 1 );
@@ -345,8 +345,8 @@ int main (int argc, char *argv[])
     if (padded < NUM)
         free(y_temp);
 
-    free_gpu_memory(host_mech, device_mech);
-    cleanup_solver(host_solver, device_solver);
+    free_gpu_memory(&host_mech, &device_mech);
+    cleanup_solver(&host_solver, &device_solver);
     cudaErrorCheck( cudaDeviceReset() );
 
     return 0;

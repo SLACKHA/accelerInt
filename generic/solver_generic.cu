@@ -10,20 +10,22 @@
 #include "header.cuh"
 #include "solver.cuh"
 #include "gpu_memory.cuh"
+#include "solver_props.cuh"
 
 #define T_ID (threadIdx.x + (blockDim.x * blockIdx.x))
-#define GRID_SIZE (blockDim.x * gridDim.x)
 
- __global__ void
-intDriver (const int NUM, const double t, const double t_end,
-                const double * __restrict__ pr_global, double * __restrict__ y_global, 
-                const mechanism_memory* __restrict__ d_mem, 
-                const solver_memory* __restrict__ s_mem)
+ __global__
+void intDriver (const int NUM,
+                const double t,
+                const double t_end,
+                const double * __restrict__ pr_global,
+                double * __restrict__ y_global,
+                const mechanism_memory * __restrict__ d_mem,
+                const solver_memory * __restrict__ s_mem)
 {
     if (T_ID < NUM)
     {
         // call integrator for one time step
         integrate (t, t_end, pr_global[T_ID], d_mem->y, d_mem, s_mem);
     }
-
 } // end intDriver
