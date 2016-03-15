@@ -2,6 +2,6 @@
 #define INVERSE_CUH
 
 __device__
-void getLU (double* A, int* indPivot, int* info);
+void getLU (const int n, const int LDA, double* A, int* indPivot, int* info);
 
 #endif
