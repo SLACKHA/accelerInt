@@ -170,5 +170,5 @@
     cudaErrorCheck( cudaFree((*h_mem)->k5) );
     cudaErrorCheck( cudaFree((*h_mem)->k6) );
     cudaErrorCheck( cudaFree((*h_mem)->k7) );
-    cudaErrorCheck( cudaFree(d_mem) );
+    cudaErrorCheck( cudaFree(*d_mem) );
  }

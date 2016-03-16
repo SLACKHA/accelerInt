@@ -93,18 +93,18 @@
  size_t required_solver_size() {
     //return the size (in bytes), needed per cuda thread
     size_t num_bytes = 0;
+    //scale array
+    num_bytes += NSP * sizeof(double);
     //three work arrays
-    num_bytes += 3 * STRIDE;
+    num_bytes += 3 * STRIDE * sizeof(double);
     //gy
-    num_bytes += NSP;
+    num_bytes += NSP * sizeof(double);
     //Hm, phiHm
-    num_bytes += 2 * STRIDE * STRIDE;
+    num_bytes += 2 * STRIDE * STRIDE * sizeof(double);
     //Vm
-    num_bytes += NSP * STRIDE;
+    num_bytes += NSP * STRIDE * sizeof(double);
     //saved actions
-    num_bytes += 5 * NSP;
-    //add all doubles
-    num_bytes *= sizeof(double);
+    num_bytes += 5 * NSP * sizeof(double);
     //one pivot array
     num_bytes += STRIDE * sizeof(int);
     //complex inverse
@@ -165,5 +165,5 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
     cudaErrorCheck( cudaFree((*h_mem)->invA) );
     cudaErrorCheck( cudaFree((*h_mem)->work4) );
     cudaErrorCheck( cudaFree((*h_mem)->result) );
-    cudaErrorCheck( cudaFree(d_mem) );
+    cudaErrorCheck( cudaFree(*d_mem) );
  }

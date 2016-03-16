@@ -225,7 +225,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//work1 is now equal to Dn3
 
 		//finally we need the action of the exponential on Dn3
-		info = arnoldi(&m2, 1.0, 4, h, A, solver, &beta, work1, work2, work4);
+		info = arnoldi(&m2, 1.0, 4, h, A, solver, work1, &beta, work2, work4);
 		if (info >= M_MAX || info < 0)
 		{
 			//need to reduce h and try again
