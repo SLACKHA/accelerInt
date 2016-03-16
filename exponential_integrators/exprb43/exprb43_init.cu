@@ -132,7 +132,7 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
   createAndZero((void**)&((*h_mem)->work1), NSP * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->work2), NSP * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->work3), NSP * padded * sizeof(double));
-  createAndZero((void**)&((*h_mem)->gy), NSP * padded * padded * sizeof(double));
+  createAndZero((void**)&((*h_mem)->gy), NSP * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->Hm), STRIDE * STRIDE * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->phiHm), STRIDE * STRIDE * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->Vm), NSP * STRIDE * padded * sizeof(double));
