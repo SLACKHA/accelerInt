@@ -44,7 +44,7 @@
  	//and add complex jacobian factorization
  	num_bytes += NSP * NSP * sizeof(cuDoubleComplex);
   //result flag
-  num_bytes += 1 * sizeof(int)
+  num_bytes += 1 * sizeof(int);
   
   return num_bytes;
  }
