@@ -164,6 +164,8 @@ int main (int argc, char *argv[])
 
     solver_memory* host_solver, *device_solver;
     mechanism_memory* host_mech, *device_mech;
+    host_solver = (solver_memory*)malloc(sizeof(solver_memory));
+    host_mech = (mechanism_memory*)malloc(sizeof(mechanism_memory));
 
     initialize_gpu_memory(padded, &host_mech, &device_mech);
     initialize_solver(padded, &host_solver, &device_solver);
@@ -185,7 +187,7 @@ int main (int argc, char *argv[])
     read_initial_conditions(filename, NUM, &y_host, &var_host);
 #endif
 
-    dim3 dimGrid (padded, 1 );
+    dim3 dimGrid (padded / TARGET_BLOCK_SIZE, 1 );
     dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
 
 // flag for ignition
@@ -212,8 +214,7 @@ int main (int argc, char *argv[])
 #endif
 
     double* y_temp = 0;
-    if (padded < NUM)
-        y_temp = (double*)malloc(padded * NSP * sizeof(double));
+    y_temp = (double*)malloc(padded * NSP * sizeof(double));
 
     //////////////////////////////
     // start timer
@@ -254,7 +255,7 @@ int main (int argc, char *argv[])
             cudaErrorCheck( cudaMemcpy2D (y_temp, padded * sizeof(double),
                                             host_mech->y, padded * sizeof(double),
                                             num_cond * sizeof(double), NSP,
-                                            cudaMemcpyHostToDevice) );
+                                            cudaMemcpyDeviceToHost) );
             memcpy2D_out(y_host, NUM, y_temp, padded,
                             num_solved, num_cond * sizeof(double), NSP);
 
@@ -344,11 +345,12 @@ int main (int argc, char *argv[])
     fclose (pFile);
 #endif
 
-    if (padded < NUM)
-        free(y_temp);
 
     free_gpu_memory(&host_mech, &device_mech);
     cleanup_solver(&host_solver, &device_solver);
+    free(y_temp);
+    free(host_mech);
+    free(host_solver);
     cudaErrorCheck( cudaDeviceReset() );
 
     return 0;

@@ -12,29 +12,35 @@
 #include "solver_props.cuh"
 #include "gpu_macros.cuh"
 
+ void createAndZero(void** ptr, size_t size)
+{
+  cudaErrorCheck(cudaMalloc(ptr, size));
+  cudaErrorCheck(cudaMemset(*ptr, 0, size));
+}
+
  void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
     find_poles_and_residuals();
     // Allocate storage for the device struct
     cudaErrorCheck( cudaMalloc(d_mem, sizeof(solver_memory)) );
     //allocate the device arrays on the host pointer
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->sc), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->work1), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->work2), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->work3), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->work4), NSP * padded * sizeof(cuDoubleComplex)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->Hm), STRIDE * STRIDE * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->phiHm), STRIDE * STRIDE * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->Vm), NSP * STRIDE * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->ipiv), NSP * sizeof(int)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->invA), STRIDE * STRIDE * padded * sizeof(cuDoubleComplex)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->result), padded * sizeof(int)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->k1), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->k2), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->k3), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->k4), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->k5), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->k6), NSP * padded * sizeof(double)) );
-    cudaErrorCheck( cudaMalloc(&((*h_mem)->k7), NSP * padded * sizeof(double)) );
+    createAndZero((void**)&((*h_mem)->sc), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->work1), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->work2), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->work3), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->work4), NSP * padded * sizeof(cuDoubleComplex));
+    createAndZero((void**)&((*h_mem)->Hm), STRIDE * STRIDE * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->phiHm), STRIDE * STRIDE * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->Vm), NSP * STRIDE * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->ipiv), NSP * sizeof(int));
+    createAndZero((void**)&((*h_mem)->invA), STRIDE * STRIDE * padded * sizeof(cuDoubleComplex));
+    createAndZero((void**)&((*h_mem)->result), padded * sizeof(int));
+    createAndZero((void**)&((*h_mem)->k1), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->k2), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->k3), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->k4), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->k5), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->k6), NSP * padded * sizeof(double));
+    createAndZero((void**)&((*h_mem)->k7), NSP * padded * sizeof(double));
 
     //copy host struct to device
     cudaErrorCheck( cudaMemcpy(*d_mem, *h_mem, sizeof(solver_memory), cudaMemcpyHostToDevice) );
