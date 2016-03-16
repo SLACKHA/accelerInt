@@ -10,23 +10,26 @@
 extern double complex poles[N_RA];
 extern double complex res[N_RA];
 
-int get_work_size(const int m) {
-	double complex work_size = 0;
-	int work_flag = -1;
-	zgetri_(&m, 0, 0, 0, &work_size, &work_flag, 0);
-	return (int)creal(work_size);
+static int LDA = STRIDE;
+
+int get_work_size(const int m, double complex* invA, int* ipiv) {
+	double complex work = 0;
+	int work_size = -1;
+	int info = 0;
+	zgetri_(&m, invA, &LDA, ipiv, &work, &work_size, &info);
+	return (int)creal(work);
 }
 
 void phi2Ac_variable(const int m, const double* A, const double c, double* phiA) {
 	
-	//query work size for inverse
-	int work_size = get_work_size(m);
-
 	//allocate arrays
-	double complex* work = (double complex*)malloc(work_size * sizeof(double complex));
 	int ipiv[STRIDE] = {0};
 	double complex invA[STRIDE * STRIDE];
 	int info = 0;
+
+	//query work size for inverse
+	int work_size = get_work_size(m, invA, ipiv);
+	double complex* work = (double complex*)malloc(work_size * sizeof(double complex));
 
 	
 	for (int i = 0; i < m; ++i) {
@@ -68,14 +71,14 @@ void phi2Ac_variable(const int m, const double* A, const double c, double* phiA)
 
 void phiAc_variable(const int m, const double* A, const double c, double* phiA) {
 	
-	//query work size for inverse
-	int work_size = get_work_size(m);
-
 	//allocate arrays
-	double complex* work = (double complex*)malloc(work_size * sizeof(double complex));
 	int ipiv[STRIDE] = {0};
 	double complex invA[STRIDE * STRIDE];
 	int info = 0;
+
+	//query work size for inverse
+	int work_size = get_work_size(m, invA, ipiv);
+	double complex* work = (double complex*)malloc(work_size * sizeof(double complex));
 	
 	
 	for (int i = 0; i < m; ++i) {
@@ -117,14 +120,14 @@ void phiAc_variable(const int m, const double* A, const double c, double* phiA) 
 
 void expAc_variable(const int m, const double* A, const double c, double* phiA) {
 	
-	//query work size for inverse
-	int work_size = get_work_size(m);
-
 	//allocate arrays
-	double complex* work = (double complex*)malloc(work_size * sizeof(double complex));
 	int ipiv[STRIDE] = {0};
 	double complex invA[STRIDE * STRIDE];
 	int info = 0;
+
+	//query work size for inverse
+	int work_size = get_work_size(m, invA, ipiv);
+	double complex* work = (double complex*)malloc(work_size * sizeof(double complex));
 	
 	
 	for (int i = 0; i < m; ++i) {

@@ -8,6 +8,7 @@
 #include "lapack_dfns.h"
 
 static int ARRAYSIZE = STRIDE;
+#define LAPACK_INVERSE
 
 void swapComplex (const int n, double complex* __restrict__ arrX, const int incX,
 					double complex* __restrict__ arrY, const int incY) {
@@ -42,7 +43,11 @@ void getHessenbergLU(const int n, double complex* __restrict__ A,
 		}
 		else
 		{
+			#ifdef LAPACK_INVERSE
+			indPivot[i] = i + 1;
+			#else
 			indPivot[i] = i;
+			#endif
 			last_free = i;
 		}
 		if (cabs(A[i * STRIDE + i]) > 0.0)
@@ -61,7 +66,12 @@ void getHessenbergLU(const int n, double complex* __restrict__ A,
 		}
 	}
 	//last index is not pivoted
+	#ifdef LAPACK_INVERSE
+	indPivot[n - 1] = n;
+	#else
 	indPivot[n - 1] = n - 1;
+	#endif
+	
 	*info = 0;
 }
 
@@ -69,6 +79,7 @@ void getComplexInverseHessenberg (const int n, double complex* __restrict__ A,
 									int* __restrict__ ipiv, int* __restrict__ info,
 									double complex* __restrict__ work, const int work_size)
 {
+
 	// first get LU factorization
 	getHessenbergLU (n, A, ipiv, info);
 
