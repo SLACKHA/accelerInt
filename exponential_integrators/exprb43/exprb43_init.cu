@@ -129,17 +129,17 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
   cudaErrorCheck( cudaMalloc(d_mem, sizeof(solver_memory)) );
   //allocate the device arrays on the host pointer
   createAndZero((void**)&((*h_mem)->sc), NSP * padded * sizeof(double));
-  createAndZero((void**)&((*h_mem)->work1), NSP * padded * sizeof(double));
-  createAndZero((void**)&((*h_mem)->work2), NSP * padded * sizeof(double));
-  createAndZero((void**)&((*h_mem)->work3), NSP * padded * sizeof(double));
+  createAndZero((void**)&((*h_mem)->work1), STRIDE * padded * sizeof(double));
+  createAndZero((void**)&((*h_mem)->work2), STRIDE * padded * sizeof(double));
+  createAndZero((void**)&((*h_mem)->work3), STRIDE * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->gy), NSP * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->Hm), STRIDE * STRIDE * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->phiHm), STRIDE * STRIDE * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->Vm), NSP * STRIDE * padded * sizeof(double));
   createAndZero((void**)&((*h_mem)->savedActions), 5 * NSP * padded * sizeof(double));
-  createAndZero((void**)&((*h_mem)->ipiv), NSP * sizeof(int));
+  createAndZero((void**)&((*h_mem)->ipiv), NSP * padded * sizeof(int));
   createAndZero((void**)&((*h_mem)->invA), STRIDE * STRIDE * padded * sizeof(cuDoubleComplex));
-  createAndZero((void**)&((*h_mem)->work4), NSP * padded * sizeof(double));
+  createAndZero((void**)&((*h_mem)->work4), STRIDE * padded * sizeof(cuDoubleComplex));
   createAndZero((void**)&((*h_mem)->result), padded * sizeof(int));
 
   //copy host struct to device
