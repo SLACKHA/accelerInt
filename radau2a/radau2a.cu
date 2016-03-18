@@ -712,6 +712,7 @@ __device__ void integrate (const double t_start,
             }
 
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
+            if (NewtonDone) break;
             if (NewtonIter >= NewtonMaxit)
             {
 				result[T_ID] = EC_newton_max_iterations_exceeded;
