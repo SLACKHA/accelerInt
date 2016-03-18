@@ -752,7 +752,7 @@ __device__ void integrate (const double t_start,
 			t += H;
 			#pragma unroll 8
 			for (int i = 0; i < NSP; i++) {
-				y[i] += solver->Z3[i];
+				y[INDEX(i)] += Z3[INDEX(i)];
 			}
 			// Construct the solution quadratic interpolant Q(c_i) = Z_i, i=1:3
 			if (StartNewton) {
