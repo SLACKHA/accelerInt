@@ -81,7 +81,7 @@ __device__
 void multiplyComplexUpperMV (const int n, cuDoubleComplex* x, const int lda, const cuDoubleComplex* A) {
     
     for (int j = 0; j < n; ++j) {
-        if (cuCabs(x[j]) > 0.0) {
+        if (cuCabs(x[INDEX(j)]) > 0.0) {
             cuDoubleComplex temp = x[INDEX(j)];
             for (int i = 0; i < j; ++i) {
                 //x[i] += temp * A[i + (lda * j)];
@@ -107,7 +107,7 @@ void complexGEMV (const int m, const int n, const int lda, const cuDoubleComplex
     
     for (int j = 0; j < n - 1; ++j) {
 
-        if (cuCabs(arrX[j]) > 0.0) {
+        if (cuCabs(arrX[INDEX(j)]) > 0.0) {
             cuDoubleComplex temp = cuCmul(alpha, arrX[INDEX(j)]);
             for (int i = 0; i < m; ++i) {
                 //arrY[i] += temp * A[i + (m * j)];
@@ -161,8 +161,8 @@ void getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
     
     // form inv(U)
     for (int j = 0; j < n; ++j) {
-        A[j + (STRIDE * j)] = cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[j + (STRIDE * j)]);
-        cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[j + (STRIDE * j)]);
+        A[INDEX(j + (STRIDE * j))] = cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[INDEX(j + (STRIDE * j))]);
+        cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[INDEX(j + (STRIDE * j))]);
         
         // compute elements 0:j-1 of jth column
         multiplyComplexUpperMV (j, &A[STRIDE * j], STRIDE, A);
