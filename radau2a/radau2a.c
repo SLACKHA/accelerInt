@@ -637,7 +637,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
 #endif
 		//!~~~> Computation of new step size Hnew
-		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
+		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
 		Hnew = Fac * H;
 		if (Err < 1.0) {
