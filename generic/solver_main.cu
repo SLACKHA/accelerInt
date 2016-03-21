@@ -37,7 +37,7 @@
     __device__ int integrator_steps[DIVERGENCE_TEST] = {0};
 #endif
 
-void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
+void write_log(int NUM, double t, const double* y_host, FILE* pFile)
 {
     fwrite(&t, sizeof(double), 1, pFile);
     double buffer[NN];
@@ -46,7 +46,7 @@ void write_log(int padded, int NUM, double t, const double* y_host, FILE* pFile)
         double Y_N = 1.0;
         for (int i = 0; i < NSP; ++i)
         {
-            buffer[i] = y_host[padded * i + j];
+            buffer[i] = y_host[NUM * i + j];
             Y_N -= buffer[i];
         }
         buffer[NSP] = Y_N;
@@ -207,7 +207,7 @@ int main (int argc, char *argv[])
     sprintf(out_name, "log/%s-log.bin", f_name);
     pFile = fopen(out_name, "wb");
 
-    write_log(padded, NUM, 0, y_host, pFile);
+    write_log(NUM, 0, y_host, pFile);
 
     //initialize integrator specific log
     init_solver_log();
@@ -280,7 +280,7 @@ int main (int argc, char *argv[])
     #endif
     #ifdef LOG_OUTPUT
             #if !defined(LOG_END_ONLY)
-                write_log(padded, NUM, t, y_host, pFile);
+                write_log(NUM, t, y_host, pFile);
                 solver_log();
             #endif
     #endif
