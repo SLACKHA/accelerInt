@@ -192,6 +192,7 @@ int main (int argc, char *argv[])
 
     dim3 dimGrid (padded / TARGET_BLOCK_SIZE, 1 );
     dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
+    int* result_flag = (int*)malloc(padded * sizeof(int));
 
 // flag for ignition
 #ifdef IGN
@@ -254,6 +255,14 @@ int main (int argc, char *argv[])
             cudaErrorCheck( cudaPeekAtLastError() );
             cudaErrorCheck( cudaDeviceSynchronize() );
     #endif
+            // copy the result flag back
+            cudaErrorCheck( cudaMemcpy(result_flag, host_solver->result, num_cond * sizeof(int), cudaMemcpyDeviceToHost) );
+            for(int i = 0; i < num_cond; ++i)
+                if (result_flag[i] != 0)
+                {
+                    printf("Thread %d returned error code %d\n", i, result_flag[i]);
+                    exit(result_flag[i]);
+                }
             // transfer memory back to CPU
             cudaErrorCheck( cudaMemcpy2D (y_temp, padded * sizeof(double),
                                             host_mech->y, padded * sizeof(double),
@@ -354,6 +363,7 @@ int main (int argc, char *argv[])
     free(y_temp);
     free(host_mech);
     free(host_solver);
+    free(result_flag);
     cudaErrorCheck( cudaDeviceReset() );
 
     return 0;
