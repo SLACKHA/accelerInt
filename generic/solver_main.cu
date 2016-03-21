@@ -126,7 +126,7 @@ int main (int argc, char *argv[])
         int id = 0;
         if (sscanf(argv[2], "%i", &id) == 1 && (id >= 0) && (id < num_devices))
         {
-            checkCudaErrors (cudaSetDevice (id) );
+            cudaErrorCheck( cudaSetDevice (id) );
         }
         else
         {
@@ -137,6 +137,9 @@ int main (int argc, char *argv[])
         }
         cudaErrorCheck (cudaGetDeviceProperties(&devProp, id));
     }
+    cudaErrorCheck( cudaDeviceReset() );
+    cudaErrorCheck( cudaPeekAtLastError() );
+    cudaErrorCheck( cudaDeviceSynchronize() );
     #ifdef DIVERGENCE_TEST
         NUM = DIVERGENCE_TEST;
         assert(NUM % 32 == 0);
