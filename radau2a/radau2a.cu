@@ -311,11 +311,11 @@ __device__ void RK_PrepareRHS(double t, double pr, double H, double* Y,
 								double* __restrict__ TMP,
 								double* __restrict__ F) {
 	double const * const __restrict__ Z1 = solver->Z1;
-	double const * const __restrict__ Z2 = solver->Z1;
-	double const * const __restrict__ Z3 = solver->Z1;
+	double const * const __restrict__ Z2 = solver->Z2;
+	double const * const __restrict__ Z3 = solver->Z3;
 	double * const __restrict__ R1 = solver->DZ1;
-	double * const __restrict__ R2 = solver->DZ1;
-	double * const __restrict__ R3 = solver->DZ1;
+	double * const __restrict__ R2 = solver->DZ2;
+	double * const __restrict__ R3 = solver->DZ3;
 
 	#pragma unroll
 	for (int i = 0; i < NSP; i++) {
