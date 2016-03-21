@@ -15,6 +15,7 @@
 
 struct solver_memory
 {
+	double* E1;
 	cuDoubleComplex* E2;
 	double* scale;
 	int* ipiv1;
@@ -27,7 +28,6 @@ struct solver_memory
 	double* DZ3;
 	double* CONT;
 	double* y0;
-	double* F0;
 	double* work1;
 	double* work2;
 	double* work3;

@@ -229,8 +229,13 @@ __constant__ double rkELO = 4;
 /*
 * calculate E1 & E2 matricies and their LU Decomposition
 */
-__device__ void RK_Decomp(double H, double* __restrict__ E1, cuDoubleComplex* __restrict__ E2,
-							int* __restrict__ ipiv1, int* __restrict__ ipiv2, int* __restrict__ info) {
+__device__ void RK_Decomp(double H, const double* const __restrict__ Jac, 
+							const solver_memory* const __restrict__ solver,
+							int* __restrict__ info) {
+	double* const __restrict__ E1 = solver->E1;
+	cuDoubleComplex* const __restrict__ E2 = solver->E2;
+	int* const __restrict__ ipiv1 = solver->ipiv1;
+	int* const __restrict__ ipiv2 = solver->ipiv2;
 	cuDoubleComplex temp = make_cuDoubleComplex(rkAlpha/H, rkBeta/H);
 	#pragma unroll 8
 	for (int i = 0; i < NSP; i++)
@@ -238,8 +243,8 @@ __device__ void RK_Decomp(double H, double* __restrict__ E1, cuDoubleComplex* __
 		#pragma unroll 8
 		for(int j = 0; j < NSP; j++)
 		{
-			E2[INDEX(i + j * NSP)] = make_cuDoubleComplex(-E1[INDEX(i + j * NSP)], 0);
-			E1[INDEX(i + j * NSP)] = -E1[INDEX(i + j * NSP)];
+			E1[INDEX(i + j * NSP)] = -Jac[INDEX(i + j * NSP)];
+			E2[INDEX(i + j * NSP)] = make_cuDoubleComplex(-Jac[INDEX(i + j * NSP)], 0);
 		}
 		E1[INDEX(i + i * NSP)] += rkGamma / H;
 		E2[INDEX(i + i * NSP)] = cuCadd(E2[INDEX(i + i * NSP)], temp); 
@@ -305,7 +310,8 @@ __device__ void DAXPY3(double DA1, double DA2, double DA3,
 *Prepare the right-hand side for Newton iterations
 *     R = Z - hA * F
 */
-__device__ void RK_PrepareRHS(double t, double pr, double H, double* Y,
+__device__ void RK_PrepareRHS(double t, double pr, double H, 
+								double const * const __restrict__ Y,
 								const solver_memory* __restrict__ solver,
 								const mechanism_memory* __restrict__ mech,
 								double* __restrict__ TMP,
@@ -456,10 +462,11 @@ __device__ void zgetrs(cuDoubleComplex * const __restrict__ A,
 	ztrsm(true, true, A, B);
 }
 
-__device__ void RK_Solve(const double H, double* const __restrict__ E1,
+__device__ void RK_Solve(const double H,
 								solver_memory const * const __restrict__ solver,
 								cuDoubleComplex * const __restrict__ temp) {
 
+	double* const __restrict__ E1 = solver->E1;
 	cuDoubleComplex * const __restrict__ E2 = solver->E2;
 	double * const __restrict__ R1 = solver->DZ1;
 	double * const __restrict__ R2 = solver->DZ2;
@@ -517,18 +524,19 @@ __device__ double RK_ErrorNorm(double const * const __restrict__ scale,
 __device__ double RK_ErrorEstimate(const double H, const double t, 
 											 const double pr, 
 											 double const * const __restrict__ Y,
-											 double * const __restrict__ E1,
 											 solver_memory const * const __restrict__ solver,
 											 mechanism_memory const * const __restrict__ mech,
-											 const bool FirstStep, const bool Reject,
-											 double * const __restrict__ F1,
-											 double * const __restrict__ F2, 
-											 double * const __restrict__ TMP) {
+											 const bool FirstStep, const bool Reject) {
+
 	double HrkE1  = rkE[1]/H;
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
 
-    double const * const __restrict__ F0 = solver->F0;
+	double * const __restrict__ E1 = mech->jac;
+	const double * const __restrict__ F0 = mech->dy;  
+    double * const __restrict__ F1 = solver->work1;
+    double * const __restrict__ F2 = solver->work2;
+    double * const __restrict__ TMP = solver->work3;
     double const * const __restrict__ Z1 = solver->Z1;
     double const * const __restrict__ Z2 = solver->Z2;
     double const * const __restrict__ Z3 = solver->Z3;
@@ -586,16 +594,12 @@ __device__ void integrate (const double t_start,
 	bool SkipLU = false;
 
 	double * const __restrict__ A = mech->jac;
-	cuDoubleComplex * const __restrict__ E2 = solver->E2;
 	double * const __restrict__ sc = solver->scale;
 	double * const __restrict__ y0 = solver->y0;
 	double * const __restrict__ F0 = mech->dy;
 	double * const __restrict__ work1 = solver->work1;
 	double * const __restrict__ work2 = solver->work2;
-	double * const __restrict__ work3 = solver->work3;
 	cuDoubleComplex * const __restrict__ work4 = solver->work4;
-	int * const __restrict__ ipiv1 = solver->ipiv1;
-	int * const __restrict__ ipiv2 = solver->ipiv2;
 	double * const __restrict__ Z1 = solver->Z1;
 	double * const __restrict__ Z2 = solver->Z2;
 	double * const __restrict__ Z3 = solver->Z3;
@@ -624,14 +628,13 @@ __device__ void integrate (const double t_start,
 		if(!SkipLU) { 
 			//need to update Jac/LU
 			if(!SkipJac) {
-				safe_memset_jac(A, 0.0);
 #ifndef FINITE_DIFF
 				eval_jacob (t, var, y, A, mech);
 #else
 				eval_jacob (t, var, y, A, mech, work1, work2);
 #endif
 			}
-			RK_Decomp(H, A, E2, ipiv1, ipiv2, &info);
+			RK_Decomp(H, A, solver, &info);
 			if(info != 0) {
 				Nconsecutive += 1;
 				if (Nconsecutive >= 5)
@@ -677,7 +680,7 @@ __device__ void integrate (const double t_start,
 
 		for (; NewtonIter < NewtonMaxit; NewtonIter++) {
 			RK_PrepareRHS(t, var, H, y, solver, mech, work1, work2);
-			RK_Solve(H, A, solver, work4);
+			RK_Solve(H, solver, work4);
 			double d1 = RK_ErrorNorm(sc, DZ1);
 			double d2 = RK_ErrorNorm(sc, DZ2);
 			double d3 = RK_ErrorNorm(sc, DZ3);
@@ -706,9 +709,9 @@ __device__ void integrate (const double t_start,
             #pragma unroll 8
             for (int i = 0; i < NSP; i++)
             {
-            	Z1[i] -= DZ1[i];
-            	Z2[i] -= DZ2[i];
-            	Z3[i] -= DZ3[i];
+            	Z1[INDEX(i)] -= DZ1[INDEX(i)];
+            	Z2[INDEX(i)] -= DZ2[INDEX(i)];
+            	Z3[INDEX(i)] -= DZ3[INDEX(i)];
             }
 
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
@@ -727,15 +730,14 @@ __device__ void integrate (const double t_start,
 			continue;
 		}
 
-		double Err = RK_ErrorEstimate(H, t, var, y, A, 
-						solver, mech, FirstStep, Reject,
-						work1, work2,
-						work3);
+		double Err = RK_ErrorEstimate(H, t, var, y, 
+						solver, mech, FirstStep, Reject);
 
 		//!~~~> Computation of new step size Hnew
-		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1 + 2 * NewtonMaxit);
+		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
 		Hnew = Fac * H;
+
 		if (Err < 1.0) {
 #ifdef Gustafsson
 			if (!FirstStep) {
