@@ -95,20 +95,6 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	double * out[3] = {0, 0, work1};
 	double scale_vec[3] = {0, 0, 0};
 
-#ifndef FORCE_ZERO
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i)
-	{
-		fy[INDEX(i)] = 0;
-		A[INDEX(i)] = 0;
-	}
-	#pragma unroll
-	for(int i = NSP; i < NSP * NSP; ++i)
-	{
-		A[INDEX(i)] = 0;
-	}
-#endif
-
 	double err = 0.0;
 	int failures = 0;
 	int steps = 0;
