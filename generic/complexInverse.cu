@@ -165,10 +165,10 @@ void getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
         cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[INDEX(j + (STRIDE * j))]);
         
         // compute elements 0:j-1 of jth column
-        multiplyComplexUpperMV (j, &A[STRIDE * j], STRIDE, A);
+        multiplyComplexUpperMV (j, &A[GRID_DIM * (STRIDE * j)], STRIDE, A);
         
         // scale
-        scaleComplex (j, Ajj, &A[STRIDE * j]);
+        scaleComplex (j, Ajj, &A[GRID_DIM * (STRIDE * j)]);
     }
     
     // solve equation inv(A)*L = inv(U) for inv(A)
