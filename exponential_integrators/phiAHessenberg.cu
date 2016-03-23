@@ -44,7 +44,7 @@ int phi2Ac_variable(const int m, const double* __restrict__ A, const double c,
 		getComplexInverseHessenberg (m, invA, ipiv, &info, work);
 
 		if (info != 0)
-			return 0;
+			return info;
 		
 		#pragma unroll
 		for (int i = 0; i < m; ++i) {

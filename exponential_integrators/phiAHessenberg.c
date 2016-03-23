@@ -20,7 +20,7 @@ int get_work_size(const int m, double complex* invA, int* ipiv) {
 	return (int)creal(work);
 }
 
-void phi2Ac_variable(const int m, const double* A, const double c, double* phiA) {
+int phi2Ac_variable(const int m, const double* A, const double c, double* phiA) {
 	
 	//allocate arrays
 	int ipiv[STRIDE] = {0};
@@ -56,6 +56,9 @@ void phi2Ac_variable(const int m, const double* A, const double c, double* phiA)
 		
 		// takes care of (A * c - poles(q) * I)^-1
 		getComplexInverseHessenberg (m, invA, ipiv, &info, work, work_size);
+
+		if (info != 0)
+			return info;
 		
 		
 		for (int i = 0; i < m; ++i) {
@@ -67,9 +70,10 @@ void phi2Ac_variable(const int m, const double* A, const double c, double* phiA)
 	}
 	
 	free(work);
+	return 0;
 }
 
-void phiAc_variable(const int m, const double* A, const double c, double* phiA) {
+int phiAc_variable(const int m, const double* A, const double c, double* phiA) {
 	
 	//allocate arrays
 	int ipiv[STRIDE] = {0};
@@ -105,6 +109,9 @@ void phiAc_variable(const int m, const double* A, const double c, double* phiA) 
 		
 		// takes care of (A * c - poles(q) * I)^-1
 		getComplexInverseHessenberg (m, invA, ipiv, &info, work, work_size);
+
+		if (info != 0)
+			return info;
 		
 		
 		for (int i = 0; i < m; ++i) {
@@ -116,9 +123,10 @@ void phiAc_variable(const int m, const double* A, const double c, double* phiA) 
 	}
 	
 	free (work);
+	return 0;
 }
 
-void expAc_variable(const int m, const double* A, const double c, double* phiA) {
+int expAc_variable(const int m, const double* A, const double c, double* phiA) {
 	
 	//allocate arrays
 	int ipiv[STRIDE] = {0};
@@ -154,6 +162,9 @@ void expAc_variable(const int m, const double* A, const double c, double* phiA) 
 		
 		// takes care of (A * c - poles(q) * I)^-1
 		getComplexInverseHessenberg (m, invA, ipiv, &info, work, work_size);
+
+		if (info != 0)
+			return info;
 		
 		
 		for (int i = 0; i < m; ++i) {
@@ -165,4 +176,5 @@ void expAc_variable(const int m, const double* A, const double c, double* phiA) 
 	}
 	
 	free (work);
+	return 0;
 }
