@@ -81,7 +81,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double temp[NSP];
 	double f_temp[NSP];
 	double y1[NSP];
-	double Hm[STRIDE * STRIDE];// = {0.0};
+	double Hm[STRIDE * STRIDE] = {0.0};
 	double Vm[NSP * STRIDE];
 	double phiHm[STRIDE * STRIDE];
 	double err = 0.0;

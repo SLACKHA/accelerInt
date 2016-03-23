@@ -88,7 +88,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	eval_jacob (t, pr, y, A);
 	double gy[NSP];
 
-	double Hm[STRIDE * STRIDE];
+	double Hm[STRIDE * STRIDE] = {0.0};
 	double Vm[NSP * STRIDE];
 	double phiHm[STRIDE * STRIDE];
 	double err = 0.0;
