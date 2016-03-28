@@ -18,89 +18,46 @@
 
 /** Matrix-vector multiplication of a matrix sized MxM and a vector Mx1
  * 
- * Performs inline matrix-vector multiplication (with unrolled loops) 
- * 
  * \param[in]		m 		size of the matrix
  * \param[in]		A		matrix of size MxM
  * \param[in]		V		vector of size Mx1
  * \param[out]		Av		vector that is A * v
  */
 __device__
-void matvec_m_by_m (const int m, const double * const __restrict__ A,
-						const double * const __restrict__ V,
-						double * const __restrict__ Av) {
-	//for each row
-	for (int i = 0; i < m; ++i) {
-		Av[INDEX(i)] = 0.0;
-		
-		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
-		for (int j = 0; j < m; ++j) {
-			Av[INDEX(i)] += A[INDEX(j * STRIDE + i)] * V[INDEX(j)];
-		}
-	}
-}
+void matvec_m_by_m (const int,
+	const double * const __restrict__,
+	const double * const __restrict__, double * const __restrict__);
 
 ///////////////////////////////////////////////////////////////////////////////
 
 /** Matrix-vector plus equals for a matrix of size MxM and vector of size Mx1
  * 
  *  That is, it returns (A + I) * v
- *
- * Performs inline matrix-vector multiplication (with unrolled loops) 
  * 
  * \param[in]		m 		size of the matrix
  * \param[in]		A		matrix of size MxM
  * \param[in]		V		vector of size Mx1
  * \param[out]		Av		vector that is (A + I) * v
  */
-__device__ void matvec_m_by_m_plusequal (const int m, const double * const __restrict__ A, 
-										 const double * const __restrict__ V, double * const __restrict__ Av)
-{
-	//for each row
-	#pragma unroll
-	for (int i = 0; i < m; ++i) {
-		Av[INDEX(i)] = 0.0;
-		
-		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
-		for (int j = 0; j < m; ++j) {
-			Av[INDEX(i)] += A[INDEX(j * STRIDE + i)] * V[INDEX(j)];
-		}
-
-		Av[INDEX(i)] += V[INDEX(i)];
-	}
-}
+__device__ void matvec_m_by_m_plusequal (const int,
+	const double * const __restrict__, 
+	const double * const __restrict__, double * const __restrict__);
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor
  * 
- * Performs inline matrix-vector multiplication (with unrolled loops)
+ *  That is, it returns A * v * scale
  * 
  * \param[in]		m 		size of the matrix
  * \param[in]		scale 	a number to scale the multplication by
  * \param[in]		A		matrix
  * \param[in]		V		the vector
- * \param[out]		Av		vector that is A * V
+ * \param[out]		Av		vector that is A * V * scale
  */
 __device__
-void matvec_n_by_m_scale (const int m, const double scale,
-						  const double * const __restrict__ A,
-						  const double * const __restrict__ V,
-						  double * const __restrict__ Av) {
-	//for each row
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		Av[INDEX(i)] = 0.0;
-		
-		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
-		for (int j = 0; j < m; ++j) {
-			Av[INDEX(i)] += A[INDEX(j * NSP + i)] * V[INDEX(j)];
-		}
-
-		Av[INDEX(i)] *= scale;
-	}
-}
+void matvec_n_by_m_scale (const int,
+	const double,
+	const double * const __restrict__,
+	const double * const __restrict__, double * const __restrict__ );
 
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor
@@ -119,38 +76,10 @@ void matvec_n_by_m_scale (const int m, const double scale,
  * \param[out]		Av		a list of 3 pointers corresponding to Av1, Av2, Av3
  */
 __device__
-void matvec_n_by_m_scale_special (const int m, const double * __restrict__ scale,
-								  const double * __restrict__ A,
-								  double ** __restrict__ V,
-								  double ** __restrict__ Av) {
-	//for each row
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		#pragma unroll
-		for (int k = 0; k < 3; k++)
-		{
-			Av[k][INDEX(i)] = 0.0;
-		}
-		
-		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
-		for (int j = 0; j < m; ++j) {
-			#pragma unroll
-			for (int k = 0; k < 3; k++)
-			{
-				Av[k][INDEX(i)] += A[INDEX(j * NSP + i)] * V[k][INDEX(j)];
-			}
-		}
-
-		#pragma unroll
-		for (int k = 0; k < 3; k++)
-		{
-			Av[k][INDEX(i)] *= scale[k];
-		}
-		Av[2][INDEX(i)] += V[3][INDEX(i)];
-		Av[2][INDEX(i)] += V[4][INDEX(i)];
-	}
-}
+void matvec_n_by_m_scale_special (const int,
+	const double * __restrict__,
+	const double * __restrict__,
+	double ** __restrict__, double ** __restrict__);
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor
  *
@@ -167,239 +96,142 @@ void matvec_n_by_m_scale_special (const int m, const double * __restrict__ scale
  * \param[out]		Av		a list of 2 pointers corresponding to Av1, Av2
  */
 __device__
-void matvec_n_by_m_scale_special2 (const int m, const double* __restrict__ scale, const double* __restrict__ A,
-										double** __restrict__ V, double** __restrict__ Av) {
-	//for each row
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		#pragma unroll
-		for (int k = 0; k < 2; k++)
-		{
-			Av[k][INDEX(i)] = 0.0;
-		}
-		
-		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
-		for (int j = 0; j < m; ++j) {
-			#pragma unroll
-			for (int k = 0; k < 2; k++)
-			{
-				Av[k][INDEX(i)] += A[INDEX(j * NSP + i)] * V[k][INDEX(j)];
-			}
-		}
-
-		#pragma unroll
-		for (int k = 0; k < 2; k++)
-		{
-			Av[k][INDEX(i)] *= scale[k];
-		}
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
+void matvec_n_by_m_scale_special2 (const int,
+	const double* __restrict__,
+	const double* __restrict__,
+	double** __restrict__, double** __restrict__);
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor and added to another vector
  * 
- * Performs inline matrix-vector multiplication (with unrolled loops)
+ * Computes A * V * scale + add
  * 
  * \param[in]		m 		size of the matrix
  * \param[in]		scale 	a number to scale the multplication by
  * \param[in]		add 	the vector to add to the result
  * \param[in]		A		matrix
  * \param[in]		V		the vector
- * \param[out]		Av		vector that is A * V + add
+ * \param[out]		Av		vector that is A * V * scale + add
  */
 __device__
-void matvec_n_by_m_scale_add (const int m, const double scale,
-								const double* __restrict__ A, const double* __restrict__ V,
-								double* __restrict__ Av, const double* __restrict__ add) {
-	//for each row
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		Av[INDEX(i)] = 0.0;
-		
-		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
-		for (int j = 0; j < m; ++j) {
-			Av[INDEX(i)] += A[INDEX(j * NSP + i)] * V[INDEX(j)];
-		}
-
-		Av[INDEX(i)] = Av[INDEX(i)] * scale + add[INDEX(i)];
-	}
-}
+void matvec_n_by_m_scale_add (const int,
+	const double,
+	const double* __restrict__,
+	const double* __restrict__,
+	double* __restrict__, const double* __restrict__);
 
 ///////////////////////////////////////////////////////////////////////////////
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor and adds and subtracts the specified vectors
  *  note, the addition is twice the specified vector
  * 
- * Performs inline matrix-vector multiplication (with unrolled loops)
+ *  Computes scale * A * V + 2 * add - sub
  * 
  * \param[in]		m 		size of the matrix
  * \param[in]		scale 	a number to scale the multplication by
- * \param[in]		add 	the vector to add to the result
- * \param[in]		sub 	the vector to subtract from the result
  * \param[in]		A		matrix
  * \param[in]		V		the vector
  * \param[out]		Av		vector that is scale * A * V + 2 * add - sub
+ * \param[in]		add 	the vector to add to the result
+ * \param[in]		sub 	the vector to subtract from the result
  */
 __device__
-void matvec_n_by_m_scale_add_subtract (const int m, const double scale,
-										const double* __restrict__ A, const double* V,
-										double* __restrict__ Av, const double* __restrict__ add,
-										const double* __restrict__ sub) {
-	//for each row
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		Av[INDEX(i)] = 0.0;
-		
-		//go across a row of A, multiplying by a column of phiHm
-		#pragma unroll
-		for (int j = 0; j < m; ++j) {
-			Av[INDEX(i)] += A[INDEX(j * NSP + i)] * V[INDEX(j)];
-		}
-
-		Av[INDEX(i)] = Av[INDEX(i)] * scale + 2.0 * add[INDEX(i)] - sub[INDEX(i)];
-	}
-}
+void matvec_n_by_m_scale_add_subtract (const int,
+	const double,
+	const double* __restrict__,
+	const double*,
+	double* __restrict__,
+	const double* __restrict__, const double* __restrict__);
 
 ///////////////////////////////////////////////////////////////////////////////
 
 /** Get scaling for weighted norm
  * 
+ *	Computes ATOL + MAX(|y0|, |y1|) * RTOL
+ *
  * \param[in]		y0		values at current timestep
  * \param[in]		y1		values at next timestep
- * \param[out]	sc	array of scaling values
+ * \param[out]		sc	array of scaling values
  */
 __device__
-void scale (const double* __restrict__ y0, const double* __restrict__ y1, double* __restrict__ sc) {
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		sc[INDEX(i)] = ATOL + fmax(fabs(y0[INDEX(i)]), fabs(y1[INDEX(i)])) * RTOL;
-	}
-}
+void scale (const double* __restrict__, 
+	const double* __restrict__, double* __restrict__);
 
 ///////////////////////////////////////////////////////////////////////////////
 
 /** Get scaling for weighted norm for the initial timestep (used in krylov process)
  * 
+ *  Computes ATOL + |y1| * RTOL
+ *
  * \param[in]		y0		values at current timestep
- * \param[out]	sc	array of scaling values
+ * \param[out]		sc	array of scaling values
  */
 __device__
-void scale_init (const double* __restrict__ y0, double* __restrict__ sc) {
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		sc[INDEX(i)] = ATOL + fabs(y0[INDEX(i)]) * RTOL;
-	}
-}
+void scale_init (const double* __restrict__, double* __restrict__);
 
 ///////////////////////////////////////////////////////////////////////////////
 
 /** Perform weighted norm
+ *
+ *  Computes sqrt(sum((nums^2) / sc) / NSP)
  * 
  * \param[in]		nums	values to be normed
  * \param[in]		sc		scaling array for norm
  * \return			norm	weighted norm
  */
 __device__
-double sc_norm (const double* __restrict__ nums, const double* __restrict__ sc) {
-	double norm = 0.0;
-	
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		norm += nums[INDEX(i)] * nums[INDEX(i)] / (sc[INDEX(i)] * sc[INDEX(i)]);
-	}
-	
-	return sqrt(norm / NSP);
-}
+double sc_norm (const double* __restrict__, const double* __restrict__);
 
 /** Computes and returns the two norm of a vector
+ *
+ *  sqrt(sum(v^2))
  *
  *	\param[in]		v 		the vector
  */
 __device__
-double two_norm(const double* __restrict__ v)
-{
-	double norm = 0.0;
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		norm += v[INDEX(i)] * v[INDEX(i)];
-	}
-	return sqrt(norm);
-}
+double two_norm(const double* __restrict__);
 
 /** Normalize the input vector using a 2-norm
  * 
+ *  v_out = v / |v|_2
+ *
  * \param[in]		v		vector to be normalized
  * \param[out]		v_out	where to stick the normalized part of v (in a column)
  */
 __device__
-double normalize (const double* __restrict__ v, double* __restrict__ v_out) {
-	
-	double norm = two_norm(v);
+double normalize (const double* __restrict__, double* __restrict__);
 
-	//unlikely to happen, if so, we still need to copy
-	if (norm == 0.0)
-		norm = 1.0;
-
-	double m_norm = 1.0 / norm;
-
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i) {
-		v_out[INDEX(i)] = v[INDEX(i)] * m_norm;
-	}
-	return norm;
-}
-
-
-/** Performs the dot product of the w vector with the given Matrix
+/** Performs the dot product of the w vector with the given vector
  * 
+ *	returns Vm \dot w
+ *
  * \param[in]		w   	the vector with with to dot
- * \param[in]		Vm		the subspace matrix
- * \out						the dot product of the specified vectors
+ * \param[in]		Vm		the subspace vector
+ * \out 			sum		the dot product of the specified vectors
  */
 __device__
-double dotproduct(const double* __restrict__ w, const double* __restrict__ Vm)
-{
-	double sum = 0;
-	#pragma unroll
-	for(int i = 0; i < NSP; i++)
-	{
-		sum += w[INDEX(i)] * Vm[INDEX(i)];
-	}
-	return sum;
-}
+double dotproduct(const double* __restrict__, const double* __restrict__);
 
 /** Subtracts Vm scaled by s from w
  * 
+ *  w -= Vm * s
+ *
  * \param[in]		s   	the scale multiplier to use
  * \param[in]		Vm		the subspace matrix
  * \param[out]		w 		the vector to subtract from
  */
-__device__ void scale_subtract(const double s, const double* __restrict__ Vm, double* __restrict__ w)
-{
-	#pragma unroll
-	for (int i = 0; i < NSP; i++)
-	{
-		w[INDEX(i)] -= s * Vm[INDEX(i)];
-	}
-}
+__device__
+void scale_subtract(const double, const double* __restrict__, double* __restrict__);
 
 /** Sets Vm to s * w
  * 
+ *	Vm = s * w
+ *
  * \param[in]		stride 	number of columns in Vm
  * \param[in]		s   	the scale multiplier to use
  * \param[in]		w 		the vector to use as a base
  * \param[out]		Vm		the subspace matrix to set
  */
-__device__ void scale_mult(const double s, const double* __restrict__ w, double* __restrict__ Vm)
-{
-	#pragma unroll
-	for (int i = 0; i < NSP; i++)
-	{
-		Vm[INDEX(i)] = w[INDEX(i)] * s;
-	}
-}
+__device__
+void scale_mult(const double, const double* __restrict__, double* __restrict__);
 
 #endif

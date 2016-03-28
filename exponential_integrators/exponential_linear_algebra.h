@@ -14,112 +14,6 @@
 #include "solver_options.h"
 #include "solver_props.h"
 
-/** Computes and returns the two norm of a vector
- *
- *	\param[in]		v 		the vector
- */
-static inline
-double two_norm(const double* v)
-{
-	double norm = 0.0;
-	
-	for (int i = 0; i < NSP; ++i) {
-		norm += v[i] * v[i];
-	}
-	return sqrt(norm);
-}
-
-/** Normalize the input vector using a 2-norm
- * 
- * \param[in]		v		vector to be normalized
- * \param[out]		v_out	where to stick the normalized part of v (in a column)
- */
-static inline
-double normalize (const double * v, double* v_out) {
-	
-	double norm = two_norm(v);
-
-	if (norm == 0)
-		norm = 1;
-
-	double m_norm = 1.0 / norm;
-
-	
-	for (int i = 0; i < NSP; ++i) {
-		v_out[i] = v[i] * m_norm;
-	}
-	return norm;
-}
-
-/** Performs the dot product of the w vector with the given Matrix
- * 
- * \param[in]		w   	the vector with with to dot
- * \param[in]		Vm		the subspace matrix
- * \out						the dot product of the specified vectors
- */
-static inline
-double dotproduct(const double* w, const double* Vm)
-{
-	double sum = 0;
-	
-	for(int i = 0; i < NSP; i++)
-	{
-		sum += w[i] * Vm[i];
-	}
-	return sum;
-}
-
-/** Sets column c of Vm to s * w
- * 
- * \param[in]		c 		the column of matrix Vm to use
- * \param[in]		stride 	number of columns in Vm
- * \param[in]		s   	the scale multiplier to use
- * \param[in]		w 		the vector to use as a base
- * \param[out]		Vm		the subspace matrix to set
- */
-static inline void scale_mult(const double s, const double* w, double* Vm)
-{
-	
-	for (int i = 0; i < NSP; i++)
-	{
-		Vm[i] = w[i] * s;
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-/** Perform weighted norm
- * 
- * \param[in]		nums	values to be normed
- * \param[in]		sc		scaling array for norm
- * \return			norm	weighted norm
- */
-static inline
-double sc_norm (const double * nums, const double * sc) {
-	double norm = 0.0;
-	
-	
-	for (int i = 0; i < NSP; ++i) {
-		norm += nums[i] * nums[i] / (sc[i] * sc[i]);
-	}
-	
-	return sqrt(norm / NSP);
-}
-
-/** Subtracts column c of Vm scaled by s from w
- * 
- * \param[in]		s   	the scale multiplier to use
- * \param[in]		Vm		the subspace matrix
- * \param[out]		w 		the vector to subtract from
- */
-static inline void scale_subtract(const double s, const double* Vm, double* w)
-{
-	
-	for (int i = 0; i < NSP; i++)
-	{
-		w[i] -= s * Vm[i];
-	}
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -383,6 +277,113 @@ void scale_init (const double * y0, double * sc) {
 	
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = ATOL + fabs(y0[i]) * RTOL;
+	}
+}
+
+/** Computes and returns the two norm of a vector
+ *
+ *	\param[in]		v 		the vector
+ */
+static inline
+double two_norm(const double* v)
+{
+	double norm = 0.0;
+	
+	for (int i = 0; i < NSP; ++i) {
+		norm += v[i] * v[i];
+	}
+	return sqrt(norm);
+}
+
+/** Normalize the input vector using a 2-norm
+ * 
+ * \param[in]		v		vector to be normalized
+ * \param[out]		v_out	where to stick the normalized part of v (in a column)
+ */
+static inline
+double normalize (const double * v, double* v_out) {
+	
+	double norm = two_norm(v);
+
+	if (norm == 0)
+		norm = 1;
+
+	double m_norm = 1.0 / norm;
+
+	
+	for (int i = 0; i < NSP; ++i) {
+		v_out[i] = v[i] * m_norm;
+	}
+	return norm;
+}
+
+/** Performs the dot product of the w vector with the given Matrix
+ * 
+ * \param[in]		w   	the vector with with to dot
+ * \param[in]		Vm		the subspace matrix
+ * \out						the dot product of the specified vectors
+ */
+static inline
+double dotproduct(const double* w, const double* Vm)
+{
+	double sum = 0;
+	
+	for(int i = 0; i < NSP; i++)
+	{
+		sum += w[i] * Vm[i];
+	}
+	return sum;
+}
+
+/** Sets column c of Vm to s * w
+ * 
+ * \param[in]		c 		the column of matrix Vm to use
+ * \param[in]		stride 	number of columns in Vm
+ * \param[in]		s   	the scale multiplier to use
+ * \param[in]		w 		the vector to use as a base
+ * \param[out]		Vm		the subspace matrix to set
+ */
+static inline void scale_mult(const double s, const double* w, double* Vm)
+{
+	
+	for (int i = 0; i < NSP; i++)
+	{
+		Vm[i] = w[i] * s;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+/** Perform weighted norm
+ * 
+ * \param[in]		nums	values to be normed
+ * \param[in]		sc		scaling array for norm
+ * \return			norm	weighted norm
+ */
+static inline
+double sc_norm (const double * nums, const double * sc) {
+	double norm = 0.0;
+	
+	
+	for (int i = 0; i < NSP; ++i) {
+		norm += nums[i] * nums[i] / (sc[i] * sc[i]);
+	}
+	
+	return sqrt(norm / NSP);
+}
+
+/** Subtracts column c of Vm scaled by s from w
+ * 
+ * \param[in]		s   	the scale multiplier to use
+ * \param[in]		Vm		the subspace matrix
+ * \param[out]		w 		the vector to subtract from
+ */
+static inline void scale_subtract(const double s, const double* Vm, double* w)
+{
+	
+	for (int i = 0; i < NSP; i++)
+	{
+		w[i] -= s * Vm[i];
 	}
 }
 
