@@ -424,8 +424,10 @@ variant = 'release' if not env['DEBUG'] else 'debug'
 env['variant'] = variant
 
 env['CPPPATH'] = common_dir_list
+if not 'NVCC_INC_PATH' in env:
+    env['NVCC_INC_PATH'] = []
 if build_cuda:
-    env['NVCCPATH'] += common_dir_list
+    env['NVCC_INC_PATH'] += common_dir_list
 
 target_list = {}
 
@@ -567,7 +569,7 @@ new_defines = {}
 new_defines['CPPDEFINES'] = ['RADAU2A']
 new_defines['CPPPATH'] = [radau2a_dir]
 new_defines['NVCCDEFINES'] = ['RADAU2A']
-new_defines['NVCCPATH'] = [radau2a_dir]
+new_defines['NVCC_INC_PATH'] = [radau2a_dir]
 radau_c, radau_cuda = builder(env_save, mech_c, 
     mech_cuda if build_cuda else None,
     new_defines, radau2a_dir,
@@ -591,7 +593,7 @@ new_defines = {}
 new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
 new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
 new_defines['LIBS'] = ['fftw3']
-new_defines['NVCCPATH'] = [exp_int_dir, exp4_int_dir]
+new_defines['NVCC_INC_PATH'] = [exp_int_dir, exp4_int_dir]
 new_defines['CPPDEFINES'] = ['EXP4']
 new_defines['NVCCDEFINES'] = ['EXP4']
 exp4_c, exp4_cuda = builder(env_save, mech_c, mech_cuda,
@@ -608,7 +610,7 @@ new_defines = {}
 new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
 new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
 new_defines['LIBS'] = ['fftw3']
-new_defines['NVCCPATH'] = [exp_int_dir, exprb43_int_dir]
+new_defines['NVCC_INC_PATH'] = [exp_int_dir, exprb43_int_dir]
 new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
 rb43c, rb43cu = builder(env_save, mech_c, mech_cuda,

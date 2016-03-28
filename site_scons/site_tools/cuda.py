@@ -10,6 +10,7 @@ import sys
 import SCons.Action
 import SCons.Builder
 import SCons.Util
+import SCons.Scanner
 
 def CUDAObjCmdDefine(env):
     # create OBJ command
@@ -19,6 +20,10 @@ def CUDAObjCmdDefine(env):
         if not isinstance(env['NVCCPATH'], list):
             env['NVCCPATH'] = [env['NVCCPATH']]
         command += ' ' + ' '.join(['-I{}'.format(path) for path in env['NVCCPATH']])
+    if 'NVCC_INC_PATH' in env:
+        if not isinstance(env['NVCC_INC_PATH'], list):
+            env['NVCC_INC_PATH'] = [env['NVCC_INC_PATH']]
+        command += ' ' + ' '.join(['-I{}'.format(path) for path in env['NVCC_INC_PATH']])
     if 'NVCCFLAGS' in env:
         if not isinstance(env['NVCCFLAGS'], list):
             env['NVCCFLAGS'] = [env['NVCCFLAGS']]
@@ -145,7 +150,7 @@ def generate(env):
         # default flags for the NVCC compiler
         env['NVCCFLAGS'] = ''
         # default NVCC commands
-        env['NVCC_OBJ_CMD'] = '$NVCC $NVCCPATH $NVCCFLAGS $NVCCDEFINES -dc -o $TARGET $SOURCES'
+        env['NVCC_OBJ_CMD'] = '$NVCC $NVCC_INC_PATH $NVCCPATH $NVCCFLAGS $NVCCDEFINES -dc -o $TARGET $SOURCES'
         env['NVCC_DLINK_CMD'] = '$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -dlink -o dlink.o'
         env['NVCC_PROG_CMD'] = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
 
@@ -247,6 +252,12 @@ def generate(env):
         env.Append(NVCCLIBPATH=[cudaSDKPath + '/common/lib/linux/x86_64/' + cudaSDKSubLibDir, cudaToolkitPath + '/lib64'])
         if not 'NVCCLIBS' in env:
             env.Append(NVCCLIBS=['cudart'])
+
+        cuda_scan = SCons.Scanner.ClassicCPP('CScanner',
+                                             '$NVCC_SUFFIX',
+                                             'NVCC_INC_PATH',
+                                             '^[ \t]*#[ \t]*(?:include|import)[ \t]*(<|")([^>"]+)(>|")')
+        env.Append(SCANNERS=cuda_scan)
 
 def exists(env):
         return env.Detect('nvcc')
