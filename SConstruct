@@ -140,8 +140,8 @@ config_options = [
      defaults.mechanism_dir),
     BoolVariable(
         'DEBUG', 'Compiles with Debugging flags and information.', False),
-    ('ATOL', 'Absolute Tolerance for integrators', '1e-15'),
-    ('RTOL', 'Relative Tolerance for integrators', '1e-8'),
+    ('ATOL', 'Absolute Tolerance for integrators', '1e-10'),
+    ('RTOL', 'Relative Tolerance for integrators', '1e-6'),
     ('t_step', 'Step size for integrator', '1e-6'),
     ('t_end', 'End time of the integrator', '1e-6'),
     ('N_RA', 'The size of the Rational Approximant for the Exponential Integrators.', '10'),
