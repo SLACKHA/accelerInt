@@ -98,11 +98,15 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 
 #ifdef RB43
 		//2. Get phiHm
-		expAc_variable (*m + p, Hm, h * scale, phiHm);
+		int info = expAc_variable (*m + p, Hm, h * scale, phiHm);
 #elif EXP4
 		//2. Get phiHm
-		phiAc_variable (*m + p, Hm, h * scale, phiHm);
+		int info = phiAc_variable (*m + p, Hm, h * scale, phiHm);
 #endif
+		if (info != 0)
+		{
+			return -info;
+		}
 
 		//3. Get error
 		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NSP], sc);

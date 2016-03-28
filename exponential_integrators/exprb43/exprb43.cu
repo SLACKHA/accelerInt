@@ -141,6 +141,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			//failure: too many krylov vectors required or singular matrix encountered
 			//need to reduce h and try again
 			h /= 5.0;
+			reject = true;
 			failures += 1;
 			continue;
 		}
@@ -180,6 +181,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		{
 			//need to reduce h and try again
 			h /= 5.0;
+			reject = true;
 			failures += 1;
 			continue;
 		}
@@ -190,7 +192,6 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		in[0] = &phiHm[GRID_DIM * ((m1 + 2) * STRIDE)];
 		in[1] = &phiHm[GRID_DIM * ((m1 + 3) * STRIDE)];
 		in[2] = &phiHm[GRID_DIM * ((m1) * STRIDE)];
-		in[3] = &phiHm[GRID_DIM * ((m1 + 2) * STRIDE)];
 		out[0] = &savedActions[GRID_DIM * NSP];
 		out[1] = &savedActions[GRID_DIM * 2 * NSP];
 		scale_vec[0] = beta / (h * h);
@@ -216,6 +217,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		{
 			//need to reduce h and try again
 			h /= 5.0;
+			reject = true;
 			failures += 1;
 			continue;
 		}
@@ -223,8 +225,8 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		out[1] = &savedActions[GRID_DIM * 4 * NSP];
 		in[0] = &phiHm[GRID_DIM * (m2 + 2) * STRIDE];
 		in[1] = &phiHm[GRID_DIM * (m2 + 3) * STRIDE];
-		//scale_vec[0] = beta / (h * h);
-		//scale_vec[1] = beta / (h * h * h);
+		scale_vec[0] = beta / (h * h);
+		scale_vec[1] = beta / (h * h * h);
 		matvec_n_by_m_scale_special2(m2, scale_vec, Vm, in, out);
 
 		//construct y1 and error vector
