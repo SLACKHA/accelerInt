@@ -379,7 +379,6 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
         file.write("""
     //turn on to log the krylov space and step sizes
     #define LOG_KRYLOV_AND_STEPSIZES
-    #define MAX_STEPS 10000
     """)
         if env['LOG_END_ONLY']:
             file.write("""

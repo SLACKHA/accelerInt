@@ -14,7 +14,10 @@ import re
 import subprocess
 import multiprocessing
 from argparse import ArgumentParser
+from pyjac import create_jacobian
 np.set_printoptions(precision=15)
+
+scons = expanduser('~/.local/bin/scons')
 
 keyfile = 'cvodes-analytic-int-log.bin'
 
@@ -44,7 +47,8 @@ def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
             data_arr = array[-1, 1:]
             #now compare column by column and get max err
             err = np.abs(data_arr - key_arr) / (atol + key_arr * rtol)
-            err = np.sum(np.abs(err)**2)
+            L2_err = np.linalg.norm(err, axis=1, ord=2)
+            L2_inf = np.linalg.norm(err, axis=1, ord=np.inf)
             err = np.sum(err)
             norm_err = np.sqrt(err)
             
@@ -76,17 +80,17 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol):
-        import pyJac
         #first compile and run cvodes to get the baseline
-        __check_exit(pyJac.create_jacobian(lang='c', 
+        __check_exit(create_jacobian(lang='c', 
             mech_name=mech, 
             therm_name=thermo,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        small_step = 1e-12
-        t_end = 5e-5 #ms
-        t_step = np.logspace(-10, -6, num=30)
+        t_end = 1e-4 #ms
+        t_step = 1e-4 #ms
+        atol = 1e-10
+        rtol = 1e-6
         nvar = None
         #get num vars
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
@@ -100,9 +104,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE',
                 'FIXED_TIMESTEP=TRUE', 'SHUFFLE=FALSE', 'PRINT=FALSE', 
-                'mechanism_dir={}'.format(build_path),
+                'mechanism_dir={}'.format(build_path), 't_end={}'.format(t_end),
                 'ATOL={}'.format(atol), 'RTOL={}'.format(rtol),
-                't_end={}'.format(t_end)]
+                't_step={}'.format(t_step)]
 
         if initial_conditions:
             arg_list.append('SAME_IC=TRUE')
@@ -110,12 +114,10 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         else:
             arg_list.append('SAME_IC=FALSE')
 
-        validator = __check_valid(nvar, num_conditions, t_end, small_step)
+        validator = __check_valid(nvar, num_conditions, t_end, t_step)
         if validator is None:
             with open('logfile', 'a') as file:
-                subprocess.check_call(['scons', 'cpu'] + arg_list +
-                            ['t_step={}'.format(small_step)],
-                              stdout=file)
+                subprocess.check_call([scons, 'cpu'] + arg_list, stdout=file)
                 #run
                 subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
                     str(num_threads), str(num_conditions)],
@@ -142,45 +144,40 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             for cache_opt in opt:
                 if lang == 'cuda':
                     for shared_mem in smem:
-                        for t in t_step:
-                            with open('logfile', 'a') as file:
-                                #subprocess.check_call(['scons', '-c'])
-                                file.write('\ncache_opt: {}\n'
-                                       'shared_mem: {}\n'.format(
-                                        cache_opt, not shared_mem))
-                                __check_exit(pyJac.create_jacobian(lang=lang, 
-                                mech_name=mech, 
-                                therm_name=thermo, 
-                                initial_state=initial_conditions, 
-                                optimize_cache=cache_opt,
-                                multi_thread=num_threads,
-                                no_shared=shared_mem,
-                                build_path=build_path))
-
-                                subprocess.check_call(['scons', builder[lang]] + arg_list + 
-                                        ['t_step={}'.format(t)], stdout=file)
-                                __execute(builder[lang], num_threads, num_conditions)
-                                __check_error(builder[lang], num_conditions, nvar, t,
-                                                validator, atol, rtol)
-
-                else:
-                    for t in t_step:
                         with open('logfile', 'a') as file:
-                            file.write('\ncache_opt: {}\n'.format(
-                                        cache_opt))
-                            __check_exit(pyJac.create_jacobian(lang=lang, 
+                            file.write('\ncache_opt: {}\n'
+                                   'shared_mem: {}\n'.format(
+                                    cache_opt, not shared_mem))
+                            __check_exit(create_jacobian(lang=lang, 
                             mech_name=mech, 
                             therm_name=thermo, 
                             initial_state=initial_conditions, 
                             optimize_cache=cache_opt,
                             multi_thread=num_threads,
+                            no_shared=shared_mem,
                             build_path=build_path))
 
-                            subprocess.check_call(['scons', builder[lang]] + arg_list + 
-                                        ['t_step={}'.format(t)], stdout=file)
+                            subprocess.check_call([scons, builder[lang]] + arg_list, stdout=file)
                             __execute(builder[lang], num_threads, num_conditions)
-                            __check_error(builder[lang], num_conditions, nvar, t,
+                            __check_error(builder[lang], num_conditions, nvar, t_end,
                                             validator, atol, rtol)
+
+                else:
+                    with open('logfile', 'a') as file:
+                        file.write('\ncache_opt: {}\n'.format(
+                                    cache_opt))
+                        __check_exit(create_jacobian(lang=lang, 
+                        mech_name=mech, 
+                        therm_name=thermo, 
+                        initial_state=initial_conditions, 
+                        optimize_cache=cache_opt,
+                        multi_thread=num_threads,
+                        build_path=build_path))
+
+                        subprocess.check_call([scons, builder[lang]] + arg_list, stdout=file)
+                        __execute(builder[lang], num_threads, num_conditions)
+                        __check_error(builder[lang], num_conditions, nvar, t_end,
+                                        validator, atol, rtol)
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
@@ -263,14 +260,8 @@ if __name__ == '__main__':
                         type=float,
                         default=1e-8,
                         help='The relative tolerance to use during integration')
-    parser.add_argument('-pjd', '--pyjac_directory',
-                        required=False,
-                        type=str,
-                        default=pjoin(expanduser('~'), 'pyJac'),
-                        help='The relative tolerance to use during integration')
     args = parser.parse_args()
 
-    sys.path.append(args.pyjac_directory)
     assert not (args.test_data is None and args.initial_conditions is None), \
     "Either a test data file or initial conditions must be specified"
 
