@@ -11,6 +11,7 @@
 */
 
 #include "header.h"
+#include "solver_props.h"
 #include "solver_options.h"
 #include "lapack_dfns.h"
 #include "dydt.h"
