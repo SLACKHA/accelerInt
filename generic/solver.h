@@ -13,10 +13,11 @@
 
  #include "solver_options.h"
  #include "solver_init.h"
+ #include "solver_props.h"
 
  void intDriver (const int NUM, const double t, const double t_end, 
                 const double* pr_global, double* y_global);
 
- void integrate(const double t_start, const double t_end, const double pr, double* y);
+ int integrate(const double t_start, const double t_end, const double pr, double* y);
 
  #endif

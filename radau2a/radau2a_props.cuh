@@ -35,11 +35,10 @@ struct solver_memory
 	int* result;
 };
 
-#define EC_success (0);
-#define EC_consecutive_steps (1);
-#define EC_max_steps_exceeded (2);
-#define EC_h_plus_t_equals_h (3);
-#define EC_newton_max_iterations_exceeded (4);
-
+#define EC_success (0)
+#define EC_consecutive_steps (1)
+#define EC_max_steps_exceeded (2)
+#define EC_h_plus_t_equals_h (3)
+#define EC_newton_max_iterations_exceeded (4)
 
 #endif

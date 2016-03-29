@@ -36,14 +36,14 @@
 #define UNROLL (8)
 //#define SDIRK_ERROR
 
-void scale (const double * y0, const double* y, double * sc) {
+static inline void scale (const double * __restrict__ y0, const double* __restrict__ y, double * __restrict__ sc) {
 	
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fmax(fabs(y0[i]), fabs(y[i])) * RTOL);
 	}
 }
 
-void scale_init (const double * y0, double * sc) {
+static inline void scale_init (const double * __restrict__ y0, double * __restrict__ sc) {
 	
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
@@ -192,7 +192,9 @@ static int ARRSIZE = NSP;
 /*
 * calculate E1 & E2 matricies and their LU Decomposition
 */
-static void RK_Decomp(double H, double* E1, double complex* E2, const double* Jac, int* ipiv1, int* ipiv2, int* info) {
+static void RK_Decomp(const double H, double* __restrict__ E1,
+					  double complex* __restrict__ E2, const double* __restrict__ Jac,
+					  int* __restrict__ ipiv1, int* __restrict__ ipiv2, int* __restrict__ info) {
 	double complex temp2 = rkAlpha/H + I * rkBeta/H;
 	double temp1 = rkGamma / H;
 	
@@ -214,7 +216,8 @@ static void RK_Decomp(double H, double* E1, double complex* E2, const double* Ja
 	zgetrf_(&ARRSIZE, &ARRSIZE, E2, &ARRSIZE, ipiv2, info);
 }
 
-static void RK_Make_Interpolate(const double* Z1, const double* Z2, const double* Z3, double* CONT) {
+static void RK_Make_Interpolate(const double* __restrict__ Z1, const double* __restrict__ Z2,
+								const double* __restrict__ Z3, double* __restrict__ CONT) {
 	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]); 
 	
 	for (int i = 0; i < NSP; i++) {
@@ -229,7 +232,8 @@ static void RK_Make_Interpolate(const double* Z1, const double* Z2, const double
 	}
 }
 
-static void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, double* Z3, const double* CONT) {
+static void RK_Interpolate(double H, double Hold, double* __restrict__ Z1,
+						   double* __restrict__ Z2, double* __restrict__ Z3, const double* __restrict__ CONT) {
 	double r = H / Hold;
 	double x1 = 1.0 + rkC[0] * r;
 	double x2 = 1.0 + rkC[1] * r;
@@ -243,7 +247,8 @@ static void RK_Interpolate(double H, double Hold, double* Z1, double* Z2, double
 }
 
 
-static void WADD(const  double* X, const double* Y, double* Z) {
+static inline void WADD(const double* __restrict__ X, const double* __restrict__ Y,
+						double* __restrict__ Z) {
 	
 	for (int i = 0; i < NSP; i++)
 	{
@@ -251,7 +256,9 @@ static void WADD(const  double* X, const double* Y, double* Z) {
 	}
 }
 
-static void DAXPY3(double DA1, double DA2, double DA3, const double* DX, double* DY1, double* DY2, double* DY3) {
+static inline void DAXPY3(const double DA1, const double DA2, const double DA3,
+						  const double* __restrict__ DX, double* __restrict__ DY1,
+						  double* __restrict__ DY2, double* __restrict__ DY3) {
 	
 	for (int i = 0; i < NSP; i++) {
 		DY1[i] += DA1 * DX[i];
@@ -264,7 +271,10 @@ static void DAXPY3(double DA1, double DA2, double DA3, const double* DX, double*
 *Prepare the right-hand side for Newton iterations
 *     R = Z - hA * F
 */
-void RK_PrepareRHS(double t, double pr, double H, double* Y, double* Z1, double* Z2, double* Z3, double* R1, double* R2, double* R3) {
+static void RK_PrepareRHS(const double t, const  double pr, const  double H,
+						  const double* __restrict__ Y, const double* __restrict__ Z1,
+						  const double* __restrict__ Z2, const double* __restrict__ Z3,
+						  double* __restrict__ R1, double* __restrict__ R2, double* __restrict__ R3) {
 	double TMP[NSP];
 	double F[NSP];
 	
@@ -293,7 +303,10 @@ void RK_PrepareRHS(double t, double pr, double H, double* Y, double* Z1, double*
 	DAXPY3(-H * rkA[0][2], -H * rkA[1][2], -H * rkA[2][2], F, R1, R2, R3);
 }
 
-void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, double* R3, int* ipiv1, int* ipiv2) {
+static void RK_Solve(const double H, double* __restrict__ E1,
+					 double complex* __restrict__ E2, double* __restrict__ R1,
+					 double* __restrict__ R2, double* __restrict__ R3, int* __restrict__ ipiv1,
+					 int* __restrict__ ipiv2) {
 	// Z = (1/h) T^(-1) A^(-1) * Z
 	
 	for(int i = 0; i < NSP; i++)
@@ -341,7 +354,7 @@ void RK_Solve(double H, double* E1, double complex* E2, double* R1, double* R2, 
 	}
 }
 
-double RK_ErrorNorm(double* scale, double* DY) {
+static inline double RK_ErrorNorm(const double* __restrict__ scale, double* __restrict__ DY) {
 	
 	double sum = 0;
 	for (int i = 0; i < NSP; ++i){
@@ -350,7 +363,7 @@ double RK_ErrorNorm(double* scale, double* DY) {
 	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
 
-double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* scale, double* E1, int* ipiv1, bool FirstStep, bool Reject) {
+static double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* scale, double* E1, int* ipiv1, bool FirstStep, bool Reject) {
 	double HrkE1  = rkE[1]/H;
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
@@ -397,7 +410,7 @@ double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, do
  *  5th-order Radau2A implementation
  * 
  */
-void integrate (const double t_start, const double t_end, const double pr, double* y) {
+int integrate (const double t_start, const double t_end, const double pr, double* y) {
 	double Hmin = 0;
 	double Hold = 0;
 #ifdef Gustafsson
@@ -438,9 +451,6 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	int Nconsecutive = 0;
 	int Nsteps = 0;
 	double NewtonRate = pow(2.0, 1.25);
-#ifdef FIXED_TIMESTEP
-	H = t_end - t_start;
-#endif
 
 	while (t + Roundoff < t_end) {
 		if (!Reject) {
@@ -457,8 +467,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				if (Nconsecutive >= 5)
 				{
 					//todo implement return codes
-					y[0] = logf(-1);
-					return;
+					return EC_consecutive_steps;
 				}
 				H *= 0.5;
 				Reject = true;
@@ -473,13 +482,10 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		}
 		Nsteps += 1;
 		if (Nsteps >= Max_no_steps) {
-			printf("Max Steps exceeded...\n");
-			//todo implement return codes
-			exit(-1);
+			return EC_max_steps_exceeded;
 		}
 		if (0.1 * fabs(H) <= fabs(t) * Roundoff) {
-			printf("H smaller than minimum step-size...\n");
-			exit(-1);
+			return EC_h_plus_t_equals_h;
 		}
 		if (FirstStep || !StartNewton) {
 			memset(Z1, 0, NSP * sizeof(double));
@@ -539,21 +545,15 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
             NewtonDone = (NewtonRate * NewtonIncrement <= NewtonTol);
             if (NewtonDone) break;
             if (NewtonIter == NewtonMaxit - 1) {
-#ifndef FIXED_TIMESTEP
-            	//todo implement return codes
-				y[0] = logf(-1);
-				return;
-#endif
+            	return EC_newton_max_iterations_exceeded;
             }
 		}
-#ifdef FIXED_TIMESTEP
 		t = t_end;
 		
 		for (int i = 0; i < NSP; i++) {
 			y[i] += Z3[i];
 		}
 		continue;
-#endif
 		if (!NewtonDone) {
 			H = Fac * H;
 			Reject = true;
@@ -691,4 +691,5 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			SkipLU = false;
 		}
 	}
+	return EC_success;
 }

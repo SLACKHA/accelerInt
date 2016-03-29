@@ -88,6 +88,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double phiHm[STRIDE * STRIDE];
 	double err = 0.0;
 	double savedActions[NSP * 5];
+	int numSteps = 0;
 	while ((t < t_end) && (t + h > t)) {
 		
 		if (!reject) {
@@ -233,6 +234,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 				h_new = fmin(h, h_new);
 			}
 			h = fmin(h_new, t_end - t);
+			numSteps++;
 						
 		} else {
 

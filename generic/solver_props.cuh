@@ -15,4 +15,7 @@
  	struct solver_memory {};
 #endif
 
+__host__
+void check_error(int, int*);
+
 #endif

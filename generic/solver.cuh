@@ -14,7 +14,6 @@
  #include "solver_options.h"
  #include "solver_init.cuh"
  #include "solver_props.cuh"
- #include "header.cuh"
 
  __global__ void 
  intDriver (const int,
@@ -31,5 +30,8 @@ __device__ void integrate (const double,
 						   double * const __restrict__,
 						   mechanism_memory const * const __restrict__,
 						   solver_memory const * const __restrict__);
+
+__host__
+void check_error(int num_conditions, int* code_arr);
 
  #endif

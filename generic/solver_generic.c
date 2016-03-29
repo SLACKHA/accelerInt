@@ -29,7 +29,7 @@ void intDriver (const int NUM, const double t, const double t_end,
         }
 
         // call integrator for one time step
-        integrate (t, t_end, pr_local, y_local);
+        check_error(tid, integrate (t, t_end, pr_local, y_local));
 
         // update global array with integrated values
 

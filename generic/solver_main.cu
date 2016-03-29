@@ -257,12 +257,7 @@ int main (int argc, char *argv[])
     #endif
             // copy the result flag back
             cudaErrorCheck( cudaMemcpy(result_flag, host_solver->result, num_cond * sizeof(int), cudaMemcpyDeviceToHost) );
-            for(int i = 0; i < num_cond; ++i)
-                if (result_flag[i] != 0)
-                {
-                    printf("Thread %d returned error code %d\n", i, result_flag[i]);
-                    exit(result_flag[i]);
-                }
+            check_error(num_cond, result_flag);
             // transfer memory back to CPU
             cudaErrorCheck( cudaMemcpy2D (y_temp, padded * sizeof(double),
                                             host_mech->y, padded * sizeof(double),

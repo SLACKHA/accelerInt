@@ -8,6 +8,7 @@
  */
 
 #include "solver.cuh"
+#include "header.cuh"
 
 #define T_ID (threadIdx.x + (blockDim.x * blockIdx.x))
 

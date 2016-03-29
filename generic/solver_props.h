@@ -13,4 +13,6 @@
  	#include "radau2a_props.h"
 #endif
 
+void check_error(int, int);
+
 #endif
