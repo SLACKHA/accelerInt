@@ -83,7 +83,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		Hm[(*m - 1) * STRIDE + *m] = 0.0;
 
 		//0. fill potentially non-empty memory first
-		memset(&Hm[*m * STRIDE], 0, (*m + 1) * sizeof(double)); 
+		memset(&Hm[*m * STRIDE], 0, (*m + 2) * sizeof(double));
 
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
@@ -92,7 +92,7 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
-			memset(&Hm[(*m + i) * STRIDE], 0, (*m + i + 1) * sizeof(double));
+			memset(&Hm[(*m + i) * STRIDE], 0, (*m + i + 2) * sizeof(double));
 			Hm[(*m + i) * STRIDE + (*m + i - 1)] = 1.0;
 		}
 
