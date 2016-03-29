@@ -227,7 +227,6 @@ exp_int_dir = os.path.join(home, 'exponential_integrators')
 exp4_int_dir = os.path.join(home, 'exponential_integrators', 'exp4')
 exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
 cvodes_dir = os.path.join(home, 'cvodes')
-runge_kutta_dir = os.path.join(home, 'runge_kutta')
 
 common_dir_list = [generic_dir, mech_dir]
 
@@ -578,15 +577,6 @@ radau_c, radau_cuda = builder(env_save, mech_c,
 if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
     radau_cu = [x for x in radau_cuda if 'radau2a.cu' in str(x[0])]
     Depends(radau_cu, os.path.join(generic_dir, 'solver_options.h'))
-
-#runge kutta
-new_defines = {}
-new_defines['CPPDEFINES'] = ['RK78']
-new_defines['CPPPATH'] = [runge_kutta_dir]
-builder(env_save, mech_c, None,
-    new_defines, runge_kutta_dir,
-    variant, 'rk78-int', target_list,
-    filter_out='nverse')
 
 #exp4
 new_defines = {}
