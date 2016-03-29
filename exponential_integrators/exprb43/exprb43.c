@@ -32,7 +32,7 @@
  * 
  * 
  */
-void integrate (const double t_start, const double t_end, const double pr, double* y) {
+int integrate (const double t_start, const double t_end, const double pr, double* y) {
 	
 	//initial time
 	double h = fmin(1.0e-8, t_end - t_start);
@@ -42,6 +42,8 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double h_old = h;
 	
 	bool reject = false;
+	int failures = 0;
+	int steps = 0;
 
 	double t = t_start;
 
@@ -90,7 +92,21 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double savedActions[NSP * 5];
 	int numSteps = 0;
 	while ((t < t_end) && (t + h > t)) {
-		
+
+		//error checking
+		if (failures >= 5)
+		{
+			return EC_consecutive_steps;
+		}
+		if (steps++ >= MAX_STEPS)
+		{
+			return EC_max_steps_exceeded;
+		}
+		if (t + h <= t)
+		{
+			return EC_h_plus_t_equals_h;
+		}
+
 		if (!reject) {
 			dydt (t, pr, y, fy);
 			eval_jacob (t, pr, y, A);
@@ -257,4 +273,5 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		fclose(rFile);
 	#endif
 	
+	return EC_success;
 }

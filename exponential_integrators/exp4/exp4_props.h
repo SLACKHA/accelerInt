@@ -18,6 +18,7 @@
 #define ORD 3.0
 #define M_MAX NSP
 #define STRIDE (M_MAX + P)
+#define MAX_STEPS (10000)
 
 #define EC_success (0)
 #define EC_consecutive_steps (1)

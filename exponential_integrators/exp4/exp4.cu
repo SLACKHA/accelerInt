@@ -88,20 +88,6 @@ void integrate (const double t_start, const double t_end, const double pr,
 
 	// get scaling for weighted norm
 	scale_init(y, sc);
-
-#ifndef FORCE_ZERO
-	#pragma unroll
-	for (int i = 0; i < NSP; ++i)
-	{
-		fy[INDEX(i)] = 0;
-		A[INDEX(i)] = 0;
-	}
-	#pragma unroll
-	for(int i = NSP; i < NSP * NSP; ++i)
-	{
-		A[INDEX(i)] = 0;
-	}
-#endif
 			
 	//initial krylov subspace sizes
 	int m, m1, m2;

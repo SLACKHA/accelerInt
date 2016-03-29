@@ -30,7 +30,7 @@ void matvec_m_by_m (const int m, const double * __restrict__ A,
 	//for each row
 	
 	for (int i = 0; i < m; ++i) {
-		Av[i] = A[i] * V[0]
+		Av[i] = A[i] * V[0];
 		
 		//go across a row of A, multiplying by a column of phiHm
 		
@@ -57,7 +57,7 @@ static inline void matvec_m_by_m_plusequal (const int m, const double * __restri
 	//for each row
 	
 	for (int i = 0; i < m; ++i) {
-		Av[i] = A[i] * V[0]
+		Av[i] = A[i] * V[0];
 		
 		//go across a row of A, multiplying by a column of phiHm
 		
@@ -132,11 +132,6 @@ void matvec_n_by_m_scale_special (const int m, const double* __restrict__ scale,
 			Av[2][i] += A[j * NSP + i] * V[2][j];
 		}
 
-		
-		for (int k = 0; k < 3; k++)
-		{
-			Av[k][i] *= scale[k];
-		}
 		Av[0][i] *= scale[0];
 		Av[1][i] *= scale[1];
 		Av[2][i] = Av[2][i] * scale[2] + V[3][i] + V[4][i];

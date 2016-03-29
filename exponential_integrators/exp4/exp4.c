@@ -33,7 +33,7 @@
  * 
  * 
  */
-void integrate (const double t_start, const double t_end, const double pr, double* y) {
+int integrate (const double t_start, const double t_end, const double pr, double* y) {
 	
 	//initial time
 	double h = fmin(1.0e-8, t_end - t_start);
@@ -43,6 +43,8 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	double h_old = h;
 	
 	bool reject = false;
+	int failures = 0;
+	int steps = 0;
 
 	double t = t_start;
 
@@ -98,19 +100,33 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	int m, m1, m2;
 	while ((t < t_end) && (t + h > t)) {
 		
+		//error checking
+		if (failures >= 5)
+		{
+			return EC_consecutive_steps;
+		}
+		if (steps++ >= MAX_STEPS)
+		{
+			return EC_max_steps_exceeded;
+		}
+		if (t + h <= t)
+		{
+			return EC_h_plus_t_equals_h;
+		}
+
 		if (!reject) {
 			dydt (t, pr, y, fy);
 			eval_jacob (t, pr, y, A);
 		}
 
 		//do arnoldi
-		if (arnoldi(&m, 1.0 / 3.0, P, h, A, fy, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		int info = arnoldi(&m, 1.0 / 3.0, P, h, A, fy, sc, &beta, Vm, Hm, phiHm);
+		if (info < 0 || info >= M_MAX)
 		{
-#ifndef FIXED_TIMESTEP
 			//need to reduce h and try again
-			h /= 3;
+			h /= 5.0;
+			failures += 1;
 			continue;
-#endif
 		}
 
 		//k1 is partially in the first column of phiHm
@@ -148,7 +164,14 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		}
 
 		//do arnoldi
-		arnoldi(&m1, 1.0 / 3.0, P, h, A, k4, sc, &beta, Vm, Hm, phiHm);
+		info = arnoldi(&m1, 1.0 / 3.0, P, h, A, k4, sc, &beta, Vm, Hm, phiHm);
+		if (info < 0 || info >= M_MAX)
+		{
+			//need to reduce h and try again
+			h /= 5.0;
+			failures += 1;
+			continue;
+		}
 		//k4 is partially in the m'th column of phiHm
 		matvec_n_by_m_scale(m1, beta, Vm, phiHm, k4);
 	
@@ -182,7 +205,14 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			k7[i] = temp[i] - fy[i] - k7[i];
 		}
 	
-		arnoldi(&m2, 1.0 / 3.0, P, h, A, k7, sc, &beta, Vm, Hm, phiHm);
+		info = arnoldi(&m2, 1.0 / 3.0, P, h, A, k7, sc, &beta, Vm, Hm, phiHm);
+		if (info < 0 || info >= M_MAX)
+		{
+			//need to reduce h and try again
+			h /= 5.0;
+			failures += 1;
+			continue;
+		}
 		//k7 is partially in the m'th column of phiHm
 		matvec_n_by_m_scale(m2, beta / (h / 3.0), Vm, &phiHm[m2 * STRIDE], k7);
 				
@@ -192,16 +222,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
 		}
 		
-		scale (y, y1, f_temp);	
-
-#ifdef FIXED_TIMESTEP
-		t = t_end;
-		
-		for (int i = 0; i < NSP; ++i) {
-			y[i] = y1[i];
-		}
-		break;
-#endif			
+		scale (y, y1, f_temp);		
 		
 		///////////////////
 		// calculate errors
@@ -281,5 +302,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		fclose(logFile);
 		fclose(rFile);
 	#endif
+
+	return EC_success;
 	
 }
