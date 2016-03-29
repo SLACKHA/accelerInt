@@ -37,14 +37,17 @@
 #define UNROLL (8)
 //#define SDIRK_ERROR
 
-static inline void scale (const double * __restrict__ y0, const double* __restrict__ y, double * __restrict__ sc) {
+static inline void scale (const double * __restrict__ y0,
+						  const double* __restrict__ y,
+						  double * __restrict__ sc) {
 	
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fmax(fabs(y0[i]), fabs(y[i])) * RTOL);
 	}
 }
 
-static inline void scale_init (const double * __restrict__ y0, double * __restrict__ sc) {
+static inline void scale_init (const double * __restrict__ y0,
+							   double * __restrict__ sc) {
 	
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
@@ -233,7 +236,7 @@ static void RK_Make_Interpolate(const double* __restrict__ Z1, const double* __r
 	}
 }
 
-static void RK_Interpolate(double H, double Hold, double* __restrict__ Z1,
+static void RK_Interpolate(const double H, const double Hold, double* __restrict__ Z1,
 						   double* __restrict__ Z2, double* __restrict__ Z3, const double* __restrict__ CONT) {
 	double r = H / Hold;
 	double x1 = 1.0 + rkC[0] * r;
@@ -364,7 +367,11 @@ static inline double RK_ErrorNorm(const double* __restrict__ scale, double* __re
 	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
 
-static double RK_ErrorEstimate(double H, double t, double pr, double* Y, double* F0, double* Z1, double* Z2, double* Z3, double* scale, double* E1, int* ipiv1, bool FirstStep, bool Reject) {
+static double RK_ErrorEstimate(const double H, const double t, const double pr,
+							   const double* __restrict__ Y, const double* __restrict__ F0,
+							   double* __restrict__ Z1, double* __restrict__ Z2, double* __restrict__ Z3,
+							   const double* __restrict__ scale, double* __restrict__ E1, int* __restrict__ ipiv1,
+							   const bool FirstStep, const bool Reject) {
 	double HrkE1  = rkE[1]/H;
     double HrkE2  = rkE[2]/H;
     double HrkE3  = rkE[3]/H;
