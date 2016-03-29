@@ -66,9 +66,6 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 	  //open and clear
 	  rFile = fopen(out_reject_name, "a");
   	#endif
-#ifdef FIXED_TIMESTEP
-	h = t_end - t_start;
-#endif
 
 	double beta = 0;
 	//initial krylov subspace sizes
@@ -81,11 +78,9 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 
 	// source vector
 	double fy[NSP];
-	dydt (t, pr, y, fy);
 
 	// Jacobian matrix
 	double A[NSP * NSP] = {0.0};
-	eval_jacob (t, pr, y, A);
 	double gy[NSP];
 
 	double Hm[STRIDE * STRIDE] = {0.0};
@@ -107,13 +102,12 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		}
 
 		//do arnoldi
-		if (arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		int info = arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm);
+		if (info < 0 || info >= M_MAX)
 		{
-#ifndef FIXED_TIMESTEP
 			//need to reduce h and try again
-			h /= 3;
+			h /= 5.0;
 			continue;
-#endif
 		}
 
 		// Un2 to be stored in temp
@@ -146,13 +140,12 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 		//now we need the action of the exponential on Dn2
-		if (arnoldi(&m1, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		info = arnoldi(&m1, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
+		if (info < 0 || info >= M_MAX)
 		{
-#ifndef FIXED_TIMESTEP
 			//need to reduce h and try again
-			h /= 3;
+			h /= 5.0;
 			continue;
-#endif
 		}
 
 		//save Phi3(h * A) * Dn2 to savedActions[0]
@@ -176,13 +169,12 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 		//temp is now equal to Dn3
 
 		//finally we need the action of the exponential on Dn3
-		if (arnoldi(&m2, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm) >= M_MAX)
+		info = arnoldi(&m2, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
+		if (info < 0 || info >= M_MAX)
 		{
-#ifndef FIXED_TIMESTEP
 			//need to reduce h and try again
-			h /= 3;
+			h /= 5.0;
 			continue;
-#endif
 		}
 		out[0] = &savedActions[3 * NSP];
 		out[1] = &savedActions[4 * NSP];
@@ -200,16 +192,7 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			//error vec
 			temp[i] = 48.0 * savedActions[2 * NSP + i] - 12.0 * savedActions[4 * NSP + i];
 		}
-
-
-#ifdef FIXED_TIMESTEP
-		t = t_end;
 		
-		for (int i = 0; i < NSP; ++i) {
-			y[i] = y1[i];
-		}
-		break;
-#else			
 
 		//scale and find err
 		scale (y, y1, f_temp);
@@ -264,7 +247,6 @@ void integrate (const double t_start, const double t_end, const double pr, doubl
 			reject = true;
 			h = fmin(h, h_new);
 		}
-#endif
 
 	} // end while
 
