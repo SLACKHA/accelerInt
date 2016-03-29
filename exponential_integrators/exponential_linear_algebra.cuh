@@ -79,7 +79,7 @@ __device__
 void matvec_n_by_m_scale_special (const int,
 	const double * __restrict__,
 	const double * __restrict__,
-	double ** __restrict__, double ** __restrict__);
+	const double ** __restrict__, double ** __restrict__);
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor
  *
@@ -146,7 +146,7 @@ void matvec_n_by_m_scale_add_subtract (const int,
 
 /** Get scaling for weighted norm
  * 
- *	Computes ATOL + MAX(|y0|, |y1|) * RTOL
+ *	Computes 1.0 / (ATOL + MAX(|y0|, |y1|) * RTOL)
  *
  * \param[in]		y0		values at current timestep
  * \param[in]		y1		values at next timestep
@@ -160,7 +160,7 @@ void scale (const double* __restrict__,
 
 /** Get scaling for weighted norm for the initial timestep (used in krylov process)
  * 
- *  Computes ATOL + |y1| * RTOL
+ *  Computes 1.0 / (ATOL + |y1| * RTOL)
  *
  * \param[in]		y0		values at current timestep
  * \param[out]		sc	array of scaling values
@@ -172,7 +172,7 @@ void scale_init (const double* __restrict__, double* __restrict__);
 
 /** Perform weighted norm
  *
- *  Computes sqrt(sum((nums^2) / sc) / NSP)
+ *  Computes sqrt(sum((nums^2) * sc) / NSP)
  * 
  * \param[in]		nums	values to be normed
  * \param[in]		sc		scaling array for norm

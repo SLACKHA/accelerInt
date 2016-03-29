@@ -110,7 +110,7 @@ void matvec_n_by_m_scale (const int m, const double scale,
 __device__
 void matvec_n_by_m_scale_special (const int m, const double * __restrict__ scale,
 								  const double * __restrict__ A,
-								  double ** __restrict__ V,
+								  const double ** __restrict__ V,
 								  double ** __restrict__ Av) {
 	//for each row
 	#pragma unroll
