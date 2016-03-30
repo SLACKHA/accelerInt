@@ -120,24 +120,12 @@ int main (int argc, char *argv[])
 #endif
 
     double* y_host;
-#ifdef CONP
-    double* pres_host;
-#elif CONV
-    double* rho_host;
-#endif
+    double* var_host;
 
 #ifdef SAME_IC
-#ifdef CONP
-    set_same_initial_conditions(NUM, &y_host, &pres_host);
+    set_same_initial_conditions(NUM, &y_host, &var_host);
 #else
-    set_same_initial_conditions(NUM, &y_host, &rho_host);
-#endif
-#else
-#ifdef CONP
-    read_initial_conditions(filename, NUM, &y_host, &pres_host);
-#elif CONV
-    read_initial_conditions(filename, NUM, &y_host, &rho_host);
-#endif
+    read_initial_conditions(filename, NUM, &y_host, &var_host);
 #endif
 
 // flag for ignition
@@ -176,13 +164,7 @@ int main (int argc, char *argv[])
     {
         numSteps++;
 
-#if defined(CONP)
-        // constant pressure case
-        intDriver (NUM, t, t_next, pres_host, y_host);
-#elif defined(CONV)
-        // constant volume case
-        intDriver (NUM, t, t_next, rho_host, y_host);
-#endif
+        intDriver(NUM, t, t_next, var_host, y_host);
         t = t_next;
         t_next = fmin(end_time, (numSteps + 1) * t_step);
 
@@ -238,11 +220,7 @@ int main (int argc, char *argv[])
 #endif
 
     free (y_host);
-#ifdef CONP
-    free (pres_host);
-#elif CONV
-    free (rho_host);
-#endif
+    free(var_host);
     cleanup_solver(num_threads);
 
     return 0;
