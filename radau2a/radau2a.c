@@ -474,7 +474,6 @@ int integrate (const double t_start, const double t_end, const double pr, double
 				Nconsecutive += 1;
 				if (Nconsecutive >= 5)
 				{
-					//todo implement return codes
 					return EC_consecutive_steps;
 				}
 				H *= 0.5;

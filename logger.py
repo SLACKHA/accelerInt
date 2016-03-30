@@ -37,7 +37,6 @@ def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
     globtxt = '*-gpu-log.bin' if builder == 'gpu' else '*-int-log.bin'
     key_arr = validator[-1, 1:]
     with open('logfile', 'a') as file:
-        file.write('t={}\n'.format(t))
         for f in glob(pjoin('log', globtxt)):
             if keyfile in f:
                 continue
@@ -168,6 +167,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     file.flush()
                     for ts in range(-4, -10, -1):
                         t_step = np.power(10., ts)
+                        file.write('t_step={:.0e}\n'.format(t_step))
+                        file.flush()
                         the_args = arg_list + ['t_step={:.0e}'.format(t_step)]
                         subprocess.check_call([scons, builder[lang]] + the_args, stdout=errfile, stderr=errfile)
                         __execute(builder[lang], num_threads, num_conditions)
