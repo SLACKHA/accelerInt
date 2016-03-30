@@ -45,17 +45,18 @@ def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
 
             file.write(f + '\n')
             data_arr = array[-1, 1:]
+            data_arr = data_arr.reshape(-1, nvar)
+            key_arr = key_arr.reshape(-1, nvar)
             #now compare column by column and get max err
             err = np.abs(data_arr - key_arr) / (atol + key_arr * rtol)
-            L2_err = np.linalg.norm(err, axis=1, ord=2)
-            L2_inf = np.linalg.norm(err, axis=1, ord=np.inf)
-            err = np.sum(err)
-            norm_err = np.sqrt(err)
-            
-            file.write("{:.16e}\n".format(norm_err))
+            L2_err = np.linalg.norm(err, axis=0, ord=2)
+            Linf_err = np.linalg.norm(err, axis=0, ord=np.inf)
+
+            file.write('L2 = ' + ', '.join('{:.16e}'.format(x) for x in L2_err) + '\n')
+            file.write('Linf = ' + ', '.join('{:.16e}'.format(x) for x in Linf_err) + '\n')
 
 def __execute(builder, num_threads, num_conditions):
-    with open('logfile', 'a') as file:
+    with open('logerr', 'a') as file:
         if builder == 'gpu':
             for exe in glob('*-gpu'):
                 file.write('\n' + exe + '\n')
@@ -116,7 +117,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
         validator = __check_valid(nvar, num_conditions, t_end, t_step)
         if validator is None:
-            with open('logfile', 'a') as file:
+            with open('logerr', 'a') as file:
                 subprocess.check_call([scons, 'cpu'] + arg_list, stdout=file)
                 #run
                 subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
@@ -139,50 +140,54 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         builder = {'c':'cpu', 'cuda':'gpu'}
         opt = [False]#[True, False]
         smem = [False, True]
-        #now check for various options
-        for lang in langs:
-            for cache_opt in opt:
-                if lang == 'cuda':
-                    for shared_mem in smem:
-                        with open('logfile', 'a') as file:
-                            file.write('\ncache_opt: {}\n'
-                                   'shared_mem: {}\n'.format(
-                                    cache_opt, not shared_mem))
+        with open('logfile', 'a') as file:
+            with open('logerr', 'a') as errfile:
+                #now check for various options
+                for lang in langs:
+                    for cache_opt in opt:
+                        if lang == 'cuda':
+                            for shared_mem in smem:
+                                file.write('\ncache_opt: {}\n'
+                                       'shared_mem: {}\n'.format(
+                                        cache_opt, not shared_mem))
+                                file.flush()
+                                __check_exit(create_jacobian(lang=lang, 
+                                mech_name=mech, 
+                                therm_name=thermo, 
+                                initial_state=initial_conditions, 
+                                optimize_cache=cache_opt,
+                                multi_thread=num_threads,
+                                no_shared=shared_mem,
+                                build_path=build_path))
+
+                                subprocess.check_call([scons, builder[lang]] + arg_list, stdout=errfile, stderr=errfile)
+                                __execute(builder[lang], num_threads, num_conditions)
+                                __check_error(builder[lang], num_conditions, nvar, t_end,
+                                                validator, atol, rtol)
+
+                        else:
+                            file.write('\ncache_opt: {}\n'.format(
+                                        cache_opt))
+                            file.flush()
                             __check_exit(create_jacobian(lang=lang, 
                             mech_name=mech, 
                             therm_name=thermo, 
                             initial_state=initial_conditions, 
                             optimize_cache=cache_opt,
                             multi_thread=num_threads,
-                            no_shared=shared_mem,
                             build_path=build_path))
 
-                            subprocess.check_call([scons, builder[lang]] + arg_list, stdout=file)
+                            subprocess.check_call([scons, builder[lang]] + arg_list, stdout=errfile, stderr=errfile)
                             __execute(builder[lang], num_threads, num_conditions)
                             __check_error(builder[lang], num_conditions, nvar, t_end,
                                             validator, atol, rtol)
-
-                else:
-                    with open('logfile', 'a') as file:
-                        file.write('\ncache_opt: {}\n'.format(
-                                    cache_opt))
-                        __check_exit(create_jacobian(lang=lang, 
-                        mech_name=mech, 
-                        therm_name=thermo, 
-                        initial_state=initial_conditions, 
-                        optimize_cache=cache_opt,
-                        multi_thread=num_threads,
-                        build_path=build_path))
-
-                        subprocess.check_call([scons, builder[lang]] + arg_list, stdout=file)
-                        __execute(builder[lang], num_threads, num_conditions)
-                        __check_error(builder[lang], num_conditions, nvar, t_end,
-                                        validator, atol, rtol)
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol):
     with open('logfile', 'w') as file:
+        pass
+    with open('logerr', 'w') as file:
         pass
     if initial_conditions is not None:
         with open('logfile', 'a') as file:

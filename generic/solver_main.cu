@@ -44,7 +44,8 @@ void write_log(int NUM, double t, const double* y_host, FILE* pFile)
     for (int j = 0; j < NUM; j++)
     {
         double Y_N = 1.0;
-        for (int i = 0; i < NSP; ++i)
+        buffer[0] = y_host[j];
+        for (int i = 1; i < NSP; ++i)
         {
             buffer[i] = y_host[NUM * i + j];
             Y_N -= buffer[i];
