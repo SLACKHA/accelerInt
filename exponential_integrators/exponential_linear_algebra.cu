@@ -110,8 +110,8 @@ void matvec_n_by_m_scale (const int m, const double scale,
 __device__
 void matvec_n_by_m_scale_special (const int m, const double * __restrict__ scale,
 								  const double * __restrict__ A,
-								  const double ** __restrict__ V,
-								  double ** __restrict__ Av) {
+								  double * const __restrict__ * V,
+								  double * __restrict__ * Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {
@@ -148,7 +148,7 @@ void matvec_n_by_m_scale_special (const int m, const double * __restrict__ scale
  */
 __device__
 void matvec_n_by_m_scale_special2 (const int m, const double* __restrict__ scale, const double* __restrict__ A,
-										double** __restrict__ V, double** __restrict__ Av) {
+										double* const __restrict__ * V, double* __restrict__ * Av) {
 	//for each row
 	#pragma unroll
 	for (int i = 0; i < NSP; ++i) {

@@ -79,7 +79,7 @@ __device__
 void matvec_n_by_m_scale_special (const int,
 	const double * __restrict__,
 	const double * __restrict__,
-	const double ** __restrict__, double ** __restrict__);
+	double * const __restrict__ *, double * __restrict__*);
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor
  *
@@ -99,7 +99,7 @@ __device__
 void matvec_n_by_m_scale_special2 (const int,
 	const double* __restrict__,
 	const double* __restrict__,
-	double** __restrict__, double** __restrict__);
+	double* const __restrict__ *, double* __restrict__ *);
 
 /** Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor and added to another vector
  * 
