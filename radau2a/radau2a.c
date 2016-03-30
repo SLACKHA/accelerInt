@@ -556,12 +556,6 @@ int integrate (const double t_start, const double t_end, const double pr, double
             	return EC_newton_max_iterations_exceeded;
             }
 		}
-		t = t_end;
-		
-		for (int i = 0; i < NSP; i++) {
-			y[i] += Z3[i];
-		}
-		continue;
 		if (!NewtonDone) {
 			H = Fac * H;
 			Reject = true;
@@ -569,81 +563,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			SkipLU = false;
 			continue;
 		}
-#ifdef SDIRK_ERROR
-		//!~~~>   Prepare the loop-independent part of the right-hand side
-		//!       G = H*rkBgam(0)*F0 + rkTheta(1)*Z1 + rkTheta(2)*Z2 + rkTheta(3)*Z3
-		
-		for (int i = 0; i < NSP; i++) {
-			Z4[i] = Z3[i];
-			G[i] = rkBgam[0]*F0[i]*H + rkTheta[0] * Z1[i] + rkTheta[1] * Z2[i] + rkTheta[2] * Z3[i];
-		}
-		NewtonDone = false;
-        Fac = 0.5; // ! Step reduction factor if too many iterations
-        double NewtonIncrement = 0;
-        for (int sNewtonIter = 0; sNewtonIter < NewtonMaxit; sNewtonIter++) {
-        	//!~~~>   Prepare the loop-dependent part of the right-hand side
-        	WADD(y, Z4, TMP);
-        	dydt(t + H, pr, TMP, DZ4);
-        	
-        	for(int i = 0; i < NSP; i++){
-        		DZ4[i] += (rkGamma / H) * (G[i] - Z4[i]);
-        	}
-        	//Solve the linear system
-        	dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, DZ4, &ARRSIZE, &info);
-        	if (info != 0) {
-        		printf("Error in back-substitution\n");
-        		exit(-1);
-        	}
-        	//Check convergence of Newton iterations
-        	NewtonIncrement = RK_ErrorNorm(sc,DZ4);
-        	double sNewtonRate = 2.0;
-        	double ThetaSD = ThetaMin;
-        	if (NewtonIter > 0) {
-            	ThetaSD = NewtonIncrement/NewtonIncrementOld;
-            	if (ThetaSD < 0.99) {
-            		sNewtonRate = ThetaSD/(1.0-ThetaSD);
-                    //! Predict error at the end of Newton process 
-                    double NewtonPredictedErr = (NewtonIncrement * pow(ThetaSD, (NewtonMaxit - sNewtonIter - 1))) / (1.0 - Theta);
-                    if (NewtonPredictedErr >= NewtonTol) {
-                    	//! Non-convergence of Newton: predicted error too large
-						double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
-	                    Fac = 0.8 * pow(Qnewton, -1.0/((double)(NewtonMaxit-sNewtonIter)));
-	                    break;
-                    }
-            	}
-            	else
-            	{
-            		//! Non-convergence of Newton: predicted error too large
-            		break;
-            	}
-            }
-            NewtonIncrementOld = NewtonIncrement;
-            //! Update solution: Z4 <-- Z4 + DZ4
-            
-            for (int i = 0; i < NSP; i++) {
-            	Z4[i] += DZ4[i];
-            }
-
-            NewtonDone = (sNewtonRate*NewtonIncrement <= NewtonTol);
-            if (NewtonDone) break;
-        }
-        if (!NewtonDone) {
-        	H = Fac*H;
-        	Reject = true;
-        	SkipJac = true;
-        	SkipLU = false;
-        	continue;
-		}
-#endif
-#ifdef SDIRK_ERROR
-		
-		for (int i = 0; i < NSP; i++) {
-			DZ4[i] = Z3[i] - Z4[i];
-		}
-		double Err = RK_ErrorNorm(sc, DZ4);
-#else
 		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
-#endif
 		//!~~~> Computation of new step size Hnew
 		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
