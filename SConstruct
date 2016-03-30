@@ -158,8 +158,6 @@ config_options = [
     BoolVariable(
         'LOG_END_ONLY', 'Log only beginning and end states to file.', False),
     BoolVariable(
-        'FIXED_TIMESTEP', 'Turn off adaptive time stepping.', False),
-    BoolVariable(
         'IGN', 'Log ignition time.', False),
     BoolVariable(
         'FAST_MATH', 'Compile with Fast Math.', False),
@@ -380,16 +378,11 @@ with open(os.path.join(generic_dir, 'solver_options.h'), 'w') as file:
     //turn on to log the krylov space and step sizes
     #define LOG_KRYLOV_AND_STEPSIZES
     """)
-        if env['LOG_END_ONLY']:
+    
+    if env['LOG_END_ONLY']:
             file.write("""
     //used to only log output on end step
     #define LOG_END_ONLY
-    """)
-
-    if env['FIXED_TIMESTEP']:
-        file.write("""
-    //used to only log output on end step
-    #define FIXED_TIMESTEP
     """)
 
     if int(env['DIVERGENCE_WARPS']) > 0:

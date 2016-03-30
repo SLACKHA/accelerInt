@@ -69,9 +69,6 @@ int integrate (const double t_start, const double t_end, const double pr, double
 	//open and clear
 	rFile = fopen(out_reject_name, "a");
 #endif
-#ifdef FIXED_TIMESTEP
-	h = t_end - t_start;
-#endif
 	
 	double beta = 0;
 	// source vector	
