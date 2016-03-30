@@ -49,7 +49,7 @@ void intDriver (const int NUM, const double t, const double t_end,
             if (flag != CV_SUCCESS)
             {
                 printf("Error reinitializing CVodes: %d", flag);
-                exit(-1);
+                exit(flag);
             }
         #endif
 
@@ -59,7 +59,7 @@ void intDriver (const int NUM, const double t, const double t_end,
             if (flag != CV_SUCCESS)
             {
                 printf("Error setting user data: %d", flag);
-                exit(-1);
+                exit(flag);
             }
         #endif
 
@@ -72,12 +72,12 @@ void intDriver (const int NUM, const double t, const double t_end,
                 for (int i = 0; i < NSP; i++)
                     printf("%le\t%le\n", y_local[i], y_global[tid + NUM * i]);
                 printf("Error on integration step: %d", flag);
-                exit(-1);
+                exit(flag);
             }
             if (t_next != t_end)
             {
                 printf("Error on integration step: %d", flag);
-                exit(-1);
+                exit(flag);
             }
         #endif
 
