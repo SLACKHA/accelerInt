@@ -70,8 +70,6 @@ int integrate (const double t_start, const double t_end, const double pr, double
   	#endif
 
 	double beta = 0;
-	//initial krylov subspace sizes
-	int m, m1, m2;
 
 	// temporary arrays
 	double temp[NSP];

@@ -39,7 +39,11 @@ void getHessenbergLU(const int n, double complex* __restrict__ A,
 		{
 			//swap rows
 			swapComplex(n - last_free, &A[last_free * STRIDE + i], STRIDE, &A[last_free * STRIDE + i + 1], STRIDE);
+			#ifdef LAPACK_INVERSE
+			indPivot[i] = i + 2;
+			#else
 			indPivot[i] = i + 1;
+			#endif
 		}
 		else
 		{
