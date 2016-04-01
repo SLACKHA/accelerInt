@@ -97,8 +97,8 @@ int arnoldi(int* m, const double scale,
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
-			for (int j = 0; j < (*m + i + 2); ++j)
-				Hm[INDEX((*m + i) * STRIDE + j)] = 0;
+			for (int k = 0; k < (*m + i + 2); ++k)
+				Hm[INDEX((*m + i) * STRIDE + k)] = 0;
 			//1. Construct augmented Hm (fill in identity matrix)
 			Hm[INDEX((*m + i) * STRIDE + (*m + i - 1))] = 1.0;
 		}
