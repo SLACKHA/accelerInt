@@ -119,11 +119,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		}
 
 		//do arnoldi
-		int info = arnoldi(&m, 0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm);
-		if (info < 0 || info >= M_MAX)
+		int m = arnoldi(0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm);
+		if (m >= M_MAX || m < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
+			failures++;
 			continue;
 		}
 
@@ -157,11 +158,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 		//now we need the action of the exponential on Dn2
-		info = arnoldi(&m1, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
-		if (info < 0 || info >= M_MAX)
+		int m1 = arnoldi(1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
+		if (m1 >= M_MAX || m1 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
+			failures++;
 			continue;
 		}
 
@@ -186,11 +188,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		//temp is now equal to Dn3
 
 		//finally we need the action of the exponential on Dn3
-		info = arnoldi(&m2, 1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
-		if (info < 0 || info >= M_MAX)
+		int m2 = arnoldi(1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
+		if (m2 >= M_MAX || m2 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
+			failures++;
 			continue;
 		}
 		out[0] = &savedActions[3 * NSP];
@@ -218,6 +221,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		// classical step size calculation
 		h_new = pow(err, -1.0 / ORD);	
 		
+		failures = 0;
 		if (err <= 1.0) {
 
 			#ifdef LOG_KRYLOV_AND_STEPSIZES

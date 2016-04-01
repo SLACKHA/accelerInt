@@ -94,7 +94,6 @@ int integrate (const double t_start, const double t_end, const double pr, double
 	double k6[NSP];
 	double k7[NSP];
 	//initial krylov subspace sizes
-	int m, m1, m2;
 	while ((t < t_end) && (t + h > t)) {
 		
 		//error checking
@@ -117,12 +116,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		}
 
 		//do arnoldi
-		int info = arnoldi(&m, 1.0 / 3.0, P, h, A, fy, sc, &beta, Vm, Hm, phiHm);
-		if (info < 0 || info >= M_MAX)
+		int m = arnoldi(1.0 / 3.0, P, h, A, fy, sc, &beta, Vm, Hm, phiHm);
+		if (m >= M_MAX || m < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
-			failures += 1;
+			failures++;
 			continue;
 		}
 
@@ -161,12 +160,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		}
 
 		//do arnoldi
-		info = arnoldi(&m1, 1.0 / 3.0, P, h, A, k4, sc, &beta, Vm, Hm, phiHm);
-		if (info < 0 || info >= M_MAX)
+		int m1 = arnoldi(1.0 / 3.0, P, h, A, k4, sc, &beta, Vm, Hm, phiHm);
+		if (m1 >= M_MAX || m1 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
-			failures += 1;
+			failures++;
 			continue;
 		}
 		//k4 is partially in the m'th column of phiHm
@@ -202,12 +201,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			k7[i] = temp[i] - fy[i] - k7[i];
 		}
 	
-		info = arnoldi(&m2, 1.0 / 3.0, P, h, A, k7, sc, &beta, Vm, Hm, phiHm);
-		if (info < 0 || info >= M_MAX)
+		int m2 = arnoldi(1.0 / 3.0, P, h, A, k7, sc, &beta, Vm, Hm, phiHm);
+		if (m2 >= M_MAX || m2 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
-			failures += 1;
+			failures++;
 			continue;
 		}
 		//k7 is partially in the m'th column of phiHm
@@ -243,6 +242,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		// classical step size calculation
 		h_new = pow(err, -1.0 / ORD);	
 		
+		failures = 0;
 		if (err <= 1.0) {
 
 			#ifdef LOG_KRYLOV_AND_STEPSIZES

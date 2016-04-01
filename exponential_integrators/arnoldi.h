@@ -40,7 +40,7 @@ static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42,
  * \param[out] 			phiHm   the exponential matrix computed from h * scale * Hm
  */
 static inline
-int arnoldi(int* m, const double scale, const int p, const double h, const double* A, const double* v, const double* sc, double* beta, double* Vm, double* Hm, double* phiHm)
+int arnoldi(const double scale, const int p, const double h, const double* A, const double* v, const double* sc, double* beta, double* Vm, double* Hm, double* phiHm)
 {
 	//the temporary work array
 	double w[NSP];
@@ -51,14 +51,10 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 	double store = 0;
 	int index = 0;
 	int j = 0;
-	double err = 0;
+	double err = 2.0;
 
-	do
+	while(err > 1.0 && j + p < M_MAX)
 	{
-		if (j + p >= M_MAX) //need to modify h_kry and restart
-		{
-			break;
-		}
 		
 		for (; j < index_list[index]; j++)
 		{
@@ -72,36 +68,35 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 			if (fabs(Hm[j * STRIDE + j + 1]) < ATOL)
 			{
 				//happy breakdown
-				*m = j;
 				break;
 			}
 			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NSP]);
 		}
-		*m = index_list[index++];
+		index++;
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
-		store = Hm[(*m - 1) * STRIDE + *m];
-		Hm[(*m - 1) * STRIDE + *m] = 0.0;
+		store = Hm[(j - 1) * STRIDE + j];
+		Hm[(j - 1) * STRIDE + j] = 0.0;
 
 		//0. fill potentially non-empty memory first
-		memset(&Hm[*m * STRIDE], 0, (*m + 2) * sizeof(double));
+		memset(&Hm[j * STRIDE], 0, (j + 2) * sizeof(double));
 
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
-		Hm[(*m) * STRIDE] = 1.0;
+		Hm[(j) * STRIDE] = 1.0;
 		
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
-			memset(&Hm[(*m + i) * STRIDE], 0, (*m + i + 2) * sizeof(double));
-			Hm[(*m + i) * STRIDE + (*m + i - 1)] = 1.0;
+			memset(&Hm[(j + i) * STRIDE], 0, (j + i + 2) * sizeof(double));
+			Hm[(j + i) * STRIDE + (j + i - 1)] = 1.0;
 		}
 
 #ifdef RB43
 		//2. Get phiHm
-		int info = expAc_variable (*m + p, Hm, h * scale, phiHm);
+		int info = expAc_variable (j + p, Hm, h * scale, phiHm);
 #elif EXP4
 		//2. Get phiHm
-		int info = phiAc_variable (*m + p, Hm, h * scale, phiHm);
+		int info = phiAc_variable (j + p, Hm, h * scale, phiHm);
 #endif
 		if (info != 0)
 		{
@@ -109,14 +104,14 @@ int arnoldi(int* m, const double scale, const int p, const double h, const doubl
 		}
 
 		//3. Get error
-		err = h * (*beta) * fabs(store * phiHm[(*m) * STRIDE + (*m) - 1]) * sc_norm(&Vm[(*m) * NSP], sc);
+		err = h * (*beta) * fabs(store * phiHm[(j) * STRIDE + (j) - 1]) * sc_norm(&Vm[(j) * NSP], sc);
 
 		//restore Hm(m, m + 1)
-		Hm[(*m - 1) * STRIDE + *m] = store;
+		Hm[(j - 1) * STRIDE + j] = store;
 		//restore real Hm (NOTE: untested in RB43)
-		Hm[(*m) * STRIDE] = 0.0;
+		Hm[(j) * STRIDE] = 0.0;
 
-	} while (err >= 1.0);
+	}
 
 	return j;
 }

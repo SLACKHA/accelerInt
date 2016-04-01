@@ -90,7 +90,6 @@ void integrate (const double t_start, const double t_end, const double pr,
 	scale_init(y, sc);
 			
 	//initial krylov subspace sizes
-	int m, m1, m2;
 	while (t < t_end) {
 
 		//error checking
@@ -122,12 +121,12 @@ void integrate (const double t_start, const double t_end, const double pr,
 		#ifdef DIVERGENCE_TEST
 		integrator_steps[T_ID]++;
 		#endif
-		int info = arnoldi(&m, 1.0 / 3.0, P, h, A, solver, fy, &beta, work1, work4);
-		if (info >= M_MAX || info < 0)
+		int m = arnoldi(1.0 / 3.0, P, h, A, solver, fy, &beta, work1, work4);
+		if (m >= M_MAX || m < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
-			failures += 1;
+			failures++;
 			continue;
 		}
 
@@ -167,12 +166,12 @@ void integrate (const double t_start, const double t_end, const double pr,
 		}
 
 		//do arnoldi
-		info = arnoldi(&m1, 1.0 / 3.0, P, h, A, solver, k4, &beta, work1, work4);
-		if (info >= M_MAX || info < 0)
+		int m1 = arnoldi(1.0 / 3.0, P, h, A, solver, k4, &beta, work1, work4);
+		if (m1 >= M_MAX || m1 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
-			failures += 1;
+			failures++;
 			continue;
 		}
 		//k4 is partially in the m'th column of phiHm
@@ -208,12 +207,12 @@ void integrate (const double t_start, const double t_end, const double pr,
 			k7[INDEX(i)] = work1[INDEX(i)] - fy[INDEX(i)] - k7[INDEX(i)];
 		}
 	
-		info = arnoldi(&m2, 1.0 / 3.0, P, h, A, solver, k7, &beta, work1, work4);
-		if (info >= M_MAX || info < 0)
+		int m2 = arnoldi(1.0 / 3.0, P, h, A, solver, k7, &beta, work1, work4);
+		if (m2 >= M_MAX || m2 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
-			failures += 1;
+			failures++;
 			continue;
 		}
 		//k7 is partially in the m'th column of phiHm
@@ -249,6 +248,7 @@ void integrate (const double t_start, const double t_end, const double pr,
 		// classical step size calculation
 		h_new = pow(err, -1.0 / ORD);	
 		
+		failures = 0;
 		if (err <= 1.0) {
 			// update y, t and scale
 			#pragma unroll

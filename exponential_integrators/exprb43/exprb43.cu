@@ -74,8 +74,6 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 #endif
 
 	double beta = 0;
-	//initial krylov subspace sizes
-	int m, m1, m2;
 
 	//arrays
 	double * const __restrict__ work1 = solver->work1;
@@ -135,14 +133,14 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		#ifdef DIVERGENCE_TEST
 		integrator_steps[T_ID]++;
 		#endif
-		int info = arnoldi(&m, 0.5, 1, h, A, solver, fy, &beta, work2, work4);
-		if (info >= M_MAX || info < 0)
+		int m = arnoldi(0.5, 1, h, A, solver, fy, &beta, work2, work4);
+		if (m >= M_MAX || m < 0)
 		{
 			//failure: too many krylov vectors required or singular matrix encountered
 			//need to reduce h and try again
 			h /= 5.0;
 			reject = true;
-			failures += 1;
+			failures++;
 			continue;
 		}
 
@@ -176,13 +174,13 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//Un3 = y + ** h * beta * Vm * phiHm(:, m) **
 
 		//now we need the action of the exponential on Dn2
-		info = arnoldi(&m1, 1.0, 4, h, A, solver, work1, &beta, work2, work4);
-		if (info >= M_MAX || info < 0)
+		int m1 = arnoldi(1.0, 4, h, A, solver, work1, &beta, work2, work4);
+		if (m1 >= M_MAX || m1 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			reject = true;
-			failures += 1;
+			failures++;
 			continue;
 		}
 
@@ -212,13 +210,13 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//work1 is now equal to Dn3
 
 		//finally we need the action of the exponential on Dn3
-		info = arnoldi(&m2, 1.0, 4, h, A, solver, work1, &beta, work2, work4);
-		if (info >= M_MAX || info < 0)
+		int m2 = arnoldi(1.0, 4, h, A, solver, work1, &beta, work2, work4);
+		if (m2 >= M_MAX || m2 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			reject = true;
-			failures += 1;
+			failures++;
 			continue;
 		}
 		out[0] = &savedActions[GRID_DIM * 3 * NSP];
@@ -264,9 +262,8 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		}
 #endif
 		
+		failures = 0;
 		if (err <= 1.0) {
-
-			failures = 0;
 			// update y, scale vector and t
 			#pragma unroll
 			for (int i = 0; i < NSP; ++i)
@@ -294,7 +291,6 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			h = fmin(h_new, t_end - t);
 						
 		} else {
-			failures += 1;
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 			h_new = fmin(h_new, t_end - t);

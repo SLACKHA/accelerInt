@@ -40,7 +40,7 @@ __constant__ int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 3
  * \param[out] 			phiHm   the exponential matrix computed from h * scale * Hm
  */
 __device__
-int arnoldi(int* m, const double scale,
+int arnoldi(const double scale,
 			const int p, const double h,
 			const double* __restrict__ A,
 			const solver_memory* __restrict__ solver,
@@ -76,51 +76,50 @@ int arnoldi(int* m, const double scale,
 			if (fabs(Hm[INDEX(j * STRIDE + j + 1)]) < ATOL)
 			{
 				//happy breakdown
-				*m = j;
 				break;
 			}
 			scale_mult(1.0 / Hm[INDEX(j * STRIDE + j + 1)], work, &Vm[GRID_DIM * ((j + 1) * NSP)]);
 		}
-		*m = index_list[index++];
+		index++;
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
-		store = Hm[INDEX((*m - 1) * STRIDE + *m)];
-		Hm[INDEX((*m - 1) * STRIDE + *m)] = 0.0;
+		store = Hm[INDEX((j - 1) * STRIDE + j)];
+		Hm[INDEX((j - 1) * STRIDE + j)] = 0.0;
 
 		//0. fill potentially non-empty memory first
-		for (int i = 0; i < (*m + 2); ++i)
-			Hm[INDEX(*m * STRIDE + i)] = 0;
+		for (int i = 0; i < (j + 2); ++i)
+			Hm[INDEX(j * STRIDE + i)] = 0;
 
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
-		Hm[INDEX((*m) * STRIDE)] = 1.0;
+		Hm[INDEX((j) * STRIDE)] = 1.0;
 		#pragma unroll
 		for (int i = 1; i < p; i++)
 		{
 			//0. fill potentially non-empty memory first
-			for (int k = 0; k < (*m + i + 2); ++k)
-				Hm[INDEX((*m + i) * STRIDE + k)] = 0;
+			for (int k = 0; k < (j + i + 2); ++k)
+				Hm[INDEX((j + i) * STRIDE + k)] = 0;
 			//1. Construct augmented Hm (fill in identity matrix)
-			Hm[INDEX((*m + i) * STRIDE + (*m + i - 1))] = 1.0;
+			Hm[INDEX((j + i) * STRIDE + (j + i - 1))] = 1.0;
 		}
 
 #ifdef RB43
 		//2. Get phiHm
-		info = expAc_variable (*m + p, Hm, h * scale, phiHm, solver, work2);
+		info = expAc_variable (j + p, Hm, h * scale, phiHm, solver, work2);
 #elif EXP4
 		//2. Get phiHm
-		info = phiAc_variable (*m + p, Hm, h * scale, phiHm, solver, work2);
+		info = phiAc_variable (j + p, Hm, h * scale, phiHm, solver, work2);
 #endif
 		if (info != 0)
 			return -info;
 
 		//3. Get error
-		err = h * (*beta) * fabs(store * phiHm[INDEX((*m) * STRIDE + (*m) - 1)]) * sc_norm(&Vm[GRID_DIM * ((*m) * NSP)], sc);
+		err = h * (*beta) * fabs(store * phiHm[INDEX((j) * STRIDE + (j) - 1)]) * sc_norm(&Vm[GRID_DIM * ((j) * NSP)], sc);
 
 		//restore Hm(m, m + 1)
-		Hm[INDEX((*m - 1) * STRIDE + *m)] = store;
+		Hm[INDEX((j - 1) * STRIDE + j)] = store;
 
 		//restore real Hm
-		Hm[INDEX((*m) * STRIDE)] = 0.0;
+		Hm[INDEX((j) * STRIDE)] = 0.0;
 	}
 
 	return j;
