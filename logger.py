@@ -80,7 +80,7 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, reuse_valid):
+        atol, rtol, t_end, small_atol, small_rtol, reuse_valid):
         #first compile and run cvodes to get the baseline
         __check_exit(create_jacobian(lang='c', 
             mech_name=mech, 
@@ -103,6 +103,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     if match:
                         nvar = int(match.group(1))
                         break
+        if num_conditions is None and test_data is not None:
+            num_conditions = np.fromfile('ign_data.bin').reshape((-1, nvar + 2)).shape[0]
         assert nvar is not None
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE',
@@ -115,11 +117,11 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         else:
             arg_list.append('SAME_IC=FALSE')
 
-        validator = __check_valid(nvar, num_conditions, t_end, t_step)
+        validator = __check_valid(nvar, num_conditions, t_end, t_end)
         if validator is None or not reuse_valid:
             with open('logerr', 'a') as file:
                 extra_args = ['ATOL={:.0e}'.format(small_atol), 'RTOL={:.0e}'.format(small_rtol),
-                                't_step={:.0e}'.format(t_step)]
+                                't_step={:.0e}'.format(t_end)]
                 subprocess.check_call([scons, 'cpu'] + arg_list + extra_args, stdout=file)
                 #run
                 subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
@@ -177,7 +179,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, reuse_valid):
+        atol, rtol, t_end, small_atol, small_rtol, reuse_valid):
     with open('logfile', 'w') as file:
         pass
     with open('logerr', 'w') as file:
@@ -186,8 +188,9 @@ def run_log(mech, thermo, initial_conditions, build_path,
         with open('logfile', 'a') as file:
             file.write('Running Same ICs\n')
         __run_and_check(mech, thermo, initial_conditions, build_path, 
-            num_threads, num_conditions, None, skip_c, skip_cuda,
-            atol, rtol, reuse_valid)
+            num_threads, 1 if num_conditions is None else num_conditions,
+            None, skip_c, skip_cuda, atol, rtol, t_end,
+            small_atol, small_rtol, reuse_valid)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -197,7 +200,8 @@ def run_log(mech, thermo, initial_conditions, build_path,
             pass
         __run_and_check(mech, thermo, '', build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, reuse_valid)
+        atol, rtol, t_end, small_atol, small_rtol, 
+        reuse_valid)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -230,7 +234,7 @@ if __name__ == '__main__':
     parser.add_argument('-nc', '--num_conditions',
                         type=int,
                         required=False,
-                        default=1,
+                        default=None,
                         help='The number of conditions to test')
     parser.add_argument('-td', '--test_data',
                         type=str,
@@ -251,13 +255,28 @@ if __name__ == '__main__':
     parser.add_argument('-atol', '--abs_tolerance',
                         required=False,
                         type=float,
-                        default=1e-15,
+                        default=1e-10,
                         help='The absolute tolerance to use during integration')
     parser.add_argument('-rtol', '--rel_tolerance',
                         required=False,
                         type=float,
-                        default=1e-8,
+                        default=1e-6,
                         help='The relative tolerance to use during integration')
+    parser.add_argument('-satol', '--abs_tolerance_small',
+                        required=False,
+                        type=float,
+                        default=1e-20,
+                        help='The absolute tolerance to use during integration')
+    parser.add_argument('-srtol', '--rel_tolerance_small',
+                        required=False,
+                        type=float,
+                        default=1e-15,
+                        help='The relative tolerance to use during integration')
+    parser.add_argument('-tend', '--end_time',
+                        required=False,
+                        type=float,
+                        default=1e-3,
+                        help='The end time of the simulation')
     parser.add_argument('-ru', '--reuse_valid',
                         required=False,
                         default=False,
@@ -273,4 +292,4 @@ if __name__ == '__main__':
     run_log(args.input, args.thermo, args.initial_conditions, args.build_path,
         args.num_threads, args.num_conditions, args.test_data,
         args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance,
-        args.reuse_valid)
+        args.end_time, args.abs_tolerance_small, args.rel_tolerance_small, args.reuse_valid)
