@@ -45,41 +45,27 @@ void intDriver (const int NUM, const double t, const double t_end,
 
         //reinit this integrator for time t, w/ updated state
         int flag = CVodeReInit(integrators[index], t, fill);
-        #ifdef DEBUG
-            if (flag != CV_SUCCESS)
-            {
-                printf("Error reinitializing CVodes: %d", flag);
-                exit(flag);
-            }
-        #endif
+        if (flag != CV_SUCCESS)
+        {
+            printf("Error reinitializing integrator for thread %d, code: %d\n", tid, flag);
+            exit(flag);
+        }
 
         //set user data to Pr
         flag = CVodeSetUserData(integrators[index], &pr_local);
-        #ifdef DEBUG
-            if (flag != CV_SUCCESS)
-            {
-                printf("Error setting user data: %d", flag);
-                exit(flag);
-            }
-        #endif
+        if (flag != CV_SUCCESS)
+        {
+            printf("Error setting user data for thread %d, code: %d\n", tid, flag);
+            exit(flag);
+        }
 
         // call integrator for one time step
         flag = CVode(integrators[index], t_end, fill, &t_next, CV_NORMAL);
-        #ifdef DEBUG
-            if (flag != CV_SUCCESS)
-            {
-                printf("%d\t%d\n", index, NUM);
-                for (int i = 0; i < NSP; i++)
-                    printf("%le\t%le\n", y_local[i], y_global[tid + NUM * i]);
-                printf("Error on integration step: %d", flag);
-                exit(flag);
-            }
-            if (t_next != t_end)
-            {
-                printf("Error on integration step: %d", flag);
-                exit(flag);
-            }
-        #endif
+        if (flag != CV_SUCCESS || t_next != t_end)
+        {
+            printf("Error on integration step for thread %d, code %d", tid, flag);
+            exit(flag);
+        }
 
         // update global array with integrated values
         
