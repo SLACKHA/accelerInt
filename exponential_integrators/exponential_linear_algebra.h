@@ -32,8 +32,7 @@ void matvec_m_by_m (const int m, const double * __restrict__ A,
 	for (int i = 0; i < m; ++i) {
 		Av[i] = A[i] * V[0];
 		
-		//go across a row of A, multiplying by a column of phiHm
-		
+		//go across a row of A, multiplying by a column
 		for (int j = 1; j < m; ++j) {
 			Av[i] += A[j * STRIDE + i] * V[j];
 		}

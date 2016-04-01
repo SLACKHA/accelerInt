@@ -249,22 +249,15 @@ int integrate (const double t_start, const double t_end, const double pr, double
 				fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
   			#endif
 
-			reject = false;
-
-			memcpy(sc, f_temp, NSP * sizeof(double));
-			
 			// minimum of classical and Gustafsson step size prediction
 			h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
 			
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 			
-			// update y and t
-			
-			for (int i = 0; i < NSP; ++i) {
-				y[i] = y1[i];
-			}
-			
+			// update y, t and sc
+			memcpy(sc, f_temp, NSP * sizeof(double));
+			memcpy(y, y1, NSP * sizeof(double));
 			t += h;
 			
 			// store time step and error

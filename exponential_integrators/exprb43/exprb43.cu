@@ -286,10 +286,10 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			err_old = fmax(1.0e-2, err);
 			h_old = h;
 			
-			reject = false;
 			// check if last step rejected
 			if (reject) {
 				h_new = fmin(h, h_new);
+				reject = false;
 			}
 			h = fmin(h_new, t_end - t);
 						
