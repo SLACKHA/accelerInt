@@ -10,6 +10,7 @@
 
 #include "header.cuh"
 #include <cuComplex.h>
+#include <stdio.h>
  
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR

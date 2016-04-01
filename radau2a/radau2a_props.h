@@ -9,6 +9,7 @@
 #define RADAU2A_PROPS_H
 
 #include "header.h"
+#include <stdio.h>
  
 #define STRIDE (NSP)
 

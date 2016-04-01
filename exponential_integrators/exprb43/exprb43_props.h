@@ -9,6 +9,7 @@
 #define RB43_PROPS_H
 
 #include "header.h"
+#include <stdio.h>
 
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR

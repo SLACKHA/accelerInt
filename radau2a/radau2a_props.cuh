@@ -10,6 +10,7 @@
 
 #include "header.cuh"
 #include <cuComplex.h>
+#include <stdio.h>
 
 #define STRIDE (NSP)
 
