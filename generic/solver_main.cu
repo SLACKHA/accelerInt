@@ -16,6 +16,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <complex.h>
+#ifdef DEBUG
+#include <fenv.h>
+#endif
 
 /** Include CUDA libraries. */
 #include <cuda.h>

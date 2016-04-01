@@ -16,6 +16,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <complex.h>
+#ifdef DEBUG
+#include <fenv.h>
+#endif
 
 //our code
 #include "header.h"
