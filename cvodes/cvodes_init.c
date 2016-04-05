@@ -38,76 +38,100 @@ void** integrators;
 		y_locals[i] = N_VMake_Serial(NSP, &y_local_vectors[i * NSP]);
 		if (integrators[i] == NULL)
 		{
-			printf("Error creating CVodes Integrator");
-			exit(1);
+			printf("Error creating CVodes Integrator\n");
+			exit(-1);
 		}
 
 		//initialize
 		int flag = CVodeInit(integrators[i], dydt_cvodes, 0, y_locals[i]);
 		if (flag != CV_SUCCESS) {
 		    if (flag == CV_MEM_FAIL) {
-		        printf("Memory allocation failed.");
-	            exit(-1);
+		        printf("Memory allocation failed.\n");
 		    } else if (flag == CV_ILL_INPUT) {
-		        printf("Illegal value for CVodeInit input argument.");
-	            exit(-1);
-		    } else {
-		        printf("CVodeInit failed.");
-	            exit(-1);
+		        printf("Illegal value for CVodeInit input argument.\n");
+	        } else if (flag == CV_MEM_NULL) {
+	        	printf("CVODEs Memory was not initialized with CVodeInit!\n");
 		    }
+		    exit(flag);
 		}
 
 		//set tolerances
 		flag = CVodeSStolerances(integrators[i], RTOL, ATOL);
 		if (flag != CV_SUCCESS) {
-	        if (flag == CV_MEM_FAIL) {
-	            printf("Memory allocation failed.");
-	            exit(-1);
-	        } else if (flag == CV_ILL_INPUT) {
-	        	printf("Illegal value for CVodeInit input argument.");
-	            exit(-1);
-	        } else {
-	        	printf("CVodeInit failed.");
-	            exit(-1);
-	        }
-    	}
+		    if (flag == CV_NO_MALLOC) {
+		        printf("CVODE memory block not initialized by CVodeCreate.\n");
+		    } else if (flag == CV_ILL_INPUT) {
+		        printf("Illegal value for CVodeInit input argument.\n");
+	        } else if (flag == CV_MEM_NULL) {
+	        	printf("CVODEs Memory was not initialized with CVodeInit!\n");
+		    }
+		    exit(flag);
+		}
 
     	//setup the solver
 	    flag = CVLapackDense(integrators[i], NSP);
-
-	    if (flag != CV_SUCCESS) {
-	    	printf("Error setting up CVODES solver");
-	    	exit(-1);
-	    }
+		if (flag != CVDLS_SUCCESS) {
+		    if (flag == CVDLS_MEM_FAIL) {
+		        printf("CVODE memory block not initialized by CVodeCreate.\n");
+		    } else if (flag == CVDLS_ILL_INPUT) {
+		        printf("Illegal value for CVodeInit input argument.\n");
+	        } else if (flag == CVDLS_MEM_NULL) {
+	        	printf("CVODEs Memory was not initialized with CVodeInit!\n");
+		    }
+		    exit(flag);
+		}
 
 	    #ifdef SUNDIALS_ANALYTIC_JACOBIAN
 	    	flag = CVDlsSetDenseJacFn(integrators[i], eval_jacob_cvodes);
+	    	if (flag != CV_SUCCESS) {
+		    	printf("Error setting analytic jacobian\n");
+		    	exit(flag);
+	    	}
 	    #endif
-
-	    if (flag != CV_SUCCESS) {
-	    	printf("Error setting analytic jacobian");
-	    	exit(-1);
-	    }
 
 	    #ifdef CV_MAX_ORD
 	        CVodeSetMaxOrd(integrators[i], CV_MAX_ORD);
+	        if (flag != CV_SUCCESS) {
+		    	printf("Error setting max order\n");
+		    	exit(flag);
+	    	}
 	    #endif
 
 	    #ifdef CV_MAX_STEPS
 	        CVodeSetMaxNumSteps(integrators[i], CV_MAX_STEPS);
+	        if (flag != CV_SUCCESS) {
+		    	printf("Error setting max steps\n");
+		    	exit(flag);
+	    	}
 	    #endif
 
 	    #ifdef CV_HMAX
 	        CVodeSetMaxStep(integrators[i], CV_HMAX);
+	        if (flag != CV_SUCCESS) {
+		    	printf("Error setting max timestep\n");
+		    	exit(flag);
+	    	}
 	    #endif
 	    #ifdef CV_HMIN
 	        CVodeSetMinStep(integrators[i], CV_HMIN);
+	        if (flag != CV_SUCCESS) {
+		    	printf("Error setting min timestep\n");
+		    	exit(flag);
+	    	}
 	    #endif
 	    #ifdef CV_MAX_ERRTEST_FAILS
 	        CVodeSetMaxErrTestFails(integrators[i], CV_MAX_ERRTEST_FAILS);
+	        if (flag != CV_SUCCESS) {
+		    	printf("Error setting max error test fails\n");
+		    	exit(flag);
+	    	}
 	    #endif
 	    #ifdef CV_MAX_HNIL
 	        CVodeSetMaxHnilWarns(integrators[i], CV_MAX_HNIL);
+	        if (flag != CV_SUCCESS) {
+		    	printf("Error setting max hnil warnings\n");
+		    	exit(flag);
+	    	}
 	    #endif
 	}
  }
