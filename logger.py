@@ -60,13 +60,29 @@ def __execute(builder, num_threads, num_conditions):
         if builder == 'gpu':
             for exe in glob('*-gpu'):
                 file.write('\n' + exe + '\n')
-                subprocess.check_call([pjoin(cwd(), exe), str(num_conditions)], stdout=file)
+                try:
+                    subprocess.check_call([pjoin(cwd(), exe), str(num_conditions)], stdout=file)
+                except CalledProcessError as e:
+                    output = e.output
+                    returncode = e.returncode
+                    file.write('Error encountered running {}\n'.format(' '.join([exe, str(num_conditions)])))
+                    file.write(output + '\n')
+                    file.write('Error code: {}\n'.format(returncode))
+                    sys.exit(-1)
         else:
             for exe in glob('*-int'):
                 if exe in keyfile:
                     continue
                 file.write('\n' + exe + '\n')
-                subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
+                try:
+                    subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
+                except CalledProcessError as e:
+                    output = e.output
+                    returncode = e.returncode
+                    file.write('Error encountered running {}\n'.format(' '.join([exe, str(num_threads), str(num_conditions)])))
+                    file.write(output + '\n')
+                    file.write('Error code: {}\n'.format(returncode))
+                    sys.exit(-1)
 
 def __check_valid(nvar, num_conditions, t_end, t_step):
     if not isfile(pjoin('log', 'valid.bin')):
