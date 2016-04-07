@@ -29,7 +29,7 @@ int getComplexMax (const int n, const cuDoubleComplex * __restrict__ complexArr)
 ///////////////////////////////////////////////////////////
 
 __device__
-void scaleComplex (const int n, const cuDoubleComplex val, cuDoubleComplex* arrX) {
+void scaleComplex (const int n, const cuDoubleComplex val, cuDoubleComplex* __restrict__ arrX) {
     
     for (int i = 0; i < n; ++i) {
         arrX[INDEX(i)] = cuCmul(arrX[INDEX(i)], val);
@@ -40,7 +40,8 @@ void scaleComplex (const int n, const cuDoubleComplex val, cuDoubleComplex* arrX
 ///////////////////////////////////////////////////////////
 
 __device__
-void swapComplex (const int n, cuDoubleComplex* arrX, const int incX, cuDoubleComplex* arrY, const int incY) {
+void swapComplex (const int n, cuDoubleComplex* __restrict__ arrX, const int incX,
+    cuDoubleComplex* __restrict__ arrY, const int incY) {
     
     int ix = 0;
     int iy = 0;
@@ -76,7 +77,7 @@ void complexGERU (const int n, const cuDoubleComplex alpha, const cuDoubleComple
 }
 
 ///////////////////////////////////////////////////////////
-
+//note: can't use __restrict__ here
 __device__
 void multiplyComplexUpperMV (const int n, cuDoubleComplex* x, const int lda, const cuDoubleComplex* A) {
     
@@ -218,19 +219,17 @@ void getComplexInverse (const int n, cuDoubleComplex* __restrict__ A,
 __device__
 void getHessenbergLU(const int n, cuDoubleComplex* A, int* __restrict__ indPivot, int* __restrict__ info)
 {
-    int last_free = 0;
     for (int i = 0; i < n - 1; i ++)
     {
         if (cuCabs(A[INDEX(i * STRIDE + i)]) < cuCabs(A[INDEX(i * STRIDE + i + 1)]))
         {
             //swap rows
-            swapComplex(n - last_free, &A[GRID_DIM * (last_free * STRIDE + i)], STRIDE, &A[GRID_DIM * (last_free * STRIDE + i + 1)], STRIDE);
+            swapComplex(n - i + 1, &A[GRID_DIM * ((i - 1) * STRIDE + i)], STRIDE, &A[GRID_DIM * ((i - 1) * STRIDE + i + 1)], STRIDE);
             indPivot[INDEX(i)] = i + 1;
         }
         else
         {
             indPivot[INDEX(i)] = i;
-            last_free = i;
         }
         if (cuCabs(A[INDEX(i * STRIDE + i)]) > 0.0)
         {
