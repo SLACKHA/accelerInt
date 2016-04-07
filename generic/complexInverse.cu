@@ -156,12 +156,14 @@ void getComplexLU (const int n, cuDoubleComplex* __restrict__ A,
 }
 
 __device__
-void getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
+int getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
                             const int* __restrict__ indPivot,
                             cuDoubleComplex* __restrict__ work) {
     
     // form inv(U)
     for (int j = 0; j < n; ++j) {
+        if (cuCabs(A[INDEX(j + (STRIDE * j))]) == 0)
+            return j;
         A[INDEX(j + (STRIDE * j))] = cuCdiv(make_cuDoubleComplex(1.0, 0.0), A[INDEX(j + (STRIDE * j))]);
         cuDoubleComplex Ajj = cuCmul(make_cuDoubleComplex(-1.0, 0.0), A[INDEX(j + (STRIDE * j))]);
         
@@ -195,6 +197,7 @@ void getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
         if (indPivot[INDEX(j)] != j)
             swapComplex (n, &A[GRID_DIM * (STRIDE * j)], 1, &A[GRID_DIM * (STRIDE * indPivot[INDEX(j)])], 1);
     }
+    return 0;
 }
 
 __device__
@@ -211,7 +214,7 @@ void getComplexInverse (const int n, cuDoubleComplex* __restrict__ A,
     }
 
     // now get inverse
-    getComplexInverseLU (n, A, ipiv, work);
+    *info = getComplexInverseLU (n, A, ipiv, work);
 }
 
 //Matrix Algorithms: Volume 1: Basic Decompositions
@@ -262,5 +265,5 @@ void getComplexInverseHessenberg (const int n, cuDoubleComplex* __restrict__ A,
         return;
 
     // now get inverse
-    getComplexInverseLU (n, A, ipiv, work);
+    *info = getComplexInverseLU (n, A, ipiv, work);
 }

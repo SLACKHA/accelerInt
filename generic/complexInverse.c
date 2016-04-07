@@ -109,13 +109,15 @@ void complexGEMV (const int m, const int n, const int lda, const double alpha, c
     }
 }
 
-void getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
+int getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
 										const int* __restrict__ indPivot) {
     
 	double complex work[STRIDE] = {0};
 
     // form inv(U)
     for (int j = 0; j < n; ++j) {
+    	if (cabs(A[j + (STRIDE * j)]) == 0)
+    		return j;
         A[j + (STRIDE * j)] = 1.0 / A[j + (STRIDE * j)];
         double complex Ajj = -A[j + (STRIDE * j)];
         
@@ -149,6 +151,7 @@ void getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
         if (indPivot[j] != j)
             swapComplex (n, &A[STRIDE * j], 1, &A[STRIDE * indPivot[j]], 1);
     }
+    return 0;
 }
 
 #include <assert.h>
