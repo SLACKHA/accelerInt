@@ -7,39 +7,28 @@
 #include "solver_props.h"
 #include "lapack_dfns.h"
 
-void swapComplex (const int n, double complex* __restrict__ arrX, const int incX,
-					double complex* __restrict__ arrY, const int incY) {
-	
-	int ix = 0;
-	int iy = 0;
-	
-	for (int i = 0; i < n; ++i) {
-		double complex temp = arrX[ix];
-		arrX[ix] = arrY[iy];
-		arrY[iy] = temp;
-		ix += incX;
-		iy += incY;
-	}
-	
-}
-
-//Matrix Algorithms: Volume 1: Basic Decompositions
-//By G. W. Stewart
 static inline
 int getHessenbergLU(const int n, double complex* __restrict__ A,
 						int* __restrict__ indPivot)
 {
+	int last_pivot = 0;
 	for (int i = 0; i < n - 1; i ++)
 	{
 		if (cabs(A[i * STRIDE + i]) < cabs(A[i * STRIDE + i + 1]))
 		{
 			//swap rows
-			swapComplex(n - i + 1, &A[(i - 1) * STRIDE + i], STRIDE, &A[(i - 1) * STRIDE + i + 1], STRIDE);
+			for(int k = last_pivot; k < n; ++k)
+			{
+				double complex temp = A[k * STRIDE + i];
+				A[k * STRIDE + i] = A[k * STRIDE + i + 1];
+				A[k * STRIDE + i + 1] = temp;
+			}
 			indPivot[i] = i + 1;
 		}
 		else
 		{
 			indPivot[i] = i;
+			last_pivot = i;
 		}
 		if (cabs(A[i * STRIDE + i]) > 0.0)
 		{
@@ -149,17 +138,20 @@ int getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
     for (int j = n - 2; j >= 0; --j) {
     
         if (indPivot[j] != j)
-            swapComplex (n, &A[STRIDE * j], 1, &A[STRIDE * indPivot[j]], 1);
+        {
+        	for (int i = 0; i < n; ++i) {
+				double complex temp = A[STRIDE * j + i];
+				A[STRIDE * j + i] = A[STRIDE * indPivot[j] + i];
+				A[STRIDE * indPivot[j] + i] = A[STRIDE * j + i];
+			}
+        }
     }
     return 0;
 }
 
-#include <assert.h>
 void getComplexInverseHessenberg (const int n, double complex* __restrict__ A,
-									int* __restrict__ ipiv, int* __restrict__ info,
-									double complex* __restrict__ work, const int work_size)
+									int* __restrict__ ipiv, int* __restrict__ info)
 {
-
 	// first get LU factorization
 	*info = getHessenbergLU (n, A, ipiv);
 

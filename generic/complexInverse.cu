@@ -136,7 +136,14 @@ void getComplexLU (const int n, cuDoubleComplex* __restrict__ A,
             
             // apply interchange to columns 1:n-1
             if (jp != j)
-                swapComplex (n, &A[GRID_DIM * (j)], STRIDE, &A[GRID_DIM * (jp)], STRIDE);
+            {
+                for (int i = 0; i < n; ++i) {
+                    cuDoubleComplex temp = A[INDEX(STRIDE * i + j)];
+                    A[INDEX(STRIDE * i + j)] = A[INDEX(STRIDE * i + jp)];
+                    A[INDEX(STRIDE * i + jp)] = temp;
+                }
+                //swapComplex (n, &A[GRID_DIM * (j)], STRIDE, &A[GRID_DIM * (jp)], STRIDE);
+            }
             
             // compute elements j+1:m-1 of the jth column
             
@@ -193,9 +200,16 @@ int getComplexInverseLU (const int n, cuDoubleComplex* __restrict__ A,
     // apply column interchanges
     
     for (int j = n - 2; j >= 0; --j) {
-    
-        if (indPivot[INDEX(j)] != j)
-            swapComplex (n, &A[GRID_DIM * (STRIDE * j)], 1, &A[GRID_DIM * (STRIDE * indPivot[INDEX(j)])], 1);
+        
+        int jp = indPivot[INDEX(j)];
+        if (jp != j)
+        {
+            for (int i = 0; i < n; ++i) {
+                cuDoubleComplex temp = A[INDEX(STRIDE * j + i)];
+                A[INDEX(STRIDE * j + i)] = A[INDEX(STRIDE * jp + i)];
+                A[INDEX(STRIDE * jp + i)] = temp;
+            }
+        }
     }
     return 0;
 }
@@ -222,17 +236,24 @@ void getComplexInverse (const int n, cuDoubleComplex* __restrict__ A,
 __device__
 void getHessenbergLU(const int n, cuDoubleComplex* A, int* __restrict__ indPivot, int* __restrict__ info)
 {
+    int last_pivot = 0;
     for (int i = 0; i < n - 1; i ++)
     {
         if (cuCabs(A[INDEX(i * STRIDE + i)]) < cuCabs(A[INDEX(i * STRIDE + i + 1)]))
         {
             //swap rows
-            swapComplex(n - i + 1, &A[GRID_DIM * ((i - 1) * STRIDE + i)], STRIDE, &A[GRID_DIM * ((i - 1) * STRIDE + i + 1)], STRIDE);
+            for(int k = last_pivot; k < n; ++k)
+            {
+                cuDoubleComplex temp = A[INDEX(k * STRIDE + i)];
+                A[INDEX(k * STRIDE + i)] = A[INDEX(k * STRIDE + i + 1)];
+                A[INDEX(k * STRIDE + i + 1)] = temp;
+            }
             indPivot[INDEX(i)] = i + 1;
         }
         else
         {
             indPivot[INDEX(i)] = i;
+            last_pivot = i;
         }
         if (cuCabs(A[INDEX(i * STRIDE + i)]) > 0.0)
         {
