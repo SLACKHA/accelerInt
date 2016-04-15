@@ -20,7 +20,7 @@ np.set_printoptions(precision=15)
 
 scons = expanduser('~/.local/bin/scons')
 
-keyfile = 'cvodes-analytic-int-log.bin'
+keyfile = 'rk78-int-log.bin'
 
 def create_dir(path):
     try:
@@ -48,7 +48,7 @@ def __check_error(builder, num_conditions, nvar, t, validator, atol, rtol):
             data_arr = data_arr.reshape(-1, nvar)
             key_arr = key_arr.reshape(-1, nvar)
             #now compare column by column and get max err
-            err = np.abs(data_arr - key_arr) / (atol + rtol * key_arr)
+            err = np.abs(data_arr - key_arr) / (atol + rtol * np.abs(key_arr))
             L2_err = np.linalg.norm(err, axis=1, ord=2)
             Linf_err = np.linalg.norm(err, axis=1, ord=np.inf)
 
@@ -63,10 +63,8 @@ def __execute(builder, num_threads, num_conditions):
                 try:
                     subprocess.check_call([pjoin(cwd(), exe), str(num_conditions)], stdout=file)
                 except CalledProcessError as e:
-                    output = e.output
                     returncode = e.returncode
                     file.write('Error encountered running {}\n'.format(' '.join([exe, str(num_conditions)])))
-                    file.write(output + '\n')
                     file.write('Error code: {}\n'.format(returncode))
                     sys.exit(-1)
         else:
@@ -76,11 +74,9 @@ def __execute(builder, num_threads, num_conditions):
                 file.write('\n' + exe + '\n')
                 try:
                     subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
-                except CalledProcessError as e:
-                    output = e.output
+                except subprocess.CalledProcessError, e:
                     returncode = e.returncode
                     file.write('Error encountered running {}\n'.format(' '.join([exe, str(num_threads), str(num_conditions)])))
-                    file.write(output + '\n')
                     file.write('Error code: {}\n'.format(returncode))
                     sys.exit(-1)
 
@@ -96,20 +92,14 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, t_end, small_atol, small_rtol, reuse_valid):
-        #first compile and run cvodes to get the baseline
+        atol, rtol, t_end, small_atol, small_rtol, reuse_valid, t_small):
+        #first compile and run the explicit integrator to get the baseline
         __check_exit(create_jacobian(lang='c', 
             mech_name=mech, 
             therm_name=thermo,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        t_end = 1e-4 #ms
-        t_step = 1e-4 #ms
-        small_atol = 1e-20
-        small_rtol = 1e-15
-        atol = 1e-10
-        rtol = 1e-6
         nvar = None
         #get num vars
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
@@ -124,7 +114,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         assert nvar is not None
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE',
-                'SHUFFLE=FALSE', 'PRINT=FALSE', 
+                'SHUFFLE=FALSE', 'PRINT=FALSE', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
                 'mechanism_dir={}'.format(build_path), 't_end={:.0e}'.format(t_end)]
 
         if initial_conditions:
@@ -133,14 +123,14 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         else:
             arg_list.append('SAME_IC=FALSE')
 
-        validator = __check_valid(nvar, num_conditions, t_end, t_end)
+        validator = __check_valid(nvar, num_conditions, t_end, t_small)
         if validator is None or not reuse_valid:
             with open('logerr', 'a') as file:
                 extra_args = ['ATOL={:.0e}'.format(small_atol), 'RTOL={:.0e}'.format(small_rtol),
-                                't_step={:.0e}'.format(t_end)]
+                                't_step={:.0e}'.format(t_small)]
                 subprocess.check_call([scons, 'cpu'] + arg_list + extra_args, stdout=file)
                 #run
-                subprocess.check_call([pjoin(cwd(), 'cvodes-analytic-int'), 
+                subprocess.check_call([pjoin(cwd(), 'rk78-int'), 
                     str(num_threads), str(num_conditions)],
                     stdout=file)
                 #copy to saved data
@@ -182,9 +172,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     file.write('\ncache_opt: {}\n'
                                'shared_mem: {}\n'.format(
                                cache_opt, not shared_mem))
-                    file.flush()
-                    for ts in range(-4, -10, -1):
-                        t_step = np.power(10., ts)
+                    for j in range(-4, -13, -1):
+                        t_step = np.power(10.0, j)
                         file.write('t_step={:.0e}\n'.format(t_step))
                         file.flush()
                         the_args = arg_list + ['t_step={:.0e}'.format(t_step)]
@@ -195,7 +184,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, t_end, small_atol, small_rtol, reuse_valid):
+        atol, rtol, t_end, small_atol, small_rtol, reuse_valid, t_small):
     with open('logfile', 'w') as file:
         pass
     with open('logerr', 'w') as file:
@@ -206,7 +195,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
         __run_and_check(mech, thermo, initial_conditions, build_path, 
             num_threads, 1 if num_conditions is None else num_conditions,
             None, skip_c, skip_cuda, atol, rtol, t_end,
-            small_atol, small_rtol, reuse_valid)
+            small_atol, small_rtol, reuse_valid, t_small)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -217,7 +206,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
         __run_and_check(mech, thermo, '', build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, t_end, small_atol, small_rtol, 
-        reuse_valid)
+        reuse_valid, t_small)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -262,7 +251,7 @@ if __name__ == '__main__':
                         required=False,
                         default=False,
                         action='store_true',
-                        help='Use to skip C testing. Note baseline is still calculated using CVODES')
+                        help='Use to skip C testing. Note baseline is still calculated using an CPU integrator')
     parser.add_argument('-scu', '--skip_cuda',
                         required=False,
                         default=False,
@@ -271,12 +260,12 @@ if __name__ == '__main__':
     parser.add_argument('-atol', '--abs_tolerance',
                         required=False,
                         type=float,
-                        default=1e-10,
+                        default=1e-13,
                         help='The absolute tolerance to use during integration')
     parser.add_argument('-rtol', '--rel_tolerance',
                         required=False,
                         type=float,
-                        default=1e-6,
+                        default=1e-11,
                         help='The relative tolerance to use during integration')
     parser.add_argument('-satol', '--abs_tolerance_small',
                         required=False,
@@ -291,8 +280,13 @@ if __name__ == '__main__':
     parser.add_argument('-tend', '--end_time',
                         required=False,
                         type=float,
-                        default=1e-3,
+                        default=5e-3,
                         help='The end time of the simulation')
+    parser.add_argument('-tsmall', '--small_time_step',
+                        required=False,
+                        type=float,
+                        default=1e-15,
+                        help='The timestep to w/ the explicit integrator for validation')
     parser.add_argument('-ru', '--reuse_valid',
                         required=False,
                         default=False,
@@ -308,4 +302,5 @@ if __name__ == '__main__':
     run_log(args.input, args.thermo, args.initial_conditions, args.build_path,
         args.num_threads, args.num_conditions, args.test_data,
         args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance,
-        args.end_time, args.abs_tolerance_small, args.rel_tolerance_small, args.reuse_valid)
+        args.end_time, args.abs_tolerance_small, args.rel_tolerance_small, args.reuse_valid,
+        args.small_time_step)
