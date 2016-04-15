@@ -42,7 +42,7 @@ void cleanup_solver(int num_threads) {
 }
 
 const char* solver_name() {
-	const char* name = "rk78";
+	const char* name = "rk78-int";
 	return name;
 }
 
