@@ -260,12 +260,12 @@ if __name__ == '__main__':
     parser.add_argument('-atol', '--abs_tolerance',
                         required=False,
                         type=float,
-                        default=1e-13,
+                        default=1e-10,
                         help='The absolute tolerance to use during integration')
     parser.add_argument('-rtol', '--rel_tolerance',
                         required=False,
                         type=float,
-                        default=1e-11,
+                        default=1e-07,
                         help='The relative tolerance to use during integration')
     parser.add_argument('-satol', '--abs_tolerance_small',
                         required=False,
@@ -278,9 +278,8 @@ if __name__ == '__main__':
                         default=1e-15,
                         help='The relative tolerance to use during integration')
     parser.add_argument('-tend', '--end_time',
-                        required=False,
+                        required=True,
                         type=float,
-                        default=5e-3,
                         help='The end time of the simulation')
     parser.add_argument('-tsmall', '--small_time_step',
                         required=False,
