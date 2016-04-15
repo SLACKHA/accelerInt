@@ -284,7 +284,7 @@ if __name__ == '__main__':
     parser.add_argument('-tsmall', '--small_time_step',
                         required=False,
                         type=float,
-                        default=1e-15,
+                        default=1e-10,
                         help='The timestep to w/ the explicit integrator for validation')
     parser.add_argument('-ru', '--reuse_valid',
                         required=False,
