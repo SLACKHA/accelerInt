@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "header.cuh"
-#include "solver_options.h"
+#include "solver_options.cuh"
 #include "solver_props.cuh"
 //#include "linear-algebra.h"
 #include "complexInverse.cuh"

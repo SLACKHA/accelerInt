@@ -14,7 +14,7 @@
 extern "C" {
 #include "cf.h"
 }
-#include "solver_options.h"
+#include "solver_options.cuh"
 #include "gpu_macros.cuh"
 
 __device__ __constant__ cuDoubleComplex poles[N_RA];

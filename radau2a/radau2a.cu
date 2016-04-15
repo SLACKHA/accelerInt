@@ -16,7 +16,7 @@
 
 //various mechanism/solver defns
 #include "header.cuh"
-#include "solver_options.h"
+#include "solver_options.cuh"
 #include "solver_props.cuh"
 
 //math operations

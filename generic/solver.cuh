@@ -11,7 +11,7 @@
  #ifndef SOLVER_CUH
  #define SOLVER_CUH
 
- #include "solver_options.h"
+ #include "solver_options.cuh"
  #include "solver_init.cuh"
  #include "solver_props.cuh"
 

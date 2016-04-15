@@ -8,7 +8,7 @@
  */
 
 #include "rational_approximant.cuh"
-#include "solver_options.h"
+#include "solver_options.cuh"
 #include "solver_props.cuh"
 #include "gpu_macros.cuh"
 

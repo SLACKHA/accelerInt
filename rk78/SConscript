@@ -1,0 +1,9 @@
+Import('env')
+cObj = []
+c_src = Glob('*.cpp')
+
+for src in c_src:
+	cObj.append(env.Object(src, variant_dir=env['variant']))
+
+cudaObj = []
+Return ('cObj', 'cudaObj')
