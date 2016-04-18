@@ -17,7 +17,7 @@
  }
 
  const char* solver_name() {
-    const char* name = "rb43-int-gpu";
+    const char* name = "exprb43-int-gpu";
     return name;
  }
 

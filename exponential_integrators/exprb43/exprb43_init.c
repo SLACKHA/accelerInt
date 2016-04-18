@@ -36,7 +36,7 @@
  }
 
  const char* solver_name() {
- 	const char* name = "rb43-int";
+ 	const char* name = "exprb43-int";
  	return name;
  }
 
