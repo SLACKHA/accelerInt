@@ -59,11 +59,19 @@ void intDriver (const int NUM, const double t, const double t_end,
             exit(flag);
         }
 
+        //set end time
+        flag = CVodeSetStopTime(integrators[index], t_end);
+        if (flag != CV_SUCCESS)
+        {
+            printf("Error setting end time for thread %d, code: %d\n", tid, flag);
+            exit(flag);
+        }
+
         // call integrator for one time step
         flag = CVode(integrators[index], t_end, fill, &t_next, CV_NORMAL);
-        if (flag != CV_SUCCESS || t_next != t_end)
+        if ((flag != CV_SUCCESS && flag != CV_TSTOP_RETURN) || t_next != t_end)
         {
-            printf("Error on integration step for thread %d, code %d", tid, flag);
+            printf("Error on integration step for thread %d, code %d\n", tid, flag);
             exit(flag);
         }
 
