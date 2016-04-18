@@ -10,6 +10,9 @@ import cantera as ct
 import numpy as np
 import multiprocessing
 import re
+from pyjac import create_jacobian
+
+scons = subprocess.check_output('which scons', shell=True).strip()
 
 def check_dir(dir, force):
     old_files = [file for file in os.listdir(dir) if '.timing' in file and os.path.isfile(os.path.join(dir, file))]
@@ -64,10 +67,11 @@ def check_file(filename):
                 count += 1
     return count
 
-def run(thedir, blacklist=[], force=False, pyjac='', 
+def run(thedir, blacklist=[], force=False,
         repeats=5, num_cond=131072,
         threads=[6, 12], langs=['c', 'cuda'],
-        hybrid_mode=False):
+        atol=1e-10,
+        rtol=1e-7):
     jthread = str(multiprocessing.cpu_count())
 
     make_sure_path_exists(os.path.join(thedir, 'output'))
@@ -89,23 +93,17 @@ def run(thedir, blacklist=[], force=False, pyjac='',
                 os.path.join(home, 'ign_data.bin'))
 
     #generate mechanisms
-    cache_opt = [False]#[True, False]
+    cache_opt = [True, False]
     use_smem = [True, False]
-    if hybrid_mode:
-        time_steps = [1e-4]
-    else:
-        time_steps = [1e-6, 1e-4]
+    time_steps = [1e-6, 1e-4]
     same_ics = [False]#[True, False]
     for opt in cache_opt:
         mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
         mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
         make_sure_path_exists(mech_dir)
-        args = ['python2.7', os.path.join(pyjac, 'pyJac.py'), '-l', 'c', '-i', mechanism]
-        if not opt:
-            args.append('-nco')
-        args.extend(['-ic', ic_str])
-        args.extend(['-b', mech_dir])
-        subprocess.check_call(args)
+        create_jacobian(lang='c', mech_name=mechanism,
+                        optimize_cache=opt, initial_state=ic_str,
+                        build_path=mech_dir, multi_thread=int(jthread))
 
         for smem in use_smem:
             gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
@@ -115,15 +113,9 @@ def run(thedir, blacklist=[], force=False, pyjac='',
                 #copy the pickle from the cpu folder
                 shutil.copy(os.path.join(mech_dir, 'optimized.pickle'), 
                     os.path.join(gpu_mech_dir, 'optimized.pickle'))
-            args = ['python2.7', os.path.join(pyjac, 'pyJac.py'), '-l', 'cuda', '-i', mechanism]
-            if not opt:
-                args.append('-nco')
-            if not smem:
-                args.append('-nosmem')
-            args.extend(['-ic', ic_str])
-            args.extend(['-b', gpu_mech_dir])
-            subprocess.check_call(args)
-
+            create_jacobian(lang='cuda', mech_name=mechanism,
+                        optimize_cache=opt, initial_state=ic_str,
+                        build_path=gpu_mech_dir, no_shared=not smem, multi_thread=int(jthread))
 
     #now build and run
     for t_step in time_steps:
@@ -133,16 +125,18 @@ def run(thedir, blacklist=[], force=False, pyjac='',
                 cpu_built = False
                 mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
                 mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
-                args = ['scons', 'cpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
-                     'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
-                     'PRINT=FALSE', 'mechanism_dir={}'.format(mech_dir),
+                args = ['-j', jthread, 'DEBUG=False', 'FAST_MATH=True',
+                     'LOG_OUTPUT=False','SHUFFLE=False', 'LOG_END_ONLY=False',
+                     'PRINT=False',
                      't_step={}'.format(t_step),
                      't_end={}'.format(t_step),
-                     'DIVERGENCE_WARPS=0']
+                     'DIVERGENCE_WARPS=0', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
+                     'ATOL={:.0e}'.format(atol),
+                     'RTOL={:.0e}'.format(rtol)]
                 args.append('SAME_IC={}'.format(same))
 
                 #run with repeats
-                if 'c' in langs and not hybrid_mode:
+                if 'c' in langs:
                     run_me = get_executables(blacklist + ['gpu', 'rk78'], inverse=['int'])
                     for exe in run_me:
                         for thread in threads:
@@ -153,7 +147,7 @@ def run(thedir, blacklist=[], force=False, pyjac='',
                                     'sameic' if same else 'psric', t_step))
                                 my_repeats = repeats - check_file(filename)
                                 if my_repeats and not cpu_built:
-                                    subprocess.check_call(args)
+                                    subprocess.check_call([scons, 'cpu'] + args + ['mechanism_dir={}'.format(mech_dir)])
                                     cpu_built = True
                                 with open(filename, 'a') as file:
                                     for repeat in range(my_repeats):
@@ -164,25 +158,17 @@ def run(thedir, blacklist=[], force=False, pyjac='',
                         gpu_built = False
                         gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
                         gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
-                        args = ['scons', 'gpu', '-j', jthread, 'DEBUG=False', 'FAST_MATH=FALSE',
-                         'LOG_OUTPUT=FALSE','SHUFFLE=FALSE',
-                         'PRINT=FALSE', 'mechanism_dir={}'.format(gpu_mech_dir),
-                         't_step={}'.format(t_step / 100. if hybrid_mode else t_step),
-                         't_end={}'.format(t_step),
-                         'DIVERGENCE_WARPS=0']
-                        args.append('SAME_IC={}'.format(same))
                         #run with repeats
                         run_me = get_executables(blacklist + ['rk78'], inverse=['int-gpu'])
                         for exe in run_me:
                             for cond in thepow:
                                 filename = os.path.join(thedir, 'output',
-                                    ('h' if hybrid_mode else '') +
                                     exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
                                     'co' if opt else 'nco', 'smem' if smem else 'nosmem',
                                     'sameic' if same else 'psric', t_step))
                                 my_repeats = repeats - check_file(filename)
                                 if my_repeats and not gpu_built:
-                                    subprocess.check_call(args)
+                                    subprocess.check_call([scons, 'cpu'] + args + ['mechanism_dir={}'.format(gpu_mech_dir)])
                                     gpu_built = True
                                 with open(filename, 'a') as file:
                                     for repeat in range(my_repeats):
@@ -200,10 +186,6 @@ if __name__ == '__main__':
                         required=False,
                         default='performance',
                         help='The base directory containing a folder per mechanism')
-    parser.add_argument('-p', '--pyjac_dir',
-                        required=False,
-                        default='~/pyJac/',
-                        help='The base directory of pyJac')
     parser.add_argument('-s', '--solver_blacklist',
                         required=False,
                         default='',
@@ -221,18 +203,21 @@ if __name__ == '__main__':
     parser.add_argument('-nt', '--num_threads',
                         type=str,
                         required=False,
-                        default='6,12',
+                        default='12',
                         help='Comma separated list of # of threads to test with for CPU integrators')
     parser.add_argument('-l', '--langs',
                         type=str,
                         required=False,
                         default='c,cuda',
                         help='Comma separated list of languages to test.')
-    parser.add_argument('-hy', '--hybrid_mode',
+    parser.add_argument('-atol', '--absolute_tolerance',
                         required=False,
-                        default=False,
-                        action='store_true',
-                        help='Specify to turn on hybrid timestepping mode.')
+                        default=1e-10,
+                        help='The absolute tolerance for the integrators')
+    parser.add_argument('-rtol', '--relative_tolerance',
+                        required=False,
+                        default=1e-7,
+                        help='The relative tolerance for the integrators')
     args = parser.parse_args()
 
     num_threads = [int(x) for x in args.num_threads.split(',')]
@@ -244,11 +229,11 @@ if __name__ == '__main__':
     for d in dir_list:
         run(d, blacklist=[x.strip() for x in 
                     args.solver_blacklist.split(',') if x.strip()], 
-            force=args.force, 
-            pyjac=os.path.expanduser(args.pyjac_dir), 
+            force=args.force,
             num_cond=args.num_cond,
             repeats=args.repeats,
             threads=num_threads,
             langs=[x.strip() for x in 
                     args.langs.split(',') if x.strip()],
-            hybrid_mode=args.hybrid_mode)
+            atol=args.absolute_tolerance,
+            rtol=args.relative_tolerance)
