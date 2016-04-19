@@ -156,11 +156,11 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                                     initial_state=initial_conditions, 
                                     optimize_cache=cache_opt,
                                     multi_thread=num_threads,
-                                    no_shared=shared_mem,
+                                    no_shared=not shared_mem,
                                     build_path=build_path))
                     file.write('\ncache_opt: {}\n'
                                'shared_mem: {}\n'.format(
-                               cache_opt, not shared_mem))
+                               cache_opt, (shared_mem and lang == 'cuda')))
                     for j in range(-4, -13, -1):
                         t_step = np.power(10.0, j)
                         #build the validation set for this timestep
