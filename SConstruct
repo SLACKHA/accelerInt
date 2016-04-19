@@ -304,8 +304,8 @@ def check_extras(lang, subdir, check_str, check_file, list_file):
 #check for additional files
 check_extras('c', 'jacobs', 'jacobs/jac_include.h', 'jacob.h', 'jac_list_c')
 check_extras('cuda', 'jacobs', 'jacobs/jac_include.cuh', 'jacob.cuh', 'jac_list_cuda')
-check_extras('c', 'rates', 'rates/rates_include.h', 'rates/rxn_rates.c', 'rates_list_c')
-check_extras('cuda', 'rates', 'rates/rates_include.cuh', 'rates/rxn_rates.cu', 'rates_list_cuda')
+check_extras('c', 'rates', 'rates/rates_include.h', 'rxn_rates.c', 'rate_list_c')
+check_extras('cuda', 'rates', 'rates/rates_include.cuh', 'rxn_rates.cu', 'rate_list_cuda')
 
 #link lines
 LibDirs = listify(env['blas_lapack_dir'])
