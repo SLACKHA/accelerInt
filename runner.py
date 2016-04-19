@@ -99,18 +99,16 @@ def run(thedir, blacklist=[], force=False,
     t_list = [1e-6, 1e-4]
     ics_list = [False]
 
-    c_params = defaultdict(lambda x: return False)
-    c_params = {'lang' : 'c', 
+    c_params = optionloop({'lang' : 'c', 
                 'opt' : opt_list,
                 't_step' : t_list,
-                'same_ics' : ics_list}
-    cuda_params = defaultdict(lambda x: return False)
-    cuda_params = {'lang' : 'cuda', 
+                'same_ics' : ics_list}, lambda x: return False)
+    cuda_params = optionloop({'lang' : 'cuda', 
                 'opt' : opt_list,
                 't_step' : t_list,
-                'smem'
-                'same_ics' : ics_list}
-    optionloop op = optionloop(c_params) + optionloop(cuda_params)
+                'smem' : smem_list,
+                'same_ics' : ics_list}, lambda x: return False)
+    optionloop op = c_params + cuda_params
     for state in op:
         opt = state['opt']
         smem = state['smem']
