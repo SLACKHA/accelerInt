@@ -11,6 +11,8 @@ import numpy as np
 import multiprocessing
 import re
 from pyjac import create_jacobian
+from optionLoop import optionloop
+from collections import defaultdict
 
 scons = subprocess.check_output('which scons', shell=True).strip()
 
@@ -92,24 +94,44 @@ def run(thedir, blacklist=[], force=False,
     shutil.copy(os.path.join(thedir, 'data.bin'),
                 os.path.join(home, 'ign_data.bin'))
 
-    #generate mechanisms
-    cache_opt = [True, False]
-    use_smem = [True, False]
-    time_steps = [1e-6, 1e-4]
-    same_ics = [False]#[True, False]
-    for opt in cache_opt:
-        mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
-        mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
-        make_sure_path_exists(mech_dir)
-        create_jacobian(lang='c', mech_name=mechanism,
-                        optimize_cache=opt, initial_state=ic_str,
-                        build_path=mech_dir, multi_thread=int(jthread))
+    opt_list = [True, False]
+    smem_list = [True, False]
+    t_list = [1e-6, 1e-4]
+    ics_list = [False]
 
-        for smem in use_smem:
+    c_params = defaultdict(lambda x: return False)
+    c_params = {'lang' : 'c', 
+                'opt' : opt_list,
+                't_step' : t_list,
+                'same_ics' : ics_list}
+    cuda_params = defaultdict(lambda x: return False)
+    cuda_params = {'lang' : 'cuda', 
+                'opt' : opt_list,
+                't_step' : t_list,
+                'smem'
+                'same_ics' : ics_list}
+    optionloop op = optionloop(c_params) + optionloop(cuda_params)
+    for state in op:
+        opt = state['opt']
+        smem = state['smem']
+        t_step = state['t_step']
+        same = state['same_ics']
+        thepow = same_powers if same else diff_powers
+
+        #generate mechanisms
+        if 'c' in langs:
+            mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
+            mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
+            make_sure_path_exists(mech_dir)
+            create_jacobian(lang='c', mech_name=mechanism,
+                            optimize_cache=opt, initial_state=ic_str,
+                            build_path=mech_dir, multi_thread=int(jthread))
+
+        if 'cuda' in langs:
             gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
             gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
             make_sure_path_exists(gpu_mech_dir)
-            if opt:
+            if opt and 'c' in langs:
                 #copy the pickle from the cpu folder
                 shutil.copy(os.path.join(mech_dir, 'optimized.pickle'), 
                     os.path.join(gpu_mech_dir, 'optimized.pickle'))
@@ -117,58 +139,47 @@ def run(thedir, blacklist=[], force=False,
                         optimize_cache=opt, initial_state=ic_str,
                         build_path=gpu_mech_dir, no_shared=not smem, multi_thread=int(jthread))
 
-    #now build and run
-    for t_step in time_steps:
-        for same in same_ics:
-            thepow = same_powers if same else diff_powers
-            for opt in cache_opt:
-                cpu_built = False
-                mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
-                mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
-                args = ['-j', jthread, 'DEBUG=False', 'FAST_MATH=True',
-                     'LOG_OUTPUT=False','SHUFFLE=False', 'LOG_END_ONLY=False',
-                     'PRINT=False',
-                     't_step={}'.format(t_step),
-                     't_end={}'.format(t_step),
-                     'DIVERGENCE_WARPS=0', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
-                     'ATOL={:.0e}'.format(atol),
-                     'RTOL={:.0e}'.format(rtol)]
-                args.append('SAME_IC={}'.format(same))
+        #now build and run
+        args = ['-j', jthread, 'DEBUG=False', 'FAST_MATH=True',
+             'LOG_OUTPUT=False','SHUFFLE=False', 'LOG_END_ONLY=False',
+             'PRINT=False',
+             't_step={}'.format(t_step),
+             't_end={}'.format(t_step),
+             'DIVERGENCE_WARPS=0', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
+             'ATOL={:.0e}'.format(atol),
+             'RTOL={:.0e}'.format(rtol)]
+        args.append('SAME_IC={}'.format(same))
 
-                #run with repeats
-                if 'c' in langs:
-                    run_me = get_executables(blacklist + ['gpu', 'rk78'], inverse=['int'])
-                    subprocess.check_call([scons, 'cpu'] + args + ['mechanism_dir={}'.format(mech_dir)])
-                    for exe in run_me:
-                        for thread in threads:
-                            for cond in thepow:
-                                filename = os.path.join(thedir, 'output',
-                                    exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
-                                    thread, 'co' if opt else 'nco',
-                                    'sameic' if same else 'psric', t_step))
-                                my_repeats = repeats - check_file(filename)
-                                with open(filename, 'a') as file:
-                                    for repeat in range(my_repeats):
-                                        subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
+        #run with repeats
+        if 'c' in langs:
+            run_me = get_executables(blacklist + ['gpu', 'rk78'], inverse=['int'])
+            subprocess.check_call([scons, 'cpu'] + args + ['mechanism_dir={}'.format(mech_dir)])
+            for exe in run_me:
+                for thread in threads:
+                    for cond in thepow:
+                        filename = os.path.join(thedir, 'output',
+                            exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                            thread, 'co' if opt else 'nco',
+                            'sameic' if same else 'psric', t_step))
+                        my_repeats = repeats - check_file(filename)
+                        with open(filename, 'a') as file:
+                            for repeat in range(my_repeats):
+                                subprocess.check_call([os.path.join(home, exe), str(thread), str(cond)], stdout=file)
 
-                for smem in use_smem:
-                    if 'cuda' in langs:
-                        gpu_built = False
-                        gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
-                        gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
-                        #run with repeats
-                        subprocess.check_call([scons, 'gpu'] + args + ['mechanism_dir={}'.format(gpu_mech_dir)])
-                        run_me = get_executables(blacklist + ['rk78'], inverse=['int-gpu'])
-                        for exe in run_me:
-                            for cond in thepow:
-                                filename = os.path.join(thedir, 'output',
-                                    exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
-                                    'co' if opt else 'nco', 'smem' if smem else 'nosmem',
-                                    'sameic' if same else 'psric', t_step))
-                                my_repeats = repeats - check_file(filename)
-                                with open(filename, 'a') as file:
-                                    for repeat in range(my_repeats):
-                                        subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
+        if 'cuda' in langs:
+            #run with repeats
+            subprocess.check_call([scons, 'gpu'] + args + ['mechanism_dir={}'.format(gpu_mech_dir)])
+            run_me = get_executables(blacklist + ['rk78'], inverse=['int-gpu'])
+            for exe in run_me:
+                for cond in thepow:
+                    filename = os.path.join(thedir, 'output',
+                        exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                        'co' if opt else 'nco', 'smem' if smem else 'nosmem',
+                        'sameic' if same else 'psric', t_step))
+                    my_repeats = repeats - check_file(filename)
+                    with open(filename, 'a') as file:
+                        for repeat in range(my_repeats):
+                            subprocess.check_call([os.path.join(home, exe), str(cond)], stdout=file)
 
 
 if __name__ == '__main__':
