@@ -102,13 +102,13 @@ def run(thedir, blacklist=[], force=False,
     c_params = optionloop({'lang' : 'c', 
                 'opt' : opt_list,
                 't_step' : t_list,
-                'same_ics' : ics_list}, lambda x: return False)
+                'same_ics' : ics_list}, lambda x: False)
     cuda_params = optionloop({'lang' : 'cuda', 
                 'opt' : opt_list,
                 't_step' : t_list,
                 'smem' : smem_list,
-                'same_ics' : ics_list}, lambda x: return False)
-    optionloop op = c_params + cuda_params
+                'same_ics' : ics_list}, lambda x: False)
+    op = c_params + cuda_params
     for state in op:
         opt = state['opt']
         smem = state['smem']
