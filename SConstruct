@@ -187,6 +187,8 @@ config_options = [
         'IGN', 'Log ignition time.', False),
     BoolVariable(
         'FAST_MATH', 'Compile with Fast Math.', False),
+    BoolVariable(
+        'FINITE_DIFFERENCE', 'Use a finite difference Jacobian (not recommended)', False),
     ('DIVERGENCE_WARPS', 'If specified, measure divergence in that many warps', '0'),
     ('CV_HMAX', 'If specified, the maximum stepsize for CVode', '0'),
     ('CV_MAX_STEPS', 'If specified, the maximum stepsize for CVode', '20000')
@@ -302,8 +304,9 @@ def check_extras(lang, subdir, check_str, check_file, list_file):
                 pass
 
 #check for additional files
-check_extras('c', 'jacobs', 'jacobs/jac_include.h', 'jacob.h', 'jac_list_c')
-check_extras('cuda', 'jacobs', 'jacobs/jac_include.cuh', 'jacob.cuh', 'jac_list_cuda')
+if not env['FINITE_DIFFERENCE']:
+    check_extras('c', 'jacobs', 'jacobs/jac_include.h', 'jacob.h', 'jac_list_c')
+    check_extras('cuda', 'jacobs', 'jacobs/jac_include.cuh', 'jacob.cuh', 'jac_list_cuda')
 check_extras('c', 'rates', 'rates/rates_include.h', 'rxn_rates.c', 'rate_list_c')
 check_extras('cuda', 'rates', 'rates/rates_include.cuh', 'rxn_rates.cu', 'rate_list_cuda')
 
@@ -420,6 +423,12 @@ def write_options(lang, dir):
         //used to only log output on end step
         #define LOG_END_ONLY
         """)
+
+        if env['FINITE_DIFFERENCE']:
+            file.write("""
+            //used to only log output on end step
+            #define FINITE_DIFFERENCE
+            """)
 
         if int(env['DIVERGENCE_WARPS']) > 0:
             file.write("""
@@ -606,10 +615,6 @@ radau_c, radau_cuda = builder(env_save, mech_c,
     new_defines, radau2a_dir,
     variant, 'radau2a-int', target_list)
 
-if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
-    radau_cu = [x for x in radau_cuda if 'radau2a.cu' in str(x[0])]
-    Depends(radau_cu, os.path.join(generic_dir, 'solver_options.h'))
-
 #exp4
 new_defines = {}
 new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
@@ -623,10 +628,6 @@ exp4_c, exp4_cuda = builder(env_save, mech_c, mech_cuda,
     variant, 'exp4-int', target_list,
     [exp_int_dir])
 
-if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
-    exp4_cu = [x for x in exp4_cuda if 'exp4.cu' in str(x[0])]
-    Depends(exp4_cu, os.path.join(generic_dir, 'solver_options.h'))
-
 #exprb43
 new_defines = {}
 new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
@@ -639,10 +640,6 @@ rb43c, rb43cu = builder(env_save, mech_c, mech_cuda,
     new_defines, exprb43_int_dir,
     variant, 'exprb43-int', target_list,
     [exp_int_dir])
-
-if build_cuda and os.path.isfile(os.path.join(mech_dir, 'launch_bounds.cuh')):
-    exprb43_cu = [x for x in rb43cu if 'exprb43.cu' in str(x[0])]
-    Depends(exprb43_cu, os.path.join(generic_dir, 'solver_options.h'))
 
 #cvodes
 new_defines = {}

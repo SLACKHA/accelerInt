@@ -1,6 +1,8 @@
 Import('env')
 cObj = []
-blacklist = ['fd_jacob', 'preconditioner']
+blacklist = ['preconditioner']
+if not env['FINITE_DIFFERENCE']:
+	blacklist += ['fd_jacob']
 c_src = Glob('*.c')
 c_src = [x for x in c_src if not any(b in str(x) for b in blacklist)]
 
