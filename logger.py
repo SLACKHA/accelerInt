@@ -63,7 +63,7 @@ def __execute(builder, num_threads, num_conditions, t_step=None):
                 file.write('\n' + exe + '\n')
                 try:
                     subprocess.check_call([pjoin(cwd(), exe), str(num_conditions)], stdout=file)
-                except CalledProcessError as e:
+                except subprocess.CalledProcessError as e:
                     returncode = e.returncode
                     file.write('Error encountered running {}\n'.format(' '.join([exe, str(num_conditions)])))
                     file.write('Error code: {}\n'.format(returncode))
@@ -77,7 +77,7 @@ def __execute(builder, num_threads, num_conditions, t_step=None):
                 file.write('\n' + exe + '\n')
                 try:
                     subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
-                except CalledProcessError, e:
+                except subprocess.CalledProcessError, e:
                     returncode = e.returncode
                     file.write('Error encountered running {}\n'.format(' '.join([exe, str(num_threads), str(num_conditions)])))
                     file.write('Error code: {}\n'.format(returncode))
@@ -262,12 +262,12 @@ if __name__ == '__main__':
     parser.add_argument('-atol', '--abs_tolerance',
                         required=False,
                         type=float,
-                        default=1e-13,
+                        default=1e-10,
                         help='The absolute tolerance to use during integration')
     parser.add_argument('-rtol', '--rel_tolerance',
                         required=False,
                         type=float,
-                        default=1e-10,
+                        default=1e-7,
                         help='The relative tolerance to use during integration')
     parser.add_argument('-satol', '--abs_tolerance_small',
                         required=False,
