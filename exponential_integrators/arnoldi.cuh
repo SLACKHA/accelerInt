@@ -76,6 +76,7 @@ int arnoldi(const double scale,
 			if (fabs(Hm[INDEX(j * STRIDE + j + 1)]) < ATOL)
 			{
 				//happy breakdown
+				j++;
 				break;
 			}
 			scale_mult(1.0 / Hm[INDEX(j * STRIDE + j + 1)], work, &Vm[GRID_DIM * ((j + 1) * NSP)]);

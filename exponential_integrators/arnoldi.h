@@ -68,6 +68,7 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 			if (fabs(Hm[j * STRIDE + j + 1]) < ATOL)
 			{
 				//happy breakdown
+				j++;
 				break;
 			}
 			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NSP]);
