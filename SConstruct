@@ -589,6 +589,11 @@ if 'extra_c_jacobs' in env or 'extra_cuda_jacobs' in env:
     
     mech_c += cJacs
     mech_cuda += cudaJacs
+if 'extra_c_rates' in env or 'extra_cuda_rates' in env:
+    cRates, cudaRates = SConscript(os.path.join(mech_dir, 'rates', 'SConscript'),
+        variant_dir=os.path.join(mech_dir, 'rates', variant))
+    mech_c += cRates
+    mech_cuda += cudaRates
 
 #radua
 new_defines = {}
