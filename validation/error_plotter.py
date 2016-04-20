@@ -60,7 +60,16 @@ for line in lines:
 	if match:
 		solver = match.group(1)
 		continue
-	match = re.search(r'L2 \(max, mean\) = (\d+\.\d+e(?:[-])?\d+)', line)
+	match = re.search(r'L2 \(max, mean\) = (nan, nan)', line)
+	if match:
+		yval = np.nan
+		series = next((x for x in series_list if x.state_eq(PaSR, opt, smem, solver)), None)
+		if series is None:
+			series = data_series(PaSR, opt, smem, solver)
+			series_list.append(series)
+		series.xy.append((timestep, yval))
+		continue
+	match = re.search(r'L2 \(max, mean\) = (\d+\.\d+e(?:[+-])?\d+)', line)
 	if match:
 		yval = float(match.group(1))
 		series = next((x for x in series_list if x.state_eq(PaSR, opt, smem, solver)), None)
@@ -69,6 +78,9 @@ for line in lines:
 			series_list.append(series)
 		series.xy.append((timestep, yval))
 		continue
+	if 'Linf' in line:
+		continue
+	raise Exception(line)
 
 c_params = optionloop({'lang' : 'c', 
             'opt' : [True, False],
