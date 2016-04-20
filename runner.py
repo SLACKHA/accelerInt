@@ -148,7 +148,7 @@ def run(thedir, blacklist=[], force=False,
                         build_path=gpu_mech_dir, no_shared=not smem, multi_thread=int(jthread))
 
         #now build and run
-        args = ['-j', jthread, 'DEBUG=False', 'FAST_MATH=True',
+        args = ['-j', jthread, 'DEBUG=False', 'FAST_MATH=False',
              'LOG_OUTPUT=False','SHUFFLE=False', 'LOG_END_ONLY=False',
              'PRINT=False',
              't_step={}'.format(t_step),
