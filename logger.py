@@ -20,7 +20,7 @@ np.set_printoptions(precision=15)
 
 scons = subprocess.check_output('which scons', shell=True).strip()
 
-valid_int = 'cvodes-analytic-int'
+valid_int = 'cvodes-int'
 keyfile = valid_int + '-log.bin'
 
 def create_dir(path):
@@ -120,6 +120,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE',
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
+                'FINITE_DIFFERENCE=FALSE',
                 'mechanism_dir={}'.format(build_path)]
 
         if initial_conditions:
@@ -144,6 +145,20 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                              'smem' : [False, True]})
         small_tol = ['ATOL={:.0e}'.format(small_atol), 'RTOL={:.0e}'.format(small_rtol)]
         large_tol = ['ATOL={:.0e}'.format(atol), 'RTOL={:.0e}'.format(rtol)]
+        #build the validation set for this timestep
+        extra_args = ['t_step={:.0e}'.format(1e-10), 't_end={:.0e}'.format(1e-6)]
+        with open('logerr', 'a') as errfile:
+            subprocess.check_call([scons, 'cpu'] + arg_list + extra_args + small_tol, stdout=errfile)
+            #run
+            subprocess.check_call([pjoin(cwd(), valid_int), 
+                str(num_threads), str(num_conditions)],
+                stdout=errfile)
+        #copy to saved data
+        shutil.copy(pjoin(cwd(), 'log', keyfile),
+                    pjoin(cwd(), 'log', 'valid.bin'))
+
+        validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
+        validator = validator.reshape((-1, 1 + num_conditions * nvar))
         with open('logfile', 'a') as file:
             with open('logerr', 'a') as errfile:
                 for op in oploop:
@@ -161,22 +176,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     file.write('\ncache_opt: {}\n'
                                'shared_mem: {}\n'.format(
                                cache_opt, (shared_mem and lang == 'cuda')))
-                    for j in range(-4, -13, -1):
+                    for j in range(-6, -13, -1):
                         t_step = np.power(10.0, j)
-                        #build the validation set for this timestep
-                        extra_args = ['t_step={:.0e}'.format(t_step), 't_end={:.0e}'.format(t_step)]
-                        subprocess.check_call([scons, 'cpu'] + arg_list + extra_args + small_tol, stdout=errfile)
-                        #run
-                        subprocess.check_call([pjoin(cwd(), valid_int), 
-                            str(num_threads), str(num_conditions)],
-                            stdout=errfile)
-                        #copy to saved data
-                        shutil.copy(pjoin(cwd(), 'log', keyfile),
-                                    pjoin(cwd(), 'log', 'valid.bin'))
-
-                        validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
-                        validator = validator.reshape((-1, 1 + num_conditions * nvar))
-                        
+                        extra_args = ['t_step={:.0e}'.format(t_step), 't_end={:.0e}'.format(1e-6)]
                         file.write('t_step={:.0e}\n'.format(t_step))
                         file.flush()
                         subprocess.check_call([scons, builder[lang]] + arg_list + extra_args + large_tol,
