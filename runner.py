@@ -98,23 +98,33 @@ def run(thedir, blacklist=[], force=False,
     smem_list = [True, False]
     t_list = [1e-6, 1e-4]
     ics_list = [False]
+    fd_list = [True, False]
 
     c_params = optionloop({'lang' : 'c', 
                 'opt' : opt_list,
                 't_step' : t_list,
-                'same_ics' : ics_list}, lambda x: False)
+                'same_ics' : ics_list,
+                'FD' : fd_list}, lambda x: False)
     cuda_params = optionloop({'lang' : 'cuda', 
                 'opt' : opt_list,
                 't_step' : t_list,
                 'smem' : smem_list,
-                'same_ics' : ics_list}, lambda x: False)
+                'same_ics' : ics_list,
+                'FD' : fd_list}, lambda x: False)
     op = c_params + cuda_params
     for state in op:
         opt = state['opt']
         smem = state['smem']
         t_step = state['t_step']
         same = state['same_ics']
+        FD = state['FD']
         thepow = same_powers if same else diff_powers
+
+        #custom rules so evaluation doesn't take so damn long
+        if opt and t_step == 1e-4:
+            continue
+        if not smem and t_step == 1e-4:
+            continue
 
         #generate mechanisms
         if 'c' in langs:
@@ -145,7 +155,8 @@ def run(thedir, blacklist=[], force=False,
              't_end={}'.format(t_step),
              'DIVERGENCE_WARPS=0', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
              'ATOL={:.0e}'.format(atol),
-             'RTOL={:.0e}'.format(rtol)]
+             'RTOL={:.0e}'.format(rtol),
+             'FINITE_DIFFERENCE={}'.format(FD)]
         args.append('SAME_IC={}'.format(same))
 
         #run with repeats
@@ -156,9 +167,9 @@ def run(thedir, blacklist=[], force=False,
                 for thread in threads:
                     for cond in thepow:
                         filename = os.path.join(thedir, 'output',
-                            exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                            exe + '_{}_{}_{}_{}_{}_{:e}.txt'.format(cond,
                             thread, 'co' if opt else 'nco',
-                            'sameic' if same else 'psric', t_step))
+                            'sameic' if same else 'psric', 'FD' if FD else 'AJ', t_step))
                         my_repeats = repeats - check_file(filename)
                         with open(filename, 'a') as file:
                             for repeat in range(my_repeats):
@@ -171,9 +182,9 @@ def run(thedir, blacklist=[], force=False,
             for exe in run_me:
                 for cond in thepow:
                     filename = os.path.join(thedir, 'output',
-                        exe + '_{}_{}_{}_{}_{:e}.txt'.format(cond,
+                        exe + '_{}_{}_{}_{}_{}_{:e}.txt'.format(cond,
                         'co' if opt else 'nco', 'smem' if smem else 'nosmem',
-                        'sameic' if same else 'psric', t_step))
+                        'sameic' if same else 'psric', 'FD' if FD else 'AJ', t_step))
                     my_repeats = repeats - check_file(filename)
                     with open(filename, 'a') as file:
                         for repeat in range(my_repeats):
