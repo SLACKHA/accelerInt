@@ -546,47 +546,6 @@ def builder(env_save, cmech, cumech, newdict, mydir, variant,
         cuint += dlink
     return cgen + cint, cugen + cuint
 
-def cvodes_builder(env_save, cobj, newdict, mydir, variant,
-                 target_list, additional_sconstructs=None, filter_out=None):
-    #update the env
-    env = env_save.Clone()
-
-    for key, value in newdict.iteritems():
-        if not isinstance(value, list):
-            value = list(value)
-        if not key in env:
-            env[key] = value
-        else:
-            env[key] += value
-    Export('env')
-
-    mygendir = os.path.join(generic_dir, os.path.basename(os.path.normpath(mydir)))
-    cgen, cugen = SConscript(os.path.join(generic_dir, 'SConscript'), 
-        variant_dir=os.path.join(mygendir, variant))
-
-    if filter_out is not None:
-        cgen = [x for x in cgen if not any(f in str(x) for f in filter_out)]
-
-    fd_c, ana_c = SConscript(os.path.join(mydir, 'SConscript'), 
-        variant_dir=os.path.join(mydir, variant))
-    #check for additional sconstructs
-    if additional_sconstructs is not None:
-        for thedir in additional_sconstructs:
-            temp_c = SConscript(os.path.join(thedir, 'SConscript'),
-                variant_dir=os.path.join(thedir, variant))
-            int_c += temp_c
-    target_list['cvodes-int'] = []
-    target_list['cvodes-int'].append(
-        env.Program(target='cvodes-int',
-                    source=cobj + fd_c + cgen,
-                    variant_dir=os.path.join(mydir, variant)))
-
-    target_list['cvodes-analytic-int'] = []
-    target_list['cvodes-analytic-int'].append(
-        env.Program(target='cvodes-analytic-int',
-                    source=cobj + ana_c + cgen,
-                    variant_dir=os.path.join(mydir, variant)))
-
 env['build_cuda'] = build_cuda
 env_save = env.Clone()
 Export('env')
@@ -647,8 +606,9 @@ new_defines['CPPDEFINES'] = ['CVODES']
 new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
-cvodes_builder(env_save, mech_c, new_defines,
-    cvodes_dir, variant, target_list, filter_out=['solver_generic', 'nverse'])
+cvodesc, dummy = builder(env_save, mech_c, None, new_defines,
+    cvodes_dir, variant, 'cvodes-int', 
+    target_list, None, filter_out=['solver_generic', 'nverse'])
 
 #rk78
 new_defines = {}

@@ -1,16 +1,10 @@
 Import('env')
 c_src = Glob('*.c')
-aObj = []
-fdObj = []
-#now add another object w/ the analytical jacobian defined
-env_clone = env.Clone()
-env_clone['CPPDEFINES'] += ['SUNDIALS_ANALYTIC_JACOBIAN']
+cObj = []
+cuObj = []
 for src in c_src:
-	fdObj.append(env.Object(target='fd_' + str(src).replace('.c', '.o'),
-							source=src, 
-							variant_dir=env['variant']))
-	aObj.append(env_clone.Object(target='ana_' + str(src).replace('.c', '.o'),
-							source=src, 
-							variant_dir=env_clone['variant']))
+	if env['FINITE_DIFFERENCE'] and 'cvodes_jac' in str(src):
+		continue
+	cObj.append(env.Object(src, variant_dir=env['variant']))
 
-Return ('fdObj', 'aObj')
+Return ('cObj', 'cuObj')

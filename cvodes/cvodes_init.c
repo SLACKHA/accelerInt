@@ -11,7 +11,7 @@
 #include "solver_options.h"
 #include "cvodes_dydt.h"
 
-#ifdef SUNDIALS_ANALYTIC_JACOBIAN
+#ifndef FINITE_DIFFERENCE
  	#include "cvodes_jac.h"
 #endif
 
@@ -81,7 +81,7 @@ void** integrators;
 		    exit(flag);
 		}
 
-	    #ifdef SUNDIALS_ANALYTIC_JACOBIAN
+	    #ifndef FINITE_DIFFERENCE
 	    	flag = CVDlsSetDenseJacFn(integrators[i], eval_jacob_cvodes);
 	    	if (flag != CV_SUCCESS) {
 		    	printf("Error setting analytic jacobian\n");
