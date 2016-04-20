@@ -161,7 +161,7 @@ def run(thedir, blacklist=[], force=False,
 
         #run with repeats
         if 'c' in langs:
-            run_me = get_executables(blacklist + ['gpu', 'rk78'], inverse=['int'])
+            run_me = get_executables(blacklist + ['gpu'], inverse=['int'])
             subprocess.check_call([scons, 'cpu'] + args + ['mechanism_dir={}'.format(mech_dir)])
             for exe in run_me:
                 for thread in threads:
@@ -178,7 +178,7 @@ def run(thedir, blacklist=[], force=False,
         if 'cuda' in langs:
             #run with repeats
             subprocess.check_call([scons, 'gpu'] + args + ['mechanism_dir={}'.format(gpu_mech_dir)])
-            run_me = get_executables(blacklist + ['rk78'], inverse=['int-gpu'])
+            run_me = get_executables(blacklist, inverse=['int-gpu'])
             for exe in run_me:
                 for cond in thepow:
                     filename = os.path.join(thedir, 'output',
@@ -204,7 +204,7 @@ if __name__ == '__main__':
                         help='The base directory containing a folder per mechanism')
     parser.add_argument('-s', '--solver_blacklist',
                         required=False,
-                        default='',
+                        default='rk78',
                         help='The solvers to not run')
     parser.add_argument('-nc', '--num_cond',
                         type=int,
