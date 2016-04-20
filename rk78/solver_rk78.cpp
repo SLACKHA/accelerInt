@@ -2,8 +2,10 @@
 #include "rk78_typedefs.hpp"
 
 //boost includes
-#include <boost/numeric/odeint/integrate/integrate_const.hpp>
-
+#include <boost/numeric/odeint/integrate/integrate_adaptive.hpp>
+extern "C" {
+#include "solver.h"
+}
 extern std::vector<state_type*> state_vectors;
 extern std::vector<rhs_eval*> evaluators;
 extern std::vector<stepper*> steppers;
@@ -28,7 +30,8 @@ void intDriver (const int NUM, const double t, const double t_end,
             vec[i] = y_global[tid + i * NUM];
         }
 
-        integrate_const(*steppers[index], *evaluators[index], vec, t, t_end, t_end - t);
+        integrate_adaptive(make_controlled(ATOL, RTOL, *steppers[index]),
+            *evaluators[index], vec, t, t_end, t_end - t);
 
         // update global array with integrated values
         
