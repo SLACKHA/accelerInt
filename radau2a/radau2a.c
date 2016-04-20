@@ -324,10 +324,12 @@ static void RK_Solve(const double H, double* __restrict__ E1,
 	}
 	int info = 0;
 	dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, R1, &ARRSIZE, &info);
+#ifdef DEBUG
 	if (info != 0) {
 		printf("Error in back-substitution\n");
 		exit(-1);
 	}
+#endif
 	double complex temp[NSP];
 	
 	for (int i = 0; i < NSP; ++i)
@@ -335,10 +337,12 @@ static void RK_Solve(const double H, double* __restrict__ E1,
 		temp[i] = R2[i] + I * R3[i];
 	}
 	zgetrs_(&TRANS, &ARRSIZE, &NRHS, E2, &ARRSIZE, ipiv2, temp, &ARRSIZE, &info);
+#ifdef DEBUG
 	if (info != 0) {
 		printf("Error in back-substitution\n");
 		exit(-1);
 	}
+#endif
 	
 	for (int i = 0; i < NSP; ++i)
 	{
@@ -389,10 +393,13 @@ static double RK_ErrorEstimate(const double H, const double t, const double pr,
     }
     int info = 0;
     dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, TMP, &ARRSIZE, &info);
+#ifdef DEBUG
+    //this is only true on an incorrect call of dgetrs, hence ignore
     if (info != 0) {
     	printf("Error on back-substitution.");
     	exit(-1);
     }
+#endif
     double Err = RK_ErrorNorm(scale, TMP);
     if (Err >= 1.0 && (FirstStep || Reject)) {
         
@@ -405,10 +412,12 @@ static double RK_ErrorEstimate(const double H, const double t, const double pr,
         	TMP[i] = F1[i] + F2[i];
         }
        	dgetrs_ (&TRANS, &ARRSIZE, &NRHS, E1, &ARRSIZE, ipiv1, TMP, &ARRSIZE, &info);
+#ifdef DEBUG
        	if (info != 0) {
 	    	printf("Error on back-substitution.");
 	    	exit(-1);
     	}
+#endif
         Err = RK_ErrorNorm(scale, TMP);
     }
     return Err;
