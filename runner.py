@@ -218,8 +218,7 @@ if __name__ == '__main__':
                         help='The number of timing repeats to run')
     parser.add_argument('-nt', '--num_threads',
                         type=str,
-                        required=False,
-                        default='12',
+                        required=True,
                         help='Comma separated list of # of threads to test with for CPU integrators')
     parser.add_argument('-l', '--langs',
                         type=str,
