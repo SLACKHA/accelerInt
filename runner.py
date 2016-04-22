@@ -166,6 +166,10 @@ def run(thedir, blacklist=[], force=False,
             for exe in run_me:
                 for thread in threads:
                     for cond in thepow:
+                        if 'exp' in exe and FD:
+                            #the exponential integrators are not formulated for FD Jacobians
+                            #thus we don't evaluate them
+                            continue
                         filename = os.path.join(thedir, 'output',
                             exe + '_{}_{}_{}_{}_{}_{:e}.txt'.format(cond,
                             thread, 'co' if opt else 'nco',
