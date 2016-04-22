@@ -8,15 +8,28 @@ extern "C" {
 }
 extern std::vector<state_type*> state_vectors;
 extern std::vector<rhs_eval*> evaluators;
-extern std::vector<stepper*> steppers;
+extern std::vector<controller*> controllers;
 
 extern "C" void intDriver(const int, const double, const double, const double*, double*);
+
+#ifdef STIFFNESS_MEASURE
+    extern std::vector<double> max_stepsize;
+#endif
 
 void intDriver (const int NUM, const double t, const double t_end,
                 const double *pr_global, double *y_global)
 {
+    #ifdef STIFFNESS_MEASURE
+    max_stepsize.clear();
+    max_stepsize.resize(NUM, 0.0);
+    #endif
+
 	int tid = 0;
-	#pragma omp parallel for shared(state_vectors, evaluators, steppers) private(tid)
+#ifdef STIFFNESS_MEASURE
+    #pragma omp parallel for shared(state_vectors, evaluators, controllers, max_stepsize) private(tid)
+#else
+	#pragma omp parallel for shared(state_vectors, evaluators, controllers) private(tid)
+#endif
     for (tid = 0; tid < NUM; ++tid) {
     	int index = omp_get_thread_num();
 
@@ -30,8 +43,41 @@ void intDriver (const int NUM, const double t, const double t_end,
             vec[i] = y_global[tid + i * NUM];
         }
 
-        integrate_adaptive(make_controlled(ATOL, RTOL, *steppers[index]),
+#ifndef STIFFNESS_MEASURE
+        integrate_adaptive(*controllers[index],
             *evaluators[index], vec, t, t_end, t_end - t);
+#else
+        double tol = 1e-10;
+        double t_copy = t;
+        state_type y_copy(vec);
+        //do a binary search to find the maximum stepsize
+        double left_size = 1.0;
+        while (controllers[index]->try_step(*evaluators[index], vec, t_copy, y_copy, left_size) == success)
+        {
+            left_size *= 10.0;
+        }
+        double right_size = 1e-6;
+        while (controllers[index]->try_step(*evaluators[index], vec, t_copy, y_copy, right_size) == fail)
+        {
+            right_size /= 10.0;
+        }
+        double delta = 1.0;
+        double mid = 0;
+        while (delta > tol) {
+            mid = (left_size + right_size) / 2.0;
+            controlled_step_result result = controllers[index]->try_step(*evaluators[index], vec, t_copy, y_copy, mid);
+            if (result == success) {
+                //mid becomes the new left
+                delta = fabs(left_size - mid) / left_size;
+                left_size = mid;
+            }
+            else{
+                delta = fabs(right_size - mid) / right_size;
+                right_size = mid;
+            }
+        }
+        max_stepsize[tid] = mid;
+#endif
 
         // update global array with integrated values
         

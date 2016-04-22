@@ -11,19 +11,32 @@
 #ifndef RK78_TYPEDEFS_HPP
 #define RK78_TYPEDEFS_HPP
 
+#include <boost/numeric/odeint.hpp>
+using namespace boost::numeric::odeint;
+
 //our code
 extern "C" {
 	#include "dydt.h"
+	#include "solver_options.h"
 }
-
-#include <boost/numeric/odeint.hpp>
-using namespace boost::numeric::odeint;
 
 //state vector
 typedef std::vector< double > state_type;
 
 //solver type
 typedef runge_kutta_fehlberg78< state_type , double > stepper;
+
+//controller type
+typedef controlled_runge_kutta< stepper > controller;
+
+//stiffness measure for project
+//do a binary search to find the maximum available stepsize
+#ifdef LOG_OUTPUT
+#define STIFFNESS_MEASURE
+#endif
+#ifdef STIFFNESS_MEASURE
+#include <boost/numeric/odeint/stepper/controlled_step_result.hpp>
+#endif
 
 /* A wrapper class to evaluate the rhs function y' = f(y) 
    stores the state variable, and provides to dydt
