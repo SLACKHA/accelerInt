@@ -151,11 +151,11 @@ def run(thedir, blacklist=[], force=False,
         args = ['-j', jthread, 'DEBUG=False', 'FAST_MATH=False',
              'LOG_OUTPUT=False','SHUFFLE=False', 'LOG_END_ONLY=False',
              'PRINT=False',
-             't_step={}'.format(t_step),
-             't_end={}'.format(t_step),
+             't_step={:e}'.format(t_step),
+             't_end={:e}'.format(t_step),
              'DIVERGENCE_WARPS=0', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
-             'ATOL={:.0e}'.format(atol),
-             'RTOL={:.0e}'.format(rtol),
+             'ATOL={:.e}'.format(atol),
+             'RTOL={:.e}'.format(rtol),
              'FINITE_DIFFERENCE={}'.format(FD)]
         args.append('SAME_IC={}'.format(same))
 
