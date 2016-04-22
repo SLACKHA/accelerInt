@@ -32,7 +32,7 @@ typedef controlled_runge_kutta< stepper > controller;
 //stiffness measure for project
 //do a binary search to find the maximum available stepsize
 #ifdef LOG_OUTPUT
-#define STIFFNESS_MEASURE
+//#define STIFFNESS_MEASURE
 #endif
 #ifdef STIFFNESS_MEASURE
 #include <boost/numeric/odeint/stepper/controlled_step_result.hpp>
