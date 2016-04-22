@@ -154,8 +154,8 @@ def run(thedir, blacklist=[], force=False,
              't_step={:e}'.format(t_step),
              't_end={:e}'.format(t_step),
              'DIVERGENCE_WARPS=0', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
-             'ATOL={:.e}'.format(atol),
-             'RTOL={:.e}'.format(rtol),
+             'ATOL={:e}'.format(atol),
+             'RTOL={:e}'.format(rtol),
              'FINITE_DIFFERENCE={}'.format(FD)]
         args.append('SAME_IC={}'.format(same))
 
