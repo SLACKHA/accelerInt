@@ -14,6 +14,19 @@ extern "C" void intDriver(const int, const double, const double, const double*, 
 
 #ifdef STIFFNESS_MEASURE
     extern std::vector<double> max_stepsize;
+    controlled_step_result test_step(int index, const state_type& y, const double t, state_type& y_out, const double dt)
+    {
+        try
+        {
+            double t_copy = t;
+            double dt_copy = dt;
+            return controllers[index]->try_step(*evaluators[index], y, t_copy, y_out, dt_copy);
+        }
+        catch(...)
+        {
+            return fail;
+        }
+    }
 #endif
 
 void intDriver (const int NUM, const double t, const double t_end,
@@ -47,17 +60,16 @@ void intDriver (const int NUM, const double t, const double t_end,
         integrate_adaptive(*controllers[index],
             *evaluators[index], vec, t, t_end, t_end - t);
 #else
-        double tol = 1e-10;
-        double t_copy = t;
+        double tol = 1e-15;
         state_type y_copy(vec);
         //do a binary search to find the maximum stepsize
         double left_size = 1.0;
-        while (controllers[index]->try_step(*evaluators[index], vec, t_copy, y_copy, left_size) == success)
+        while (test_step(index, vec, t, y_copy, left_size) == success)
         {
             left_size *= 10.0;
         }
-        double right_size = 1e-6;
-        while (controllers[index]->try_step(*evaluators[index], vec, t_copy, y_copy, right_size) == fail)
+        double right_size = 1e-20;
+        while (test_step(index, vec, t, y_copy, right_size) == fail)
         {
             right_size /= 10.0;
         }
@@ -65,8 +77,8 @@ void intDriver (const int NUM, const double t, const double t_end,
         double mid = 0;
         while (delta > tol) {
             mid = (left_size + right_size) / 2.0;
-            controlled_step_result result = controllers[index]->try_step(*evaluators[index], vec, t_copy, y_copy, mid);
-            if (result == success) {
+            controlled_step_result result = test_step(index, vec, t, y_copy, mid);
+            if (result == fail) {
                 //mid becomes the new left
                 delta = fabs(left_size - mid) / left_size;
                 left_size = mid;
