@@ -176,7 +176,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     file.write('\ncache_opt: {}\n'
                                'shared_mem: {}\n'.format(
                                cache_opt, (shared_mem and lang == 'cuda')))
-                    for j in range(-6, -13, -1):
+                    for j in range(-6, -12, -1):
                         t_step = np.power(10.0, j)
                         extra_args = ['t_step={:.0e}'.format(t_step), 't_end={:.0e}'.format(1e-6)]
                         file.write('t_step={:.0e}\n'.format(t_step))
