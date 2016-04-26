@@ -142,7 +142,7 @@ int getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
         	for (int i = 0; i < n; ++i) {
 				double complex temp = A[STRIDE * j + i];
 				A[STRIDE * j + i] = A[STRIDE * indPivot[j] + i];
-				A[STRIDE * indPivot[j] + i] = A[STRIDE * j + i];
+				A[STRIDE * indPivot[j] + i] = temp;
 			}
         }
     }
