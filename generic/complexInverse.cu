@@ -242,11 +242,14 @@ void getHessenbergLU(const int n, cuDoubleComplex* A, int* __restrict__ indPivot
         if (cuCabs(A[INDEX(i * STRIDE + i)]) < cuCabs(A[INDEX(i * STRIDE + i + 1)]))
         {
             //swap rows
-            for(int k = last_pivot; k < n; ++k)
+            for(int k = 0; k < n; ++k)
             {
-                cuDoubleComplex temp = A[INDEX(k * STRIDE + i)];
-                A[INDEX(k * STRIDE + i)] = A[INDEX(k * STRIDE + i + 1)];
-                A[INDEX(k * STRIDE + i + 1)] = temp;
+                if (k >= last_pivot)
+                {
+                    cuDoubleComplex temp = A[INDEX(k * STRIDE + i)];
+                    A[INDEX(k * STRIDE + i)] = A[INDEX(k * STRIDE + i + 1)];
+                    A[INDEX(k * STRIDE + i + 1)] = temp;
+                }
             }
             indPivot[INDEX(i)] = i + 1;
         }
