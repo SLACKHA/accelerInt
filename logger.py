@@ -74,6 +74,8 @@ def __execute(builder, num_threads, num_conditions, t_step=None):
             for exe in glob('*-int'):
                 if exe in valid_int:
                     continue
+                if 'rk78' in exe:
+                    continue
                 file.write('\n' + exe + '\n')
                 try:
                     subprocess.check_call([pjoin(cwd(), exe), str(num_threads), str(num_conditions)], stdout=file)
@@ -129,20 +131,23 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         else:
             arg_list.append('SAME_IC=FALSE')
 
-        langs = []
+        oploop = None
         if not skip_c:
-            langs += ['c']
-        if not skip_cuda:
-            langs += ['cuda']
-        if langs == []:
-            raise Exception('No languages to test specified')
-        builder = {'c':'cpu', 'cuda':'gpu'}
-        oploop = optionloop({'lang' : ['c'], 
+            oploop = optionloop({'lang' : ['c'], 
                              'cache_opt' : [False, True],
                              'smem' : [False]})
-        oploop += optionloop({'lang' : ['cuda'], 
+        if not skip_cuda:
+            if oploop is not None:
+                oploop += optionloop({'lang' : ['cuda'], 
                              'cache_opt' : [False, True],
                              'smem' : [False, True]})
+            else:
+                oploop = optionloop({'lang' : ['cuda'], 
+                             'cache_opt' : [False, True],
+                             'smem' : [False, True]})
+        if oploop is None:
+            raise Exception('No languages to test specified')
+        builder = {'c':'cpu', 'cuda':'gpu'}
         small_tol = ['ATOL={:.0e}'.format(small_atol), 'RTOL={:.0e}'.format(small_rtol)]
         large_tol = ['ATOL={:.0e}'.format(atol), 'RTOL={:.0e}'.format(rtol)]
         #build the validation set for this timestep
