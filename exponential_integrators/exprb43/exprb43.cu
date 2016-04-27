@@ -18,9 +18,18 @@
 #include <stdbool.h>
 #include <cuComplex.h>
 
+//various mechanism/solver defns
+//these should be included first
 #include "header.cuh"
+#include "solver_options.cuh"
+#include "solver_props.cuh"
+ 
 #include "dydt.cuh"
+#ifndef FINITE_DIFFERENCE
 #include "jacob.cuh"
+#else
+#include "fd_jacob.cuh"
+#endif
 #include "exprb43_props.cuh"
 #include "arnoldi.cuh"
 #include "exponential_linear_algebra.cuh"

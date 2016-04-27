@@ -15,6 +15,7 @@
 #include <cuComplex.h>
 
 //various mechanism/solver defns
+//these should be included first
 #include "header.cuh"
 #include "solver_options.cuh"
 #include "solver_props.cuh"
@@ -24,7 +25,11 @@
 #include "complexInverse.cuh"
 
 //rate/jacobian subroutines
+#ifndef FINITE_DIFFERENCE
 #include "jacob.cuh"
+#else
+#include "fd_jacob.cuh"
+#endif
 #include "dydt.cuh"
 
 //#define WARP_VOTING
@@ -628,7 +633,7 @@ __device__ void integrate (const double t_start,
 		if(!SkipLU) { 
 			//need to update Jac/LU
 			if(!SkipJac) {
-#ifndef FINITE_DIFF
+#ifndef FINITE_DIFFERENCE
 				eval_jacob (t, var, y, A, mech);
 #else
 				eval_jacob (t, var, y, A, mech, work1, work2);

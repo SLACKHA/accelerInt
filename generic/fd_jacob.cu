@@ -1,9 +1,4 @@
-#include <math.h>
-#include <float.h>
-#include "header.cuh"
-#include "dydt.cuh"
-#include "gpu_macros.cuh"
-#include "solver_options.cuh"
+#include "fd_jacob.cuh"
 
 #define FD_ORD 1
 
@@ -22,7 +17,7 @@
 __device__
 void eval_jacob (const double t, const double pres, const double * __restrict__ cy,
                     double * __restrict__ jac, const mechanism_memory* __restrict__ d_mem,
-                    double* __restrict__ y_temp, double* __restrict__* ewt) {
+                    double* __restrict__ y_temp, double* __restrict__ ewt) {
   double* dy = d_mem->dy;
   
   #pragma unroll
@@ -57,7 +52,7 @@ void eval_jacob (const double t, const double pres, const double * __restrict__ 
   #pragma unroll
   for (int j = 0; j < NSP; ++j) {
     double yj_orig = y_temp[INDEX(j)];
-    double r = fmax(srur * fabs(yj_orig), r0 / ewt[INDEX(i)]);
+    double r = fmax(srur * fabs(yj_orig), r0 / ewt[INDEX(j)]);
     
     #if FD_ORD == 1
       y_temp[INDEX(j)] = yj_orig + r;
