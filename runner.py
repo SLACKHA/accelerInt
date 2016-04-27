@@ -125,6 +125,8 @@ def run(thedir, blacklist=[], force=False,
             continue
         if not smem and t_step == 1e-4:
             continue
+        if FD and t_step == 1e-4:
+            continue
 
         #generate mechanisms
         if 'c' in langs:
@@ -185,6 +187,10 @@ def run(thedir, blacklist=[], force=False,
             run_me = get_executables(blacklist, inverse=['int-gpu'])
             for exe in run_me:
                 for cond in thepow:
+                    if 'exp' in exe and FD:
+                            #the exponential integrators are not formulated for FD Jacobians
+                            #thus we don't evaluate them
+                            continue
                     filename = os.path.join(thedir, 'output',
                         exe + '_{}_{}_{}_{}_{}_{:e}.txt'.format(cond,
                         'co' if opt else 'nco', 'smem' if smem else 'nosmem',
