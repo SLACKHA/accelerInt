@@ -53,10 +53,10 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 	int j = 0;
 	double err = 2.0;
 
-	while(err > 1.0 && j + p < M_MAX)
+	while(err > 1.0)
 	{
 		
-		for (; j < index_list[index]; j++)
+		for (; j < index_list[index] && j + p < STRIDE; j++)
 		{
 			sparse_multiplier(A, &Vm[j * NSP], w);
 			for (int i = 0; i <= j; i++)
@@ -73,6 +73,8 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 			}
 			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NSP]);
 		}
+		if (j + p >= STRIDE)
+			return j;
 		index++;
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
 		store = Hm[(j - 1) * STRIDE + j];

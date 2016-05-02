@@ -62,9 +62,9 @@ int arnoldi(const double scale,
 	double err = 2.0;
 	int info = 0;
 
-	while (err >= 1.0 && j + p < M_MAX)
+	while (err >= 1.0)
 	{
-		for (; j < index_list[index]; j++)
+		for (; j < index_list[index] && j + p < STRIDE; j++)
 		{
 			sparse_multiplier(A, &Vm[GRID_DIM * (j * NSP)], work);
 			for (int i = 0; i <= j; i++)
@@ -81,6 +81,8 @@ int arnoldi(const double scale,
 			}
 			scale_mult(1.0 / Hm[INDEX(j * STRIDE + j + 1)], work, &Vm[GRID_DIM * ((j + 1) * NSP)]);
 		}
+		if (j + p >= STRIDE)
+			return j;
 		index++;
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
 		store = Hm[INDEX((j - 1) * STRIDE + j)];

@@ -143,7 +143,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		integrator_steps[T_ID]++;
 		#endif
 		int m = arnoldi(0.5, 1, h, A, solver, fy, &beta, work2, work4);
-		if (m >= M_MAX || m < 0)
+		if (m + 1 >= STRIDE || m < 0)
 		{
 			//failure: too many krylov vectors required or singular matrix encountered
 			//need to reduce h and try again
@@ -184,7 +184,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 		//now we need the action of the exponential on Dn2
 		int m1 = arnoldi(1.0, 4, h, A, solver, work1, &beta, work2, work4);
-		if (m1 >= M_MAX || m1 < 0)
+		if (m1 + 4 >= STRIDE || m1 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
@@ -220,7 +220,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 		//finally we need the action of the exponential on Dn3
 		int m2 = arnoldi(1.0, 4, h, A, solver, work1, &beta, work2, work4);
-		if (m2 >= M_MAX || m2 < 0)
+		if (m2 + 4 >= STRIDE || m2 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;

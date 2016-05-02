@@ -130,11 +130,12 @@ void integrate (const double t_start, const double t_end, const double pr,
 		integrator_steps[T_ID]++;
 		#endif
 		int m = arnoldi(1.0 / 3.0, P, h, A, solver, fy, &beta, work1, work4);
-		if (m >= M_MAX || m < 0)
+		if (m + P >= STRIDE || m < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			failures++;
+			reject = true;
 			continue;
 		}
 
@@ -175,11 +176,12 @@ void integrate (const double t_start, const double t_end, const double pr,
 
 		//do arnoldi
 		int m1 = arnoldi(1.0 / 3.0, P, h, A, solver, k4, &beta, work1, work4);
-		if (m1 >= M_MAX || m1 < 0)
+		if (m1 + P >= STRIDE || m1 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			failures++;
+			reject = true;
 			continue;
 		}
 		//k4 is partially in the m'th column of phiHm
@@ -216,11 +218,12 @@ void integrate (const double t_start, const double t_end, const double pr,
 		}
 	
 		int m2 = arnoldi(1.0 / 3.0, P, h, A, solver, k7, &beta, work1, work4);
-		if (m2 >= M_MAX || m2 < 0)
+		if (m2 + P >= STRIDE || m2 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			failures++;
+			reject = true;
 			continue;
 		}
 		//k7 is partially in the m'th column of phiHm

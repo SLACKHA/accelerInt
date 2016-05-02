@@ -118,11 +118,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 
 		//do arnoldi
 		int m = arnoldi(0.5, 1, h, A, fy, sc, &beta, Vm, Hm, phiHm);
-		if (m >= M_MAX || m < 0)
+		if (m + 1 >= STRIDE || m < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			failures++;
+			reject = true;
 			continue;
 		}
 
@@ -157,11 +158,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 
 		//now we need the action of the exponential on Dn2
 		int m1 = arnoldi(1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
-		if (m1 >= M_MAX || m1 < 0)
+		if (m1 + 4 >= STRIDE || m1 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			failures++;
+			reject = true;
 			continue;
 		}
 
@@ -187,11 +189,12 @@ int integrate (const double t_start, const double t_end, const double pr, double
 
 		//finally we need the action of the exponential on Dn3
 		int m2 = arnoldi(1.0, 4, h, A, temp, sc, &beta, Vm, Hm, phiHm);
-		if (m2 >= M_MAX || m2 < 0)
+		if (m2 + 4 >= STRIDE || m2 < 0)
 		{
 			//need to reduce h and try again
 			h /= 5.0;
 			failures++;
+			reject = true;
 			continue;
 		}
 		out[0] = &savedActions[3 * NSP];
