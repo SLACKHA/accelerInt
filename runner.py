@@ -11,7 +11,7 @@ import numpy as np
 import multiprocessing
 import re
 from pyjac import create_jacobian
-from optionLoop import optionloop
+from optionloop import OptionLoop
 from collections import defaultdict
 
 scons = subprocess.check_output('which scons', shell=True).strip()
@@ -100,12 +100,12 @@ def run(thedir, blacklist=[], force=False,
     ics_list = [False]
     fd_list = [True, False]
 
-    c_params = optionloop({'lang' : 'c', 
+    c_params = OptionLoop({'lang' : 'c', 
                 'opt' : opt_list,
                 't_step' : t_list,
                 'same_ics' : ics_list,
                 'FD' : fd_list}, lambda: False)
-    cuda_params = optionloop({'lang' : 'cuda', 
+    cuda_params = OptionLoop({'lang' : 'cuda', 
                 'opt' : opt_list,
                 't_step' : t_list,
                 'smem' : smem_list,
