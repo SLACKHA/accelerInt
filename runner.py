@@ -112,6 +112,7 @@ def run(thedir, blacklist=[], force=False,
                 'same_ics' : ics_list,
                 'FD' : fd_list}, lambda: False)
     op = c_params + cuda_params
+    pickley = None
     for state in op:
         opt = state['opt']
         smem = state['smem']
@@ -133,21 +134,27 @@ def run(thedir, blacklist=[], force=False,
             mech_dir = 'cpu_{}'.format('co' if opt else 'nco')
             mech_dir = os.path.join(thedir, mech_dir) + os.path.sep
             make_sure_path_exists(mech_dir)
+            if opt and pickley is not None:
+                shutil.copy(pickley, 
+                    os.path.join(mech_dir, 'optimized.pickle'))
             create_jacobian(lang='c', mech_name=mechanism,
                             optimize_cache=opt, initial_state=ic_str,
                             build_path=mech_dir, multi_thread=int(jthread))
+            if opt and pickley is None:
+                pickley = os.path.join(mech_dir, 'optimized.pickle')
 
         if 'cuda' in langs:
             gpu_mech_dir = 'gpu_{}_{}'.format('co' if opt else 'nco', 'smem' if smem else 'nosmem')
             gpu_mech_dir = os.path.join(thedir, gpu_mech_dir)
             make_sure_path_exists(gpu_mech_dir)
-            if opt and 'c' in langs:
-                #copy the pickle from the cpu folder
-                shutil.copy(os.path.join(mech_dir, 'optimized.pickle'), 
+            if opt and pickley is not None:
+                shutil.copy(pickley, 
                     os.path.join(gpu_mech_dir, 'optimized.pickle'))
             create_jacobian(lang='cuda', mech_name=mechanism,
                         optimize_cache=opt, initial_state=ic_str,
                         build_path=gpu_mech_dir, no_shared=not smem, multi_thread=int(jthread))
+            if opt and pickley is None:
+                pickley = os.path.join(gpu_mech_dir, 'optimized.pickle')
 
         #now build and run
         args = ['-j', jthread, 'DEBUG=False', 'FAST_MATH=False',
