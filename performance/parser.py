@@ -29,7 +29,7 @@ class data_series(object):
 		self.kwargs['markerfacecolor']='k'
 
 	def __str__(self):
-		return 'solver: {}\tthreads={}\tgpu={}\tsmem={}\tcache_opt={}\tfinite_diff={}\tdt={}'.format(
+		return 'solver: {}\tthreads={}\tgpu={}\tsmem={}\tcache_opt={}\tfinite_diff={}\tdt={}\n'.format(
 			self.name, self.threads, self.gpu, self.smem, self.cache_opt, self.finite_difference, self.dt)
 
 	def __repr__(self):

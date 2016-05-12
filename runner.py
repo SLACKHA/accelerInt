@@ -126,7 +126,8 @@ def run(thedir, blacklist=[], force=False,
             continue
         if not smem and t_step == 1e-4:
             continue
-        if FD and t_step == 1e-4:
+        #turn on FD for long timestep with H2 for direct comparison
+        if FD and t_step == 1e-4 and 'H2' not in thedir:
             continue
 
         #generate mechanisms
