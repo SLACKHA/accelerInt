@@ -94,7 +94,7 @@ def run(thedir, blacklist=[], force=False,
     shutil.copy(os.path.join(thedir, 'data.bin'),
                 os.path.join(home, 'ign_data.bin'))
 
-    opt_list = [True, False]
+    opt_list = [False]
     smem_list = [True, False]
     t_list = [1e-6, 1e-4]
     ics_list = [False]

@@ -7,7 +7,8 @@ import re
 import os
 
 class data_series(object):
-	def __init__(self, name, gpu=False, smem=False, threads=6, dt=1e-6):
+	def __init__(self, name, gpu=False, cache_opt=False, smem=False, finite_difference=False,
+		threads=6, dt=1e-6):
 		self.name = name
 		self.threads=threads
 		self.gpu=gpu
@@ -15,6 +16,9 @@ class data_series(object):
 		self.dt = dt
 		self.data = []
 		self.sorted = False
+		self.cache_opt = cache_opt
+		self.smem = smem
+		self.finite_difference = finite_difference
 
 		self.kwargs = {}
 		self.kwargs['linestyle']=''
@@ -25,8 +29,8 @@ class data_series(object):
 		self.kwargs['markerfacecolor']='k'
 
 	def __str__(self):
-		return 'solver: {}\tthreads={}\tgpu={}\tsmem={}\tdt={}'.format(
-			self.name, self.threads, self.gpu, self.smem, self.dt)
+		return 'solver: {}\tthreads={}\tgpu={}\tsmem={}\tcache_opt={}\tfinite_diff={}\tdt={}'.format(
+			self.name, self.threads, self.gpu, self.smem, self.cache_opt, self.finite_difference, self.dt)
 
 	def __repr__(self):
 		return self.__str__()
@@ -36,7 +40,9 @@ class data_series(object):
 				self.threads == other.threads and \
 				self.gpu == other.gpu and \
 				self.smem == other.smem and \
-				self.dt == other.dt
+				self.dt == other.dt and \
+				self.cache_opt == other.cache_opt and \
+				self.finite_difference == other.finite_difference
 
 	def set_clear_marker(self, marker=None, color=None, size=None):
 		self.kwargs['markerfacecolor']='None'
@@ -114,7 +120,9 @@ def get_series():
 			open_name = os.path.join(thedir, file_name)
 			name = file_name[:file_name.index('-int')]
 			gpu = 'gpu' in file_name
-			smem = 'nosmem' not in file_name
+			smem = ('nosmem' not in file_name) and gpu
+			FD = 'FD' in file_name
+			cache_opt = '_co_' in file_name
 			if gpu:
 				match =  gpu_re.search(file_name)
 				num_cond = int(match.group(1))
@@ -125,7 +133,7 @@ def get_series():
 				num_cond = int(match.group(1))
 				num_thread = int(match.group(2))
 				dt =  float(match.group(3))
-			series = data_series(name, gpu, smem, num_thread, dt)
+			series = data_series(name, gpu, cache_opt, smem, FD, num_thread, dt)
 			if not series in data[mechanism]:
 				data[mechanism].append(series)
 			series = next(s for s in data[mechanism] if s == series)

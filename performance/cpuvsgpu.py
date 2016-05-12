@@ -15,13 +15,13 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 def pretty_names(name):
-    if name == 'cvodes-analytic':
+    if name == 'cvodes':
         return 'CVODE'
     elif name == 'radau2a':
         return 'Radau-IIA'
     return name
 
-blacklist = ['cvodes', 'hradau2a']
+blacklist = ['hradau2a']
 marker_list = ['v', 's', 'o', '>', '*']
 marker_dict = {}
 gpu_color = 'b'
@@ -56,9 +56,11 @@ for dt in dt_list:
         ax.set_yscale("log", nonposy='clip')
 
         series = [s for s in data[mech] if 
-                    ((s.gpu == False and s.threads==6) or 
-                    (s.gpu and s.smem)) and s.dt == dt]
+                    (s.gpu == False or (s.gpu and s.smem)) and s.dt == dt
+                    and s.finite_difference == False
+                    and s.cache_opt == False]
         series = sorted(series, key=lambda x: 0 if x.gpu else 1)
+        print mech, dt
 
         radau_gpu = next(s for s in series if s.name == 'radau2a' and s.gpu)
         radau_cpu = next(s for s in series if s.name == 'radau2a' and not s.gpu)
@@ -66,7 +68,7 @@ for dt in dt_list:
         exp4_gpu = next((s for s in series if s.name == 'exp4' and s.gpu), None)
         exprb43_cpu = next(s for s in series if s.name == 'exprb43' and not s.gpu)
         exprb43_gpu = next((s for s in series if s.name == 'exprb43' and s.gpu), None)
-        cvode = next(s for s in series if s.name == 'cvodes-analytic')
+        cvode = next(s for s in series if s.name == 'cvodes')
 
         def name_fun(x):
             return x.name + (' - gpu' if x.gpu else '')

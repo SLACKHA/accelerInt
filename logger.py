@@ -15,7 +15,7 @@ import subprocess
 import multiprocessing
 from argparse import ArgumentParser
 from pyjac import create_jacobian
-from optionLoop import optionloop
+from optionloop import OptionLoop
 np.set_printoptions(precision=15)
 
 scons = subprocess.check_output('which scons', shell=True).strip()
@@ -133,16 +133,16 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
         oploop = None
         if not skip_c:
-            oploop = optionloop({'lang' : ['c'], 
+            oploop = OptionLoop({'lang' : ['c'], 
                              'cache_opt' : [False, True],
                              'smem' : [False]})
         if not skip_cuda:
             if oploop is not None:
-                oploop += optionloop({'lang' : ['cuda'], 
+                oploop += OptionLoop({'lang' : ['cuda'], 
                              'cache_opt' : [False, True],
                              'smem' : [False, True]})
             else:
-                oploop = optionloop({'lang' : ['cuda'], 
+                oploop = OptionLoop({'lang' : ['cuda'], 
                              'cache_opt' : [False, True],
                              'smem' : [False, True]})
         if oploop is None:
