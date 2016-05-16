@@ -68,7 +68,7 @@ class data_series(object):
 		if y:
 			y_avg = np.mean(y)
 			y_dev = np.std(y)
-			self.data.append((x, y_avg, y_dev))
+			self.data.append((float(x), y_avg, y_dev))
 
 	def plot(self, plt, name_fn=None, show_dev=False):
 		if not self.sorted:
