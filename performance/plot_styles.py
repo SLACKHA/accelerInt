@@ -30,10 +30,10 @@ clear_marker_style = {
     'size' : 17
 }
 
-marker_dict = {'cvodes' : '*',
-'radau2a' : '>',
-'exp4' : 'o',
-'exprb43' : 's'
+marker_dict = {'cvodes' : ('.', False),
+'radau2a' : ('>', True),
+'exp4' : ('o', True),
+'exprb43' : ('s', True)
 }
 
 def pretty_names(name):
@@ -43,32 +43,4 @@ def pretty_names(name):
         return 'Radau-IIA'
     return name
 
-color_wheel = ['b', 'r']
-def get_color(series, decision_fun):
-    if decision_fun(series):
-        return color_wheel[0]
-    else:
-        return color_wheel[1]
-
-def make_legend(names, loc=0, patch_names=None):
-    artists = []
-    labels = []
-    for name in names:
-        show = '\\texttt{{\\textbf{{{}}}}}'.format(pretty_names(name))
-
-        artist = plt.Line2D((0,1),(0,0),
-                    linestyle='',
-                    marker=marker_dict[name],
-                    markersize=15,
-                    markerfacecolor='k')
-        artists.append(artist)
-        labels.append(show)
-
-    if patch_names is not None:
-        artists.append(mpatches.Patch(facecolor='None', edgecolor=color_wheel[0]))
-        labels.append(patch_names[0])
-
-        artists.append(mpatches.Patch(facecolor='None', edgecolor=color_wheel[1]))
-        labels.append(patch_names[1])
-
-    plt.legend(artists, labels, **legend_style)
+color_wheel = ['b', 'r', 'g', 'k', 'y']

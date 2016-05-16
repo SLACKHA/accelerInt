@@ -15,6 +15,29 @@ data = parser.get_series()
 import numpy as np
 import matplotlib.pyplot as plt
 
+def make_comp_legend(names, loc=0, patch_names=None):
+    artists = []
+    labels = []
+    for name in names:
+        show = '\\texttt{{\\textbf{{{}}}}}'.format(pretty_names(name))
+
+        artist = plt.Line2D((0,1),(0,0),
+                    linestyle='',
+                    marker=marker_dict[name],
+                    markersize=15,
+                    markerfacecolor='k')
+        artists.append(artist)
+        labels.append(show)
+
+    if patch_names is not None:
+        artists.append(mpatches.Patch(facecolor='None', edgecolor=color_wheel[0]))
+        labels.append(patch_names[0])
+
+        artists.append(mpatches.Patch(facecolor='None', edgecolor=color_wheel[1]))
+        labels.append(patch_names[1])
+
+    plt.legend(artists, labels, **legend_style)
+
 dt_list = [1e-6, 1e-4]
 #plot of smem vs non-smem
 for dt in dt_list:
@@ -66,9 +89,12 @@ for dt in dt_list:
                 dummy.data.append((point1[0], ratio, dev))
 
             assert dummy.name in ps.marker_dict
-            marker = ps.marker_dict[dummy.name]
-            color = ps.get_color(dummy, lambda x: x.gpu)
-            dummy.set_clear_marker(marker=marker, color=color, **ps.clear_marker_style)
+            marker, hollow = ps.marker_dict[s.name]
+            color = ps.
+            if hollow:
+                s.set_clear_marker(marker=marker, color=color, **ps.clear_marker_style)
+            else:
+                s.set_marker(marker=marker, color=color, **ps.marker_style)
             dummy.plot(ax, name_fun)
             names = names.union([dummy.name])
 
@@ -80,7 +106,7 @@ for dt in dt_list:
         #top left
         ps.legend_style['loc'] = 2
         #make legend
-        ps.make_legend(names, patch_names=['GPU', 'CPU'])
+        ps.make_comp_legend(names, patch_names=['GPU', 'CPU'])
 
         plt.xlabel('Number of ODEs')
         plt.ylabel(r'$\lvert \textbf{R}_{FD}\rvert\slash\lvert \textbf{R}_{AJ}\rvert$')
