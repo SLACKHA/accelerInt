@@ -162,6 +162,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         shutil.copy(pjoin(cwd(), 'log', keyfile),
                     pjoin(cwd(), 'log', 'valid.bin'))
 
+        force_opt = True
         validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
         validator = validator.reshape((-1, 1 + num_conditions * nvar))
         with open('logfile', 'a') as file:
@@ -177,7 +178,11 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                                     optimize_cache=cache_opt,
                                     multi_thread=num_threads,
                                     no_shared=not shared_mem,
+                                    force_optimize=force_opt,
                                     build_path=build_path))
+                    if cache_opt:
+                        #successful force optimize
+                        force_opt = False
                     file.write('\ncache_opt: {}\n'
                                'shared_mem: {}\n'.format(
                                cache_opt, (shared_mem and lang == 'cuda')))
