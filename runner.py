@@ -80,8 +80,6 @@ def run(thedir, blacklist=[], force=False,
 
     try:
         mechanism = os.path.join(thedir, glob.glob(os.path.join(thedir, '*.cti'))[0])
-        with open(os.path.join(thedir, 'ics.txt'), 'r') as file:
-            ic_str = file.readline().strip()
     except:
         print "Mechanism file not found in {}, skipping...".format(thedir)
         return
@@ -138,7 +136,7 @@ def run(thedir, blacklist=[], force=False,
                     shutil.copy(pickley,
                         os.path.join(mech_dir, 'optimized.pickle'))
             create_jacobian(lang='c', mech_name=mechanism,
-                            optimize_cache=opt, initial_state=ic_str,
+                            optimize_cache=opt,
                             build_path=mech_dir, multi_thread=int(jthread))
             if opt and pickley is None:
                 pickley = os.path.join(mech_dir, 'optimized.pickle')
@@ -152,7 +150,7 @@ def run(thedir, blacklist=[], force=False,
                     shutil.copy(pickley,
                         os.path.join(gpu_mech_dir, 'optimized.pickle'))
             create_jacobian(lang='cuda', mech_name=mechanism,
-                        optimize_cache=opt, initial_state=ic_str,
+                        optimize_cache=opt,
                         build_path=gpu_mech_dir, no_shared=not smem, multi_thread=int(jthread))
             if opt and pickley is None:
                 pickley = os.path.join(gpu_mech_dir, 'optimized.pickle')
