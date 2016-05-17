@@ -1,0 +1,15 @@
+Import('env')
+cObj = []
+import os
+
+cObj = []
+if 'extra_c_rates' in env:
+	for src in env['extra_c_rates']:
+		cObj.append(env.Object(src, variant_dir=env['variant']))
+
+cudaObj = []
+if 'extra_cuda_rates' in env and env['build_cuda']:
+	for src in env['extra_cuda_rates']:
+		cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
+
+Return ('cObj', 'cudaObj')
