@@ -183,8 +183,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     if cache_opt:
                         #successful force optimize
                         force_opt = False
-                    file.write('\ncache_opt: {}\n'
-                               'shared_mem: {}\n'.format(
+                    file.write('\nlang:{}\n'
+                               'cache_opt: {}\n'
+                               'shared_mem: {}\n'.format(lang,
                                cache_opt, (shared_mem and lang == 'cuda')))
                     for j in range(-6, -12, -1):
                         t_step = np.power(10.0, j)
