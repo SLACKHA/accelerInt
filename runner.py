@@ -91,7 +91,7 @@ def run(thedir, blacklist=[], force=False,
     diff_powers = get_powers(get_diff_ics_cond(thedir, mechanism))
 
     #copy the datafile
-    shutil.copy(os.path.join(thedir, 'data.bin'),
+    shutil.copy(os.path.join(thedir, 'data_eqremoved.bin'),
                 os.path.join(home, 'ign_data.bin'))
 
     opt_list = [False]
@@ -122,9 +122,7 @@ def run(thedir, blacklist=[], force=False,
         thepow = same_powers if same else diff_powers
 
         #custom rules so evaluation doesn't take so damn long
-        if opt and t_step == 1e-4:
-            continue
-        if not smem and t_step == 1e-4:
+        if opt:
             continue
         #turn on FD for long timestep with H2 for direct comparison
         if FD and t_step == 1e-4 and 'H2' not in thedir:
