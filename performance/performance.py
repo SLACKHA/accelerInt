@@ -15,6 +15,15 @@ oploop = op({'dt' : [1e-6, 1e-4],
 
 normalize=True
 
+#guarentee the same colors between plots
+name_list = set()
+for mech in data:
+    name_list = name_list.union([s.name for s in data[mech]])
+color_dict = {}
+color_list = iter(ps.color_wheel)
+for name in name_list:
+    color_dict[name] = color_list.next()
+
 for state in oploop:
     dt = state['dt']
     gpu = state['gpu']
@@ -31,20 +40,19 @@ for state in oploop:
                 (not s.gpu or (s.gpu and s.smem))
                 and s.finite_difference == False
                 and s.cache_opt == False]
-    series = sorted(series, key=lambda x: 0 if x.gpu else 1)
+    series = sorted(series, key=lambda x: x.name)
     print mech, 'gpu' if gpu else 'cpu'
 
     def name_fun(series):
         return '\\texttt{{\\textbf{{{}}}}}'.format(ps.pretty_names(series.name))
 
-    color_list = iter(ps.color_wheel)
     names = set()
     # print mech
     for i, s in enumerate(series):
         print s
         assert s.name in ps.marker_dict
         marker, hollow = ps.marker_dict[s.name]
-        color = color_list.next()
+        color = color_dict[s.name]
         if hollow:
             s.set_clear_marker(marker=marker, color=color, **ps.clear_marker_style)
         else:

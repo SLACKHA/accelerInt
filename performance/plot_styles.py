@@ -4,8 +4,6 @@
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.lines as mlines
 
 #setup latex
 plt.rc('text', usetex=True)
