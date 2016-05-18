@@ -14,6 +14,7 @@ from pyjac import create_jacobian
 from optionloop import OptionLoop
 from collections import defaultdict
 
+datafile = 'data_eqremoved.bin'
 scons = subprocess.check_output('which scons', shell=True).strip()
 
 def check_dir(dir, force):
@@ -54,7 +55,7 @@ def get_powers(num_cond):
 
 def get_diff_ics_cond(thedir, mechanism):
     gas = ct.Solution(mechanism)
-    data = np.fromfile(os.path.join(thedir, 'data.bin'), dtype='float64')
+    data = np.fromfile(os.path.join(thedir, datafile), dtype='float64')
     num_c = data.shape[0] / float(gas.n_species + 3)
     assert int(num_c) == num_c
     return int(num_c)
@@ -89,7 +90,7 @@ def run(thedir, blacklist=[], force=False,
     diff_powers = get_powers(get_diff_ics_cond(thedir, mechanism))
 
     #copy the datafile
-    shutil.copy(os.path.join(thedir, 'data_eqremoved.bin'),
+    shutil.copy(os.path.join(thedir, datafile),
                 os.path.join(home, 'ign_data.bin'))
 
     opt_list = [False]
