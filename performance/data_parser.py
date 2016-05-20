@@ -15,7 +15,7 @@ class data_series(object):
 		self.smem = smem
 		self.dt = dt
 		self.data = []
-		self.sorted = False
+		self.is_sorted = False
 		self.cache_opt = cache_opt
 		self.smem = smem
 		self.finite_difference = finite_difference
@@ -70,13 +70,16 @@ class data_series(object):
 			y_dev = np.std(y)
 			self.data.append((float(x), y_avg, y_dev))
 
+	def sort(self):
+		self.data = sorted(self.data, key=lambda x:x[0])
+		self.x, self.y, self.z = zip(*self.data)
+		self.x = np.array(self.x)
+		self.y = np.array(self.y)
+		self.z = np.array(self.z)
+
 	def plot(self, plt, name_fn=None, show_dev=False):
-		if not self.sorted:
-			self.data = sorted(self.data, key=lambda x:x[0])
-			self.x, self.y, self.z = zip(*self.data)
-			self.x = np.array(self.x)
-			self.y = np.array(self.y)
-			self.z = np.array(self.z)
+		if not self.is_sorted:
+			self.sort()
 		args = [self.x, self.y]
 
 		self.kwargs['label'] = self.name if name_fn is None else name_fn(self)

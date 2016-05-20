@@ -16,25 +16,29 @@ oploop = op({'dt' : [1e-6, 1e-4],
 
 smem = True
 normalize=True
+CPU_CORE_COUNT = 40.
+num_odes = 1e7
+steps = 1e3
+num_odes *= steps
 
 #guarentee the same colors between plots
-name_list = set()
+dt_list = set()
 for mech in data:
-    name_list = name_list.union([s.name for s in data[mech]])
+    dt_list = dt_list.union([s.dt for s in data[mech]])
 color_dict = {}
 color_list = iter(ps.color_wheel)
-for name in name_list:
-    color_dict[name] = color_list.next()
+for dt in dt_list:
+    color_dict[dt] = color_list.next()
 
+gpu_marker = 's'
+cpu_marker = 'o'
+
+
+slopes = {}
 for state in oploop:
     dt = state['dt']
     gpu = state['gpu']
     mech = state['mech']
-
-    fig = plt.figure()
-    ax = fig.add_subplot(1,1,1)
-    ax.set_xscale("log", nonposx='clip')
-    ax.set_yscale("log", nonposy='clip')
 
     series = [s for s in data[mech] if 
                 s.gpu == gpu and
@@ -45,38 +49,43 @@ for state in oploop:
     series = sorted(series, key=lambda x: x.name)
     print mech, 'gpu' if gpu else 'cpu'
 
-    names = set()
-    # print mech
+    #get cost per ode
     for i, s in enumerate(sorted(series, key=lambda x:x.name)):
-        print s
-        assert s.name in ps.marker_dict
-        marker, hollow = ps.marker_dict[s.name]
-        color = color_dict[s.name]
-        if hollow:
-            s.set_clear_marker(marker=marker, color=color, **ps.clear_marker_style)
-        else:
-            s.set_marker(marker=marker, color=color, **ps.marker_style)
-
         if normalize:
             for i in range(len(s.data)):
                 s.data[i] = (s.data[i][0], s.data[i][1] / s.data[i][0], s.data[i][2] / s.data[i][0])
 
-        s.plot(ax, ps.pretty_names, show_dev=True)
-        names = names.union([s.name])
+        s.sort()
+
+    to_calc = next((s for s in series if s.name == "radau2a" and s.gpu), None)
+    if to_calc is None:
+        to_calc = next((s for s in series if s.name == "cvodes"), None)
 
     #draw threshold
     x_t = thresholds[mech]['gpu' if series[0].gpu else 'cpu'][series[0].dt]
-    plt.axvline(x_t, color='k')
-    #make legend
-    plt.legend(**ps.legend_style)
+    
+    x_index = np.where(to_calc.x == x_t)[0]
 
-    plt.xlabel('Number of ODEs')
-    if normalize:
-        plt.ylabel('Runtime / ODE (s)')
+    #(s * unit)/ODE
+    sec_per_ode = np.mean(to_calc.y[x_index:])
+    if not to_calc.gpu:
+        sec_per_ode *= CPU_CORE_COUNT
+
+    if mech not in slopes:
+        slopes[mech] = {}
+    if dt not in slopes[mech]:
+        slopes[mech][dt] = {}
+    if gpu:
+        if 'gpu' not in slopes[mech][dt]:
+            slopes[mech][dt]['gpu'] = sec_per_ode
+        else:
+            raise Exception
     else:
-        plt.ylabel('Runtime (s)')
-    #final stylings
-    ps.finalize()
-    plt.savefig('figures/{}_{:.0e}_{}.pdf'.format(mech, dt,
-        'gpu' if gpu else 'cpu'))
-    plt.close()
+        if 'cpu' not in slopes[mech][dt]:
+            slopes[mech][dt]['cpu'] = sec_per_ode
+        else:
+            raise Exception
+
+for mech in slopes:
+    for dt in slopes[mech]:
+        print mech, dt, slopes[mech][dt]['cpu'] / slopes[mech][dt]['gpu']

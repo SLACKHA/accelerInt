@@ -4,9 +4,11 @@
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+from data_parser import data_series
 
 #setup latex
 plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 plt.rc('text.latex', 
     preamble=r'\usepackage{amsmath},\usepackage{siunitx}')
 plt.rc('font', family='serif')
@@ -34,11 +36,19 @@ marker_dict = {'cvodes' : ('.', False),
 'exprb43' : ('s', True)
 }
 
-def pretty_names(name):
-    if name == 'cvodes':
-        return 'CVODE'
-    elif name == 'radau2a':
-        return 'Radau-IIA'
-    return name
+def pretty_names(pname):
+    if isinstance(pname, data_series):
+        pname = pname.name
+    if pname == 'cvodes':
+        pname = 'CVODE'
+    elif pname == 'radau2a':
+        pname = 'Radau-IIA'
+    return '\\texttt{{\\textbf{{{}}}}}'.format(pname)
 
 color_wheel = ['b', 'r', 'g', 'k', 'y']
+
+def finalize():
+    ax = plt.gca()
+    for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
+     ax.get_xticklabels() + ax.get_yticklabels()):
+        item.set_fontsize(tick_font_size)

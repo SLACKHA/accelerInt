@@ -7,7 +7,7 @@ analytical and finite difference jacobian's on various platforms
 
 import copy
 
-import parser as parser
+import data_parser as parser
 import plot_styles as ps
 
 data = parser.get_series()
@@ -21,13 +21,14 @@ def make_comp_legend(names, loc=0, patch_names=None):
     artists = []
     labels = []
     for name in names:
-        show = '\\texttt{{\\textbf{{{}}}}}'.format(ps.pretty_names(name))
+        show = ps.pretty_names(name)
 
         artist = plt.Line2D((0,1),(0,0),
                     linestyle='',
                     marker=ps.marker_dict[name][0],
                     markersize=15,
-                    markerfacecolor='k')
+                    markerfacecolor='k',
+                    markeredgecolor='none')
         artists.append(artist)
         labels.append(show)
 
@@ -73,7 +74,7 @@ for dt in dt_list:
 
         names = set()
         # print mech
-        for i, s in enumerate(plot_items):
+        for i, s in enumerate(sorted(plot_items, key=lambda x: x[0].name)):
             #create the ratio series
             dummy = copy.copy(s[0])
             dummy.data = []
@@ -97,10 +98,10 @@ for dt in dt_list:
                 dummy.set_clear_marker(marker=marker, color=color, **ps.clear_marker_style)
             else:
                 dummy.set_marker(marker=marker, color=color, **ps.marker_style)
-            dummy.plot(ax, name_fun)
+            dummy.plot(ax, name_fun, show_dev=True)
             names = names.union([dummy.name])
 
-        max_x = max(x[0] for x in dummy.data)
+        max_x = ax.get_xlim()[1]
         dummy_x = np.linspace(0, max_x, num=1000, endpoint=True)
         dummy_y = np.ones_like(dummy_x)
         plt.plot(dummy_x, dummy_y, 'k')
@@ -112,8 +113,6 @@ for dt in dt_list:
 
         plt.xlabel('Number of ODEs')
         plt.ylabel(r'$\lvert \textbf{R}_{FD}\rvert\slash\lvert \textbf{R}_{AJ}\rvert$')
-        for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
-             ax.get_xticklabels() + ax.get_yticklabels()):
-            item.set_fontsize(ps.tick_font_size)
+        ps.finalize()
         plt.savefig('figures/{}_{:.0e}_ajac_comp.pdf'.format(mech, dt))
         plt.close()
