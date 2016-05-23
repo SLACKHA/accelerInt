@@ -54,7 +54,7 @@ class data_series(object):
 		if size is not None:
 			self.kwargs['markersize'] = size
 
-	def set_marker(self, marker=None, color=None, size=None):
+	def set_marker(self, marker=None, color=None, size=None, alpha=None):
 		if marker is not None:
 			self.kwargs['marker'] = marker
 		if color is not None:
@@ -63,6 +63,8 @@ class data_series(object):
 			self.kwargs['markeredgewidth'] = 1
 		if size is not None:
 			self.kwargs['markersize'] = size
+		if alpha is not None:
+			self.kwargs['alpha'] = alpha
 
 	def add_x_y(self, x, y):
 		if y:

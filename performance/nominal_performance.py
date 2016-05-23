@@ -2,7 +2,6 @@
 
 import data_parser as parser
 import plot_styles as ps
-from thresholds import thresholds
 
 data = parser.get_series()
 
@@ -33,6 +32,9 @@ for dt in dt_list:
 gpu_marker = 's'
 cpu_marker = 'o'
 
+with open('thresholds.txt', 'w'):
+    pass
+
 
 slopes = {}
 for state in oploop:
@@ -50,7 +52,7 @@ for state in oploop:
     print mech, 'gpu' if gpu else 'cpu'
 
     #get cost per ode
-    for i, s in enumerate(sorted(series, key=lambda x:x.name)):
+    for i, s in enumerate(series):
         if normalize:
             for i in range(len(s.data)):
                 s.data[i] = (s.data[i][0], s.data[i][1] / s.data[i][0], s.data[i][2] / s.data[i][0])
@@ -61,10 +63,15 @@ for state in oploop:
     if to_calc is None:
         to_calc = next((s for s in series if s.name == "cvodes"), None)
 
+    last_value = s.y[-1] * 1.1
+
     #draw threshold
-    x_t = thresholds[mech]['gpu' if series[0].gpu else 'cpu'][series[0].dt]
     
-    x_index = np.where(to_calc.x == x_t)[0]
+    x_index = np.where(to_calc.y <= last_value)[0][0]
+    x_t = to_calc.x[x_index]
+
+    with open('thresholds.txt', 'a') as file:
+        file.write('{}\t{}\t{:.0e}\t{}\n'.format(mech, 'gpu' if gpu else 'cpu', dt, x_t))
 
     #(s * unit)/ODE
     sec_per_ode = np.mean(to_calc.y[x_index:])

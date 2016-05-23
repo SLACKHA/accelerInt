@@ -2,7 +2,7 @@
 
 import data_parser as parser
 import plot_styles as ps
-from thresholds import thresholds
+from thresholds import get_threshold
 
 data = parser.get_series()
 
@@ -14,8 +14,8 @@ oploop = op({'dt' : [1e-6, 1e-4],
             'gpu' : [True, False],
             'mech' : data.keys()})
 
-smem = True
-normalize=True
+smem = False
+normalize = True
 
 #guarentee the same colors between plots
 name_list = set()
@@ -65,7 +65,8 @@ for state in oploop:
         names = names.union([s.name])
 
     #draw threshold
-    x_t = thresholds[mech]['gpu' if series[0].gpu else 'cpu'][series[0].dt]
+    
+    x_t = get_threshold(mech, gpu, dt)
     plt.axvline(x_t, color='k')
     #make legend
     plt.legend(**ps.legend_style)
