@@ -19,6 +19,8 @@
 #include "solver_options.h"
 #include "solver_props.h"
 
+//#define EXACT_KRYLOV
+
 static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,6 +115,15 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 		Hm[(j - 1) * STRIDE + j] = store;
 		//restore real Hm (NOTE: untested in RB43)
 		Hm[(j) * STRIDE] = 0.0;
+
+#if defined(LOG_OUTPUT) && defined(EXACT_KRYLOV)
+		//kill the error such that we will continue
+		//and greatly reduce the subspace approximation error
+		if (index_list[index] + p < STRIDE  && fabs(Hm[(j - 1) * STRIDE + j]) >= ATOL)
+		{
+			err = 10;
+		}
+#endif
 
 	}
 
