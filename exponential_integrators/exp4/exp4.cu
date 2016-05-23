@@ -33,8 +33,8 @@
 #include "arnoldi.cuh"
 #include "exponential_linear_algebra.cuh"
 #include "solver_init.cuh"
+#include "gpu_macros.cuh" 
 
-#define T_ID (threadIdx.x + blockIdx.x * blockDim.x)
 #ifdef LOG_KRYLOV_AND_STEPSIZES
  	extern __device__ double err_log[MAX_STEPS];
  	extern __device__ int m_log[MAX_STEPS];

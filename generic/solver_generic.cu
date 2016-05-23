@@ -9,8 +9,7 @@
 
 #include "solver.cuh"
 #include "header.cuh"
-
-#define T_ID (threadIdx.x + (blockDim.x * blockIdx.x))
+#include "gpu_macros.cuh"
 
  __global__
 void intDriver (const int NUM,

@@ -31,6 +31,7 @@
 #include "fd_jacob.cuh"
 #endif
 #include "dydt.cuh"
+#include "gpu_macros.cuh"
 
 //#define WARP_VOTING
 #ifdef WARP_VOTING
@@ -54,7 +55,6 @@
 #define Qmin (1.0)
 #define Qmax (1.2)
 #define UNROLL (8)
-#define T_ID (threadIdx.x + blockIdx.x * blockDim.x)
 #ifdef DIVERGENCE_TEST
  	extern __device__ int integrator_steps[DIVERGENCE_TEST];
 #endif
