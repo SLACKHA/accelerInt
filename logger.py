@@ -294,8 +294,8 @@ if __name__ == '__main__':
                         help='The relative tolerance to use during integration')
     parser.add_argument('-fd', '--finite_difference',
                         required=False,
-                        type=bool,
                         default=False,
+                        action='store_true',
                         help='Use a finite difference Jacobian')
     args = parser.parse_args()
 
