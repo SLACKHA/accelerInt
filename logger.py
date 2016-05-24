@@ -122,7 +122,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE',
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
-                'FINITE_DIFFERENCE={}'.format('FALSE' if not finite_difference else 'TRUE',
+                'FINITE_DIFFERENCE={}'.format('FALSE' if not finite_difference else 'TRUE'),
                 'mechanism_dir={}'.format(build_path)]
 
         if initial_conditions:
