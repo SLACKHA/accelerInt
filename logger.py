@@ -99,7 +99,7 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, small_atol, small_rtol):
+        atol, rtol, small_atol, small_rtol, finite_difference):
         #first compile and run the explicit integrator to get the baseline
         __check_exit(create_jacobian(lang='c', 
             mech_name=mech, 
@@ -122,7 +122,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         arg_list = ['-j{}'.format(num_threads),
                 'DEBUG=FALSE', 'FAST_MATH=FALSE', 'LOG_OUTPUT=TRUE', 'LOG_END_ONLY=TRUE',
                 'SHUFFLE=FALSE', 'PRINT=FALSE', 'CV_HMAX=0', 'CV_MAX_STEPS=-1',
-                'FINITE_DIFFERENCE=FALSE',
+                'FINITE_DIFFERENCE={}'.format('FALSE' if not finite_difference else 'TRUE',
                 'mechanism_dir={}'.format(build_path)]
 
         if initial_conditions:
@@ -200,7 +200,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, small_atol, small_rtol):
+        atol, rtol, small_atol, small_rtol, finite_difference):
     with open('logfile', 'w') as file:
         pass
     with open('logerr', 'w') as file:
@@ -211,7 +211,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
         __run_and_check(mech, thermo, initial_conditions, build_path, 
             num_threads, 1 if num_conditions is None else num_conditions,
             None, skip_c, skip_cuda, atol, rtol,
-            small_atol, small_rtol)
+            small_atol, small_rtol, finite_difference)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -221,7 +221,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
             pass
         __run_and_check(mech, thermo, '', build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, small_atol, small_rtol)
+        atol, rtol, small_atol, small_rtol, finite_difference)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -292,6 +292,11 @@ if __name__ == '__main__':
                         type=float,
                         default=1e-15,
                         help='The relative tolerance to use during integration')
+    parser.add_argument('-fd', '--finite_difference',
+                        required=False,
+                        type=bool,
+                        default=False,
+                        help='Use a finite difference Jacobian')
     args = parser.parse_args()
 
     assert not (args.test_data is None and args.initial_conditions is None), \
@@ -303,4 +308,4 @@ if __name__ == '__main__':
     run_log(args.input, args.thermo, args.initial_conditions, args.build_path,
         args.num_threads, args.num_conditions, args.test_data,
         args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance,
-        args.abs_tolerance_small, args.rel_tolerance_small)
+        args.abs_tolerance_small, args.rel_tolerance_small, args.finite_difference)
