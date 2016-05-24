@@ -2,14 +2,13 @@
 import os
 import matplotlib
 import numpy as np
+import plot_styles as ps
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-
-agg_preamble = [r'\usepackage{siunitx}',
-                r'\sisetup{detect-all}']
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+from glob import glob
+from matplotlib.ticker import FuncFormatter
+import plot_styles as ps
 
 marker_list = ['o', 's']
 color_list = ['r', 'b']
@@ -17,6 +16,17 @@ color_list = ['r', 'b']
 dt_dict = {}
 mech_dict = {}
 num_bins = 25
+
+def to_percent(y, position):
+    # Ignore the passed in position. This has the effect of scaling the default
+    # tick locations.
+    s = str(y) #str(100 * y)
+
+    # The percent symbol needs escaping in latex
+    if matplotlib.rcParams['text.usetex'] is True:
+        return s + r'$\%$'
+    else:
+        return s + '%'
 
 class data(object):
     def __init__(self, mech, solver, dt, div):
@@ -37,16 +47,16 @@ data_list = []
 solver_list = []
 mech_list = []
 dt_list = []
-for f in os.listdir('divergence/'):
+for f in glob('divergence/*/*/*.txt'):
     if not f.endswith('div.txt'):
         continue
-    args = f.split('_')
-    mech = args[0].strip()
-    solver = args[1].strip()
-    dt = args[2].strip()
+    args = f.split('/')
+    mech = args[1].strip()
+    dt = float(args[2].strip())
+    solver = args[3][:args[3].index('-int')]
 
     div = []
-    with open('divergence/' + f) as file:
+    with open(f) as file:
         div = [float(d.strip()) for d in file.readlines()]
 
     data_list.append(data(mech, solver, dt, div))
@@ -78,9 +88,11 @@ for solver in solver_list:
                 if dt not in dt_dict:
                     dt_dict[dt] = marker_list.pop()
 
-                bins, edges = np.histogram(data.div, num_bins, (0., 1.))
+                bins, edges = np.histogram(data.div, num_bins, range=(0., 1.))
+                formatter = FuncFormatter(to_percent)
+
                 x = (edges[:-1] + edges[1:]) / 2
-                y = bins[:]
+                y = 100. * bins / float(np.sum(bins))
                 zeros = np.where(y==0)
                 if zeros:
                     y[zeros[0]] = -1000
@@ -104,13 +116,13 @@ for solver in solver_list:
                         markeredgewidth=3,
                         markersize=15)
 
-        plt.legend(loc='upper left', fontsize=22, numpoints=1,
-                        shadow=True, fancybox=True)
+        ps.legend_style['fontsize']=22
+        ps.legend_style['loc']= 'upper left'
+        plt.legend(**ps.legend_style)
         plt.xlabel('Divergence Measure $D$')
-        plt.ylabel('Number of Occurances')
-        ax.set_ylim((0, None))
-        for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
-             ax.get_xticklabels() + ax.get_yticklabels()):
-            item.set_fontsize(20)
+        plt.ylabel('Percent of Total Warps')
+        ax.set_ylim((0, 105))
+        plt.gca().yaxis.set_major_formatter(formatter)
+        ps.finalize()
         plt.savefig('figures/{}_{}_div.pdf'.format(mech, solver))
         plt.close()

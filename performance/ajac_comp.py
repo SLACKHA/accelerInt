@@ -51,12 +51,12 @@ for dt in dt_list:
         ax.set_yscale("log", nonposy='clip')
 
         series = [s for s in data[mech] if 
-                    (s.gpu == False or (s.gpu and s.smem)) and s.dt == dt
+                    (s.gpu == False or (s.gpu and s.smem == False)) and s.dt == dt
                     and s.cache_opt == False]
         series = sorted(series, key=lambda x: 0 if x.gpu else 1)
         print mech, dt
 
-        names = set([s.name for s in series])
+        names = set([s.name for s in series if s.name != 'cvodes'])
         plot_items = []
         for name in names:
             ajac_gpu = next((s for s in series if s.name == name and s.gpu and not s.finite_difference), None)

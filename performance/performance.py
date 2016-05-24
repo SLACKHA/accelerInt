@@ -15,7 +15,7 @@ oploop = op({'dt' : [1e-6, 1e-4],
             'mech' : data.keys()})
 
 smem = False
-normalize = True
+normalize = False
 
 #guarentee the same colors between plots
 name_list = set()
@@ -66,8 +66,9 @@ for state in oploop:
 
     #draw threshold
     
-    x_t = get_threshold(mech, gpu, dt)
-    plt.axvline(x_t, color='k')
+    if normalize:
+        x_t = get_threshold(mech, gpu, dt)
+        plt.axvline(x_t, color='k')
     #make legend
     plt.legend(**ps.legend_style)
 
@@ -78,6 +79,6 @@ for state in oploop:
         plt.ylabel('Runtime (s)')
     #final stylings
     ps.finalize()
-    plt.savefig('figures/{}_{:.0e}_{}.pdf'.format(mech, dt,
-        'gpu' if gpu else 'cpu'))
+    plt.savefig('figures/{}_{:.0e}_{}{}.pdf'.format(mech, dt,
+        'gpu' if gpu else 'cpu', '' if normalize else '_nonorm'))
     plt.close()
