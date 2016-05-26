@@ -99,7 +99,7 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, small_atol, small_rtol, finite_difference):
+        atol, rtol, small_atol, small_rtol, finite_difference, end_time):
         #first compile and run the explicit integrator to get the baseline
         __check_exit(create_jacobian(lang='c', 
             mech_name=mech, 
@@ -151,7 +151,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         small_tol = ['ATOL={:.0e}'.format(small_atol), 'RTOL={:.0e}'.format(small_rtol)]
         large_tol = ['ATOL={:.0e}'.format(atol), 'RTOL={:.0e}'.format(rtol)]
         #build the validation set for this timestep
-        extra_args = ['t_step={:.0e}'.format(1e-10), 't_end={:.0e}'.format(1e-6)]
+        extra_args = ['t_step={:.0e}'.format(1e-10), 't_end={:.0e}'.format(end_time)]
         with open('logerr', 'a') as errfile:
             subprocess.check_call([scons, 'cpu'] + arg_list + extra_args + small_tol, stdout=errfile)
             #run
@@ -189,7 +189,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                                cache_opt, (shared_mem and lang == 'cuda')))
                     for j in range(-6, -12, -1):
                         t_step = np.power(10.0, j)
-                        extra_args = ['t_step={:.0e}'.format(t_step), 't_end={:.0e}'.format(1e-6)]
+                        extra_args = ['t_step={:.0e}'.format(t_step), 't_end={:.0e}'.format(end_time)]
                         file.write('t_step={:.0e}\n'.format(t_step))
                         file.flush()
                         subprocess.check_call([scons, builder[lang]] + arg_list + extra_args + large_tol,
@@ -200,7 +200,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, small_atol, small_rtol, finite_difference):
+        atol, rtol, small_atol, small_rtol, finite_difference,
+        end_time):
     with open('logfile', 'w') as file:
         pass
     with open('logerr', 'w') as file:
@@ -211,7 +212,8 @@ def run_log(mech, thermo, initial_conditions, build_path,
         __run_and_check(mech, thermo, initial_conditions, build_path, 
             num_threads, 1 if num_conditions is None else num_conditions,
             None, skip_c, skip_cuda, atol, rtol,
-            small_atol, small_rtol, finite_difference)
+            small_atol, small_rtol, finite_difference,
+            end_time)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -221,7 +223,8 @@ def run_log(mech, thermo, initial_conditions, build_path,
             pass
         __run_and_check(mech, thermo, '', build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, small_atol, small_rtol, finite_difference)
+        atol, rtol, small_atol, small_rtol, finite_difference,
+        end_time)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -280,7 +283,7 @@ if __name__ == '__main__':
     parser.add_argument('-rtol', '--rel_tolerance',
                         required=False,
                         type=float,
-                        default=1e-7,
+                        default=1e-6,
                         help='The relative tolerance to use during integration')
     parser.add_argument('-satol', '--abs_tolerance_small',
                         required=False,
@@ -297,6 +300,11 @@ if __name__ == '__main__':
                         default=False,
                         action='store_true',
                         help='Use a finite difference Jacobian')
+    parser.add_argument('-tend', '--end_time',
+                        required=False,
+                        type=float,
+                        default=1e-6,
+                        help='The end time (in seconds) to use in integration')
     args = parser.parse_args()
 
     assert not (args.test_data is None and args.initial_conditions is None), \
@@ -308,4 +316,5 @@ if __name__ == '__main__':
     run_log(args.input, args.thermo, args.initial_conditions, args.build_path,
         args.num_threads, args.num_conditions, args.test_data,
         args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance,
-        args.abs_tolerance_small, args.rel_tolerance_small, args.finite_difference)
+        args.abs_tolerance_small, args.rel_tolerance_small, args.finite_difference,
+        args.end_time)
