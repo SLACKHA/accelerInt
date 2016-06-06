@@ -590,7 +590,11 @@ __device__ void integrate (const double t_start,
 	double Hacc = 0;
 	double ErrOld = 0;
 #endif
+#ifdef CONST_TIME_STEP
+	double H = t_end - t_start;
+#else
 	double H = fmin(5e-7, t_end - t_start);
+#endif
 	double Hnew;
 	double t = t_start;
 	bool Reject = false;
@@ -727,6 +731,7 @@ __device__ void integrate (const double t_start,
 				return;
 			}
 		}
+#ifndef CONST_TIME_STEP
 		if(!NewtonDone) {
 			H = Fac * H;
 			Reject = true;
@@ -793,6 +798,15 @@ __device__ void integrate (const double t_start,
 			SkipJac = true;
 			SkipLU = false;
 		}
+#else
+		//constant time stepping
+		//update y & t
+		t += H;
+		#pragma unroll 8
+		for (int i = 0; i < NSP; i++) {
+			y[INDEX(i)] += Z3[INDEX(i)];
+		}
+#endif
 	}
 	result[T_ID] = EC_success;
 }

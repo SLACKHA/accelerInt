@@ -60,7 +60,11 @@ void integrate (const double t_start, const double t_end, const double pr,
 				const solver_memory* __restrict__ solver) {
 	
 	//initial time
+#ifdef CONST_TIME_STEP
+	double h = t_end - t_start;
+#else
 	double h = fmin(1.0e-8, t_end - t_start);
+#endif
 	double h_new;
 
 	double err_old = 1.0;
@@ -259,6 +263,7 @@ void integrate (const double t_start, const double t_end, const double pr,
 		// classical step size calculation
 		h_new = pow(err, -1.0 / ORD);	
 		
+#ifndef CONST_TIME_STEP
 		failures = 0;
 		if (err <= 1.0) {
 			// update y, t and scale
@@ -297,6 +302,16 @@ void integrate (const double t_start, const double t_end, const double pr,
 			reject = true;
 			h = fmin(h, h_new);
 		}
+#else
+		//constant time stepping
+		//update y & t
+		#pragma unroll
+		for (int i = 0; i < NSP; ++i)
+		{
+			y[INDEX(i)] = y1[INDEX(i)];
+		}
+		t += h;
+#endif
 
 	} // end while
 

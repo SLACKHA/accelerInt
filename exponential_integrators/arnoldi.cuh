@@ -19,6 +19,8 @@
 #include "solver_options.cuh"
 #include "solver_props.cuh"
 
+//#define EXACT_KRYLOV
+ 
 __constant__ int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,8 +83,13 @@ int arnoldi(const double scale,
 			}
 			scale_mult(1.0 / Hm[INDEX(j * STRIDE + j + 1)], work, &Vm[GRID_DIM * ((j + 1) * NSP)]);
 		}
+#ifndef CONST_TIME_STEP
 		if (j + p >= STRIDE)
 			return j;
+#else
+		if (j + p >= STRIDE)
+			j = STRIDE - p - 1;
+#endif
 		index++;
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
 		store = Hm[INDEX((j - 1) * STRIDE + j)];
@@ -123,6 +130,18 @@ int arnoldi(const double scale,
 
 		//restore real Hm
 		Hm[INDEX((j) * STRIDE)] = 0.0;
+#if defined(LOG_OUTPUT) && defined(EXACT_KRYLOV)
+		//kill the error such that we will continue
+		//and greatly reduce the subspace approximation error
+		if (index_list[index] + p < STRIDE  && fabs(Hm[INDEX((j - 1) * STRIDE + j)]) >= ATOL)
+		{
+			err = 10;
+		}
+#endif
+#ifdef CONST_TIME_STEP
+		if (j == STRIDE - p - 1)
+			break;
+#endif
 	}
 
 	return j;

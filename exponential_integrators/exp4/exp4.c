@@ -36,7 +36,11 @@
 int integrate (const double t_start, const double t_end, const double pr, double* y) {
 	
 	//initial time
+#ifdef CONST_TIME_STEP
+	double h = t_end - t_start;
+#else
 	double h = fmin(1.0e-8, t_end - t_start);
+#endif
 	double h_new;
 
 	double err_old = 1.0;
@@ -221,6 +225,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			y1[i] = y[i] + h * (k3[i] + k4[i] - (4.0 / 3.0) * k5[i] + k6[i] + (1.0 / 6.0) * k7[i]);
 		}
 		
+#ifndef CONST_TIME_STEP
 		scale (y, y1, f_temp);		
 		
 		///////////////////
@@ -288,6 +293,15 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			reject = true;
 			h = fmin(h, h_new);
 		}
+#else
+		//constant time stepping
+		// update y and t	
+		for (int i = 0; i < NSP; ++i) {
+			y[i] = y1[i];
+		}
+		
+		t += h;
+#endif
 
 	} // end while
 

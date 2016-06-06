@@ -373,7 +373,7 @@ static inline double RK_ErrorNorm(const double* __restrict__ scale, double* __re
 
 static double RK_ErrorEstimate(const double H, const double t, const double pr,
 							   const double* __restrict__ Y, const double* __restrict__ F0,
-							   double* __restrict__ Z1, double* __restrict__ Z2, double* __restrict__ Z3,
+							   const double* __restrict__ Z1, const double* __restrict__ Z2, const double* __restrict__ Z3,
 							   const double* __restrict__ scale, double* __restrict__ E1, int* __restrict__ ipiv1,
 							   const bool FirstStep, const bool Reject) {
 	double HrkE1  = rkE[1]/H;
@@ -434,7 +434,11 @@ int integrate (const double t_start, const double t_end, const double pr, double
 	double Hacc = 0;
 	double ErrOld = 0;
 #endif
+#ifdef CONST_TIME_STEP
+	double H = t_end - t_start;
+#else
 	double H = fmin(5e-7, t_end - t_start);
+#endif
 	double Hnew;
 	double t = t_start;
 	bool Reject = false;
@@ -564,6 +568,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
             	return EC_newton_max_iterations_exceeded;
             }
 		}
+#ifndef CONST_TIME_STEP
 		if (!NewtonDone) {
 			H = Fac * H;
 			Reject = true;
@@ -571,6 +576,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			SkipLU = false;
 			continue;
 		}
+
 		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
 		//!~~~> Computation of new step size Hnew
 		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
@@ -626,6 +632,15 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			SkipJac = true;
 			SkipLU = false;
 		}
+#else
+		//constant time stepping
+		//update y & t
+		t += H;
+			
+		for (int i = 0; i < NSP; i++) {
+			y[i] += Z3[i];
+		}
+#endif
 	}
 	return EC_success;
 }

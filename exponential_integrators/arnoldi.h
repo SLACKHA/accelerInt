@@ -75,8 +75,13 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 			}
 			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NSP]);
 		}
+#ifndef CONST_TIME_STEP
 		if (j + p >= STRIDE)
 			return j;
+#else
+		if (j + p >= STRIDE)
+			j = STRIDE - p - 1;
+#endif
 		index++;
 		//resize Hm to be mxm, and store Hm(m, m + 1) for later
 		store = Hm[(j - 1) * STRIDE + j];
@@ -123,6 +128,10 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 		{
 			err = 10;
 		}
+#endif
+#ifdef CONST_TIME_STEP
+		if (j == STRIDE - p - 1)
+			break;
 #endif
 
 	}

@@ -61,7 +61,11 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 							const solver_memory* __restrict__ solver) {
 	
 	//initial time
+#ifdef CONST_TIME_STEP
+	double h = t_end - t_start;
+#else
 	double h = fmin(1.0e-8, t_end - t_start);
+#endif
 	double h_new;
 
 	double err_old = 1.0;
@@ -271,6 +275,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		}
 #endif
 		
+#ifndef CONST_TIME_STEP
 		failures = 0;
 		if (err <= 1.0) {
 			// update y, scale vector and t
@@ -307,6 +312,16 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			reject = true;
 			h = fmin(h, h_new);
 		}
+#else
+		//constant time stepping
+		//update y & t
+		#pragma unroll
+		for (int i = 0; i < NSP; ++i)
+		{
+			y[INDEX(i)] = y1[INDEX(i)];
+		}
+		t += h;
+#endif
 
 	} // end while
 

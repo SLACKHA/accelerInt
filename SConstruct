@@ -191,7 +191,8 @@ config_options = [
         'FINITE_DIFFERENCE', 'Use a finite difference Jacobian (not recommended)', False),
     ('DIVERGENCE_WARPS', 'If specified, measure divergence in that many warps', '0'),
     ('CV_HMAX', 'If specified, the maximum stepsize for CVode', '0'),
-    ('CV_MAX_STEPS', 'If specified, the maximum stepsize for CVode', '20000')
+    ('CV_MAX_STEPS', 'If specified, the maximum stepsize for CVode', '20000'),
+    ('CONST_TIME_STEP', 'If specified, adaptive timestepping will be turned off (for logging purposes)', False)
 ]
 
 opts.AddVariables(*config_options)
@@ -426,7 +427,7 @@ def write_options(lang, dir):
 
         if env['FINITE_DIFFERENCE']:
             file.write("""
-            //used to only log output on end step
+            //turn on finite difference Jacobian
             #define FINITE_DIFFERENCE
             """)
 
@@ -435,6 +436,12 @@ def write_options(lang, dir):
         //measure the divergence for this many initial conditions
         #define DIVERGENCE_TEST ({})
         """.format(int(float(env['DIVERGENCE_WARPS']) * 32)))
+
+        if env['CONST_TIME_STEP']:
+            file.write("""
+            //turn off adaptive time stepping
+            #define CONST_TIME_STEP
+            """)
 
         file.write("""
         #endif
