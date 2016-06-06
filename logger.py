@@ -165,6 +165,9 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         force_opt = True
         validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
         validator = validator.reshape((-1, 1 + num_conditions * nvar))
+
+        #force constant time steps
+        arg_list += ['CONST_TIME_STEP=TRUE']
         with open('logfile', 'a') as file:
             with open('logerr', 'a') as errfile:
                 for op in oploop:
