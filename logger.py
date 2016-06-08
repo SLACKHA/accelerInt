@@ -190,7 +190,8 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                                'cache_opt: {}\n'
                                'shared_mem: {}\n'.format(lang,
                                cache_opt, (shared_mem and lang == 'cuda')))
-                    for j in range(-6, -12, -1):
+                    start = int(np.log10(t_end))
+                    for j in range(start, start-6, -1):
                         t_step = np.power(10.0, j)
                         extra_args = ['t_step={:.0e}'.format(t_step), 't_end={:.0e}'.format(end_time)]
                         file.write('t_step={:.0e}\n'.format(t_step))
