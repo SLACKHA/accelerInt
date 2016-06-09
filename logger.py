@@ -329,4 +329,4 @@ if __name__ == '__main__':
         args.num_threads, args.num_conditions, args.test_data,
         args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance,
         args.abs_tolerance_small, args.rel_tolerance_small, args.finite_difference,
-        args.end_time)
+        args.end_time, args.use_old_validation)
