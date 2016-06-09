@@ -99,7 +99,8 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
-        atol, rtol, small_atol, small_rtol, finite_difference, end_time):
+        atol, rtol, small_atol, small_rtol, finite_difference, end_time,
+        use_old_validation):
         #first compile and run the explicit integrator to get the baseline
         __check_exit(create_jacobian(lang='c', 
             mech_name=mech, 
@@ -152,15 +153,17 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         large_tol = ['ATOL={:.0e}'.format(atol), 'RTOL={:.0e}'.format(rtol)]
         #build the validation set for this timestep
         extra_args = ['t_step={:.0e}'.format(1e-10), 't_end={:.0e}'.format(end_time)]
-        with open('logerr', 'a') as errfile:
-            subprocess.check_call([scons, 'cpu'] + arg_list + extra_args + small_tol, stdout=errfile)
-            #run
-            subprocess.check_call([pjoin(cwd(), valid_int), 
-                str(num_threads), str(num_conditions)],
-                stdout=errfile)
-        #copy to saved data
-        shutil.copy(pjoin(cwd(), 'log', keyfile),
-                    pjoin(cwd(), 'log', 'valid.bin'))
+
+        if not use_old_validation:
+            with open('logerr', 'a') as errfile:
+                subprocess.check_call([scons, 'cpu'] + arg_list + extra_args + small_tol, stdout=errfile)
+                #run
+                subprocess.check_call([pjoin(cwd(), valid_int), 
+                    str(num_threads), str(num_conditions)],
+                    stdout=errfile)
+            #copy to saved data
+            shutil.copy(pjoin(cwd(), 'log', keyfile),
+                        pjoin(cwd(), 'log', 'valid.bin'))
 
         force_opt = True
         validator = np.fromfile(pjoin('log', 'valid.bin'), dtype='float64')
@@ -205,7 +208,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference,
-        end_time):
+        end_time, use_old_validation):
     with open('logfile', 'w') as file:
         pass
     with open('logerr', 'w') as file:
@@ -217,7 +220,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
             num_threads, 1 if num_conditions is None else num_conditions,
             None, skip_c, skip_cuda, atol, rtol,
             small_atol, small_rtol, finite_difference,
-            end_time)
+            end_time, use_old_validation)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -228,7 +231,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
         __run_and_check(mech, thermo, '', build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference,
-        end_time)
+        end_time, use_old_validation)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -309,6 +312,11 @@ if __name__ == '__main__':
                         type=float,
                         default=1e-6,
                         help='The end time (in seconds) to use in integration')
+    parser.add_argument('-uov', '--use_old_validation',
+                        required=False,
+                        default=False,
+                        action='store_true',
+                        help='Use the old validation file to save time.')
     args = parser.parse_args()
 
     assert not (args.test_data is None and args.initial_conditions is None), \
