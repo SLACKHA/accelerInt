@@ -194,7 +194,9 @@ int main (int argc, char *argv[])
     read_initial_conditions(filename, NUM, &y_host, &var_host);
 #endif
 
+    //grid sizes
     dim3 dimBlock(TARGET_BLOCK_SIZE, 1);
+    dim3 dimGrid (padded / TARGET_BLOCK_SIZE, 1 );
     int* result_flag = (int*)malloc(padded * sizeof(int));
 
 // flag for ignition
@@ -242,11 +244,6 @@ int main (int argc, char *argv[])
         while (num_solved < NUM)
         {
             int num_cond = min(NUM - num_solved, padded);
-            //figure out the padding for this num_cond
-            int num_cond_padded = int(ceil(num_cond / float(TARGET_BLOCK_SIZE)) * TARGET_BLOCK_SIZE);
-
-            //and grid sizes
-            dim3 dimGrid (num_cond_padded / TARGET_BLOCK_SIZE, 1 );
 
             cudaErrorCheck( cudaMemcpy (host_mech->var, &var_host[num_solved], 
                                         num_cond * sizeof(double), cudaMemcpyHostToDevice));
