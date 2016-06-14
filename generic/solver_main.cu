@@ -254,7 +254,7 @@ int main (int argc, char *argv[])
                                             y_temp, padded * sizeof(double),
                                             num_cond * sizeof(double), NSP,
                                             cudaMemcpyHostToDevice) );
-            intDriver <<< dimGrid, dimBlock, SHARED_SIZE >>> (NUM, t, t_next, host_mech->var, host_mech->y, device_mech, device_solver);
+            intDriver <<< dimGrid, dimBlock, SHARED_SIZE >>> (num_cond, t, t_next, host_mech->var, host_mech->y, device_mech, device_solver);
     #ifdef DEBUG
             cudaErrorCheck( cudaPeekAtLastError() );
             cudaErrorCheck( cudaDeviceSynchronize() );
