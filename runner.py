@@ -248,7 +248,7 @@ if __name__ == '__main__':
                         help='The absolute tolerance for the integrators')
     parser.add_argument('-rtol', '--relative_tolerance',
                         required=False,
-                        default=1e-7,
+                        default=1e-6,
                         help='The relative tolerance for the integrators')
     args = parser.parse_args()
 
