@@ -100,7 +100,7 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference, end_time,
-        use_old_validation):
+        use_old_validation, small_time_step):
         #first compile and run the explicit integrator to get the baseline
         __check_exit(create_jacobian(lang='c', 
             mech_name=mech, 
@@ -152,7 +152,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
         small_tol = ['ATOL={:.0e}'.format(small_atol), 'RTOL={:.0e}'.format(small_rtol)]
         large_tol = ['ATOL={:.0e}'.format(atol), 'RTOL={:.0e}'.format(rtol)]
         #build the validation set for this timestep
-        extra_args = ['t_step={:.0e}'.format(1e-10), 't_end={:.0e}'.format(end_time)]
+        extra_args = ['t_step={:.0e}'.format(small_time_step), 't_end={:.0e}'.format(end_time)]
 
         if not use_old_validation:
             with open('logerr', 'a') as errfile:
@@ -208,7 +208,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference,
-        end_time, use_old_validation):
+        end_time, use_old_validation, small_time_step):
     with open('logfile', 'w') as file:
         pass
     with open('logerr', 'w') as file:
@@ -220,7 +220,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
             num_threads, 1 if num_conditions is None else num_conditions,
             None, skip_c, skip_cuda, atol, rtol,
             small_atol, small_rtol, finite_difference,
-            end_time, use_old_validation)
+            end_time, use_old_validation, small_time_step)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -231,7 +231,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
         __run_and_check(mech, thermo, '', build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference,
-        end_time, use_old_validation)
+        end_time, use_old_validation, small_time_step)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -317,6 +317,10 @@ if __name__ == '__main__':
                         default=False,
                         action='store_true',
                         help='Use the old validation file to save time.')
+    parser.add_argument('-ststep', '--small_time_step',
+                        required=False,
+                        default=1e-10,
+                        help='Time step to use for CVODEs validator')
     args = parser.parse_args()
 
     assert not (args.test_data is None and args.initial_conditions is None), \
@@ -329,4 +333,4 @@ if __name__ == '__main__':
         args.num_threads, args.num_conditions, args.test_data,
         args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance,
         args.abs_tolerance_small, args.rel_tolerance_small, args.finite_difference,
-        args.end_time, args.use_old_validation)
+        args.end_time, args.use_old_validation, args.small_time_step)
