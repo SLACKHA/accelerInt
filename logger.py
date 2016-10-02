@@ -319,6 +319,7 @@ if __name__ == '__main__':
                         help='Use the old validation file to save time.')
     parser.add_argument('-ststep', '--small_time_step',
                         required=False,
+                        type=float,
                         default=1e-10,
                         help='Time step to use for CVODEs validator')
     args = parser.parse_args()
