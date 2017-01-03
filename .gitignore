@@ -42,5 +42,12 @@ performance/
 StiffnessPrediction/
 *.pyc
 
+#auto-populated files/folders
+generic/solver_options.*
+accelerInt.conf
+release/
+debug/
+.sconsign.dblite
+
 #this is populated by pyJac, hence we don't want to commit anything
 mechanism/
