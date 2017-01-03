@@ -40,6 +40,7 @@ derivations/
 validation/
 performance/
 StiffnessPrediction/
+*.pyc
 
 #this is populated by pyJac, hence we don't want to commit anything
 mechanism/
