@@ -1,6 +1,7 @@
 #! /usr/bin/env python2.7
 import sys
 import numpy as np
+import cantera as ct
 import shutil
 from os.path import join as pjoin
 from os import getcwd as cwd
@@ -34,7 +35,7 @@ def __check_exit(x):
     if x != 0:
         sys.exit(x)
 
-def __check_error(builder, num_conditions, nvar, validator, atol, rtol):
+def __check_error(builder, num_conditions, nvar, validator, atol, rtol, minor_species):
     globtxt = '*-gpu-log.bin' if builder == 'gpu' else '*-int-log.bin'
     key_arr = validator[-1, 1:]
     with open('logfile', 'a') as file:
@@ -55,6 +56,12 @@ def __check_error(builder, num_conditions, nvar, validator, atol, rtol):
 
             file.write('L2 (max, mean) = {:.16e}, {:.16e}\n'.format(np.max(L2_err), np.mean(L2_err)))
             file.write('Linf (max, mean) = {:.16e}, {:.16e}\n'.format(np.max(Linf_err), np.mean(Linf_err)))
+
+            for spec, ind in minor_species:
+                spec_ind = ind + 1 #deal with T indicies
+                spec_err = err[spec_ind, :]
+                file.write('{} L2 (max, mean) = {:.16e}, {:.16e}\n'.format(spec, np.max(L2_err), np.mean(L2_err)))
+                file.write('{} Linf (max, mean) = {:.16e}, {:.16e}\n'.format(spec, np.max(Linf_err), np.mean(Linf_err)))
 
 def __execute(builder, num_threads, num_conditions, t_step=None):
     with open('logerr', 'a') as file:
@@ -100,16 +107,19 @@ def __check_valid(nvar, num_conditions, t_end, t_step):
 def __run_and_check(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference, end_time,
-        use_old_validation, small_time_step):
-        #first compile and run the explicit integrator to get the baseline
-        __check_exit(create_jacobian(lang='c', 
-            mech_name=mech, 
+        use_old_validation, small_time_step, minor_species):
+        #first compile and run cvodes to get the baseline
+        __check_exit(create_jacobian(lang='c',
+            mech_name=mech,
             therm_name=thermo,
             initial_state=initial_conditions,
             optimize_cache=False,
             build_path=build_path))
-        nvar = None
+        #verify that the minor species exist and get indicies
+        gas = ct.Solution(mech)
+        minor_species = [(x, gas.species_index(x)) for x in minor_species.split(',') if x]
         #get num vars
+        nvar = None
         with open(pjoin(build_path, 'mechanism.h'), 'r') as file:
             for line in file.readlines():
                 if 'NN' in line:
@@ -134,17 +144,17 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
 
         oploop = None
         if not skip_c:
-            oploop = OptionLoop({'lang' : ['c'], 
-                             'cache_opt' : [False, True],
+            oploop = OptionLoop({'lang' : ['c'],
+                             'cache_opt' : [False],#, True],
                              'smem' : [False]})
         if not skip_cuda:
             if oploop is not None:
-                oploop += OptionLoop({'lang' : ['cuda'], 
-                             'cache_opt' : [False, True],
-                             'smem' : [False, True]})
+                oploop += OptionLoop({'lang' : ['cuda'],
+                             'cache_opt' : [False],#, True],
+                             'smem' : [False]})#, True]})
             else:
-                oploop = OptionLoop({'lang' : ['cuda'], 
-                             'cache_opt' : [False, True],
+                oploop = OptionLoop({'lang' : ['cuda'],
+                             'cache_opt' : [False],#, True],
                              'smem' : [False, True]})
         if oploop is None:
             raise Exception('No languages to test specified')
@@ -158,7 +168,7 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
             with open('logerr', 'a') as errfile:
                 subprocess.check_call([scons, 'cpu'] + arg_list + extra_args + small_tol, stdout=errfile)
                 #run
-                subprocess.check_call([pjoin(cwd(), valid_int), 
+                subprocess.check_call([pjoin(cwd(), valid_int),
                     str(num_threads), str(num_conditions)],
                     stdout=errfile)
             #copy to saved data
@@ -177,10 +187,10 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                     lang = op['lang']
                     cache_opt = op['cache_opt']
                     shared_mem = op['smem']
-                    __check_exit(create_jacobian(lang=lang, 
-                                    mech_name=mech, 
-                                    therm_name=thermo, 
-                                    initial_state=initial_conditions, 
+                    __check_exit(create_jacobian(lang=lang,
+                                    mech_name=mech,
+                                    therm_name=thermo,
+                                    initial_state=initial_conditions,
                                     optimize_cache=cache_opt,
                                     multi_thread=num_threads,
                                     no_shared=not shared_mem,
@@ -203,12 +213,12 @@ def __run_and_check(mech, thermo, initial_conditions, build_path,
                             stdout=errfile, stderr=errfile)
                         __execute(builder[lang], num_threads, num_conditions, t_step)
                         __check_error(builder[lang], num_conditions, nvar,
-                                        validator, atol, rtol)
+                                        validator, atol, rtol, minor_species)
 
 def run_log(mech, thermo, initial_conditions, build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference,
-        end_time, use_old_validation, small_time_step):
+        end_time, use_old_validation, small_time_step, minor_species):
     with open('logfile', 'w') as file:
         pass
     with open('logerr', 'w') as file:
@@ -216,11 +226,11 @@ def run_log(mech, thermo, initial_conditions, build_path,
     if initial_conditions is not None:
         with open('logfile', 'a') as file:
             file.write('Running Same ICs\n')
-        __run_and_check(mech, thermo, initial_conditions, build_path, 
+        __run_and_check(mech, thermo, initial_conditions, build_path,
             num_threads, 1 if num_conditions is None else num_conditions,
             None, skip_c, skip_cuda, atol, rtol,
             small_atol, small_rtol, finite_difference,
-            end_time, use_old_validation, small_time_step)
+            end_time, use_old_validation, small_time_step, minor_species)
     if test_data is not None:
         with open('logfile', 'a') as file:
             file.write('PaSR ICs\n')
@@ -231,7 +241,7 @@ def run_log(mech, thermo, initial_conditions, build_path,
         __run_and_check(mech, thermo, '', build_path,
         num_threads, num_conditions, test_data, skip_c, skip_cuda,
         atol, rtol, small_atol, small_rtol, finite_difference,
-        end_time, use_old_validation, small_time_step)
+        end_time, use_old_validation, small_time_step, minor_species)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='logger: Log and compare solver output for the various ODE Solvers')
@@ -322,6 +332,11 @@ if __name__ == '__main__':
                         type=float,
                         default=1e-10,
                         help='Time step to use for CVODEs validator')
+    parser.add_argument('-mspec', '--minor_species',
+                        required=False,
+                        type=str,
+                        default='',
+                        help='A comma separated list of species names to report error for')
     args = parser.parse_args()
 
     assert not (args.test_data is None and args.initial_conditions is None), \
@@ -334,4 +349,5 @@ if __name__ == '__main__':
         args.num_threads, args.num_conditions, args.test_data,
         args.skip_c, args.skip_cuda, args.abs_tolerance, args.rel_tolerance,
         args.abs_tolerance_small, args.rel_tolerance_small, args.finite_difference,
-        args.end_time, args.use_old_validation, args.small_time_step)
+        args.end_time, args.use_old_validation, args.small_time_step,
+        args.minor_species)
