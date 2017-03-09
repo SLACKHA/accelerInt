@@ -60,6 +60,8 @@ def __check_error(builder, num_conditions, nvar, validator, atol, rtol, minor_sp
             for spec, ind in minor_species:
                 spec_ind = ind + 1 #deal with T indicies
                 spec_err = err[spec_ind, :]
+                L2_err = np.linalg.norm(spec_err, axis=1, ord=2)
+                Linf_err = np.linalg.norm(spec_err, axis=1, ord=np.inf)
                 file.write('{} L2 (max, mean) = {:.16e}, {:.16e}\n'.format(spec, np.max(L2_err), np.mean(L2_err)))
                 file.write('{} Linf (max, mean) = {:.16e}, {:.16e}\n'.format(spec, np.max(Linf_err), np.mean(Linf_err)))
 
