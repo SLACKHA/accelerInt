@@ -1,0 +1,45 @@
+\hypertarget{rk78__typedefs_8hpp}{}\section{rk78/rk78\+\_\+typedefs.hpp File Reference}
+\label{rk78__typedefs_8hpp}\index{rk78/rk78\+\_\+typedefs.\+hpp@{rk78/rk78\+\_\+typedefs.\+hpp}}
+{\ttfamily \#include $<$boost/numeric/odeint.\+hpp$>$}\\*
+{\ttfamily \#include \char`\"{}dydt.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+h\char`\"{}}\\*
+Include dependency graph for rk78\+\_\+typedefs.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{rk78__typedefs_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{rk78__typedefs_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classrhs__eval}{rhs\+\_\+eval}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::vector$<$ double $>$ \hyperlink{rk78__typedefs_8hpp_ac81efbc71a13babc87c8b2fb5546dd4c}{state\+\_\+type}
+\item 
+typedef runge\+\_\+kutta\+\_\+fehlberg78$<$ \hyperlink{rk78__typedefs_8hpp_ac81efbc71a13babc87c8b2fb5546dd4c}{state\+\_\+type}, double $>$ \hyperlink{rk78__typedefs_8hpp_a9c1895604d873087ed1453971f0e32c3}{stepper}
+\item 
+typedef controlled\+\_\+runge\+\_\+kutta$<$ \hyperlink{rk78__typedefs_8hpp_a9c1895604d873087ed1453971f0e32c3}{stepper} $>$ \hyperlink{rk78__typedefs_8hpp_ace1eb17a3e098cc9c02ce96d814d376b}{controller}
+\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\index{rk78\+\_\+typedefs.\+hpp@{rk78\+\_\+typedefs.\+hpp}!controller@{controller}}
+\index{controller@{controller}!rk78\+\_\+typedefs.\+hpp@{rk78\+\_\+typedefs.\+hpp}}
+\subsubsection[{\texorpdfstring{controller}{controller}}]{\setlength{\rightskip}{0pt plus 5cm}typedef controlled\+\_\+runge\+\_\+kutta$<$ {\bf stepper} $>$ {\bf controller}}\hypertarget{rk78__typedefs_8hpp_ace1eb17a3e098cc9c02ce96d814d376b}{}\label{rk78__typedefs_8hpp_ace1eb17a3e098cc9c02ce96d814d376b}
+\index{rk78\+\_\+typedefs.\+hpp@{rk78\+\_\+typedefs.\+hpp}!state\+\_\+type@{state\+\_\+type}}
+\index{state\+\_\+type@{state\+\_\+type}!rk78\+\_\+typedefs.\+hpp@{rk78\+\_\+typedefs.\+hpp}}
+\subsubsection[{\texorpdfstring{state\+\_\+type}{state_type}}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::vector$<$ double $>$ {\bf state\+\_\+type}}\hypertarget{rk78__typedefs_8hpp_ac81efbc71a13babc87c8b2fb5546dd4c}{}\label{rk78__typedefs_8hpp_ac81efbc71a13babc87c8b2fb5546dd4c}
+\index{rk78\+\_\+typedefs.\+hpp@{rk78\+\_\+typedefs.\+hpp}!stepper@{stepper}}
+\index{stepper@{stepper}!rk78\+\_\+typedefs.\+hpp@{rk78\+\_\+typedefs.\+hpp}}
+\subsubsection[{\texorpdfstring{stepper}{stepper}}]{\setlength{\rightskip}{0pt plus 5cm}typedef runge\+\_\+kutta\+\_\+fehlberg78$<$ {\bf state\+\_\+type} , double $>$ {\bf stepper}}\hypertarget{rk78__typedefs_8hpp_a9c1895604d873087ed1453971f0e32c3}{}\label{rk78__typedefs_8hpp_a9c1895604d873087ed1453971f0e32c3}

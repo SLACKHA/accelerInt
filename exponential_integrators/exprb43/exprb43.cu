@@ -1,16 +1,19 @@
-/** 
- * \file krylov.c
+/*!
+ * \file exprb43.cu
  *
  * \author Nicholas J. Curtis
  * \date 09/02/2014
  *
- * A krylov subspace integrator using the EXP4 method
- * based on the work of Niesen and Wright (2012)
- * 
+ * \brief A krylov subspace integrator using a 4th order (3rd-order embedded)
+ * 		  exponential Rosenbrock method of Hochbruck et al. (2009)
+ *
+ * See full reference:
+ * M. Hochbruck, A. Ostermann, J. Schweitzer, Exponential Rosenbrock-type methods, SIAM J. Numer. Anal. 47 (1) (2009) 786–803. doi:10.1137/080717717.
+ *
  * NOTE: all matricies stored in column major format!
- * 
+ *
  */
- 
+
 /** Include common code. */
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,7 +26,7 @@
 #include "header.cuh"
 #include "solver_options.cuh"
 #include "solver_props.cuh"
- 
+
 #include "dydt.cuh"
 #ifndef FINITE_DIFFERENCE
 #include "jacob.cuh"
@@ -35,6 +38,10 @@
 #include "exponential_linear_algebra.cuh"
 #include "solver_init.cuh"
 #include "gpu_macros.cuh"
+
+#ifdef GENERATE_DOCS
+namespace exprb43cu {
+#endif
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
  	extern __device__ double err_log[MAX_STEPS];
@@ -52,14 +59,21 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/** 4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation
- * 
- * 
+/*!
+ * \fn int integrate(const double t_start, const double t_end, const double pr, double* y)
+ * \param t_start The initial integration time
+ * \param t_end The final integration timestep
+ * \param pr User data passed to the RHS function dydt() - commonly used for the Pressure term
+ * \param y The state vector
+ * \param mech The mechanism memory struct
+ * \param solver The solver memory struct
+ * \brief 4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation
+ * \returns The result of this integration step @see exprb43cu_ErrCodes
  */
 __device__ void integrate (const double t_start, const double t_end, const double pr,
 							double* __restrict__ y, const mechanism_memory* __restrict__ mech,
 							const solver_memory* __restrict__ solver) {
-	
+
 	//initial time
 #ifdef CONST_TIME_STEP
 	double h = t_end - t_start;
@@ -70,13 +84,13 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 	double err_old = 1.0;
 	double h_old = h;
-	
+
 	bool reject = false;
 
 	double t = t_start;
 
 	// get scaling for weighted norm
-	double * const __restrict__ sc = solver->sc; 
+	double * const __restrict__ sc = solver->sc;
 	scale_init(y, sc);
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
@@ -90,7 +104,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 	//arrays
 	double * const __restrict__ work1 = solver->work1;
-	double * const __restrict__ work2 = solver->work2; 
+	double * const __restrict__ work2 = solver->work2;
 	double * const __restrict__ y1 = solver->work3;
 	cuDoubleComplex * const __restrict__ work4 = solver->work4;
 	double * const __restrict__ fy = mech->dy;
@@ -112,7 +126,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	while (t < t_end) {
 
 		//error checking
-		if (failures >= 5)
+		if (failures >= MAX_CONSECUTIVE_ERRORS)
 		{
 			result[T_ID] = EC_consecutive_steps;
 			return;
@@ -127,7 +141,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			result[T_ID] = EC_h_plus_t_equals_h;
 			return;
 		}
-		
+
 		if (!reject) {
 			dydt (t, pr, y, fy, mech);
 		#ifdef FINITE_DIFFERENCE
@@ -178,7 +192,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
-			work1[INDEX(i)] = savedActions[INDEX(NSP + i)] - work2[INDEX(i)] - gy[INDEX(i)]; 
+			work1[INDEX(i)] = savedActions[INDEX(NSP + i)] - work2[INDEX(i)] - gy[INDEX(i)];
 		}
 		//work1 is now equal to Dn2
 
@@ -218,7 +232,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 
 		#pragma unroll
 		for (int i = 0; i < NSP; ++i) {
-			work1[INDEX(i)] = savedActions[INDEX(3 * NSP + i)] - work2[INDEX(i)] - gy[INDEX(i)]; 
+			work1[INDEX(i)] = savedActions[INDEX(3 * NSP + i)] - work2[INDEX(i)] - gy[INDEX(i)];
 		}
 		//work1 is now equal to Dn3
 
@@ -253,9 +267,9 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 		//scale and find err
 		scale (y, y1, work2);
 		err = fmax(EPS, sc_norm(work1, work2));
-		
+
 		// classical step size calculation
-		h_new = pow(err, -1.0 / ORD);	
+		h_new = pow(err, -1.0 / ORD);
 
 #ifdef LOG_KRYLOV_AND_STEPSIZES
 		if (T_ID == 0 && num_integrator_steps >= 0) {
@@ -274,7 +288,7 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 			}
 		}
 #endif
-		
+
 #ifndef CONST_TIME_STEP
 		failures = 0;
 		if (err <= 1.0) {
@@ -286,29 +300,29 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 				y[INDEX(i)] = y1[INDEX(i)];
 			}
 			t += h;
-			
+
 			// minimum of classical and Gustafsson step size prediction
 			h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
-			
+
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
-			
+
 			// store time step and error
 			err_old = fmax(1.0e-2, err);
 			h_old = h;
-			
+
 			// check if last step rejected
 			if (reject) {
 				h_new = fmin(h, h_new);
 				reject = false;
 			}
 			h = fmin(h_new, t_end - t);
-						
+
 		} else {
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 			h_new = fmin(h_new, t_end - t);
-			
+
 			reject = true;
 			h = fmin(h, h_new);
 		}
@@ -326,5 +340,9 @@ __device__ void integrate (const double t_start, const double t_end, const doubl
 	} // end while
 
 	result[T_ID] = EC_success;
-	
+
 }
+
+#ifdef GENERATE_DOCS
+}
+#endif

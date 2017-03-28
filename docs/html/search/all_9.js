@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['print',['PRINT',['../solver__options_8cuh.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.cuh'],['../solver__options_8h.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.h']]]
+  ['jac_5fhead_5fcvodes',['JAC_HEAD_CVODES',['../cvodes__init_8c.html#afc974a5ba6f507ebbdeb4dd3f8c5abdc',1,'cvodes_init.c']]]
 ];

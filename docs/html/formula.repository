@@ -1,0 +1,17 @@
+\form#0:$\sqrt{\sum{{nums}^2 * sc} / NSP}$
+\form#1:$\sqrt{\sum{v^2}}$
+\form#2:$v_out = \frac{v}{\left| v \right|}_2$
+\form#3:$\frac{1.0}{ATOL + \max\left(\left|y0\right|, \left|y1\right|) * RTOL\right)}$
+\form#4:$\left| nums * sc\right|_2$
+\form#5:$v_{out} = \frac{v}{\left| v \right|}_2$
+\form#6:$Av1 = A * V1 * scale[0]$
+\form#7:$Av2 = A * V2 * scale[1]$
+\form#8:$Av3 = A * V3 * scale[2] + V4 + V5$
+\form#9:$A * V * scale + add$
+\form#10:$scale * A * V + 2 * add - sub$
+\form#11:$Vm \dot w$
+\form#12:$ w -= Vm * s$
+\form#13:$Vm = s * w$
+\form#14:$\phi_2(c*A)$
+\form#15:$\phi_1(c*A)$
+\form#16:$\phi_0(c*A)$

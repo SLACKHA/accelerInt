@@ -1,6 +1,22 @@
+/*!
+ * \file exprb43_props.cuh
+ * \brief Error checking for the EXPRB43 algorithm
+ * \author Nicholas Curtis
+ * \date 03/10/2015
+ */
+
 #include "exprb43_props.cuh"
 
-//error checking
+#ifdef GENERATE_DOCS
+namespace exprb43cu {
+#endif
+
+/*! /fn void check_error(int tid, int code)
+	/brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	/param num_cond The total number of IVPs to check
+	/param codes The array of return codes
+	@see exprb43cu_ErrCodes
+ */
 __host__
 void check_error(int num_cond, int* codes)
 {
@@ -24,3 +40,7 @@ void check_error(int num_cond, int* codes)
 		}
 	}
 }
+
+#ifdef GENERATE_DOCS
+}
+#endif

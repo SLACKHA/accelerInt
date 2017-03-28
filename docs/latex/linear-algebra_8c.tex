@@ -1,0 +1,146 @@
+\hypertarget{linear-algebra_8c}{}\section{exponential\+\_\+integrators/linear-\/algebra.c File Reference}
+\label{linear-algebra_8c}\index{exponential\+\_\+integrators/linear-\/algebra.\+c@{exponential\+\_\+integrators/linear-\/algebra.\+c}}
+
+
+Various linear algebra routines needed for the Carathéodory-\/\+Fejér method.  
+
+
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$float.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$complex.\+h$>$}\\*
+Include dependency graph for linear-\/algebra.c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{linear-algebra_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{linear-algebra_8c_a2f33ac7496b7cd6fed5b44188e4aff1e}{get\+Inverse\+Complex} (int n, double complex $\ast$A)
+\begin{DoxyCompactList}\small\item\em Interface function to L\+A\+P\+A\+CK matrix inversion subroutine. \end{DoxyCompactList}\item 
+void \hyperlink{linear-algebra_8c_abe341bea743e72f19228e55d3fc02170}{lin\+Solve\+Complex} (int n, double complex $\ast$A, double complex $\ast$B, double complex $\ast$x)
+\begin{DoxyCompactList}\small\item\em Solves the complex linear system Ax = B. \end{DoxyCompactList}\item 
+void \hyperlink{linear-algebra_8c_ab95d3c92732d7711d9446fb25e0c6369}{roots} (int n, double $\ast$v, double complex $\ast$rt)
+\begin{DoxyCompactList}\small\item\em Polynomial root finding function. \end{DoxyCompactList}\item 
+void \hyperlink{linear-algebra_8c_a636107312a1724ef2534975b2ad05a83}{svd} (int n, double $\ast$A, double $\ast$S, double $\ast$U, double $\ast$V)
+\begin{DoxyCompactList}\small\item\em Singular value decomposition function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Various linear algebra routines needed for the Carathéodory-\/\+Fejér method. 
+
+
+
+\subsection{Function Documentation}
+\index{linear-\/algebra.\+c@{linear-\/algebra.\+c}!get\+Inverse\+Complex@{get\+Inverse\+Complex}}
+\index{get\+Inverse\+Complex@{get\+Inverse\+Complex}!linear-\/algebra.\+c@{linear-\/algebra.\+c}}
+\subsubsection[{\texorpdfstring{get\+Inverse\+Complex(int n, double complex $\ast$\+A)}{getInverseComplex(int n, double complex *A)}}]{\setlength{\rightskip}{0pt plus 5cm}void get\+Inverse\+Complex (
+\begin{DoxyParamCaption}
+\item[{int}]{n, }
+\item[{double complex $\ast$}]{A}
+\end{DoxyParamCaption}
+)}\hypertarget{linear-algebra_8c_a2f33ac7496b7cd6fed5b44188e4aff1e}{}\label{linear-algebra_8c_a2f33ac7496b7cd6fed5b44188e4aff1e}
+
+
+Interface function to L\+A\+P\+A\+CK matrix inversion subroutine. 
+
+Performs inversion of square matrix. Uses L\+A\+P\+A\+CK subroutines D\+G\+E\+T\+RF and D\+G\+E\+T\+RI.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & order of matrix \\
+\hline
+\mbox{\tt in}  & {\em A} & the input matrix, size n$\ast$n \\
+\hline
+\mbox{\tt out}  & {\em B} & the output matrix, size n$\ast$n \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+info success/fail integer flag 
+\end{DoxyReturn}
+\index{linear-\/algebra.\+c@{linear-\/algebra.\+c}!lin\+Solve\+Complex@{lin\+Solve\+Complex}}
+\index{lin\+Solve\+Complex@{lin\+Solve\+Complex}!linear-\/algebra.\+c@{linear-\/algebra.\+c}}
+\subsubsection[{\texorpdfstring{lin\+Solve\+Complex(int n, double complex $\ast$\+A, double complex $\ast$\+B, double complex $\ast$x)}{linSolveComplex(int n, double complex *A, double complex *B, double complex *x)}}]{\setlength{\rightskip}{0pt plus 5cm}void lin\+Solve\+Complex (
+\begin{DoxyParamCaption}
+\item[{int}]{n, }
+\item[{double complex $\ast$}]{A, }
+\item[{double complex $\ast$}]{B, }
+\item[{double complex $\ast$}]{x}
+\end{DoxyParamCaption}
+)}\hypertarget{linear-algebra_8c_abe341bea743e72f19228e55d3fc02170}{}\label{linear-algebra_8c_abe341bea743e72f19228e55d3fc02170}
+
+
+Solves the complex linear system Ax = B. 
+
+Performs inversion of square matrix. Uses L\+A\+P\+A\+CK subroutines D\+G\+E\+T\+RF and D\+G\+E\+T\+RI.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & order of matrix \\
+\hline
+\mbox{\tt in}  & {\em A} & the L\+HS matrix, size n$\ast$n \\
+\hline
+\mbox{\tt in}  & {\em B} & the R\+HS matrix, size n$\ast$n \\
+\hline
+\mbox{\tt out}  & {\em x} & the solved vector, size n$\ast$1 \\
+\hline
+\end{DoxyParams}
+\index{linear-\/algebra.\+c@{linear-\/algebra.\+c}!roots@{roots}}
+\index{roots@{roots}!linear-\/algebra.\+c@{linear-\/algebra.\+c}}
+\subsubsection[{\texorpdfstring{roots(int n, double $\ast$v, double complex $\ast$rt)}{roots(int n, double *v, double complex *rt)}}]{\setlength{\rightskip}{0pt plus 5cm}void roots (
+\begin{DoxyParamCaption}
+\item[{int}]{n, }
+\item[{double $\ast$}]{v, }
+\item[{double complex $\ast$}]{rt}
+\end{DoxyParamCaption}
+)}\hypertarget{linear-algebra_8c_ab95d3c92732d7711d9446fb25e0c6369}{}\label{linear-algebra_8c_ab95d3c92732d7711d9446fb25e0c6369}
+
+
+Polynomial root finding function. 
+
+This function calculates the roots of a polynomial represented by its coefficients in the array v. This is done by constructing a companion matrix out of the polynomial coefficients, then using the L\+A\+P\+A\+CK subroutine D\+G\+E\+EV to calculate its eigenvalues. These are the roots of the polynomial.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & size of v; \\
+\hline
+\mbox{\tt in}  & {\em v} & array of polynomial coefficients (real) \\
+\hline
+\mbox{\tt out}  & {\em rt} & array of polynomial roots (complex), size n -\/ 1 \\
+\hline
+\end{DoxyParams}
+\index{linear-\/algebra.\+c@{linear-\/algebra.\+c}!svd@{svd}}
+\index{svd@{svd}!linear-\/algebra.\+c@{linear-\/algebra.\+c}}
+\subsubsection[{\texorpdfstring{svd(int n, double $\ast$\+A, double $\ast$\+S, double $\ast$\+U, double $\ast$\+V)}{svd(int n, double *A, double *S, double *U, double *V)}}]{\setlength{\rightskip}{0pt plus 5cm}void svd (
+\begin{DoxyParamCaption}
+\item[{int}]{n, }
+\item[{double $\ast$}]{A, }
+\item[{double $\ast$}]{S, }
+\item[{double $\ast$}]{U, }
+\item[{double $\ast$}]{V}
+\end{DoxyParamCaption}
+)}\hypertarget{linear-algebra_8c_a636107312a1724ef2534975b2ad05a83}{}\label{linear-algebra_8c_a636107312a1724ef2534975b2ad05a83}
+
+
+Singular value decomposition function. 
+
+Decomposes a matrix A into U $\ast$ S $\ast$ V\textquotesingle{}, where S (here an array, really a diagonal matrix) holds the singular values. The function uses the L\+A\+P\+A\+CK subroutine D\+G\+E\+S\+VD.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & leading dimension of array \\
+\hline
+\mbox{\tt in}  & {\em A} & array to be decomposed, size n $\ast$ n \\
+\hline
+\mbox{\tt out}  & {\em S} & array with singular values, size n \\
+\hline
+\mbox{\tt out}  & {\em U} & array with left singular vectors, size n $\ast$ n \\
+\hline
+\mbox{\tt out}  & {\em V} & array with right singular vectors, size n $\ast$ n \\
+\hline
+\end{DoxyParams}

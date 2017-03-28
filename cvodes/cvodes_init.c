@@ -6,6 +6,11 @@
  *
  */
 
+#ifdef GENERATE_DOCS
+namespace cvode {
+#endif
+
+
 #include "header.h"
 #include "solver_options.h"
 #include "cvodes_dydt.h"
@@ -22,8 +27,11 @@
 #include "cvodes/cvodes.h"
 #include "cvodes/cvodes_lapack.h"
 
+/** The state vectors used in CVODE operation */
 N_Vector *y_locals;
+/** The base state vectors used in N_Vector creation */
 double* y_local_vectors;
+/** The stored CVODE integrator objects */
 void** integrators;
 
 /*! \fn void initialize_solver(int num_threads)
@@ -39,8 +47,6 @@ void** integrators;
    will be used in the CVODE solver.  Else, the CVODE finite difference based on the
    RHS function will be used.
 */
-
-
  void initialize_solver(int num_threads) {
  	y_locals = (N_Vector*)malloc(num_threads * sizeof(N_Vector));
  	y_local_vectors = (double*)calloc(num_threads * NSP, sizeof(double));
@@ -150,7 +156,8 @@ void** integrators;
 	}
  }
 
-/*! \fn void cleanup_solver(int num_threads)
+/*!
+   \fn void cleanup_solver(int num_threads)
    \brief Cleans up the created CVODE solvers
    \param num_threads The number of OpenMP threads to use (and CVODE solver objects to destroy)
 
@@ -168,7 +175,8 @@ void** integrators;
 	free(integrators);
  }
 
-/*! \fn char* solver_name()
+/*!
+   \fn char* solver_name()
    \brief Returns the CVODE solver name
 
    Returns a descriptive solver name for the CVODE solver, indicating use of
@@ -187,3 +195,7 @@ void** integrators;
  }
  void solver_log() {
  }
+
+#ifdef GENERATE_DOCS
+}
+#endif

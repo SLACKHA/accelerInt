@@ -1,0 +1,156 @@
+\hypertarget{complexInverse_8cu}{}\section{generic/complex\+Inverse.cu File Reference}
+\label{complexInverse_8cu}\index{generic/complex\+Inverse.\+cu@{generic/complex\+Inverse.\+cu}}
+{\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
+{\ttfamily \#include $<$cu\+Complex.\+h$>$}\\*
+Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{complexInverse_8cu__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{complexInverse_8cu_a8336c0132b5bf7f80e1a65443b2d9465}{get\+Complex\+Max} (const int n, const cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ complex\+Arr)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_aedd1b59cd1eff341e90ba6c6aaada0fd}{scale\+Complex} (const int n, const cu\+Double\+Complex val, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrX)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_abfd17009f61cab83a388c2bd3eac58d9}{swap\+Complex} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrX, const int incX, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrY, const int incY)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a4a5ccfb63190cc88035612f5c4cbbe5f}{complex\+G\+E\+RU} (const int n, const cu\+Double\+Complex alpha, const cu\+Double\+Complex $\ast$arrX, const cu\+Double\+Complex $\ast$arrY, const int incY, cu\+Double\+Complex $\ast$A, const int lda)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_ad83e7dc7b03a7837b20592aabcfe107c}{multiply\+Complex\+Upper\+MV} (const int n, cu\+Double\+Complex $\ast$x, const int lda, const cu\+Double\+Complex $\ast$A)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_ab3e9e304c4d35955cf6f79d7a5a53369}{complex\+G\+E\+MV} (const int m, const int n, const int lda, const cu\+Double\+Complex alpha, const cu\+Double\+Complex $\ast$A, const cu\+Double\+Complex $\ast$arrX, cu\+Double\+Complex $\ast$arrY)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a241fad7ccf21bf3c76f0e8f2235f9897}{get\+Complex\+LU} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{complexInverse_8cu_a33967d9901cc0d473f2ce9fdef02330e}{get\+Complex\+Inverse\+LU} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a3afc82e5f26795c2a629efdfbfb0cc5d}{get\+Complex\+Inverse} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a2a51f149a6ed728b322071b39fc49ba9}{get\+Hessenberg\+LU} (const int n, cu\+Double\+Complex $\ast$A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a33419af3f2b7c5b53f2745d8b7f3cbe1}{get\+Complex\+Inverse\+Hessenberg} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!complex\+G\+E\+MV@{complex\+G\+E\+MV}}
+\index{complex\+G\+E\+MV@{complex\+G\+E\+MV}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{complex\+G\+E\+M\+V(const int m, const int n, const int lda, const cu\+Double\+Complex alpha, const cu\+Double\+Complex $\ast$\+A, const cu\+Double\+Complex $\ast$arr\+X, cu\+Double\+Complex $\ast$arr\+Y)}{complexGEMV(const int m, const int n, const int lda, const cuDoubleComplex alpha, const cuDoubleComplex *A, const cuDoubleComplex *arrX, cuDoubleComplex *arrY)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void complex\+G\+E\+MV (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const int}]{n, }
+\item[{const int}]{lda, }
+\item[{const cu\+Double\+Complex}]{alpha, }
+\item[{const cu\+Double\+Complex $\ast$}]{A, }
+\item[{const cu\+Double\+Complex $\ast$}]{arrX, }
+\item[{cu\+Double\+Complex $\ast$}]{arrY}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_ab3e9e304c4d35955cf6f79d7a5a53369}{}\label{complexInverse_8cu_ab3e9e304c4d35955cf6f79d7a5a53369}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!complex\+G\+E\+RU@{complex\+G\+E\+RU}}
+\index{complex\+G\+E\+RU@{complex\+G\+E\+RU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{complex\+G\+E\+R\+U(const int n, const cu\+Double\+Complex alpha, const cu\+Double\+Complex $\ast$arr\+X, const cu\+Double\+Complex $\ast$arr\+Y, const int inc\+Y, cu\+Double\+Complex $\ast$\+A, const int lda)}{complexGERU(const int n, const cuDoubleComplex alpha, const cuDoubleComplex *arrX, const cuDoubleComplex *arrY, const int incY, cuDoubleComplex *A, const int lda)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void complex\+G\+E\+RU (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{const cu\+Double\+Complex}]{alpha, }
+\item[{const cu\+Double\+Complex $\ast$}]{arrX, }
+\item[{const cu\+Double\+Complex $\ast$}]{arrY, }
+\item[{const int}]{incY, }
+\item[{cu\+Double\+Complex $\ast$}]{A, }
+\item[{const int}]{lda}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_a4a5ccfb63190cc88035612f5c4cbbe5f}{}\label{complexInverse_8cu_a4a5ccfb63190cc88035612f5c4cbbe5f}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Inverse@{get\+Complex\+Inverse}}
+\index{get\+Complex\+Inverse@{get\+Complex\+Inverse}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+Complex\+Inverse(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{getComplexInverse(const int n, cuDoubleComplex *__restrict__ A, int *__restrict__ ipiv, int *__restrict__ info, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Complex\+Inverse (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{ipiv, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{info, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_a3afc82e5f26795c2a629efdfbfb0cc5d}{}\label{complexInverse_8cu_a3afc82e5f26795c2a629efdfbfb0cc5d}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Inverse\+Hessenberg@{get\+Complex\+Inverse\+Hessenberg}}
+\index{get\+Complex\+Inverse\+Hessenberg@{get\+Complex\+Inverse\+Hessenberg}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+Complex\+Inverse\+Hessenberg(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{getComplexInverseHessenberg(const int n, cuDoubleComplex *__restrict__ A, int *__restrict__ ipiv, int *__restrict__ info, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Complex\+Inverse\+Hessenberg (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{ipiv, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{info, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_a33419af3f2b7c5b53f2745d8b7f3cbe1}{}\label{complexInverse_8cu_a33419af3f2b7c5b53f2745d8b7f3cbe1}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Inverse\+LU@{get\+Complex\+Inverse\+LU}}
+\index{get\+Complex\+Inverse\+LU@{get\+Complex\+Inverse\+LU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+Complex\+Inverse\+L\+U(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{getComplexInverseLU(const int n, cuDoubleComplex *__restrict__ A, const int *__restrict__ indPivot, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int get\+Complex\+Inverse\+LU (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{ind\+Pivot, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_a33967d9901cc0d473f2ce9fdef02330e}{}\label{complexInverse_8cu_a33967d9901cc0d473f2ce9fdef02330e}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+LU@{get\+Complex\+LU}}
+\index{get\+Complex\+LU@{get\+Complex\+LU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+Complex\+L\+U(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)}{getComplexLU(const int n, cuDoubleComplex *__restrict__ A, int *__restrict__ indPivot, int *__restrict__ info)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Complex\+LU (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{ind\+Pivot, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_a241fad7ccf21bf3c76f0e8f2235f9897}{}\label{complexInverse_8cu_a241fad7ccf21bf3c76f0e8f2235f9897}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Max@{get\+Complex\+Max}}
+\index{get\+Complex\+Max@{get\+Complex\+Max}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+Complex\+Max(const int n, const cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ complex\+Arr)}{getComplexMax(const int n, const cuDoubleComplex *__restrict__ complexArr)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int get\+Complex\+Max (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{const cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{complex\+Arr}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_a8336c0132b5bf7f80e1a65443b2d9465}{}\label{complexInverse_8cu_a8336c0132b5bf7f80e1a65443b2d9465}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Hessenberg\+LU@{get\+Hessenberg\+LU}}
+\index{get\+Hessenberg\+LU@{get\+Hessenberg\+LU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+Hessenberg\+L\+U(const int n, cu\+Double\+Complex $\ast$\+A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)}{getHessenbergLU(const int n, cuDoubleComplex *A, int *__restrict__ indPivot, int *__restrict__ info)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Hessenberg\+LU (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{cu\+Double\+Complex $\ast$}]{A, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{ind\+Pivot, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_a2a51f149a6ed728b322071b39fc49ba9}{}\label{complexInverse_8cu_a2a51f149a6ed728b322071b39fc49ba9}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!multiply\+Complex\+Upper\+MV@{multiply\+Complex\+Upper\+MV}}
+\index{multiply\+Complex\+Upper\+MV@{multiply\+Complex\+Upper\+MV}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{multiply\+Complex\+Upper\+M\+V(const int n, cu\+Double\+Complex $\ast$x, const int lda, const cu\+Double\+Complex $\ast$\+A)}{multiplyComplexUpperMV(const int n, cuDoubleComplex *x, const int lda, const cuDoubleComplex *A)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void multiply\+Complex\+Upper\+MV (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{cu\+Double\+Complex $\ast$}]{x, }
+\item[{const int}]{lda, }
+\item[{const cu\+Double\+Complex $\ast$}]{A}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_ad83e7dc7b03a7837b20592aabcfe107c}{}\label{complexInverse_8cu_ad83e7dc7b03a7837b20592aabcfe107c}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!scale\+Complex@{scale\+Complex}}
+\index{scale\+Complex@{scale\+Complex}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{scale\+Complex(const int n, const cu\+Double\+Complex val, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+X)}{scaleComplex(const int n, const cuDoubleComplex val, cuDoubleComplex *__restrict__ arrX)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale\+Complex (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{const cu\+Double\+Complex}]{val, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrX}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_aedd1b59cd1eff341e90ba6c6aaada0fd}{}\label{complexInverse_8cu_aedd1b59cd1eff341e90ba6c6aaada0fd}
+\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!swap\+Complex@{swap\+Complex}}
+\index{swap\+Complex@{swap\+Complex}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
+\subsubsection[{\texorpdfstring{swap\+Complex(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+X, const int inc\+X, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+Y, const int inc\+Y)}{swapComplex(const int n, cuDoubleComplex *__restrict__ arrX, const int incX, cuDoubleComplex *__restrict__ arrY, const int incY)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void swap\+Complex (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrX, }
+\item[{const int}]{incX, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrY, }
+\item[{const int}]{incY}
+\end{DoxyParamCaption}
+)}\hypertarget{complexInverse_8cu_abfd17009f61cab83a388c2bd3eac58d9}{}\label{complexInverse_8cu_abfd17009f61cab83a388c2bd3eac58d9}

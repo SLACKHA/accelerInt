@@ -1,6 +1,6 @@
-/* rb43_init.cu
-*  Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
- * \file rb43_init.cu
+/*
+ * \file exprb43_init.cu
+ *  Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
@@ -12,10 +12,16 @@
 #include "solver_props.cuh"
 #include "gpu_macros.cuh"
 
- void initialize_solver() {
-    find_poles_and_residuals();
- }
+#ifdef GENERATE_DOCS
+namespace exprb43cu {
+#endif
 
+/*!
+   \fn char* solver_name()
+   \brief Returns the EXPB43 solver name
+
+   Returns a descriptive solver name for the GPU EXPB43 solver
+*/
  const char* solver_name() {
     const char* name = "exprb43-int-gpu";
     return name;
@@ -83,7 +89,7 @@
 	logFile = fopen(out_name, "w");
 
 	char out_reject_name[len + 23];
-	sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);    
+	sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);
 	//file for krylov logging
 	//open and clear
 	rFile = fopen(out_reject_name, "w");
@@ -113,16 +119,28 @@
     num_bytes += STRIDE * sizeof(cuDoubleComplex);
     //result flag
     num_bytes += 1 * sizeof(int);
-    
+
     return num_bytes;
  }
 
- void createAndZero(void** ptr, size_t size)
+/*!
+ * /fn void createAndZero(void** ptr, size_t size)
+ * /brief Convienvience method to Cuda Malloc and memset a pointer to zero
+ * /param ptr The address of the pointer to malloc
+ * /param size The total size (in bytes) of the pointer to malloc
+ */
+void createAndZero(void** ptr, size_t size)
 {
   cudaErrorCheck(cudaMalloc(ptr, size));
   cudaErrorCheck(cudaMemset(*ptr, 0, size));
 }
 
+/*! \fn void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
+   \brief Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes solver_memory
+   \param padded The total (padded) number of GPU threads (IVPs) to solve
+   \param h_mem The host solver_memory structure (to be copied to the GPU)
+   \param d_mem The device solver_memory structure (to be operated on by the GPU)
+*/
 void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
   find_poles_and_residuals();
   // Allocate storage for the device struct
@@ -146,6 +164,12 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
   cudaErrorCheck( cudaMemcpy(*d_mem, *h_mem, sizeof(solver_memory), cudaMemcpyHostToDevice) );
 }
 
+/*!
+   \fn void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem)
+   \brief Cleans up solver memory, and closes Krylov subspace logfiles (if LOG_OUTPUT is defined)
+   @see solver_memory
+   @see solver_options.cuh
+*/
  void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem) {
  #ifdef LOG_OUTPUT
     //close files
@@ -167,3 +191,7 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
     cudaErrorCheck( cudaFree((*h_mem)->result) );
     cudaErrorCheck( cudaFree(*d_mem) );
  }
+
+#ifdef GENERATE_DOCS
+}
+#endif

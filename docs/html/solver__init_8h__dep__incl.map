@@ -1,0 +1,9 @@
+<map id="generic/solver_init.h" name="generic/solver_init.h">
+<area shape="rect" id="node2" href="$solver_8h.html" title="generic/solver.h" alt="" coords="305,87,420,114"/>
+<area shape="rect" id="node7" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="445,80,601,121"/>
+<area shape="rect" id="node8" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="625,80,781,121"/>
+<area shape="rect" id="node3" href="$solver__cvodes_8c.html" title="cvodes/solver_cvodes.c" alt="" coords="5,169,168,196"/>
+<area shape="rect" id="node4" href="$solver__generic_8c.html" title="generic/solver_generic.c" alt="" coords="192,169,355,196"/>
+<area shape="rect" id="node5" href="$solver__main_8c.html" title="generic/solver_main.c" alt="" coords="379,169,528,196"/>
+<area shape="rect" id="node6" href="$solver__rk78_8cpp.html" title="rk78/solver_rk78.cpp" alt="" coords="551,169,694,196"/>
+</map>

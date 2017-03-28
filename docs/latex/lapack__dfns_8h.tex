@@ -1,0 +1,100 @@
+\hypertarget{lapack__dfns_8h}{}\section{generic/lapack\+\_\+dfns.h File Reference}
+\label{lapack__dfns_8h}\index{generic/lapack\+\_\+dfns.\+h@{generic/lapack\+\_\+dfns.\+h}}
+{\ttfamily \#include $<$complex.\+h$>$}\\*
+Include dependency graph for lapack\+\_\+dfns.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{lapack__dfns_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lapack__dfns_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{lapack__dfns_8h_a8b6e4afdfc82e0d8024928738768f9c4}{dgetrf\+\_\+} (const int $\ast$m, const int $\ast$n, double $\ast$A, const int $\ast$lda, int $\ast$ipiv, int $\ast$info)
+\item 
+void \hyperlink{lapack__dfns_8h_a2ebf716defd6efd95412d03c56df2858}{zgetrf\+\_\+} (const int $\ast$m, const int $\ast$n, double complex $\ast$A, const int $\ast$lda, int $\ast$ipiv, int $\ast$info)
+\item 
+void \hyperlink{lapack__dfns_8h_aa840d70b8a5a78c39c7c447e36c949b2}{dgetrs\+\_\+} (const char $\ast$trans, const int $\ast$n, const int $\ast$nrhs, double $\ast$A, const int $\ast$L\+DA, int $\ast$ipiv, double $\ast$B, const int $\ast$L\+DB, int $\ast$info)
+\item 
+void \hyperlink{lapack__dfns_8h_a96c5c8afefcf5472aca9e85a647c085c}{zgetrs\+\_\+} (const char $\ast$trans, const int $\ast$n, const int $\ast$nrhs, double complex $\ast$A, const int $\ast$L\+DA, int $\ast$ipiv, double complex $\ast$B, const int $\ast$L\+DB, int $\ast$info)
+\item 
+void \hyperlink{lapack__dfns_8h_ac2ad5fa4cc71e72154f005477e0968a2}{zgetri\+\_\+} (const int $\ast$n, double complex $\ast$A, const int $\ast$L\+DA, int $\ast$ipiv, double complex $\ast$work, const int $\ast$L\+DB, int $\ast$info)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}!dgetrf\+\_\+@{dgetrf\+\_\+}}
+\index{dgetrf\+\_\+@{dgetrf\+\_\+}!lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}}
+\subsubsection[{\texorpdfstring{dgetrf\+\_\+(const int $\ast$m, const int $\ast$n, double $\ast$\+A, const int $\ast$lda, int $\ast$ipiv, int $\ast$info)}{dgetrf_(const int *m, const int *n, double *A, const int *lda, int *ipiv, int *info)}}]{\setlength{\rightskip}{0pt plus 5cm}void dgetrf\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{const int $\ast$}]{m, }
+\item[{const int $\ast$}]{n, }
+\item[{double $\ast$}]{A, }
+\item[{const int $\ast$}]{lda, }
+\item[{int $\ast$}]{ipiv, }
+\item[{int $\ast$}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{lapack__dfns_8h_a8b6e4afdfc82e0d8024928738768f9c4}{}\label{lapack__dfns_8h_a8b6e4afdfc82e0d8024928738768f9c4}
+\index{lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}!dgetrs\+\_\+@{dgetrs\+\_\+}}
+\index{dgetrs\+\_\+@{dgetrs\+\_\+}!lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}}
+\subsubsection[{\texorpdfstring{dgetrs\+\_\+(const char $\ast$trans, const int $\ast$n, const int $\ast$nrhs, double $\ast$\+A, const int $\ast$\+L\+D\+A, int $\ast$ipiv, double $\ast$\+B, const int $\ast$\+L\+D\+B, int $\ast$info)}{dgetrs_(const char *trans, const int *n, const int *nrhs, double *A, const int *LDA, int *ipiv, double *B, const int *LDB, int *info)}}]{\setlength{\rightskip}{0pt plus 5cm}void dgetrs\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{trans, }
+\item[{const int $\ast$}]{n, }
+\item[{const int $\ast$}]{nrhs, }
+\item[{double $\ast$}]{A, }
+\item[{const int $\ast$}]{L\+DA, }
+\item[{int $\ast$}]{ipiv, }
+\item[{double $\ast$}]{B, }
+\item[{const int $\ast$}]{L\+DB, }
+\item[{int $\ast$}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{lapack__dfns_8h_aa840d70b8a5a78c39c7c447e36c949b2}{}\label{lapack__dfns_8h_aa840d70b8a5a78c39c7c447e36c949b2}
+\index{lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}!zgetrf\+\_\+@{zgetrf\+\_\+}}
+\index{zgetrf\+\_\+@{zgetrf\+\_\+}!lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}}
+\subsubsection[{\texorpdfstring{zgetrf\+\_\+(const int $\ast$m, const int $\ast$n, double complex $\ast$\+A, const int $\ast$lda, int $\ast$ipiv, int $\ast$info)}{zgetrf_(const int *m, const int *n, double complex *A, const int *lda, int *ipiv, int *info)}}]{\setlength{\rightskip}{0pt plus 5cm}void zgetrf\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{const int $\ast$}]{m, }
+\item[{const int $\ast$}]{n, }
+\item[{double complex $\ast$}]{A, }
+\item[{const int $\ast$}]{lda, }
+\item[{int $\ast$}]{ipiv, }
+\item[{int $\ast$}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{lapack__dfns_8h_a2ebf716defd6efd95412d03c56df2858}{}\label{lapack__dfns_8h_a2ebf716defd6efd95412d03c56df2858}
+\index{lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}!zgetri\+\_\+@{zgetri\+\_\+}}
+\index{zgetri\+\_\+@{zgetri\+\_\+}!lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}}
+\subsubsection[{\texorpdfstring{zgetri\+\_\+(const int $\ast$n, double complex $\ast$\+A, const int $\ast$\+L\+D\+A, int $\ast$ipiv, double complex $\ast$work, const int $\ast$\+L\+D\+B, int $\ast$info)}{zgetri_(const int *n, double complex *A, const int *LDA, int *ipiv, double complex *work, const int *LDB, int *info)}}]{\setlength{\rightskip}{0pt plus 5cm}void zgetri\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{const int $\ast$}]{n, }
+\item[{double complex $\ast$}]{A, }
+\item[{const int $\ast$}]{L\+DA, }
+\item[{int $\ast$}]{ipiv, }
+\item[{double complex $\ast$}]{work, }
+\item[{const int $\ast$}]{L\+DB, }
+\item[{int $\ast$}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{lapack__dfns_8h_ac2ad5fa4cc71e72154f005477e0968a2}{}\label{lapack__dfns_8h_ac2ad5fa4cc71e72154f005477e0968a2}
+\index{lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}!zgetrs\+\_\+@{zgetrs\+\_\+}}
+\index{zgetrs\+\_\+@{zgetrs\+\_\+}!lapack\+\_\+dfns.\+h@{lapack\+\_\+dfns.\+h}}
+\subsubsection[{\texorpdfstring{zgetrs\+\_\+(const char $\ast$trans, const int $\ast$n, const int $\ast$nrhs, double complex $\ast$\+A, const int $\ast$\+L\+D\+A, int $\ast$ipiv, double complex $\ast$\+B, const int $\ast$\+L\+D\+B, int $\ast$info)}{zgetrs_(const char *trans, const int *n, const int *nrhs, double complex *A, const int *LDA, int *ipiv, double complex *B, const int *LDB, int *info)}}]{\setlength{\rightskip}{0pt plus 5cm}void zgetrs\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{trans, }
+\item[{const int $\ast$}]{n, }
+\item[{const int $\ast$}]{nrhs, }
+\item[{double complex $\ast$}]{A, }
+\item[{const int $\ast$}]{L\+DA, }
+\item[{int $\ast$}]{ipiv, }
+\item[{double complex $\ast$}]{B, }
+\item[{const int $\ast$}]{L\+DB, }
+\item[{int $\ast$}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{lapack__dfns_8h_a96c5c8afefcf5472aca9e85a647c085c}{}\label{lapack__dfns_8h_a96c5c8afefcf5472aca9e85a647c085c}

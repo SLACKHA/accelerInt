@@ -1,0 +1,134 @@
+\hypertarget{solver__init_8cuh}{}\section{generic/solver\+\_\+init.cuh File Reference}
+\label{solver__init_8cuh}\index{generic/solver\+\_\+init.\+cuh@{generic/solver\+\_\+init.\+cuh}}
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
+Include dependency graph for solver\+\_\+init.\+cuh\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{solver__init_8cuh__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{solver__init_8cuh__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{solver__init_8cuh_a6476a3e2130c9d369a9f7f65aaf5721e}{S\+O\+L\+V\+E\+R\+\_\+\+I\+N\+I\+T\+\_\+\+C\+UH}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \hyperlink{solver__init_8cuh_ab75ba2ae0b04dfd786322e7b34f49d84}{required\+\_\+solver\+\_\+size} ()
+\begin{DoxyCompactList}\small\item\em Returns the total size (in bytes) required for memory storage for a single G\+PU thread Used in calculation of the maximum number of possible G\+PU threads to launch, this method returns the size of the \hyperlink{structsolver__memory}{solver\+\_\+memory} structure (per-\/\+G\+PU thread) \end{DoxyCompactList}\item 
+void \hyperlink{solver__init_8cuh_a39c825543042903f579cd9c35a279dca}{init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+void \hyperlink{solver__init_8cuh_ae95cbe81062a829668c5fa8e28b2e2c7}{solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+void \hyperlink{solver__init_8cuh_acb4d6fc5363c1df648e3eb91ab5004c3}{initialize\+\_\+solver} (const int, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$)
+\item 
+void \hyperlink{solver__init_8cuh_afb4079e8c474059834591935c1639cc4}{cleanup\+\_\+solver} (\hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$)
+\item 
+const char $\ast$ \hyperlink{solver__init_8cuh_abd0fcd691c85e2469a3c89438c174f2b}{solver\+\_\+name} ()
+\begin{DoxyCompactList}\small\item\em Returns the C\+V\+O\+DE solver name. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\index{solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}!S\+O\+L\+V\+E\+R\+\_\+\+I\+N\+I\+T\+\_\+\+C\+UH@{S\+O\+L\+V\+E\+R\+\_\+\+I\+N\+I\+T\+\_\+\+C\+UH}}
+\index{S\+O\+L\+V\+E\+R\+\_\+\+I\+N\+I\+T\+\_\+\+C\+UH@{S\+O\+L\+V\+E\+R\+\_\+\+I\+N\+I\+T\+\_\+\+C\+UH}!solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}}
+\subsubsection[{\texorpdfstring{S\+O\+L\+V\+E\+R\+\_\+\+I\+N\+I\+T\+\_\+\+C\+UH}{SOLVER_INIT_CUH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+O\+L\+V\+E\+R\+\_\+\+I\+N\+I\+T\+\_\+\+C\+UH}\hypertarget{solver__init_8cuh_a6476a3e2130c9d369a9f7f65aaf5721e}{}\label{solver__init_8cuh_a6476a3e2130c9d369a9f7f65aaf5721e}
+
+
+\subsection{Function Documentation}
+\index{solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
+\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}}
+\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(solver\+\_\+memory $\ast$$\ast$, solver\+\_\+memory $\ast$$\ast$)}{cleanup_solver(solver_memory **, solver_memory **)}}]{\setlength{\rightskip}{0pt plus 5cm}void cleanup\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{, }
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__init_8cuh_afb4079e8c474059834591935c1639cc4}{}\label{solver__init_8cuh_afb4079e8c474059834591935c1639cc4}
+\index{solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}}
+\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__init_8cuh_a39c825543042903f579cd9c35a279dca}{}\label{solver__init_8cuh_a39c825543042903f579cd9c35a279dca}
+
+
+Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\end{DoxySeeAlso}
+\index{solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}!initialize\+\_\+solver@{initialize\+\_\+solver}}
+\index{initialize\+\_\+solver@{initialize\+\_\+solver}!solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}}
+\subsubsection[{\texorpdfstring{initialize\+\_\+solver(const int, solver\+\_\+memory $\ast$$\ast$, solver\+\_\+memory $\ast$$\ast$)}{initialize_solver(const int, solver_memory **, solver_memory **)}}]{\setlength{\rightskip}{0pt plus 5cm}void initialize\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{const int}]{, }
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{, }
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__init_8cuh_acb4d6fc5363c1df648e3eb91ab5004c3}{}\label{solver__init_8cuh_acb4d6fc5363c1df648e3eb91ab5004c3}
+\index{solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}!required\+\_\+solver\+\_\+size@{required\+\_\+solver\+\_\+size}}
+\index{required\+\_\+solver\+\_\+size@{required\+\_\+solver\+\_\+size}!solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}}
+\subsubsection[{\texorpdfstring{required\+\_\+solver\+\_\+size()}{required_solver_size()}}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t required\+\_\+solver\+\_\+size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__init_8cuh_ab75ba2ae0b04dfd786322e7b34f49d84}{}\label{solver__init_8cuh_ab75ba2ae0b04dfd786322e7b34f49d84}
+
+
+Returns the total size (in bytes) required for memory storage for a single G\+PU thread Used in calculation of the maximum number of possible G\+PU threads to launch, this method returns the size of the \hyperlink{structsolver__memory}{solver\+\_\+memory} structure (per-\/\+G\+PU thread) 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{structsolver__memory}{solver\+\_\+memory} 
+\end{DoxySeeAlso}
+\index{solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}!solver\+\_\+log@{solver\+\_\+log}}
+\index{solver\+\_\+log@{solver\+\_\+log}!solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}}
+\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__init_8cuh_ae95cbe81062a829668c5fa8e28b2e2c7}{}\label{solver__init_8cuh_ae95cbe81062a829668c5fa8e28b2e2c7}
+
+
+Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\end{DoxySeeAlso}
+\index{solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}!solver\+\_\+name@{solver\+\_\+name}}
+\index{solver\+\_\+name@{solver\+\_\+name}!solver\+\_\+init.\+cuh@{solver\+\_\+init.\+cuh}}
+\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ solver\+\_\+name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__init_8cuh_abd0fcd691c85e2469a3c89438c174f2b}{}\label{solver__init_8cuh_abd0fcd691c85e2469a3c89438c174f2b}
+
+
+Returns the C\+V\+O\+DE solver name. 
+
+Returns a descriptive solver name for the C\+V\+O\+DE solver, indicating use of Finite Difference Jacobian (or not)
+
+Returns the C\+V\+O\+DE solver name.
+
+Returns a descriptive solver name for the E\+X\+P4 solver
+
+Returns the C\+V\+O\+DE solver name.
+
+Returns a descriptive solver name for the G\+PU E\+X\+P4 solver
+
+Returns the C\+V\+O\+DE solver name.
+
+Returns a descriptive solver name for the E\+X\+P\+R\+B43 solver
+
+Returns the C\+V\+O\+DE solver name.
+
+Returns a descriptive solver name for the G\+PU E\+X\+P\+B43 solver 

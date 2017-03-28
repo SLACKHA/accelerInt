@@ -1,10 +1,11 @@
-/* arnoli.cuh
- * Implementation of the arnoldi iteration methods
+/*!
  * \file arnoldi.h
+ * \brief Implementation of the GPU arnoldi iteration methods
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
  *
+ * Note: turn on EXACT_KRYLOV krylov definition to use the use the "happy breakdown" criteria in determining end of krylov iteration
  */
 
 #ifndef ARNOLDI_CUH
@@ -20,26 +21,31 @@
 #include "solver_props.cuh"
 
 //#define EXACT_KRYLOV
- 
+
+//! The list of indicies to check the Krylov projection error at
 __constant__ int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42, 53, 67, 84, 106, 133, 167, 211, 265};
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/** Matrix-vector multiplication of a matrix sized MxM and a vector Mx1
- * 
- * Performs inline matrix-vector multiplication (with unrolled loops) 
- * 
- * \param[in, out]		m 		in - the starting size of the matrix, out - the ending size of the matrix
+/*!
+ * \fn int arnoldi(const double scale,
+			const int p, const double h,
+			const double* __restrict__ A,
+			const solver_memory* __restrict__ solver,
+			const double* __restrict__ v, double* __restrict__ beta,
+			double * __restrict__ work,
+			cuDoubleComplex* __restrict__ work2)
+ * \brief Runs the arnoldi iteration to calculate the Krylov projection
+ * \returns				m - the ending size of the matrix
  * \param[in]			scale	the value to scale the timestep by
  * \param[in]			p		the order of the maximum phi function needed
  * \param[in]			h		the timestep
  * \param[in]			A 		the jacobian matrix
+ * \param[in,out]		solver  the solver memory struct
  * \param[in]  			v 		the vector to use for the krylov subspace
- * \param[in] 			sc 		the error scaling vector
  * \param[out] 			beta 	the norm of the v vector
- * \param[out]			Vm 		the arnoldi basis matrix
- * \param[out]			Hm 		the constructed Hm matrix, used in actual expoentials
- * \param[out] 			phiHm   the exponential matrix computed from h * scale * Hm
+ * \param[in,out]		work    A work vector
+ * \param[in,out]		work2   A complex work vector
  */
 __device__
 int arnoldi(const double scale,

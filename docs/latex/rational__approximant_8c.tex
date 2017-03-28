@@ -1,0 +1,64 @@
+\hypertarget{rational__approximant_8c}{}\section{exponential\+\_\+integrators/rational\+\_\+approximant.c File Reference}
+\label{rational__approximant_8c}\index{exponential\+\_\+integrators/rational\+\_\+approximant.\+c@{exponential\+\_\+integrators/rational\+\_\+approximant.\+c}}
+
+
+The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential.  
+
+
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}cf.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$complex.\+h$>$}\\*
+Include dependency graph for rational\+\_\+approximant.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{rational__approximant_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{rational__approximant_8c_a1cb9bed79a1ce457c891851da0cec0ba}{find\+\_\+poles\+\_\+and\+\_\+residuals} ()
+\begin{DoxyCompactList}\small\item\em get poles and residues for rational approximant to matrix exponential \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+double complex \hyperlink{rational__approximant_8c_a48b61efd6d33096c7c1b014f817d1baf}{poles} \mbox{[}\hyperlink{solver__options_8h_a69f5533c684b73d07a7e20146a285cb1}{N\+\_\+\+RA}\mbox{]}
+\item 
+double complex \hyperlink{rational__approximant_8c_a2df94bdd03b8eb32a977adec203dadef}{res} \mbox{[}\hyperlink{solver__options_8h_a69f5533c684b73d07a7e20146a285cb1}{N\+\_\+\+RA}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/09/2015
+\end{DoxyDate}
+Contains initialization and declaration of RA 
+
+\subsection{Function Documentation}
+\index{rational\+\_\+approximant.\+c@{rational\+\_\+approximant.\+c}!find\+\_\+poles\+\_\+and\+\_\+residuals@{find\+\_\+poles\+\_\+and\+\_\+residuals}}
+\index{find\+\_\+poles\+\_\+and\+\_\+residuals@{find\+\_\+poles\+\_\+and\+\_\+residuals}!rational\+\_\+approximant.\+c@{rational\+\_\+approximant.\+c}}
+\subsubsection[{\texorpdfstring{find\+\_\+poles\+\_\+and\+\_\+residuals()}{find_poles_and_residuals()}}]{\setlength{\rightskip}{0pt plus 5cm}void find\+\_\+poles\+\_\+and\+\_\+residuals (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{rational__approximant_8c_a1cb9bed79a1ce457c891851da0cec0ba}{}\label{rational__approximant_8c_a1cb9bed79a1ce457c891851da0cec0ba}
+
+
+get poles and residues for rational approximant to matrix exponential 
+
+
+
+\subsection{Variable Documentation}
+\index{rational\+\_\+approximant.\+c@{rational\+\_\+approximant.\+c}!poles@{poles}}
+\index{poles@{poles}!rational\+\_\+approximant.\+c@{rational\+\_\+approximant.\+c}}
+\subsubsection[{\texorpdfstring{poles}{poles}}]{\setlength{\rightskip}{0pt plus 5cm}double complex poles\mbox{[}{\bf N\+\_\+\+RA}\mbox{]}}\hypertarget{rational__approximant_8c_a48b61efd6d33096c7c1b014f817d1baf}{}\label{rational__approximant_8c_a48b61efd6d33096c7c1b014f817d1baf}
+\index{rational\+\_\+approximant.\+c@{rational\+\_\+approximant.\+c}!res@{res}}
+\index{res@{res}!rational\+\_\+approximant.\+c@{rational\+\_\+approximant.\+c}}
+\subsubsection[{\texorpdfstring{res}{res}}]{\setlength{\rightskip}{0pt plus 5cm}double complex res\mbox{[}{\bf N\+\_\+\+RA}\mbox{]}}\hypertarget{rational__approximant_8c_a2df94bdd03b8eb32a977adec203dadef}{}\label{rational__approximant_8c_a2df94bdd03b8eb32a977adec203dadef}

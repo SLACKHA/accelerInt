@@ -1,12 +1,10 @@
 var searchData=
 [
-  ['same_5fic',['SAME_IC',['../solver__options_8cuh.html#aa98acf0dc83a3dce3ba168d75a74cb1b',1,'SAME_IC():&#160;solver_options.cuh'],['../solver__options_8h.html#aa98acf0dc83a3dce3ba168d75a74cb1b',1,'SAME_IC():&#160;solver_options.h']]],
-  ['scale',['scale',['../radau2a_8cu.html#a4fab5866449108992478041d2e51a28c',1,'radau2a.cu']]],
-  ['scale_5finit',['scale_init',['../radau2a_8cu.html#a27a28cde87f3cbaf5f6adb19550a09a0',1,'radau2a.cu']]],
-  ['shuffle',['SHUFFLE',['../solver__options_8cuh.html#a0b43a0be2f674fea3218e7fb5221db1f',1,'SHUFFLE():&#160;solver_options.cuh'],['../solver__options_8h.html#a0b43a0be2f674fea3218e7fb5221db1f',1,'SHUFFLE():&#160;solver_options.h']]],
-  ['small',['SMALL',['../solver__options_8cuh.html#a09c78d2f8feb311dd9fc969a0bf84979',1,'SMALL():&#160;solver_options.cuh'],['../solver__options_8h.html#a09c78d2f8feb311dd9fc969a0bf84979',1,'SMALL():&#160;solver_options.h']]],
-  ['solver_5fmemory',['solver_memory',['../structsolver__memory.html',1,'']]],
-  ['solver_5fname',['solver_name',['../cvodes__init_8c.html#abd0fcd691c85e2469a3c89438c174f2b',1,'cvodes_init.c']]],
-  ['solver_5foptions_2ecuh',['solver_options.cuh',['../solver__options_8cuh.html',1,'']]],
-  ['solver_5foptions_2eh',['solver_options.h',['../solver__options_8h.html',1,'']]]
+  ['lapack_5fdfns_2eh',['lapack_dfns.h',['../lapack__dfns_8h.html',1,'']]],
+  ['linear_2dalgebra_2ec',['linear-algebra.c',['../linear-algebra_8c.html',1,'']]],
+  ['linear_2dalgebra_2eh',['linear-algebra.h',['../linear-algebra_8h.html',1,'']]],
+  ['linsolvecomplex',['linSolveComplex',['../linear-algebra_8c.html#abe341bea743e72f19228e55d3fc02170',1,'linSolveComplex(int n, double complex *A, double complex *B, double complex *x):&#160;linear-algebra.c'],['../linear-algebra_8h.html#a3c19505e0d860542b51152f7037a6261',1,'linSolveComplex(int, double complex *, double complex *, double complex *):&#160;linear-algebra.c']]],
+  ['log_5fend_5fonly',['LOG_END_ONLY',['../solver__options_8cuh.html#a09cc461392fae3949d88392adf655db5',1,'LOG_END_ONLY():&#160;solver_options.cuh'],['../solver__options_8h.html#a09cc461392fae3949d88392adf655db5',1,'LOG_END_ONLY():&#160;solver_options.h']]],
+  ['log_5fkrylov_5fand_5fstepsizes',['LOG_KRYLOV_AND_STEPSIZES',['../solver__options_8cuh.html#a2adffa059bbd6f183ff7f63db602ac42',1,'LOG_KRYLOV_AND_STEPSIZES():&#160;solver_options.cuh'],['../solver__options_8h.html#a2adffa059bbd6f183ff7f63db602ac42',1,'LOG_KRYLOV_AND_STEPSIZES():&#160;solver_options.h']]],
+  ['log_5foutput',['LOG_OUTPUT',['../solver__options_8cuh.html#ac786f5f1963363a48eed565f7cbc6931',1,'LOG_OUTPUT():&#160;solver_options.cuh'],['../solver__options_8h.html#ac786f5f1963363a48eed565f7cbc6931',1,'LOG_OUTPUT():&#160;solver_options.h']]]
 ];

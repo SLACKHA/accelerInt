@@ -1,0 +1,57 @@
+\hypertarget{solver__main_8c}{}\section{generic/solver\+\_\+main.c File Reference}
+\label{solver__main_8c}\index{generic/solver\+\_\+main.\+c@{generic/solver\+\_\+main.\+c}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdbool.\+h$>$}\\*
+{\ttfamily \#include $<$complex.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}timer.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}read\+\_\+initial\+\_\+conditions.\+h\char`\"{}}\\*
+Include dependency graph for solver\+\_\+main.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{solver__main_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{solver__main_8c_a4f005e7918ecc7f1cd2424fb1708b2ca}{write\+\_\+log} (int N\+UM, double t, const double $\ast$y\+\_\+host, F\+I\+LE $\ast$p\+File)
+\item 
+int \hyperlink{solver__main_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{solver\+\_\+main.\+c@{solver\+\_\+main.\+c}!main@{main}}
+\index{main@{main}!solver\+\_\+main.\+c@{solver\+\_\+main.\+c}}
+\subsubsection[{\texorpdfstring{main(int argc, char $\ast$argv[])}{main(int argc, char *argv[])}}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__main_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\label{solver__main_8c_a0ddf1224851353fc92bfbff6f499fa97}
+Main function
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em argc} & command line argument count \\
+\hline
+\mbox{\tt in}  & {\em argv} & command line argument vector \\
+\hline
+\end{DoxyParams}
+\index{solver\+\_\+main.\+c@{solver\+\_\+main.\+c}!write\+\_\+log@{write\+\_\+log}}
+\index{write\+\_\+log@{write\+\_\+log}!solver\+\_\+main.\+c@{solver\+\_\+main.\+c}}
+\subsubsection[{\texorpdfstring{write\+\_\+log(int N\+U\+M, double t, const double $\ast$y\+\_\+host, F\+I\+L\+E $\ast$p\+File)}{write_log(int NUM, double t, const double *y_host, FILE *pFile)}}]{\setlength{\rightskip}{0pt plus 5cm}void write\+\_\+log (
+\begin{DoxyParamCaption}
+\item[{int}]{N\+UM, }
+\item[{double}]{t, }
+\item[{const double $\ast$}]{y\+\_\+host, }
+\item[{F\+I\+LE $\ast$}]{p\+File}
+\end{DoxyParamCaption}
+)}\hypertarget{solver__main_8c_a4f005e7918ecc7f1cd2424fb1708b2ca}{}\label{solver__main_8c_a4f005e7918ecc7f1cd2424fb1708b2ca}
+Include common code. 

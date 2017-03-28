@@ -1,0 +1,107 @@
+\hypertarget{exp4__props_8h}{}\section{exponential\+\_\+integrators/exp4/exp4\+\_\+props.h File Reference}
+\label{exp4__props_8h}\index{exponential\+\_\+integrators/exp4/exp4\+\_\+props.\+h@{exponential\+\_\+integrators/exp4/exp4\+\_\+props.\+h}}
+
+
+Various macros controlling behaviour of E\+X\+P4 algorithm.  
+
+
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+Include dependency graph for exp4\+\_\+props.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{exp4__props_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{exp4__props_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceexp4}{exp4}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{exp4__props_8h_a2748566f4c443ee77aa831e63dbb5ebe}{P}~1
+\begin{DoxyCompactList}\small\item\em max order of the phi functions (for error estimation) \end{DoxyCompactList}\item 
+\#define \hyperlink{exp4__props_8h_ac5232262b17b940a7b54e6e56439aa24}{O\+RD}~3.\+0
+\begin{DoxyCompactList}\small\item\em order of embedded methods \end{DoxyCompactList}\item 
+\#define \hyperlink{exp4__props_8h_a61819141b0164a35f4d791b0e696721f}{M\+\_\+\+M\+AX}~N\+SP
+\begin{DoxyCompactList}\small\item\em maximum Krylov dimension (without phi order) \end{DoxyCompactList}\item 
+\#define \hyperlink{exp4__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE}~(\hyperlink{exprb43__props_8h_a61819141b0164a35f4d791b0e696721f}{M\+\_\+\+M\+AX} + \hyperlink{exprb43__props_8h_a2748566f4c443ee77aa831e63dbb5ebe}{P})
+\begin{DoxyCompactList}\small\item\em Krylov matrix stride. \end{DoxyCompactList}\item 
+\#define \hyperlink{exp4__props_8h_aa0414caef00a64a51d4c6c0711d9e70a}{M\+A\+X\+\_\+\+S\+T\+E\+PS}~(100000)
+\begin{DoxyCompactList}\small\item\em Maximum allowed internal timesteps per integration step. \end{DoxyCompactList}\item 
+\#define \hyperlink{exp4__props_8h_a0f51553c710580b9899756f7ad472c93}{M\+A\+X\+\_\+\+C\+O\+N\+S\+E\+C\+U\+T\+I\+V\+E\+\_\+\+E\+R\+R\+O\+RS}~(5)
+\begin{DoxyCompactList}\small\item\em Number of consecutive errors on internal integration steps allowed before exit. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__exp4__ErrCodes_gabd83bc0f9f475a2189a4db4a08b790ca}{E\+C\+\_\+success}~(0)
+\begin{DoxyCompactList}\small\item\em Successful integration step. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__exp4__ErrCodes_gae0287841c08f86f5709660fd731615ad}{E\+C\+\_\+consecutive\+\_\+steps}~(1)
+\begin{DoxyCompactList}\small\item\em Maximum consecutive errors on internal integration steps reached. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__exp4__ErrCodes_ga0f0275d9851ab5c19b79a963d5084df3}{E\+C\+\_\+max\+\_\+steps\+\_\+exceeded}~(2)
+\begin{DoxyCompactList}\small\item\em Maximum number of internal integration steps reached. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__exp4__ErrCodes_ga9326efd544880e2683c4453365ca2704}{E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h}~(3)
+\begin{DoxyCompactList}\small\item\em Timestep reduced such that update would have no effect on simulation time. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Various macros controlling behaviour of E\+X\+P4 algorithm. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}
+
+
+\subsection{Macro Definition Documentation}
+\index{exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}!M\+\_\+\+M\+AX@{M\+\_\+\+M\+AX}}
+\index{M\+\_\+\+M\+AX@{M\+\_\+\+M\+AX}!exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}}
+\subsubsection[{\texorpdfstring{M\+\_\+\+M\+AX}{M_MAX}}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+\_\+\+M\+AX~N\+SP}\hypertarget{exp4__props_8h_a61819141b0164a35f4d791b0e696721f}{}\label{exp4__props_8h_a61819141b0164a35f4d791b0e696721f}
+
+
+maximum Krylov dimension (without phi order) 
+
+\index{exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}!M\+A\+X\+\_\+\+C\+O\+N\+S\+E\+C\+U\+T\+I\+V\+E\+\_\+\+E\+R\+R\+O\+RS@{M\+A\+X\+\_\+\+C\+O\+N\+S\+E\+C\+U\+T\+I\+V\+E\+\_\+\+E\+R\+R\+O\+RS}}
+\index{M\+A\+X\+\_\+\+C\+O\+N\+S\+E\+C\+U\+T\+I\+V\+E\+\_\+\+E\+R\+R\+O\+RS@{M\+A\+X\+\_\+\+C\+O\+N\+S\+E\+C\+U\+T\+I\+V\+E\+\_\+\+E\+R\+R\+O\+RS}!exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}}
+\subsubsection[{\texorpdfstring{M\+A\+X\+\_\+\+C\+O\+N\+S\+E\+C\+U\+T\+I\+V\+E\+\_\+\+E\+R\+R\+O\+RS}{MAX_CONSECUTIVE_ERRORS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+X\+\_\+\+C\+O\+N\+S\+E\+C\+U\+T\+I\+V\+E\+\_\+\+E\+R\+R\+O\+RS~(5)}\hypertarget{exp4__props_8h_a0f51553c710580b9899756f7ad472c93}{}\label{exp4__props_8h_a0f51553c710580b9899756f7ad472c93}
+
+
+Number of consecutive errors on internal integration steps allowed before exit. 
+
+\index{exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}!M\+A\+X\+\_\+\+S\+T\+E\+PS@{M\+A\+X\+\_\+\+S\+T\+E\+PS}}
+\index{M\+A\+X\+\_\+\+S\+T\+E\+PS@{M\+A\+X\+\_\+\+S\+T\+E\+PS}!exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}}
+\subsubsection[{\texorpdfstring{M\+A\+X\+\_\+\+S\+T\+E\+PS}{MAX_STEPS}}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+X\+\_\+\+S\+T\+E\+PS~(100000)}\hypertarget{exp4__props_8h_aa0414caef00a64a51d4c6c0711d9e70a}{}\label{exp4__props_8h_aa0414caef00a64a51d4c6c0711d9e70a}
+
+
+Maximum allowed internal timesteps per integration step. 
+
+\index{exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}!O\+RD@{O\+RD}}
+\index{O\+RD@{O\+RD}!exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}}
+\subsubsection[{\texorpdfstring{O\+RD}{ORD}}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+RD~3.\+0}\hypertarget{exp4__props_8h_ac5232262b17b940a7b54e6e56439aa24}{}\label{exp4__props_8h_ac5232262b17b940a7b54e6e56439aa24}
+
+
+order of embedded methods 
+
+\index{exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}!P@{P}}
+\index{P@{P}!exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}}
+\subsubsection[{\texorpdfstring{P}{P}}]{\setlength{\rightskip}{0pt plus 5cm}\#define P~1}\hypertarget{exp4__props_8h_a2748566f4c443ee77aa831e63dbb5ebe}{}\label{exp4__props_8h_a2748566f4c443ee77aa831e63dbb5ebe}
+
+
+max order of the phi functions (for error estimation) 
+
+\index{exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}!S\+T\+R\+I\+DE@{S\+T\+R\+I\+DE}}
+\index{S\+T\+R\+I\+DE@{S\+T\+R\+I\+DE}!exp4\+\_\+props.\+h@{exp4\+\_\+props.\+h}}
+\subsubsection[{\texorpdfstring{S\+T\+R\+I\+DE}{STRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+T\+R\+I\+DE~({\bf M\+\_\+\+M\+AX} + {\bf P})}\hypertarget{exp4__props_8h_a351d54267048643c4365f6a24641d0cf}{}\label{exp4__props_8h_a351d54267048643c4365f6a24641d0cf}
+
+
+Krylov matrix stride. 
+

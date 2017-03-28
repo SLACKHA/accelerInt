@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['atol',['ATOL',['../solver__options_8cuh.html#a29a15cd00b37b1f4a5b4ec9f07c742f4',1,'ATOL():&#160;solver_options.cuh'],['../solver__options_8h.html#a29a15cd00b37b1f4a5b4ec9f07c742f4',1,'ATOL():&#160;solver_options.h']]]
+  ['_5f_5fuse_5fbsd',['__USE_BSD',['../timer_8h.html#a564ea801faec77e3835f72bc584e3969',1,'timer.h']]]
 ];

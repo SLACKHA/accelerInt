@@ -1,0 +1,82 @@
+\hypertarget{inverse_8cu}{}\section{generic/inverse.cu File Reference}
+\label{inverse_8cu}\index{generic/inverse.\+cu@{generic/inverse.\+cu}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$float.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
+Include dependency graph for inverse.\+cu\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{inverse_8cu__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{inverse_8cu_a7b3d468c8500704ef2452f40b23810bb}{get\+Max} (const int n, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Arr)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale} (const int n, const double val, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrX)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{inverse_8cu_adac70ba85b61598b9fcee8a381eed708}{swap} (const int n, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrX, const int incX, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrY, const int incY)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{inverse_8cu_a8dbfcd45123f24c8d64e2049ae2782fe}{G\+E\+RU} (const int n, const double alpha, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrX, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrY, const int incY, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const int lda)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{inverse_8cu_a25bf32c703aa4b2a43131df214ee0375}{get\+LU} (const int n, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{inverse.\+cu@{inverse.\+cu}!G\+E\+RU@{G\+E\+RU}}
+\index{G\+E\+RU@{G\+E\+RU}!inverse.\+cu@{inverse.\+cu}}
+\subsubsection[{\texorpdfstring{G\+E\+R\+U(const int n, const double alpha, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+X, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+Y, const int inc\+Y, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const int lda)}{GERU(const int n, const double alpha, const double *__restrict__ arrX, const double *__restrict__ arrY, const int incY, double *__restrict__ A, const int lda)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void G\+E\+RU (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{const double}]{alpha, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrX, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrY, }
+\item[{const int}]{incY, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const int}]{lda}
+\end{DoxyParamCaption}
+)}\hypertarget{inverse_8cu_a8dbfcd45123f24c8d64e2049ae2782fe}{}\label{inverse_8cu_a8dbfcd45123f24c8d64e2049ae2782fe}
+\index{inverse.\+cu@{inverse.\+cu}!get\+LU@{get\+LU}}
+\index{get\+LU@{get\+LU}!inverse.\+cu@{inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+L\+U(const int n, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)}{getLU(const int n, double *__restrict__ A, int *__restrict__ indPivot, int *__restrict__ info)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+LU (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{ind\+Pivot, }
+\item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{info}
+\end{DoxyParamCaption}
+)}\hypertarget{inverse_8cu_a25bf32c703aa4b2a43131df214ee0375}{}\label{inverse_8cu_a25bf32c703aa4b2a43131df214ee0375}
+\index{inverse.\+cu@{inverse.\+cu}!get\+Max@{get\+Max}}
+\index{get\+Max@{get\+Max}!inverse.\+cu@{inverse.\+cu}}
+\subsubsection[{\texorpdfstring{get\+Max(const int n, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Arr)}{getMax(const int n, const double *__restrict__ Arr)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int get\+Max (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Arr}
+\end{DoxyParamCaption}
+)}\hypertarget{inverse_8cu_a7b3d468c8500704ef2452f40b23810bb}{}\label{inverse_8cu_a7b3d468c8500704ef2452f40b23810bb}
+\index{inverse.\+cu@{inverse.\+cu}!scale@{scale}}
+\index{scale@{scale}!inverse.\+cu@{inverse.\+cu}}
+\subsubsection[{\texorpdfstring{scale(const int n, const double val, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+X)}{scale(const int n, const double val, double *__restrict__ arrX)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{const double}]{val, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrX}
+\end{DoxyParamCaption}
+)}\hypertarget{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{}\label{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}
+\index{inverse.\+cu@{inverse.\+cu}!swap@{swap}}
+\index{swap@{swap}!inverse.\+cu@{inverse.\+cu}}
+\subsubsection[{\texorpdfstring{swap(const int n, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+X, const int inc\+X, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+Y, const int inc\+Y)}{swap(const int n, double *__restrict__ arrX, const int incX, double *__restrict__ arrY, const int incY)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void swap (
+\begin{DoxyParamCaption}
+\item[{const int}]{n, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrX, }
+\item[{const int}]{incX, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrY, }
+\item[{const int}]{incY}
+\end{DoxyParamCaption}
+)}\hypertarget{inverse_8cu_adac70ba85b61598b9fcee8a381eed708}{}\label{inverse_8cu_adac70ba85b61598b9fcee8a381eed708}

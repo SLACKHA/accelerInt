@@ -1,0 +1,88 @@
+\hypertarget{solver_8h}{}\section{generic/solver.h File Reference}
+\label{solver_8h}\index{generic/solver.\+h@{generic/solver.\+h}}
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+init.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+h\char`\"{}}\\*
+Include dependency graph for solver.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{solver_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{solver_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{solver_8h_a68bf42894bc3d748ef9d7e54e4ba4d30}{int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)
+\item 
+int \hyperlink{solver_8h_a01c536019d80bd2cbfe04acfa0c68db1}{integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
+\begin{DoxyCompactList}\small\item\em 4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{solver.\+h@{solver.\+h}!int\+Driver@{int\+Driver}}
+\index{int\+Driver@{int\+Driver}!solver.\+h@{solver.\+h}}
+\subsubsection[{\texorpdfstring{int\+Driver(const int N\+U\+M, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)}{intDriver(const int NUM, const double t, const double t_end, const double *pr_global, double *y_global)}}]{\setlength{\rightskip}{0pt plus 5cm}void int\+Driver (
+\begin{DoxyParamCaption}
+\item[{const int}]{N\+UM, }
+\item[{const double}]{t, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double $\ast$}]{pr\+\_\+global, }
+\item[{double $\ast$}]{y\+\_\+global}
+\end{DoxyParamCaption}
+)}\hypertarget{solver_8h_a68bf42894bc3d748ef9d7e54e4ba4d30}{}\label{solver_8h_a68bf42894bc3d748ef9d7e54e4ba4d30}
+\index{solver.\+h@{solver.\+h}!integrate@{integrate}}
+\index{integrate@{integrate}!solver.\+h@{solver.\+h}}
+\subsubsection[{\texorpdfstring{integrate(const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)}{integrate(const double t_start, const double t_end, const double pr, double *y)}}]{\setlength{\rightskip}{0pt plus 5cm}int integrate (
+\begin{DoxyParamCaption}
+\item[{const double}]{t\+\_\+start, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double}]{pr, }
+\item[{double $\ast$}]{y}
+\end{DoxyParamCaption}
+)}\hypertarget{solver_8h_a01c536019d80bd2cbfe04acfa0c68db1}{}\label{solver_8h_a01c536019d80bd2cbfe04acfa0c68db1}
+
+
+4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation 
+
+
+\begin{DoxyParams}{Parameters}
+{\em t\+\_\+start} & The initial integration time \\
+\hline
+{\em t\+\_\+end} & The final integration timestep \\
+\hline
+{\em pr} & User data passed to the R\+HS function dydt() -\/ commonly used for the Pressure term \\
+\hline
+{\em y} & The state vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The result of this integration step 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__exp4__ErrCodes}{Return codes of E\+X\+P4 integrator}
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em t\+\_\+start} & The initial integration time \\
+\hline
+{\em t\+\_\+end} & The final integration timestep \\
+\hline
+{\em pr} & User data passed to the R\+HS function dydt() -\/ commonly used for the Pressure term \\
+\hline
+{\em y} & The state vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The result of this integration step 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__exprb43__ErrCodes}{Return codes of E\+X\+P\+R\+B43 integrator} 
+\end{DoxySeeAlso}

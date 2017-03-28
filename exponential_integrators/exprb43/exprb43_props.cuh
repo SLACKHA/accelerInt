@@ -1,6 +1,6 @@
-/*rb43_props.cuh
- *Various macros controlling behaviour of RB43 algorithm
- * \file rb43_props.cuh
+/*!
+ * \file exprb43_props.cuh
+ * \brief Various macros controlling behaviour of RB43 algorithm
  * \author Nicholas Curtis
  * \date 03/10/2015
  */
@@ -12,36 +12,63 @@
 #include <cuComplex.h>
 #include <stdio.h>
 
+#ifdef GENERATE_DOCS
+namespace exprb43cu {
+#endif
+
+
 //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 //#define USE_SMOOTHED_ERROR
-//max order of the phi functions (i.e. for error estimation)
+ //! max order of the phi functions (for error estimation)
 #define P 4
-//order of embedded methods
+//! order of embedded methods
 #define ORD 3.0
+//! maximum Krylov dimension (without phi order)
 #define M_MAX NSP
+//! Krylov matrix stride
 #define STRIDE (M_MAX + P)
+//! Maximum allowed internal timesteps per integration step
 #define MAX_STEPS (100000)
+//! Number of consecutive errors on internal integration steps allowed before exit
+#define MAX_CONSECUTIVE_ERRORS (5)
 
 struct solver_memory
 {
-	double* sc;
-	double* work1;
-	double* work2;
-	double* work3;
-	double* gy;
-	double* Hm;
-	double* phiHm;
-	double* Vm;
-	double* savedActions;
-	int* ipiv;
-	cuDoubleComplex* invA;
-	cuDoubleComplex* work4;
-	int* result;
+	double* sc; /// the scaled error coefficients
+	double* work1; /// a work array
+	double* work2; /// a work array
+	double* work3; /// a work array
+	double* gy; /// The difference between RHS function and the Jacobian state vector product
+	double* Hm; /// The Hessenberg Kyrlov subspace array for EXP4, to take the exponential action on
+	double* phiHm; /// the exponential Krylov subspace array for EXP4
+	double* Vm; /// the Arnoldi basis array
+	double* savedActions; /// Saved stage results
+	int* ipiv; /// the pivot indicies
+	cuDoubleComplex* invA; /// the inverse of the Hessenberg Krylov subspace
+	cuDoubleComplex* work4;  /// a (complex) work array
+	int* result; /// an array of integration results for the various threads @see exprb43cu_ErrCodes
 };
 
+/**
+ * \defgroup exprb43cu_ErrCodes Return codes of GPU EXP4 integrator
+ * @{
+ */
+
+//! Successful integration step
 #define EC_success (0)
+//! Maximum consecutive errors on internal integration steps reached
 #define EC_consecutive_steps (1)
+//! Maximum number of internal integration steps reached
 #define EC_max_steps_exceeded (2)
+//! Timestep reduced such that update would have no effect on simulation time
 #define EC_h_plus_t_equals_h (3)
+
+/**
+ * @}
+ */
+
+#ifdef GENERATE_DOCS
+}
+#endif
 
 #endif

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['t_5fstep',['t_step',['../solver__options_8cuh.html#aaeb7127cf3bf0b49cec6554fbc101866',1,'t_step():&#160;solver_options.cuh'],['../solver__options_8h.html#aaeb7127cf3bf0b49cec6554fbc101866',1,'t_step():&#160;solver_options.h']]]
+  ['ord',['ORD',['../exp4__props_8cuh.html#ac5232262b17b940a7b54e6e56439aa24',1,'ORD():&#160;exp4_props.cuh'],['../exp4__props_8h.html#ac5232262b17b940a7b54e6e56439aa24',1,'ORD():&#160;exp4_props.h'],['../exprb43__props_8cuh.html#ac5232262b17b940a7b54e6e56439aa24',1,'ORD():&#160;exprb43_props.cuh'],['../exprb43__props_8h.html#ac5232262b17b940a7b54e6e56439aa24',1,'ORD():&#160;exprb43_props.h']]]
 ];

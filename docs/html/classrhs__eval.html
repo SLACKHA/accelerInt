@@ -39,6 +39,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -63,6 +65,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -88,16 +91,107 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">rhs_eval Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="rk78__typedefs_8hpp_source.html">rk78_typedefs.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a4709425816e20b17c467282c9a63c6e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4709425816e20b17c467282c9a63c6e5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_state_var</b> (const double state_var)</td></tr>
+<tr class="memitem:a457069bbd6d8c484e63e65a9b1df9c13"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrhs__eval.html#a457069bbd6d8c484e63e65a9b1df9c13">rhs_eval</a> ()</td></tr>
+<tr class="separator:a457069bbd6d8c484e63e65a9b1df9c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4709425816e20b17c467282c9a63c6e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrhs__eval.html#a4709425816e20b17c467282c9a63c6e5">set_state_var</a> (const double state_var)</td></tr>
 <tr class="separator:a4709425816e20b17c467282c9a63c6e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91da050fdbf05036fb833dbae1248e15"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a91da050fdbf05036fb833dbae1248e15"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>operator()</b> (const state_type &amp;y, state_type &amp;fy, const double t) const </td></tr>
+<tr class="memitem:a91da050fdbf05036fb833dbae1248e15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrhs__eval.html#a91da050fdbf05036fb833dbae1248e15">operator()</a> (const <a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a> &amp;y, <a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a> &amp;fy, const double t) const </td></tr>
 <tr class="separator:a91da050fdbf05036fb833dbae1248e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a457069bbd6d8c484e63e65a9b1df9c13"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">rhs_eval::rhs_eval </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a91da050fdbf05036fb833dbae1248e15"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void rhs_eval::operator() </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>fy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>t</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4709425816e20b17c467282c9a63c6e5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void rhs_eval::set_state_var </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>state_var</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>rk78/<a class="el" href="rk78__typedefs_8hpp_source.html">rk78_typedefs.hpp</a></li>
 </ul>

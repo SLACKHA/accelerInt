@@ -1,0 +1,143 @@
+\hypertarget{namespaceexprb43}{}\section{exprb43 Namespace Reference}
+\label{namespaceexprb43}\index{exprb43@{exprb43}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespaceexprb43_a67d60af836938be17821d7ca32fa31fa}{integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
+\begin{DoxyCompactList}\small\item\em 4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43_adb214180d920bd67592be89b6264aa90}{init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43_ad02d94a3cc25e03cf47a6903559f4262}{solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43_a923d03974bd3461619b71ac8fb34abd8}{initialize\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods. \end{DoxyCompactList}\item 
+const char $\ast$ \hyperlink{namespaceexprb43_a5357a692b80a08edee50c4073763422b}{solver\+\_\+name} ()
+\begin{DoxyCompactList}\small\item\em Returns the E\+X\+P\+R\+B43 solver name. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43_ad7bbc3b8b5f2627e89908cdec0750523}{cleanup\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Cleans up the created C\+V\+O\+DE solvers. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43_aa165b73c13e21b53f0713c4c5ec5fd7c}{check\+\_\+error} (int tid, int code)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Include common code. 
+
+\subsection{Function Documentation}
+\index{exprb43@{exprb43}!check\+\_\+error@{check\+\_\+error}}
+\index{check\+\_\+error@{check\+\_\+error}!exprb43@{exprb43}}
+\subsubsection[{\texorpdfstring{check\+\_\+error(int tid, int code)}{check_error(int tid, int code)}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43\+::check\+\_\+error (
+\begin{DoxyParamCaption}
+\item[{int}]{tid, }
+\item[{int}]{code}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexprb43_aa165b73c13e21b53f0713c4c5ec5fd7c}{}\label{namespaceexprb43_aa165b73c13e21b53f0713c4c5ec5fd7c}
+/fn void \hyperlink{namespaceexprb43_aa165b73c13e21b53f0713c4c5ec5fd7c}{check\+\_\+error(int tid, int code)} /brief Checks the return code of the given thread (I\+VP) for an error, and exits if found /param tid The thread (I\+VP) index /param code The return code of the thread \begin{DoxySeeAlso}{See also}
+\hyperlink{group__exprb43__ErrCodes}{Return codes of E\+X\+P\+R\+B43 integrator} 
+\end{DoxySeeAlso}
+\index{exprb43@{exprb43}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
+\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!exprb43@{exprb43}}
+\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(int num\+\_\+threads)}{cleanup_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43\+::cleanup\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexprb43_ad7bbc3b8b5f2627e89908cdec0750523}{}\label{namespaceexprb43_ad7bbc3b8b5f2627e89908cdec0750523}
+
+
+Cleans up the created C\+V\+O\+DE solvers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads to use (and C\+V\+O\+DE solver objects to destroy)\\
+\hline
+\end{DoxyParams}
+Frees and cleans up allocated C\+V\+O\+DE memory. \index{exprb43@{exprb43}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!exprb43@{exprb43}}
+\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}exprb43\+::init\+\_\+solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexprb43_adb214180d920bd67592be89b6264aa90}{}\label{namespaceexprb43_adb214180d920bd67592be89b6264aa90}
+
+
+Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\end{DoxySeeAlso}
+\index{exprb43@{exprb43}!initialize\+\_\+solver@{initialize\+\_\+solver}}
+\index{initialize\+\_\+solver@{initialize\+\_\+solver}!exprb43@{exprb43}}
+\subsubsection[{\texorpdfstring{initialize\+\_\+solver(int num\+\_\+threads)}{initialize_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43\+::initialize\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexprb43_a923d03974bd3461619b71ac8fb34abd8}{}\label{namespaceexprb43_a923d03974bd3461619b71ac8fb34abd8}
+
+
+Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods. 
+
+Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads.
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & Unused \\
+\hline
+\end{DoxyParams}
+\index{exprb43@{exprb43}!integrate@{integrate}}
+\index{integrate@{integrate}!exprb43@{exprb43}}
+\subsubsection[{\texorpdfstring{integrate(const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)}{integrate(const double t_start, const double t_end, const double pr, double *y)}}]{\setlength{\rightskip}{0pt plus 5cm}int exprb43\+::integrate (
+\begin{DoxyParamCaption}
+\item[{const double}]{t\+\_\+start, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double}]{pr, }
+\item[{double $\ast$}]{y}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexprb43_a67d60af836938be17821d7ca32fa31fa}{}\label{namespaceexprb43_a67d60af836938be17821d7ca32fa31fa}
+
+
+4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation 
+
+
+\begin{DoxyParams}{Parameters}
+{\em t\+\_\+start} & The initial integration time \\
+\hline
+{\em t\+\_\+end} & The final integration timestep \\
+\hline
+{\em pr} & User data passed to the R\+HS function dydt() -\/ commonly used for the Pressure term \\
+\hline
+{\em y} & The state vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The result of this integration step 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__exprb43__ErrCodes}{Return codes of E\+X\+P\+R\+B43 integrator} 
+\end{DoxySeeAlso}
+\index{exprb43@{exprb43}!solver\+\_\+log@{solver\+\_\+log}}
+\index{solver\+\_\+log@{solver\+\_\+log}!exprb43@{exprb43}}
+\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43\+::solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexprb43_ad02d94a3cc25e03cf47a6903559f4262}{}\label{namespaceexprb43_ad02d94a3cc25e03cf47a6903559f4262}
+
+
+Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\end{DoxySeeAlso}
+\index{exprb43@{exprb43}!solver\+\_\+name@{solver\+\_\+name}}
+\index{solver\+\_\+name@{solver\+\_\+name}!exprb43@{exprb43}}
+\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ exprb43\+::solver\+\_\+name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexprb43_a5357a692b80a08edee50c4073763422b}{}\label{namespaceexprb43_a5357a692b80a08edee50c4073763422b}
+
+
+Returns the E\+X\+P\+R\+B43 solver name. 
+
+Returns the C\+V\+O\+DE solver name.
+
+Returns a descriptive solver name for the E\+X\+P\+R\+B43 solver 

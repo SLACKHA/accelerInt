@@ -1,5 +1,24 @@
+/*!
+ * \file exprb43_props.c
+ *
+ * \author Nicholas J. Curtis
+ * \date 09/02/2014
+ *
+ * \brief Contains error checking for EXPRB43 return codes
+ */
+
 #include "exprb43_props.h"
 
+#ifdef GENERATE_DOCS
+namespace exprb43 {
+#endif
+
+/*! /fn void check_error(int tid, int code)
+	/brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	/param tid The thread (IVP) index
+	/param code The return code of the thread
+	@see exprb43_ErrCodes
+ */
 void check_error(int tid, int code)
 {
 	switch(code)
@@ -18,3 +37,7 @@ void check_error(int tid, int code)
 			exit(code);
 	}
 }
+
+#ifdef GENERATE_DOCS
+}
+#endif
