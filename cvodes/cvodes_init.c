@@ -1,6 +1,5 @@
-/* rb43_init.cu
-*  Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
- * \file rb43_init.cu
+/*! \file cvodes_init.c
+ *  \brief Implementation of the necessary initialization for the CVODE interface
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
@@ -26,6 +25,21 @@
 N_Vector *y_locals;
 double* y_local_vectors;
 void** integrators;
+
+/*! \fn void initialize_solver(int num_threads)
+   \brief Creates/Checks the CVODE solvers for the specified number of threads
+   \param num_threads The number of OpenMP threads to use (and CVODE solver objects to create)
+
+   Various definitions in the generated options (solver_options.h, solver_options.cuh), e.g. FINITE_DIFFERENCE, CV_MAX_ERRTEST_FAILS,
+   etc. affect the options set for the CVODEs solver.
+
+   The RHS function dydt_cvodes() will be used in the solver.
+
+   If FINITE_DIFFERENCE is not defined, the jacobian function in eval_jacob_cvodes
+   will be used in the CVODE solver.  Else, the CVODE finite difference based on the
+   RHS function will be used.
+*/
+
 
  void initialize_solver(int num_threads) {
  	y_locals = (N_Vector*)malloc(num_threads * sizeof(N_Vector));
@@ -136,6 +150,12 @@ void** integrators;
 	}
  }
 
+/*! \fn void cleanup_solver(int num_threads)
+   \brief Cleans up the created CVODE solvers
+   \param num_threads The number of OpenMP threads to use (and CVODE solver objects to destroy)
+
+   Frees and cleans up allocated CVODE memory.
+*/
  void cleanup_solver(int num_threads) {
  	//free the integrators and nvectors
 	for (int i = 0; i < num_threads; i++)
@@ -148,6 +168,12 @@ void** integrators;
 	free(integrators);
  }
 
+/*! \fn char* solver_name()
+   \brief Returns the CVODE solver name
+
+   Returns a descriptive solver name for the CVODE solver, indicating use of
+   Finite Difference Jacobian (or not)
+*/
  const char* solver_name() {
 #ifdef SUNDIALS_ANALYTIC_JACOBIAN
  	const char* name = "cvodes-analytic-int";
@@ -158,8 +184,6 @@ void** integrators;
  }
 
  void init_solver_log() {
- 	
  }
  void solver_log() {
- 	
  }

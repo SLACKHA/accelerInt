@@ -1,0 +1,83 @@
+\hypertarget{cvodes__jac_8h}{}\section{cvodes/cvodes\+\_\+jac.h File Reference}
+\label{cvodes__jac_8h}\index{cvodes/cvodes\+\_\+jac.\+h@{cvodes/cvodes\+\_\+jac.\+h}}
+
+
+A simple wrapper, allowing for use of the analytical jacobian w/ C\+V\+O\+D\+ES.  
+
+
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sundials/sundials\+\_\+nvector.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sundials/sundials\+\_\+direct.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}nvector/nvector\+\_\+serial.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}jacob.\+h\char`\"{}}\\*
+Include dependency graph for cvodes\+\_\+jac.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cvodes__jac_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{cvodes__jac_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{cvodes__jac_8h_ace0ee8931b5755b80309735167af0b86}{eval\+\_\+jacob\+\_\+cvodes} (long int N, double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, Dls\+Mat Jac, void $\ast$f, N\+\_\+\+Vector tmp1, N\+\_\+\+Vector tmp2, N\+\_\+\+Vector tmp3)
+\begin{DoxyCompactList}\small\item\em The C\+V\+O\+D\+Es Jacobian interface for a direct dense Jacobian. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A simple wrapper, allowing for use of the analytical jacobian w/ C\+V\+O\+D\+ES. 
+
+
+
+\subsection{Function Documentation}
+\index{cvodes\+\_\+jac.\+h@{cvodes\+\_\+jac.\+h}!eval\+\_\+jacob\+\_\+cvodes@{eval\+\_\+jacob\+\_\+cvodes}}
+\index{eval\+\_\+jacob\+\_\+cvodes@{eval\+\_\+jacob\+\_\+cvodes}!cvodes\+\_\+jac.\+h@{cvodes\+\_\+jac.\+h}}
+\subsubsection[{\texorpdfstring{eval\+\_\+jacob\+\_\+cvodes(long int N, double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, Dls\+Mat Jac, void $\ast$f, N\+\_\+\+Vector tmp1, N\+\_\+\+Vector tmp2, N\+\_\+\+Vector tmp3)}{eval_jacob_cvodes(long int N, double t, N_Vector y, N_Vector ydot, DlsMat Jac, void *f, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)}}]{\setlength{\rightskip}{0pt plus 5cm}int eval\+\_\+jacob\+\_\+cvodes (
+\begin{DoxyParamCaption}
+\item[{long int}]{N, }
+\item[{double}]{t, }
+\item[{N\+\_\+\+Vector}]{y, }
+\item[{N\+\_\+\+Vector}]{ydot, }
+\item[{Dls\+Mat}]{jac, }
+\item[{void $\ast$}]{f, }
+\item[{N\+\_\+\+Vector}]{tmp1, }
+\item[{N\+\_\+\+Vector}]{tmp2, }
+\item[{N\+\_\+\+Vector}]{tmp3}
+\end{DoxyParamCaption}
+)}\hypertarget{cvodes__jac_8h_ace0ee8931b5755b80309735167af0b86}{}\label{cvodes__jac_8h_ace0ee8931b5755b80309735167af0b86}
+
+
+The C\+V\+O\+D\+Es Jacobian interface for a direct dense Jacobian. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N} & the problem size \\
+\hline
+{\em t} & The current time of the system \\
+\hline
+{\em y} & The current state vector (in C\+V\+O\+DE format) \\
+\hline
+{\em ydot} & The R\+HS vector to be populated (in C\+V\+O\+DE format) \\
+\hline
+{\em jac} & The Jacobian matrix (in C\+V\+O\+DE format) to output to \\
+\hline
+{\em f} & User data set during C\+V\+O\+D\+Es setup (e.\+g. the system pressure) \\
+\hline
+{\em tmp1} & Temporary storage used by C\+V\+O\+D\+Es \\
+\hline
+{\em tmp2} & Temporary storage used by C\+V\+O\+D\+Es \\
+\hline
+{\em tmp3} & Temporary storage used by C\+V\+O\+D\+Es \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+cvode\+\_\+return\+\_\+code The C\+V\+O\+DE output constant returned (see sec B.\+2 of C\+V\+O\+DE documentation), currently always returns C\+V\+\_\+\+S\+U\+C\+C\+E\+SS
+\end{DoxyReturn}
+This function converts the N\+\_\+\+Vectors {\ttfamily y} and {\ttfamily y\+\_\+dot} to simple double pointers, the user data {\ttfamily f} to a double and outputs the Jacobian supplied by {\ttfamily eval\+\_\+jacob} to the C\+V\+O\+DE jacobian {\ttfamily jac} Currently, C\+V\+\_\+\+S\+U\+C\+C\+E\+SS is always returned. 

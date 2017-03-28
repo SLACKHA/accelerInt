@@ -372,7 +372,7 @@ def write_options(lang, dir):
         #define CV_MAX_HNIL (1) //maximum number of t + h = t warnings
         #define CV_MAX_ERRTEST_FAILS (5) //maximum number of error test fails before an error is thrown
         """.format(env['CV_MAX_STEPS'],
-            '//#define CV_HMAX (0)' if env['CV_HMAX'] == '0' else 
+            '//#define CV_HMAX (0)' if env['CV_HMAX'] == '0' else
             '#define CV_HMAX ({})'.format(env['CV_HMAX'])))
 
         if env['SAME_IC']:
@@ -418,7 +418,7 @@ def write_options(lang, dir):
         //turn on to log the krylov space and step sizes
         #define LOG_KRYLOV_AND_STEPSIZES
         """)
-        
+
         if env['LOG_END_ONLY']:
                 file.write("""
         //used to only log output on end step

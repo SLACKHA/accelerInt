@@ -1,0 +1,381 @@
+\hypertarget{radau2a_8cu}{}\section{radau2a/radau2a.cu File Reference}
+\label{radau2a_8cu}\index{radau2a/radau2a.\+cu@{radau2a/radau2a.\+cu}}
+{\ttfamily \#include $<$cu\+Complex.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}inverse.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}complex\+Inverse.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}jacob.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}dydt.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}gpu\+\_\+macros.\+cuh\char`\"{}}\\*
+Include dependency graph for radau2a.\+cu\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{radau2a_8cu__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bfseries A\+NY}(X)~((X))\hypertarget{radau2a_8cu_a1fb079c51babe820cd76885d3c519446}{}\label{radau2a_8cu_a1fb079c51babe820cd76885d3c519446}
+
+\item 
+\#define {\bfseries A\+LL}(X)~((X))\hypertarget{radau2a_8cu_ada568356af1dada57942e4b6e5d271b0}{}\label{radau2a_8cu_ada568356af1dada57942e4b6e5d271b0}
+
+\item 
+\#define {\bfseries Max\+\_\+no\+\_\+steps}~(200000)\hypertarget{radau2a_8cu_a4f5652e996f678da1b1b93c8aa4a7961}{}\label{radau2a_8cu_a4f5652e996f678da1b1b93c8aa4a7961}
+
+\item 
+\#define {\bfseries Newton\+Maxit}~(8)\hypertarget{radau2a_8cu_ab408861ee5149b85ac129cb8a3875743}{}\label{radau2a_8cu_ab408861ee5149b85ac129cb8a3875743}
+
+\item 
+\#define {\bfseries Start\+Newton}~(true)\hypertarget{radau2a_8cu_aa9c48bc3c2002ed4e6792dd7f526d783}{}\label{radau2a_8cu_aa9c48bc3c2002ed4e6792dd7f526d783}
+
+\item 
+\#define {\bfseries Gustafsson}\hypertarget{radau2a_8cu_a619cdc11d911799dd674458eb84dc349}{}\label{radau2a_8cu_a619cdc11d911799dd674458eb84dc349}
+
+\item 
+\#define {\bfseries Roundoff}~(\hyperlink{solver__options_8h_a6ebf6899d6c1c8b7b9d09be872c05aae}{E\+PS})\hypertarget{radau2a_8cu_a0628e9521e9961c49b173765f9d815d3}{}\label{radau2a_8cu_a0628e9521e9961c49b173765f9d815d3}
+
+\item 
+\#define {\bfseries Fac\+Min}~(0.\+2)\hypertarget{radau2a_8cu_a2709085ffea146cba50846d860f7d945}{}\label{radau2a_8cu_a2709085ffea146cba50846d860f7d945}
+
+\item 
+\#define {\bfseries Fac\+Max}~(8)\hypertarget{radau2a_8cu_a3ae724566d10e7ae2a48e1d340d6937b}{}\label{radau2a_8cu_a3ae724566d10e7ae2a48e1d340d6937b}
+
+\item 
+\#define {\bfseries Fac\+Safe}~(0.\+9)\hypertarget{radau2a_8cu_a29559e0d6fcf09d76688dbc471b01219}{}\label{radau2a_8cu_a29559e0d6fcf09d76688dbc471b01219}
+
+\item 
+\#define {\bfseries Fac\+Rej}~(0.\+1)\hypertarget{radau2a_8cu_afb5b5659c29086c78a546a078c08238f}{}\label{radau2a_8cu_afb5b5659c29086c78a546a078c08238f}
+
+\item 
+\#define {\bfseries Theta\+Min}~(0.\+001)\hypertarget{radau2a_8cu_a1dea03e748069283de9d62ca81b64e75}{}\label{radau2a_8cu_a1dea03e748069283de9d62ca81b64e75}
+
+\item 
+\#define {\bfseries Newton\+Tol}~(0.\+03)\hypertarget{radau2a_8cu_a5ea658585341bf26e79bbf1ed3497e6f}{}\label{radau2a_8cu_a5ea658585341bf26e79bbf1ed3497e6f}
+
+\item 
+\#define {\bfseries Qmin}~(1.\+0)\hypertarget{radau2a_8cu_ac523cd36edc6fc54a93dfdb10a772bc0}{}\label{radau2a_8cu_ac523cd36edc6fc54a93dfdb10a772bc0}
+
+\item 
+\#define {\bfseries Qmax}~(1.\+2)\hypertarget{radau2a_8cu_afcfd11ffcebe8a32d20dcacebefa7e6f}{}\label{radau2a_8cu_afcfd11ffcebe8a32d20dcacebefa7e6f}
+
+\item 
+\#define {\bfseries U\+N\+R\+O\+LL}~(8)\hypertarget{radau2a_8cu_a870020ccb79b9bf241010e975e029bde}{}\label{radau2a_8cu_a870020ccb79b9bf241010e975e029bde}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale} (double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{radau2a_8cu_a27a28cde87f3cbaf5f6adb19550a09a0}{scale\+\_\+init} (double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries safe\+\_\+memcpy} (double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ dest, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ source)\hypertarget{radau2a_8cu_a3fe24b23317653f271f22f62bf2fd17f}{}\label{radau2a_8cu_a3fe24b23317653f271f22f62bf2fd17f}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries safe\+\_\+memset3} (double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ dest1, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ dest2, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ dest3, const double val)\hypertarget{radau2a_8cu_a8f00fd7d5d5da97d7faf474fcf545a6a}{}\label{radau2a_8cu_a8f00fd7d5d5da97d7faf474fcf545a6a}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries safe\+\_\+memset} (double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ dest1, const double val)\hypertarget{radau2a_8cu_aacde6c2050e1700429cc99df1cba83df}{}\label{radau2a_8cu_aacde6c2050e1700429cc99df1cba83df}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries safe\+\_\+memset\+\_\+jac} (double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ dest1, const double val)\hypertarget{radau2a_8cu_af04ced8f6b4fa62baf8371338878f408}{}\label{radau2a_8cu_af04ced8f6b4fa62baf8371338878f408}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries R\+K\+\_\+\+Decomp} (double H, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Jac, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)\hypertarget{radau2a_8cu_adbea49bbab9b7a7f94204cc771919860}{}\label{radau2a_8cu_adbea49bbab9b7a7f94204cc771919860}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries R\+K\+\_\+\+Make\+\_\+\+Interpolate} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z1, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z2, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z3, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ C\+O\+NT)\hypertarget{radau2a_8cu_aae1ce6a3507f0f2afcc59b0ffab07ce0}{}\label{radau2a_8cu_aae1ce6a3507f0f2afcc59b0ffab07ce0}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries R\+K\+\_\+\+Interpolate} (double H, double Hold, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z2, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z3, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ C\+O\+NT)\hypertarget{radau2a_8cu_ae7ef583c7c5164839e5ed7d761021679}{}\label{radau2a_8cu_ae7ef583c7c5164839e5ed7d761021679}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries W\+A\+DD} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ X, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Y, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z)\hypertarget{radau2a_8cu_aff01576484bab84fa153493d0aa0833f}{}\label{radau2a_8cu_aff01576484bab84fa153493d0aa0833f}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries D\+A\+X\+P\+Y3} (double D\+A1, double D\+A2, double D\+A3, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ DX, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ D\+Y1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ D\+Y2, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ D\+Y3)\hypertarget{radau2a_8cu_a99527de910c5b79e3543df52bd069a58}{}\label{radau2a_8cu_a99527de910c5b79e3543df52bd069a58}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries R\+K\+\_\+\+Prepare\+R\+HS} (double t, double pr, double H, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Y, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ mech, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ T\+MP, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ F)\hypertarget{radau2a_8cu_ad3700bc56945a6ff0b7bd7251cf86b9d}{}\label{radau2a_8cu_ad3700bc56945a6ff0b7bd7251cf86b9d}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries dlaswp} (double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv)\hypertarget{radau2a_8cu_ac3aa5304e0dad88bd10863e13c287fd5}{}\label{radau2a_8cu_ac3aa5304e0dad88bd10863e13c287fd5}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries dtrsm} (bool upper, bool nounit, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ b)\hypertarget{radau2a_8cu_a8e4331dca6e7adb9838a7cd283f5d8f5}{}\label{radau2a_8cu_a8e4331dca6e7adb9838a7cd283f5d8f5}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries dgetrs} (double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ B, int const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv)\hypertarget{radau2a_8cu_af739b5c0f82fc708026babff87a2853b}{}\label{radau2a_8cu_af739b5c0f82fc708026babff87a2853b}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries zlaswp} (cu\+Double\+Complex $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv)\hypertarget{radau2a_8cu_a6b91937bd4502e4508486bdcf23a8291}{}\label{radau2a_8cu_a6b91937bd4502e4508486bdcf23a8291}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries ztrsm} (bool upper, bool nounit, cu\+Double\+Complex const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, cu\+Double\+Complex $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ b)\hypertarget{radau2a_8cu_a6dc4374e351f792988fe9a880b9262eb}{}\label{radau2a_8cu_a6dc4374e351f792988fe9a880b9262eb}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries zgetrs} (cu\+Double\+Complex $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, cu\+Double\+Complex $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ B, int const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv)\hypertarget{radau2a_8cu_a78d590ae02cdd238f47f5f3060235d90}{}\label{radau2a_8cu_a78d590ae02cdd238f47f5f3060235d90}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void {\bfseries R\+K\+\_\+\+Solve} (const double H, \hyperlink{structsolver__memory}{solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, cu\+Double\+Complex $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ temp)\hypertarget{radau2a_8cu_a8a29dabf1d9ad69f2707d575ffc9f9d3}{}\label{radau2a_8cu_a8a29dabf1d9ad69f2707d575ffc9f9d3}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ double {\bfseries R\+K\+\_\+\+Error\+Norm} (double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ DY)\hypertarget{radau2a_8cu_a52a2afa4e1728f2fb5116ae0c6315568}{}\label{radau2a_8cu_a52a2afa4e1728f2fb5116ae0c6315568}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ double {\bfseries R\+K\+\_\+\+Error\+Estimate} (const double H, const double t, const double pr, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Y, \hyperlink{structsolver__memory}{solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ mech, const bool First\+Step, const bool Reject)\hypertarget{radau2a_8cu_a4b85075dc35ca99e0b06672bb1215ec9}{}\label{radau2a_8cu_a4b85075dc35ca99e0b06672bb1215ec9}
+
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{radau2a_8cu_a0a715eaa118190c4303b137d1a634470}{integrate} (const double t\+\_\+start, const double t\+\_\+end, const double var, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ mech, \hyperlink{structsolver__memory}{solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ solver)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rkA} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rkB} \mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rkC} \mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rk\+Gamma} = 3.\+637834252744495732208418513577775e0\hypertarget{radau2a_8cu_a1fe408f1f4381de0ba7cc7711ece69b3}{}\label{radau2a_8cu_a1fe408f1f4381de0ba7cc7711ece69b3}
+
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rk\+Alpha} = 2.\+681082873627752133895790743211112e0\hypertarget{radau2a_8cu_abcf1cc253cb759bea409e311551ad323}{}\label{radau2a_8cu_abcf1cc253cb759bea409e311551ad323}
+
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rk\+Beta} = 3.\+050430199247410569426377624787569e0\hypertarget{radau2a_8cu_a5b10ed992eb38da8c2514a77f18d6b1f}{}\label{radau2a_8cu_a5b10ed992eb38da8c2514a77f18d6b1f}
+
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rkT} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rk\+Tinv} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rk\+Tinv\+Ainv} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rk\+AinvT} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rkE} \mbox{[}4\mbox{]}
+\item 
+\+\_\+\+\_\+constant\+\_\+\+\_\+ double {\bfseries rk\+E\+LO} = 4\hypertarget{radau2a_8cu_a4a47a5c2b6246610bacf303f65dc5010}{}\label{radau2a_8cu_a4a47a5c2b6246610bacf303f65dc5010}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+Nicholas J. Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/16/2015
+\end{DoxyDate}
+A Radau2A I\+RK implementation for C\+U\+DA Based off the work of Harier and Wanner (1996), and the F\+A\+T\+O\+DE O\+DE integration library
+
+N\+O\+TE\+: all matricies stored in column major format! 
+
+\subsection{Function Documentation}
+\index{radau2a.\+cu@{radau2a.\+cu}!integrate@{integrate}}
+\index{integrate@{integrate}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{integrate(const double t\+\_\+start, const double t\+\_\+end, const double var, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ mech, solver\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ solver)}{integrate(const double t_start, const double t_end, const double var, double *const __restrict__ y, mechanism_memory const *const __restrict__ mech, solver_memory const *const __restrict__ solver)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void integrate (
+\begin{DoxyParamCaption}
+\item[{const double}]{t\+\_\+start, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double}]{var, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y, }
+\item[{mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{mech, }
+\item[{{\bf solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{solver}
+\end{DoxyParamCaption}
+)}\hypertarget{radau2a_8cu_a0a715eaa118190c4303b137d1a634470}{}\label{radau2a_8cu_a0a715eaa118190c4303b137d1a634470}
+5th-\/order Radau2A implementation Non-\/convergence of Newton\+: Theta too large
+
+$\sim$$\sim$$\sim$$>$ Computation of new step size Hnew \index{radau2a.\+cu@{radau2a.\+cu}!scale@{scale}}
+\index{scale@{scale}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{scale(double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)}{scale(double const *const __restrict__ y0, double const *const __restrict__ y, double *const __restrict__ sc)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale (
+\begin{DoxyParamCaption}
+\item[{double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y0, }
+\item[{double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{sc}
+\end{DoxyParamCaption}
+)}\hypertarget{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{}\label{radau2a_8cu_a4fab5866449108992478041d2e51a28c}
+Get scaling for weighted norm
+
+Computes 1.\+0 / (A\+T\+OL + M\+AX($\vert$y0$\vert$, $\vert$y1$\vert$) $\ast$ R\+T\+OL)
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em y0} & values at current timestep \\
+\hline
+\mbox{\tt in}  & {\em y1} & values at next timestep \\
+\hline
+\mbox{\tt out}  & {\em sc} & array of scaling values\\
+\hline
+\end{DoxyParams}
+Get scaling for weighted norm
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em y0} & values at current timestep \\
+\hline
+\mbox{\tt in}  & {\em y1} & values at next timestep \\
+\hline
+\mbox{\tt out}  & {\em sc} & array of scaling values \\
+\hline
+\end{DoxyParams}
+\index{radau2a.\+cu@{radau2a.\+cu}!scale\+\_\+init@{scale\+\_\+init}}
+\index{scale\+\_\+init@{scale\+\_\+init}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{scale\+\_\+init(double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)}{scale_init(double const *const __restrict__ y0, double *const __restrict__ sc)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y0, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{sc}
+\end{DoxyParamCaption}
+)}\hypertarget{radau2a_8cu_a27a28cde87f3cbaf5f6adb19550a09a0}{}\label{radau2a_8cu_a27a28cde87f3cbaf5f6adb19550a09a0}
+Get scaling for weighted norm for the initial timestep (used in krylov process)
+
+Computes 1.\+0 / (A\+T\+OL + $\vert$y1$\vert$ $\ast$ R\+T\+OL)
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em y0} & values at current timestep \\
+\hline
+\mbox{\tt out}  & {\em sc} & array of scaling values\\
+\hline
+\end{DoxyParams}
+Get scaling for weighted norm for the initial timestep (used in krylov process)
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em y0} & values at current timestep \\
+\hline
+\mbox{\tt out}  & {\em sc} & array of scaling values \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Variable Documentation}
+\index{radau2a.\+cu@{radau2a.\+cu}!rkA@{rkA}}
+\index{rkA@{rkA}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rkA}{rkA}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rkA\mbox{[}3\mbox{]}\mbox{[}3\mbox{]}}\hypertarget{radau2a_8cu_a0d840116f693430ce6f2ef4d39a4242e}{}\label{radau2a_8cu_a0d840116f693430ce6f2ef4d39a4242e}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{ \{
+     1.968154772236604258683861429918299e-1,
+    -6.55354258501983881085227825696087e-2,
+     2.377097434822015242040823210718965e-2
+    \}, \{
+     3.944243147390872769974116714584975e-1,
+     2.920734116652284630205027458970589e-1,
+    -4.154875212599793019818600988496743e-2
+    \}, \{
+     3.764030627004672750500754423692808e-1,
+     5.124858261884216138388134465196080e-1,
+     1.111111111111111111111111111111111e-1
+    \}
+\}
+\end{DoxyCode}
+\index{radau2a.\+cu@{radau2a.\+cu}!rk\+AinvT@{rk\+AinvT}}
+\index{rk\+AinvT@{rk\+AinvT}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rk\+AinvT}{rkAinvT}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rk\+AinvT\mbox{[}3\mbox{]}\mbox{[}3\mbox{]}}\hypertarget{radau2a_8cu_a19d86e17b8ed62af599db196b69c1b7a}{}\label{radau2a_8cu_a19d86e17b8ed62af599db196b69c1b7a}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+\{0.3435525649691961614912493915818282e0,
+-0.4703191128473198422370558694426832e0,
+0.3503786597113668965366406634269080e0\},
+\{0.9102338692094599309122768354288852e0,
+1.715425895757991796035292755937326e0,
+0.4040171993145015239277111187301784e0\},
+\{3.637834252744495732208418513577775e0,
+2.681082873627752133895790743211112e0,
+-3.050430199247410569426377624787569e0\}
+\}
+\end{DoxyCode}
+\index{radau2a.\+cu@{radau2a.\+cu}!rkB@{rkB}}
+\index{rkB@{rkB}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rkB}{rkB}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rkB\mbox{[}3\mbox{]}}\hypertarget{radau2a_8cu_af1b7e1e9dccdd6c67471dcc6574bbec9}{}\label{radau2a_8cu_af1b7e1e9dccdd6c67471dcc6574bbec9}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+3.764030627004672750500754423692808e-1,
+5.124858261884216138388134465196080e-1,
+1.111111111111111111111111111111111e-1
+\}
+\end{DoxyCode}
+\index{radau2a.\+cu@{radau2a.\+cu}!rkC@{rkC}}
+\index{rkC@{rkC}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rkC}{rkC}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rkC\mbox{[}3\mbox{]}}\hypertarget{radau2a_8cu_aad43fe540a71483ff469d059a7a2ae47}{}\label{radau2a_8cu_aad43fe540a71483ff469d059a7a2ae47}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+1.550510257216821901802715925294109e-1,
+6.449489742783178098197284074705891e-1,
+1.0
+\}
+\end{DoxyCode}
+\index{radau2a.\+cu@{radau2a.\+cu}!rkE@{rkE}}
+\index{rkE@{rkE}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rkE}{rkE}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rkE\mbox{[}4\mbox{]}}\hypertarget{radau2a_8cu_a737d65e39448a261886c48517d9bb0b0}{}\label{radau2a_8cu_a737d65e39448a261886c48517d9bb0b0}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+0.05,
+-10.04880939982741556246032950764708*0.05,
+1.382142733160748895793662840980412*0.05,
+-0.3333333333333333333333333333333333*0.05
+\}
+\end{DoxyCode}
+\index{radau2a.\+cu@{radau2a.\+cu}!rkT@{rkT}}
+\index{rkT@{rkT}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rkT}{rkT}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rkT\mbox{[}3\mbox{]}\mbox{[}3\mbox{]}}\hypertarget{radau2a_8cu_a23863b2377430f09acb8523df5be7c3a}{}\label{radau2a_8cu_a23863b2377430f09acb8523df5be7c3a}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+\{9.443876248897524148749007950641664e-2,
+-1.412552950209542084279903838077973e-1,
+-3.00291941051474244918611170890539e-2\},
+\{2.502131229653333113765090675125018e-1,
+2.041293522937999319959908102983381e-1,
+3.829421127572619377954382335998733e-1\},
+\{1.0e0,
+1.0e0,
+0.0e0\}
+\}
+\end{DoxyCode}
+\index{radau2a.\+cu@{radau2a.\+cu}!rk\+Tinv@{rk\+Tinv}}
+\index{rk\+Tinv@{rk\+Tinv}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rk\+Tinv}{rkTinv}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rk\+Tinv\mbox{[}3\mbox{]}\mbox{[}3\mbox{]}}\hypertarget{radau2a_8cu_a0544fa464c96867fbe9b2db33c118361}{}\label{radau2a_8cu_a0544fa464c96867fbe9b2db33c118361}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+\{4.178718591551904727346462658512057e0,
+3.27682820761062387082533272429617e-1,
+5.233764454994495480399309159089876e-1\},
+\{-4.178718591551904727346462658512057e0,
+-3.27682820761062387082533272429617e-1,
+4.766235545005504519600690840910124e-1\},
+\{-5.02872634945786875951247343139544e-1,
+2.571926949855605429186785353601676e0,
+-5.960392048282249249688219110993024e-1\}
+\}
+\end{DoxyCode}
+\index{radau2a.\+cu@{radau2a.\+cu}!rk\+Tinv\+Ainv@{rk\+Tinv\+Ainv}}
+\index{rk\+Tinv\+Ainv@{rk\+Tinv\+Ainv}!radau2a.\+cu@{radau2a.\+cu}}
+\subsubsection[{\texorpdfstring{rk\+Tinv\+Ainv}{rkTinvAinv}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+constant\+\_\+\+\_\+ double rk\+Tinv\+Ainv\mbox{[}3\mbox{]}\mbox{[}3\mbox{]}}\hypertarget{radau2a_8cu_a954ecd55208794555a1cd474035c742f}{}\label{radau2a_8cu_a954ecd55208794555a1cd474035c742f}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+\{1.520148562492775501049204957366528e+1,
+1.192055789400527921212348994770778e0,
+1.903956760517560343018332287285119e0\},
+\{-9.669512977505946748632625374449567e0,
+-8.724028436822336183071773193986487e0,
+3.096043239482439656981667712714881e0\},
+\{-1.409513259499574544876303981551774e+1,
+5.895975725255405108079130152868952e0,
+-1.441236197545344702389881889085515e-1\}
+\}
+\end{DoxyCode}

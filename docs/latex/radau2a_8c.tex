@@ -1,0 +1,97 @@
+\hypertarget{radau2a_8c}{}\section{radau2a/radau2a.c File Reference}
+\label{radau2a_8c}\index{radau2a/radau2a.\+c@{radau2a/radau2a.\+c}}
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lapack\+\_\+dfns.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}dydt.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}jacob.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$complex.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdbool.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+Include dependency graph for radau2a.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{radau2a_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bfseries Max\+\_\+no\+\_\+steps}~(200000)\hypertarget{radau2a_8c_a4f5652e996f678da1b1b93c8aa4a7961}{}\label{radau2a_8c_a4f5652e996f678da1b1b93c8aa4a7961}
+
+\item 
+\#define {\bfseries Newton\+Maxit}~(8)\hypertarget{radau2a_8c_ab408861ee5149b85ac129cb8a3875743}{}\label{radau2a_8c_ab408861ee5149b85ac129cb8a3875743}
+
+\item 
+\#define {\bfseries Start\+Newton}~(true)\hypertarget{radau2a_8c_aa9c48bc3c2002ed4e6792dd7f526d783}{}\label{radau2a_8c_aa9c48bc3c2002ed4e6792dd7f526d783}
+
+\item 
+\#define {\bfseries Gustafsson}\hypertarget{radau2a_8c_a619cdc11d911799dd674458eb84dc349}{}\label{radau2a_8c_a619cdc11d911799dd674458eb84dc349}
+
+\item 
+\#define {\bfseries Roundoff}~(\hyperlink{solver__options_8h_a6ebf6899d6c1c8b7b9d09be872c05aae}{E\+PS})\hypertarget{radau2a_8c_a0628e9521e9961c49b173765f9d815d3}{}\label{radau2a_8c_a0628e9521e9961c49b173765f9d815d3}
+
+\item 
+\#define {\bfseries Fac\+Min}~(0.\+2)\hypertarget{radau2a_8c_a2709085ffea146cba50846d860f7d945}{}\label{radau2a_8c_a2709085ffea146cba50846d860f7d945}
+
+\item 
+\#define {\bfseries Fac\+Max}~(8)\hypertarget{radau2a_8c_a3ae724566d10e7ae2a48e1d340d6937b}{}\label{radau2a_8c_a3ae724566d10e7ae2a48e1d340d6937b}
+
+\item 
+\#define {\bfseries Fac\+Safe}~(0.\+9)\hypertarget{radau2a_8c_a29559e0d6fcf09d76688dbc471b01219}{}\label{radau2a_8c_a29559e0d6fcf09d76688dbc471b01219}
+
+\item 
+\#define {\bfseries Fac\+Rej}~(0.\+1)\hypertarget{radau2a_8c_afb5b5659c29086c78a546a078c08238f}{}\label{radau2a_8c_afb5b5659c29086c78a546a078c08238f}
+
+\item 
+\#define {\bfseries Theta\+Min}~(0.\+001)\hypertarget{radau2a_8c_a1dea03e748069283de9d62ca81b64e75}{}\label{radau2a_8c_a1dea03e748069283de9d62ca81b64e75}
+
+\item 
+\#define {\bfseries Newton\+Tol}~(0.\+03)\hypertarget{radau2a_8c_a5ea658585341bf26e79bbf1ed3497e6f}{}\label{radau2a_8c_a5ea658585341bf26e79bbf1ed3497e6f}
+
+\item 
+\#define {\bfseries Qmin}~(1.\+0)\hypertarget{radau2a_8c_ac523cd36edc6fc54a93dfdb10a772bc0}{}\label{radau2a_8c_ac523cd36edc6fc54a93dfdb10a772bc0}
+
+\item 
+\#define {\bfseries Qmax}~(1.\+2)\hypertarget{radau2a_8c_afcfd11ffcebe8a32d20dcacebefa7e6f}{}\label{radau2a_8c_afcfd11ffcebe8a32d20dcacebefa7e6f}
+
+\item 
+\#define {\bfseries U\+N\+R\+O\+LL}~(8)\hypertarget{radau2a_8c_a870020ccb79b9bf241010e975e029bde}{}\label{radau2a_8c_a870020ccb79b9bf241010e975e029bde}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{radau2a_8c_a01c536019d80bd2cbfe04acfa0c68db1}{integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+Nicholas J. Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/16/2015
+\end{DoxyDate}
+A Radau2A I\+RK implementation for C
+
+N\+O\+TE\+: all matricies stored in column major format! 
+
+\subsection{Function Documentation}
+\index{radau2a.\+c@{radau2a.\+c}!integrate@{integrate}}
+\index{integrate@{integrate}!radau2a.\+c@{radau2a.\+c}}
+\subsubsection[{\texorpdfstring{integrate(const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)}{integrate(const double t_start, const double t_end, const double pr, double *y)}}]{\setlength{\rightskip}{0pt plus 5cm}int integrate (
+\begin{DoxyParamCaption}
+\item[{const double}]{t\+\_\+start, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double}]{pr, }
+\item[{double $\ast$}]{y}
+\end{DoxyParamCaption}
+)}\hypertarget{radau2a_8c_a01c536019d80bd2cbfe04acfa0c68db1}{}\label{radau2a_8c_a01c536019d80bd2cbfe04acfa0c68db1}
+5th-\/order Radau2A implementation Non-\/convergence of Newton\+: Theta too large
+
+$\sim$$\sim$$\sim$$>$ Computation of new step size Hnew 
