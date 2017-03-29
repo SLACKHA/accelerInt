@@ -1,5 +1,0 @@
-<map id="exponential_integrators/phiAHessenberg.h" name="exponential_integrators/phiAHessenberg.h">
-<area shape="rect" id="node2" href="$arnoldi_8h.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="95,95,251,136"/>
-<area shape="rect" id="node3" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="5,184,161,225"/>
-<area shape="rect" id="node4" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="185,184,341,225"/>
-</map>

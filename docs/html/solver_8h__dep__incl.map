@@ -1,6 +1,0 @@
-<map id="generic/solver.h" name="generic/solver.h">
-<area shape="rect" id="node2" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="5,80,168,107"/>
-<area shape="rect" id="node3" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="192,80,355,107"/>
-<area shape="rect" id="node4" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="379,80,528,107"/>
-<area shape="rect" id="node5" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="551,80,694,107"/>
-</map>

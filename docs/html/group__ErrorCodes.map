@@ -1,5 +1,0 @@
-<map id="Return codes of Integrators" name="Return codes of Integrators">
-<area shape="rect" id="node1" href="$group__exprb43__ErrCodes.html" title="Return codes of EXPRB43\l integrator" alt="" coords="235,5,413,47"/>
-<area shape="rect" id="node3" href="$group__RK__ErrCodes.html" title="Return codes of Radau\l&#45;IIa integrator" alt="" coords="245,71,403,112"/>
-<area shape="rect" id="node4" href="$group__exp4__ErrCodes.html" title="Return codes of EXP4\l integrator" alt="" coords="247,136,401,177"/>
-</map>

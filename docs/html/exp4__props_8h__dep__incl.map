@@ -1,4 +1,0 @@
-<map id="exponential_integrators/exp4/exp4_props.h" name="exponential_integrators/exp4/exp4_props.h">
-<area shape="rect" id="node2" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="5,95,161,136"/>
-<area shape="rect" id="node3" href="$exp4__props_8c.html" title="Contains error checking for EXP4 return codes. " alt="" coords="185,95,341,136"/>
-</map>
