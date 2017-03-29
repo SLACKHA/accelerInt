@@ -1,6 +1,6 @@
-/*
+/**
  * \file exprb43_init.cu
- *  Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
+ * \brief Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
@@ -18,9 +18,7 @@ namespace exprb43cu {
 
 /*!
    \fn char* solver_name()
-   \brief Returns the EXPB43 solver name
-
-   Returns a descriptive solver name for the GPU EXPB43 solver
+   \brief Returns a descriptive solver name
 */
  const char* solver_name() {
     const char* name = "exprb43-int-gpu";
@@ -49,6 +47,13 @@ namespace exprb43cu {
     FILE* rFile = 0;
 #endif
 
+/*!
+   \fn solver_log()
+   \brief Executes solver specific logging tasks
+
+   Logs errors, step-sizes, and krylov subspace size (if #LOG_OUTPUT is defined)
+   @see solver_options.cuh
+*/
  void solver_log() {
  #ifdef LOG_OUTPUT
  	//first copy back num steps to make sure we're inbounds
@@ -78,6 +83,13 @@ namespace exprb43cu {
  #endif
  }
 
+ /*!
+   \fn init_solver_log()
+   \brief Initializes solver specific items for logging
+
+   Initializes the Krylov subspace logging files (if #LOG_OUTPUT is defined)
+   @see solver_options.cuh
+*/
  void init_solver_log() {
  #ifdef LOG_OUTPUT
 	//file for krylov logging
@@ -96,6 +108,13 @@ namespace exprb43cu {
  #endif
  }
 
+/*!
+   \fn size_t required_solver_size()
+   \brief Returns the total size (in bytes) required for memory storage for a single GPU thread
+   Used in calculation of the maximum number of possible GPU threads to launch, this method
+   returns the size of the solver_memory structure (per-GPU thread)
+   @see solver_memory
+*/
  size_t required_solver_size() {
     //return the size (in bytes), needed per cuda thread
     size_t num_bytes = 0;
@@ -124,10 +143,10 @@ namespace exprb43cu {
  }
 
 /*!
- * /fn void createAndZero(void** ptr, size_t size)
- * /brief Convienvience method to Cuda Malloc and memset a pointer to zero
- * /param ptr The address of the pointer to malloc
- * /param size The total size (in bytes) of the pointer to malloc
+ * \fn void createAndZero(void** ptr, size_t size)
+ * \brief Convienvience method to Cuda Malloc and memset a pointer to zero
+ * \param ptr The address of the pointer to malloc
+ * \param size The total size (in bytes) of the pointer to malloc
  */
 void createAndZero(void** ptr, size_t size)
 {
@@ -136,10 +155,12 @@ void createAndZero(void** ptr, size_t size)
 }
 
 /*! \fn void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
-   \brief Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes solver_memory
+   \brief Initializes the GPU solver
    \param padded The total (padded) number of GPU threads (IVPs) to solve
    \param h_mem The host solver_memory structure (to be copied to the GPU)
    \param d_mem The device solver_memory structure (to be operated on by the GPU)
+
+   Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes solver_memory
 */
 void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
   find_poles_and_residuals();
@@ -166,9 +187,11 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
 
 /*!
    \fn void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem)
-   \brief Cleans up solver memory, and closes Krylov subspace logfiles (if LOG_OUTPUT is defined)
+   \brief Cleans up solver memory
    @see solver_memory
    @see solver_options.cuh
+
+   Additionally closes Krylov subspace logfiles (if #LOG_OUTPUT is defined)
 */
  void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem) {
  #ifdef LOG_OUTPUT

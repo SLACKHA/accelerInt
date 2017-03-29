@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['radau2a',['radau2a',['../namespaceradau2a.html',1,'']]]
+  ['generic',['generic',['../namespacegeneric.html',1,'']]],
+  ['genericcu',['genericcu',['../namespacegenericcu.html',1,'']]]
 ];

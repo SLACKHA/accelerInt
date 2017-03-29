@@ -34,6 +34,10 @@ namespace exp4 {
 #define MAX_CONSECUTIVE_ERRORS (5)
 
 /**
+ * \addtogroup ErrorCodes Return codes of Integrators
+ * @{
+ */
+/**
  * \defgroup exp4_ErrCodes Return codes of EXP4 integrator
  * @{
  */
@@ -46,6 +50,9 @@ namespace exp4 {
 #define EC_max_steps_exceeded (2)
 //! Timestep reduced such that update would have no effect on simulation time
 #define EC_h_plus_t_equals_h (3)
+/**
+ * @}
+ */
 /**
  * @}
  */

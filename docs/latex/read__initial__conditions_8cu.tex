@@ -1,5 +1,10 @@
 \hypertarget{read__initial__conditions_8cu}{}\section{generic/read\+\_\+initial\+\_\+conditions.cu File Reference}
 \label{read__initial__conditions_8cu}\index{generic/read\+\_\+initial\+\_\+conditions.\+cu@{generic/read\+\_\+initial\+\_\+conditions.\+cu}}
+
+
+the generic C\+U\+DA initial condition reader  
+
+
 {\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}gpu\+\_\+memory.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}gpu\+\_\+macros.\+cuh\char`\"{}}\\*
@@ -18,7 +23,18 @@ Include dependency graph for read\+\_\+initial\+\_\+conditions.\+cu\+:\nopagebre
 \begin{DoxyCompactItemize}
 \item 
 void \hyperlink{read__initial__conditions_8cu_a79be377a219a9ab2ae5c3a313b33afed}{read\+\_\+initial\+\_\+conditions} (const char $\ast$filename, int N\+UM, double $\ast$$\ast$y\+\_\+host, double $\ast$$\ast$variable\+\_\+host)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Reads initial conditions for I\+V\+Ps from binary file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+the generic C\+U\+DA initial condition reader 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}
 
 
 \subsection{Function Documentation}
@@ -32,3 +48,21 @@ void \hyperlink{read__initial__conditions_8cu_a79be377a219a9ab2ae5c3a313b33afed}
 \item[{double $\ast$$\ast$}]{variable\+\_\+host}
 \end{DoxyParamCaption}
 )}\hypertarget{read__initial__conditions_8cu_a79be377a219a9ab2ae5c3a313b33afed}{}\label{read__initial__conditions_8cu_a79be377a219a9ab2ae5c3a313b33afed}
+
+
+Reads initial conditions for I\+V\+Ps from binary file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & the file to read from \\
+\hline
+\mbox{\tt in}  & {\em N\+UM} & the number of I\+VP initial conditions to read \\
+\hline
+\mbox{\tt in,out}  & {\em y\+\_\+host} & Address of the host state vector pointer. This is initialized and populated by this method \\
+\hline
+\mbox{\tt in,out}  & {\em variable\+\_\+host} & Address of the host pressure/density pointer. This is initialized and populated by this method\\
+\hline
+\end{DoxyParams}
+Note\+: the data file is expected to be in the following format\+:~\newline
+ time, Temperature, Pressure, mass fractions (State \#1) ~\newline
+ time, Temperature, Pressure, mass fractions (State \#2) ... 

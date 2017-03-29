@@ -1,6 +1,6 @@
-/*rational_approximant.cuh
-*	The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential
-* \file rational_approximant.cuh
+/**
+* \file rational_approximant.h
+* \brief The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential
 *
 * \author Nicholas Curtis
 * \date 03/09/2015

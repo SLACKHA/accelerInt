@@ -1,5 +1,10 @@
 \hypertarget{solver__init_8h}{}\section{generic/solver\+\_\+init.h File Reference}
 \label{solver__init_8h}\index{generic/solver\+\_\+init.\+h@{generic/solver\+\_\+init.\+h}}
+
+
+Header definitions for solver initialization routins.  
+
+
 This graph shows which files directly or indirectly include this file\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
@@ -7,120 +12,33 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \includegraphics[width=350pt]{solver__init_8h__dep__incl}
 \end{center}
 \end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacegeneric}{generic}
+\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{solver__init_8h_a39c825543042903f579cd9c35a279dca}{init\+\_\+solver\+\_\+log} ()
-\begin{DoxyCompactList}\small\item\em Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
-void \hyperlink{solver__init_8h_ae95cbe81062a829668c5fa8e28b2e2c7}{solver\+\_\+log} ()
-\begin{DoxyCompactList}\small\item\em Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
-void \hyperlink{solver__init_8h_ad7426609d0f4af2fd6d2ac6cc98f5995}{initialize\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads. \end{DoxyCompactList}\item 
-void \hyperlink{solver__init_8h_af1a41619f661af5da4dfea21eaed85fd}{cleanup\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Cleans up the created C\+V\+O\+DE solvers. \end{DoxyCompactList}\item 
-const char $\ast$ \hyperlink{solver__init_8h_a4ca568c33c1f8f478970cc5eec5d1d81}{solver\+\_\+name} ()
-\begin{DoxyCompactList}\small\item\em Returns the C\+V\+O\+DE solver name. \end{DoxyCompactList}\end{DoxyCompactItemize}
+void \hyperlink{namespacegeneric_a262501be5ff14645a2e61d407ddde344}{generic\+::init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes solver specific items for logging. \end{DoxyCompactList}\item 
+void \hyperlink{namespacegeneric_af0b90d29725f8fd6ceb9338ed125aa5f}{generic\+::solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Executes solver specific logging tasks. \end{DoxyCompactList}\item 
+void \hyperlink{namespacegeneric_a82578fa45769fa8dd324e18a01f492d2}{generic\+::initialize\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Initializes the solver. \end{DoxyCompactList}\item 
+void \hyperlink{namespacegeneric_a105e2cd1d3777b806e59d7725754867b}{generic\+::cleanup\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Cleans up the created solvers. \end{DoxyCompactList}\item 
+const char $\ast$ \hyperlink{namespacegeneric_a8ea23497102dccb8aaf87ed6d27506fe}{generic\+::solver\+\_\+name} ()
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
-\subsection{Function Documentation}
-\index{solver\+\_\+init.\+h@{solver\+\_\+init.\+h}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
-\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!solver\+\_\+init.\+h@{solver\+\_\+init.\+h}}
-\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(int num\+\_\+threads)}{cleanup_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void cleanup\+\_\+solver (
-\begin{DoxyParamCaption}
-\item[{int}]{num\+\_\+threads}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__init_8h_af1a41619f661af5da4dfea21eaed85fd}{}\label{solver__init_8h_af1a41619f661af5da4dfea21eaed85fd}
+\subsection{Detailed Description}
+Header definitions for solver initialization routins. 
 
-
-Cleans up the created C\+V\+O\+DE solvers. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num\+\_\+threads} & The number of Open\+MP threads to use (and C\+V\+O\+DE solver objects to destroy)\\
-\hline
-\end{DoxyParams}
-Frees and cleans up allocated C\+V\+O\+DE memory. \index{solver\+\_\+init.\+h@{solver\+\_\+init.\+h}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
-\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!solver\+\_\+init.\+h@{solver\+\_\+init.\+h}}
-\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+solver\+\_\+log (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__init_8h_a39c825543042903f579cd9c35a279dca}{}\label{solver__init_8h_a39c825543042903f579cd9c35a279dca}
-
-
-Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
-
-\begin{DoxySeeAlso}{See also}
-\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
-\end{DoxySeeAlso}
-\index{solver\+\_\+init.\+h@{solver\+\_\+init.\+h}!initialize\+\_\+solver@{initialize\+\_\+solver}}
-\index{initialize\+\_\+solver@{initialize\+\_\+solver}!solver\+\_\+init.\+h@{solver\+\_\+init.\+h}}
-\subsubsection[{\texorpdfstring{initialize\+\_\+solver(int num\+\_\+threads)}{initialize_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void initialize\+\_\+solver (
-\begin{DoxyParamCaption}
-\item[{int}]{num\+\_\+threads}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__init_8h_ad7426609d0f4af2fd6d2ac6cc98f5995}{}\label{solver__init_8h_ad7426609d0f4af2fd6d2ac6cc98f5995}
-
-
-Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num\+\_\+threads} & The number of Open\+MP threads to use (and C\+V\+O\+DE solver objects to create)\\
-\hline
-\end{DoxyParams}
-Various definitions in the generated options (\hyperlink{solver__options_8h}{solver\+\_\+options.\+h}, \hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh}), e.\+g. F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE, C\+V\+\_\+\+M\+A\+X\+\_\+\+E\+R\+R\+T\+E\+S\+T\+\_\+\+F\+A\+I\+LS, etc. affect the options set for the C\+V\+O\+D\+Es solver.
-
-The R\+HS function \hyperlink{namespacecvode_aa10a063b2a82d5b49c2bb338f16ddae4}{dydt\+\_\+cvodes()} will be used in the solver.
-
-If F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE is not defined, the jacobian function in eval\+\_\+jacob\+\_\+cvodes will be used in the C\+V\+O\+DE solver. Else, the C\+V\+O\+DE finite difference based on the R\+HS function will be used.
-
-Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads.
-
-
-\begin{DoxyParams}{Parameters}
-{\em num\+\_\+threads} & Unused \\
-\hline
-\end{DoxyParams}
-\index{solver\+\_\+init.\+h@{solver\+\_\+init.\+h}!solver\+\_\+log@{solver\+\_\+log}}
-\index{solver\+\_\+log@{solver\+\_\+log}!solver\+\_\+init.\+h@{solver\+\_\+init.\+h}}
-\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void solver\+\_\+log (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__init_8h_ae95cbe81062a829668c5fa8e28b2e2c7}{}\label{solver__init_8h_ae95cbe81062a829668c5fa8e28b2e2c7}
-
-
-Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
-
-\begin{DoxySeeAlso}{See also}
-\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
-\end{DoxySeeAlso}
-\index{solver\+\_\+init.\+h@{solver\+\_\+init.\+h}!solver\+\_\+name@{solver\+\_\+name}}
-\index{solver\+\_\+name@{solver\+\_\+name}!solver\+\_\+init.\+h@{solver\+\_\+init.\+h}}
-\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ solver\+\_\+name (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__init_8h_a4ca568c33c1f8f478970cc5eec5d1d81}{}\label{solver__init_8h_a4ca568c33c1f8f478970cc5eec5d1d81}
-
-
-Returns the C\+V\+O\+DE solver name. 
-
-Returns a descriptive solver name for the C\+V\+O\+DE solver, indicating use of Finite Difference Jacobian (or not)
-
-Returns the C\+V\+O\+DE solver name.
-
-Returns a descriptive solver name for the E\+X\+P4 solver
-
-Returns the C\+V\+O\+DE solver name.
-
-Returns a descriptive solver name for the G\+PU E\+X\+P4 solver
-
-Returns the C\+V\+O\+DE solver name.
-
-Returns a descriptive solver name for the E\+X\+P\+R\+B43 solver
-
-Returns the C\+V\+O\+DE solver name.
-
-Returns a descriptive solver name for the G\+PU E\+X\+P\+B43 solver 
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/09/2015
+\end{DoxyDate}
+Contains declarations for initialization routines that all individual solvers must implement 

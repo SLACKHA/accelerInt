@@ -1,5 +1,10 @@
 \hypertarget{solver__props_8cuh}{}\section{generic/solver\+\_\+props.cuh File Reference}
 \label{solver__props_8cuh}\index{generic/solver\+\_\+props.\+cuh@{generic/solver\+\_\+props.\+cuh}}
+
+
+simple convenience file to include the correct solver properties file  
+
+
 This graph shows which files directly or indirectly include this file\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
@@ -12,6 +17,11 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \item 
 struct \hyperlink{structsolver__memory}{solver\+\_\+memory}
 \end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacegenericcu}{genericcu}
+\end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
@@ -20,28 +30,16 @@ struct \hyperlink{structsolver__memory}{solver\+\_\+memory}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{solver__props_8cuh_a28fd85b20b0d1af38759f820ab5ec5dc}{check\+\_\+error} (int, int $\ast$)
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_af403dabfc12de79ff9ab8575983d6f83}{genericcu\+::check\+\_\+error} (int num\+\_\+conditions, int $\ast$code\+\_\+arr)
 \end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+simple convenience file to include the correct solver properties file 
+
 
 
 \subsection{Macro Definition Documentation}
 \index{solver\+\_\+props.\+cuh@{solver\+\_\+props.\+cuh}!S\+O\+L\+V\+E\+R\+\_\+\+P\+R\+O\+P\+S\+\_\+\+C\+UH@{S\+O\+L\+V\+E\+R\+\_\+\+P\+R\+O\+P\+S\+\_\+\+C\+UH}}
 \index{S\+O\+L\+V\+E\+R\+\_\+\+P\+R\+O\+P\+S\+\_\+\+C\+UH@{S\+O\+L\+V\+E\+R\+\_\+\+P\+R\+O\+P\+S\+\_\+\+C\+UH}!solver\+\_\+props.\+cuh@{solver\+\_\+props.\+cuh}}
 \subsubsection[{\texorpdfstring{S\+O\+L\+V\+E\+R\+\_\+\+P\+R\+O\+P\+S\+\_\+\+C\+UH}{SOLVER_PROPS_CUH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+O\+L\+V\+E\+R\+\_\+\+P\+R\+O\+P\+S\+\_\+\+C\+UH}\hypertarget{solver__props_8cuh_abab1859a388294ac0be0474379ddc940}{}\label{solver__props_8cuh_abab1859a388294ac0be0474379ddc940}
-
-
-\subsection{Function Documentation}
-\index{solver\+\_\+props.\+cuh@{solver\+\_\+props.\+cuh}!check\+\_\+error@{check\+\_\+error}}
-\index{check\+\_\+error@{check\+\_\+error}!solver\+\_\+props.\+cuh@{solver\+\_\+props.\+cuh}}
-\subsubsection[{\texorpdfstring{check\+\_\+error(int, int $\ast$)}{check_error(int, int *)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+host\+\_\+\+\_\+ void check\+\_\+error (
-\begin{DoxyParamCaption}
-\item[{int}]{num\+\_\+cond, }
-\item[{int $\ast$}]{codes}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__props_8cuh_a28fd85b20b0d1af38759f820ab5ec5dc}{}\label{solver__props_8cuh_a28fd85b20b0d1af38759f820ab5ec5dc}
-/fn void \hyperlink{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{check\+\_\+error(int tid, int code)} /brief Checks the return code of the given thread (I\+VP) for an error, and exits if found /param num\+\_\+cond The total number of I\+V\+Ps to check /param codes The array of return codes \begin{DoxySeeAlso}{See also}
-\hyperlink{group__exp4cu__ErrCodes}{Return codes of G\+P\+U E\+X\+P\+R\+B43 integrator}
-\end{DoxySeeAlso}
-/fn void \hyperlink{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{check\+\_\+error(int tid, int code)} /brief Checks the return code of the given thread (I\+VP) for an error, and exits if found /param num\+\_\+cond The total number of I\+V\+Ps to check /param codes The array of return codes \begin{DoxySeeAlso}{See also}
-\hyperlink{group__exprb43cu__ErrCodes}{Return codes of G\+P\+U E\+X\+P4 integrator} 
-\end{DoxySeeAlso}

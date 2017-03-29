@@ -1,5 +1,10 @@
 \hypertarget{exprb43__init_8cu}{}\section{exponential\+\_\+integrators/exprb43/exprb43\+\_\+init.cu File Reference}
 \label{exprb43__init_8cu}\index{exponential\+\_\+integrators/exprb43/exprb43\+\_\+init.\+cu@{exponential\+\_\+integrators/exprb43/exprb43\+\_\+init.\+cu}}
+
+
+Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver.  
+
+
 {\ttfamily \#include \char`\"{}rational\+\_\+approximant.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+options.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
@@ -20,16 +25,27 @@ Include dependency graph for exprb43\+\_\+init.\+cu\+:\nopagebreak
 \begin{DoxyCompactItemize}
 \item 
 const char $\ast$ \hyperlink{namespaceexprb43cu_adb32cc589856026fca36d47f1982ee00}{exprb43cu\+::solver\+\_\+name} ()
-\begin{DoxyCompactList}\small\item\em Returns the E\+X\+P\+B43 solver name. \end{DoxyCompactList}\item 
-void \hyperlink{namespaceexprb43cu_a77622bf304d732c5402474fe69dbb4a2}{exprb43cu\+::solver\+\_\+log} ()
-\begin{DoxyCompactList}\small\item\em Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
-void \hyperlink{namespaceexprb43cu_a61e02bb434629c817de6934d514fc96c}{exprb43cu\+::init\+\_\+solver\+\_\+log} ()
-\begin{DoxyCompactList}\small\item\em Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43cu_a4cf705b7d338850571b92dcae3e1654c}{exprb43cu\+::solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Executes solver specific logging tasks. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43cu_aa82c3608832f5b5891f2f3a992aaf8c7}{exprb43cu\+::init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes solver specific items for logging. \end{DoxyCompactList}\item 
 size\+\_\+t \hyperlink{namespaceexprb43cu_ad837089abb4cfc3819786aad86440da0}{exprb43cu\+::required\+\_\+solver\+\_\+size} ()
 \begin{DoxyCompactList}\small\item\em Returns the total size (in bytes) required for memory storage for a single G\+PU thread Used in calculation of the maximum number of possible G\+PU threads to launch, this method returns the size of the \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} structure (per-\/\+G\+PU thread) \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexprb43cu_a411c61dc481c439d2a19e8f17ec5af63}{exprb43cu\+::create\+And\+Zero} (void $\ast$$\ast$ptr, size\+\_\+t size)
-\item 
+\begin{DoxyCompactList}\small\item\em Convienvience method to Cuda Malloc and memset a pointer to zero. \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexprb43cu_a6c8137b2fd79c625faa2773ea26deb10}{exprb43cu\+::initialize\+\_\+solver} (int padded, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$h\+\_\+mem, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$d\+\_\+mem)
-\begin{DoxyCompactList}\small\item\em Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory}. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initializes the G\+PU solver. \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexprb43cu_a2a93d9ac22d074a6003cb959e74fae61}{exprb43cu\+::cleanup\+\_\+solver} (\hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$h\+\_\+mem, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$d\+\_\+mem)
-\begin{DoxyCompactList}\small\item\em Cleans up solver memory, and closes Krylov subspace logfiles (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Cleans up solver memory. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/09/2015 
+\end{DoxyDate}

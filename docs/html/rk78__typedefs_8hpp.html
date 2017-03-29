@@ -89,11 +89,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">rk78_typedefs.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Defines an interface for boost's runge_kutta_fehlberg78 solver.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;boost/numeric/odeint.hpp&gt;</code><br />
 <code>#include &quot;dydt.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="solver__options_8h_source.html">solver_options.h</a>&quot;</code><br />
@@ -110,8 +114,8 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="rk78__typedefs_8hpp__dep__incl.png" border="0" usemap="#rk78_2rk78__typedefs_8hppdep" alt=""/></div>
 <map name="rk78_2rk78__typedefs_8hppdep" id="rk78_2rk78__typedefs_8hppdep">
-<area shape="rect" id="node2" href="rk78__init_8cpp.html" title="rk78/rk78_init.cpp" alt="" coords="5,80,131,107"/>
-<area shape="rect" id="node3" href="solver__rk78_8cpp.html" title="rk78/solver_rk78.cpp" alt="" coords="155,80,298,107"/>
+<area shape="rect" id="node2" href="rk78__init_8cpp.html" title="Implementation of the necessary initialization for Boost&#39;s RK78&#45;Felhberg solver. " alt="" coords="5,80,131,107"/>
+<area shape="rect" id="node3" href="solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="155,80,298,107"/>
 </map>
 </div>
 </div>
@@ -119,56 +123,32 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrhs__eval.html">rhs_eval</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrk78_1_1rhs__eval.html">rk78::rhs_eval</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A wrapper class to evaluate the rhs function y' = f(y) stores the state variable, and provides to dydt.  <a href="classrk78_1_1rhs__eval.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacerk78"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerk78.html">rk78</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ac81efbc71a13babc87c8b2fb5546dd4c"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a></td></tr>
-<tr class="separator:ac81efbc71a13babc87c8b2fb5546dd4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c1895604d873087ed1453971f0e32c3"><td class="memItemLeft" align="right" valign="top">typedef runge_kutta_fehlberg78&lt; <a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a>, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rk78__typedefs_8hpp.html#a9c1895604d873087ed1453971f0e32c3">stepper</a></td></tr>
-<tr class="separator:a9c1895604d873087ed1453971f0e32c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace1eb17a3e098cc9c02ce96d814d376b"><td class="memItemLeft" align="right" valign="top">typedef controlled_runge_kutta&lt; <a class="el" href="rk78__typedefs_8hpp.html#a9c1895604d873087ed1453971f0e32c3">stepper</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rk78__typedefs_8hpp.html#ace1eb17a3e098cc9c02ce96d814d376b">controller</a></td></tr>
-<tr class="separator:ace1eb17a3e098cc9c02ce96d814d376b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adee5ce562c6782cdcf0bd77d751c739a"><td class="memItemLeft" align="right" valign="top">typedef std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerk78.html#adee5ce562c6782cdcf0bd77d751c739a">rk78::state_type</a></td></tr>
+<tr class="memdesc:adee5ce562c6782cdcf0bd77d751c739a"><td class="mdescLeft">&#160;</td><td class="mdescRight">state vector  <a href="namespacerk78.html#adee5ce562c6782cdcf0bd77d751c739a">More...</a><br /></td></tr>
+<tr class="separator:adee5ce562c6782cdcf0bd77d751c739a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6e4b40bcf9a8f507a0bb1260f92777e"><td class="memItemLeft" align="right" valign="top">typedef runge_kutta_fehlberg78&lt; state_type, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerk78.html#ac6e4b40bcf9a8f507a0bb1260f92777e">rk78::stepper</a></td></tr>
+<tr class="memdesc:ac6e4b40bcf9a8f507a0bb1260f92777e"><td class="mdescLeft">&#160;</td><td class="mdescRight">solver type  <a href="namespacerk78.html#ac6e4b40bcf9a8f507a0bb1260f92777e">More...</a><br /></td></tr>
+<tr class="separator:ac6e4b40bcf9a8f507a0bb1260f92777e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba972d6260988e04e23d64437536c04c"><td class="memItemLeft" align="right" valign="top">typedef controlled_runge_kutta&lt; stepper &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerk78.html#aba972d6260988e04e23d64437536c04c">rk78::controller</a></td></tr>
+<tr class="memdesc:aba972d6260988e04e23d64437536c04c"><td class="mdescLeft">&#160;</td><td class="mdescRight">controller type  <a href="namespacerk78.html#aba972d6260988e04e23d64437536c04c">More...</a><br /></td></tr>
+<tr class="separator:aba972d6260988e04e23d64437536c04c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a class="anchor" id="ace1eb17a3e098cc9c02ce96d814d376b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef controlled_runge_kutta&lt; <a class="el" href="rk78__typedefs_8hpp.html#a9c1895604d873087ed1453971f0e32c3">stepper</a> &gt; <a class="el" href="rk78__typedefs_8hpp.html#ace1eb17a3e098cc9c02ce96d814d376b">controller</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac81efbc71a13babc87c8b2fb5546dd4c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef std::vector&lt; double &gt; <a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9c1895604d873087ed1453971f0e32c3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef runge_kutta_fehlberg78&lt; <a class="el" href="rk78__typedefs_8hpp.html#ac81efbc71a13babc87c8b2fb5546dd4c">state_type</a> , double &gt; <a class="el" href="rk78__typedefs_8hpp.html#a9c1895604d873087ed1453971f0e32c3">stepper</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines an interface for boost's runge_kutta_fehlberg78 solver. </p>
+<dl class="section author"><dt>Author</dt><dd>Nicholas J. Curtis </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>04/29/2016 </dd></dl>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

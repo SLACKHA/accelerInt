@@ -1,4 +1,4 @@
-/*
+/**
 * \file rational_approximant.cu
 * \brief The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential
 *

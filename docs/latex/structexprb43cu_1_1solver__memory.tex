@@ -4,31 +4,31 @@
 \begin{DoxyCompactItemize}
 \item 
 double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_aff9b454c8a0c5ecef261b359c44db926}{sc}
-\item 
-double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a97191dca9ff8d04d16d37b26fbea4906}{work1}
 \begin{DoxyCompactList}\small\item\em the scaled error coefficients \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a97191dca9ff8d04d16d37b26fbea4906}{work1}
+\begin{DoxyCompactList}\small\item\em a work array \end{DoxyCompactList}\item 
 double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a9339316b1097345efa3b55832b3d0d1c}{work2}
 \begin{DoxyCompactList}\small\item\em a work array \end{DoxyCompactList}\item 
 double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_ae3a2fe062018c4b7f97f039feceeb003}{work3}
 \begin{DoxyCompactList}\small\item\em a work array \end{DoxyCompactList}\item 
 double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a020f6e5fb98c3395373e8098c0b726ee}{gy}
-\begin{DoxyCompactList}\small\item\em a work array \end{DoxyCompactList}\item 
-double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a2ca03f02755ba0786e0460f33542216b}{Hm}
 \begin{DoxyCompactList}\small\item\em The difference between R\+HS function and the Jacobian state vector product. \end{DoxyCompactList}\item 
-double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_aebb83d142ab8d04edad3538544c67ec4}{phi\+Hm}
+double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a2ca03f02755ba0786e0460f33542216b}{Hm}
 \begin{DoxyCompactList}\small\item\em The Hessenberg Kyrlov subspace array for E\+X\+P4, to take the exponential action on. \end{DoxyCompactList}\item 
-double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a3b68c5a632fe265037cd25195e266c65}{Vm}
+double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_aebb83d142ab8d04edad3538544c67ec4}{phi\+Hm}
 \begin{DoxyCompactList}\small\item\em the exponential Krylov subspace array for E\+X\+P4 \end{DoxyCompactList}\item 
-double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_aee268d381ce2f3ab02754793dfd068ee}{saved\+Actions}
+double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a3b68c5a632fe265037cd25195e266c65}{Vm}
 \begin{DoxyCompactList}\small\item\em the Arnoldi basis array \end{DoxyCompactList}\item 
-int $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_ad00e33aaa4241cc8356ea30869d311ff}{ipiv}
+double $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_aee268d381ce2f3ab02754793dfd068ee}{saved\+Actions}
 \begin{DoxyCompactList}\small\item\em Saved stage results. \end{DoxyCompactList}\item 
-cu\+Double\+Complex $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a41d0878433e4e8e15ce8403b8efc8c23}{invA}
+int $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_ad00e33aaa4241cc8356ea30869d311ff}{ipiv}
 \begin{DoxyCompactList}\small\item\em the pivot indicies \end{DoxyCompactList}\item 
-cu\+Double\+Complex $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a7db0969d6909faa9beb4965290c52a63}{work4}
+cu\+Double\+Complex $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a41d0878433e4e8e15ce8403b8efc8c23}{invA}
 \begin{DoxyCompactList}\small\item\em the inverse of the Hessenberg Krylov subspace \end{DoxyCompactList}\item 
+cu\+Double\+Complex $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a7db0969d6909faa9beb4965290c52a63}{work4}
+\begin{DoxyCompactList}\small\item\em a (complex) work array \end{DoxyCompactList}\item 
 int $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a69d7ae536d679306d284b461a8bdb2c3}{result}
-\begin{DoxyCompactList}\small\item\em a (complex) work array \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em an array of integration results for the various threads \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Member Data Documentation}
@@ -37,66 +37,73 @@ int $\ast$ \hyperlink{structexprb43cu_1_1solver__memory_a69d7ae536d679306d284b46
 \subsubsection[{\texorpdfstring{gy}{gy}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exprb43cu\+::solver\+\_\+memory\+::gy}\hypertarget{structexprb43cu_1_1solver__memory_a020f6e5fb98c3395373e8098c0b726ee}{}\label{structexprb43cu_1_1solver__memory_a020f6e5fb98c3395373e8098c0b726ee}
 
 
-a work array 
+The difference between R\+HS function and the Jacobian state vector product. 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!Hm@{Hm}}
 \index{Hm@{Hm}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{Hm}{Hm}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exprb43cu\+::solver\+\_\+memory\+::\+Hm}\hypertarget{structexprb43cu_1_1solver__memory_a2ca03f02755ba0786e0460f33542216b}{}\label{structexprb43cu_1_1solver__memory_a2ca03f02755ba0786e0460f33542216b}
 
 
-The difference between R\+HS function and the Jacobian state vector product. 
+The Hessenberg Kyrlov subspace array for E\+X\+P4, to take the exponential action on. 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!invA@{invA}}
 \index{invA@{invA}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{invA}{invA}}]{\setlength{\rightskip}{0pt plus 5cm}cu\+Double\+Complex$\ast$ exprb43cu\+::solver\+\_\+memory\+::invA}\hypertarget{structexprb43cu_1_1solver__memory_a41d0878433e4e8e15ce8403b8efc8c23}{}\label{structexprb43cu_1_1solver__memory_a41d0878433e4e8e15ce8403b8efc8c23}
 
 
-the pivot indicies 
+the inverse of the Hessenberg Krylov subspace 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!ipiv@{ipiv}}
 \index{ipiv@{ipiv}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{ipiv}{ipiv}}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ exprb43cu\+::solver\+\_\+memory\+::ipiv}\hypertarget{structexprb43cu_1_1solver__memory_ad00e33aaa4241cc8356ea30869d311ff}{}\label{structexprb43cu_1_1solver__memory_ad00e33aaa4241cc8356ea30869d311ff}
 
 
-Saved stage results. 
+the pivot indicies 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!phi\+Hm@{phi\+Hm}}
 \index{phi\+Hm@{phi\+Hm}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{phi\+Hm}{phiHm}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exprb43cu\+::solver\+\_\+memory\+::phi\+Hm}\hypertarget{structexprb43cu_1_1solver__memory_aebb83d142ab8d04edad3538544c67ec4}{}\label{structexprb43cu_1_1solver__memory_aebb83d142ab8d04edad3538544c67ec4}
 
 
-The Hessenberg Kyrlov subspace array for E\+X\+P4, to take the exponential action on. 
+the exponential Krylov subspace array for E\+X\+P4 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!result@{result}}
 \index{result@{result}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{result}{result}}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ exprb43cu\+::solver\+\_\+memory\+::result}\hypertarget{structexprb43cu_1_1solver__memory_a69d7ae536d679306d284b461a8bdb2c3}{}\label{structexprb43cu_1_1solver__memory_a69d7ae536d679306d284b461a8bdb2c3}
 
 
-a (complex) work array 
+an array of integration results for the various threads 
 
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__exprb43cu__ErrCodes}{Return codes of G\+P\+U E\+X\+P4 integrator} 
+\end{DoxySeeAlso}
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!saved\+Actions@{saved\+Actions}}
 \index{saved\+Actions@{saved\+Actions}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{saved\+Actions}{savedActions}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exprb43cu\+::solver\+\_\+memory\+::saved\+Actions}\hypertarget{structexprb43cu_1_1solver__memory_aee268d381ce2f3ab02754793dfd068ee}{}\label{structexprb43cu_1_1solver__memory_aee268d381ce2f3ab02754793dfd068ee}
 
 
-the Arnoldi basis array 
+Saved stage results. 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!sc@{sc}}
 \index{sc@{sc}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{sc}{sc}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exprb43cu\+::solver\+\_\+memory\+::sc}\hypertarget{structexprb43cu_1_1solver__memory_aff9b454c8a0c5ecef261b359c44db926}{}\label{structexprb43cu_1_1solver__memory_aff9b454c8a0c5ecef261b359c44db926}
+
+
+the scaled error coefficients 
+
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!Vm@{Vm}}
 \index{Vm@{Vm}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{Vm}{Vm}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exprb43cu\+::solver\+\_\+memory\+::\+Vm}\hypertarget{structexprb43cu_1_1solver__memory_a3b68c5a632fe265037cd25195e266c65}{}\label{structexprb43cu_1_1solver__memory_a3b68c5a632fe265037cd25195e266c65}
 
 
-the exponential Krylov subspace array for E\+X\+P4 
+the Arnoldi basis array 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!work1@{work1}}
 \index{work1@{work1}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
 \subsubsection[{\texorpdfstring{work1}{work1}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exprb43cu\+::solver\+\_\+memory\+::work1}\hypertarget{structexprb43cu_1_1solver__memory_a97191dca9ff8d04d16d37b26fbea4906}{}\label{structexprb43cu_1_1solver__memory_a97191dca9ff8d04d16d37b26fbea4906}
 
 
-the scaled error coefficients 
+a work array 
 
 \index{exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}!work2@{work2}}
 \index{work2@{work2}!exprb43cu\+::solver\+\_\+memory@{exprb43cu\+::solver\+\_\+memory}}
@@ -117,7 +124,7 @@ a work array
 \subsubsection[{\texorpdfstring{work4}{work4}}]{\setlength{\rightskip}{0pt plus 5cm}cu\+Double\+Complex$\ast$ exprb43cu\+::solver\+\_\+memory\+::work4}\hypertarget{structexprb43cu_1_1solver__memory_a7db0969d6909faa9beb4965290c52a63}{}\label{structexprb43cu_1_1solver__memory_a7db0969d6909faa9beb4965290c52a63}
 
 
-the inverse of the Hessenberg Krylov subspace 
+a (complex) work array 
 
 
 

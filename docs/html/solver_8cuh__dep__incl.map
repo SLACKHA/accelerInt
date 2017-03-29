@@ -1,4 +1,4 @@
 <map id="generic/solver.cuh" name="generic/solver.cuh">
-<area shape="rect" id="node2" href="$solver__generic_8cu.html" title="generic/solver_generic.cu" alt="" coords="5,80,176,107"/>
-<area shape="rect" id="node3" href="$solver__main_8cu.html" title="generic/solver_main.cu" alt="" coords="201,80,357,107"/>
+<area shape="rect" id="node2" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="5,80,176,107"/>
+<area shape="rect" id="node3" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="201,80,357,107"/>
 </map>

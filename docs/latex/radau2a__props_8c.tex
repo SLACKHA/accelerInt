@@ -1,5 +1,10 @@
 \hypertarget{radau2a__props_8c}{}\section{radau2a/radau2a\+\_\+props.c File Reference}
 \label{radau2a__props_8c}\index{radau2a/radau2a\+\_\+props.\+c@{radau2a/radau2a\+\_\+props.\+c}}
+
+
+Error checking for the C\+PU Radua-\/\+I\+Ia solver.  
+
+
 {\ttfamily \#include \char`\"{}radau2a\+\_\+props.\+h\char`\"{}}\\*
 Include dependency graph for radau2a\+\_\+props.\+c\+:\nopagebreak
 \begin{figure}[H]
@@ -12,7 +17,12 @@ Include dependency graph for radau2a\+\_\+props.\+c\+:\nopagebreak
 \begin{DoxyCompactItemize}
 \item 
 void \hyperlink{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{check\+\_\+error} (int tid, int code)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Checks the return code of the given thread (I\+VP) for an error, and exits if found. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Error checking for the C\+PU Radua-\/\+I\+Ia solver. 
+
 
 
 \subsection{Function Documentation}
@@ -24,3 +34,17 @@ void \hyperlink{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{check\+\_\+
 \item[{int}]{code}
 \end{DoxyParamCaption}
 )}\hypertarget{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{}\label{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}
+
+
+Checks the return code of the given thread (I\+VP) for an error, and exits if found. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tid} & The thread (I\+VP) index \\
+\hline
+{\em code} & The return code of the thread \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__ErrorCodes}{Return codes of Integrators} 
+\end{DoxySeeAlso}

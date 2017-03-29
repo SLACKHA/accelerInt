@@ -1,6 +1,6 @@
-/*solver_generic.cu
- * the generic integration driver for all GPU solvers
- * \file solver_generic.cu
+/**
+ * \file
+ * \brief the generic integration driver for the CPU solvers
  *
  * \author Nicholas Curtis
  * \date 03/10/2015
@@ -10,6 +10,21 @@
 #include "header.h"
 #include "solver.h"
 
+#ifdef GENERATE_DOCS
+ namespace generic {
+#endif
+
+/**
+ * \brief Integration driver for the CPU integrators
+ * \param[in]       NUM             The (non-padded) number of IVPs to integrate
+ * \param[in]       t               The current system time
+ * \param[in]       t_end           The IVP integration end time
+ * \param[in]       pr_global       The system constant variable (pressures / densities)
+ * \param[in,out]   y_global        The system state vectors at time t.
+                                    Returns system state vectors at time t_end
+ *
+ * This is generic driver for CPU integrators
+ */
 void intDriver (const int NUM, const double t, const double t_end,
                 const double *pr_global, double *y_global)
 {
@@ -41,3 +56,7 @@ void intDriver (const int NUM, const double t, const double t_end,
     } //end tid loop
 
 } // end intDriver
+
+#ifdef GENERATE_DOCS
+ }
+#endif

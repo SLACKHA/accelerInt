@@ -94,6 +94,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">fd_jacob.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Finite Difference Jacobian implementation based on CVODEs.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;header.h&quot;</code><br />
 <code>#include &quot;dydt.h&quot;</code><br />
 <code>#include &lt;math.h&gt;</code><br />
@@ -111,14 +114,18 @@ Include dependency graph for fd_jacob.c:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a5c00ed5d35f84424a9e4b2197bf21ac7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fd__jacob_8c.html#a5c00ed5d35f84424a9e4b2197bf21ac7">FD_ORD</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:a5c00ed5d35f84424a9e4b2197bf21ac7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The finite difference order [Default: 1].  <a href="#a5c00ed5d35f84424a9e4b2197bf21ac7">More...</a><br /></td></tr>
 <tr class="separator:a5c00ed5d35f84424a9e4b2197bf21ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:acc1470a4068b80fdef18c84671591fb3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fd__jacob_8c.html#acc1470a4068b80fdef18c84671591fb3">eval_jacob</a> (const double t, const double pres, const double *cy, double *jac)</td></tr>
+<tr class="memdesc:acc1470a4068b80fdef18c84671591fb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a finite difference Jacobian of order FD_ORD of the RHS function dydt at the given pressure and state.  <a href="#acc1470a4068b80fdef18c84671591fb3">More...</a><br /></td></tr>
 <tr class="separator:acc1470a4068b80fdef18c84671591fb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Finite Difference Jacobian implementation based on CVODEs. </p>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="a5c00ed5d35f84424a9e4b2197bf21ac7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -128,6 +135,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The finite difference order [Default: 1]. </p>
 
 </div>
 </div>
@@ -167,6 +176,17 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Computes a finite difference Jacobian of order FD_ORD of the RHS function dydt at the given pressure and state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>the current system time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pres</td><td>the current system pressure </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cy</td><td>the system state vector </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">jac</td><td>the resulting Jacobian </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

@@ -1,5 +1,10 @@
 \hypertarget{radau2a__init_8cu}{}\section{radau2a/radau2a\+\_\+init.cu File Reference}
 \label{radau2a__init_8cu}\index{radau2a/radau2a\+\_\+init.\+cu@{radau2a/radau2a\+\_\+init.\+cu}}
+
+
+Implementation of the necessary initialization for the Radau-\/\+I\+IA solver.  
+
+
 {\ttfamily \#include \char`\"{}solver\+\_\+init.\+cuh\char`\"{}}\\*
 Include dependency graph for radau2a\+\_\+init.\+cu\+:\nopagebreak
 \begin{figure}[H]
@@ -8,81 +13,14 @@ Include dependency graph for radau2a\+\_\+init.\+cu\+:\nopagebreak
 \includegraphics[width=254pt]{radau2a__init_8cu__incl}
 \end{center}
 \end{figure}
-\subsection*{Functions}
-\begin{DoxyCompactItemize}
-\item 
-void \hyperlink{radau2a__init_8cu_a39c825543042903f579cd9c35a279dca}{init\+\_\+solver\+\_\+log} ()
-\item 
-void \hyperlink{radau2a__init_8cu_ae95cbe81062a829668c5fa8e28b2e2c7}{solver\+\_\+log} ()
-\item 
-const char $\ast$ \hyperlink{radau2a__init_8cu_a4ca568c33c1f8f478970cc5eec5d1d81}{solver\+\_\+name} ()
-\begin{DoxyCompactList}\small\item\em Returns the C\+V\+O\+DE solver name. \end{DoxyCompactList}\item 
-size\+\_\+t \hyperlink{radau2a__init_8cu_ab75ba2ae0b04dfd786322e7b34f49d84}{required\+\_\+solver\+\_\+size} ()
-\item 
-void \hyperlink{radau2a__init_8cu_aa4559ac37af59319f0c28865a2efdef0}{create\+And\+Zero} (void $\ast$$\ast$ptr, size\+\_\+t size)
-\item 
-void \hyperlink{radau2a__init_8cu_a30a747ce9a24af37c39f0ccbc093e13a}{initialize\+\_\+solver} (const int padded, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$h\+\_\+mem, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$d\+\_\+mem)
-\item 
-void \hyperlink{radau2a__init_8cu_a61dcb06647ae55dd950a9ea354b330d8}{cleanup\+\_\+solver} (\hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$h\+\_\+mem, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$d\+\_\+mem)
-\end{DoxyCompactItemize}
 
 
-\subsection{Function Documentation}
-\index{radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
-\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}}
-\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(solver\+\_\+memory $\ast$$\ast$h\+\_\+mem, solver\+\_\+memory $\ast$$\ast$d\+\_\+mem)}{cleanup_solver(solver_memory **h_mem, solver_memory **d_mem)}}]{\setlength{\rightskip}{0pt plus 5cm}void cleanup\+\_\+solver (
-\begin{DoxyParamCaption}
-\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{h\+\_\+mem, }
-\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{d\+\_\+mem}
-\end{DoxyParamCaption}
-)}\hypertarget{radau2a__init_8cu_a61dcb06647ae55dd950a9ea354b330d8}{}\label{radau2a__init_8cu_a61dcb06647ae55dd950a9ea354b330d8}
-\index{radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}!create\+And\+Zero@{create\+And\+Zero}}
-\index{create\+And\+Zero@{create\+And\+Zero}!radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}}
-\subsubsection[{\texorpdfstring{create\+And\+Zero(void $\ast$$\ast$ptr, size\+\_\+t size)}{createAndZero(void **ptr, size_t size)}}]{\setlength{\rightskip}{0pt plus 5cm}void create\+And\+Zero (
-\begin{DoxyParamCaption}
-\item[{void $\ast$$\ast$}]{ptr, }
-\item[{size\+\_\+t}]{size}
-\end{DoxyParamCaption}
-)}\hypertarget{radau2a__init_8cu_aa4559ac37af59319f0c28865a2efdef0}{}\label{radau2a__init_8cu_aa4559ac37af59319f0c28865a2efdef0}
-\index{radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
-\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}}
-\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+solver\+\_\+log (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\hypertarget{radau2a__init_8cu_a39c825543042903f579cd9c35a279dca}{}\label{radau2a__init_8cu_a39c825543042903f579cd9c35a279dca}
-\index{radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}!initialize\+\_\+solver@{initialize\+\_\+solver}}
-\index{initialize\+\_\+solver@{initialize\+\_\+solver}!radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}}
-\subsubsection[{\texorpdfstring{initialize\+\_\+solver(const int padded, solver\+\_\+memory $\ast$$\ast$h\+\_\+mem, solver\+\_\+memory $\ast$$\ast$d\+\_\+mem)}{initialize_solver(const int padded, solver_memory **h_mem, solver_memory **d_mem)}}]{\setlength{\rightskip}{0pt plus 5cm}void initialize\+\_\+solver (
-\begin{DoxyParamCaption}
-\item[{const int}]{padded, }
-\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{h\+\_\+mem, }
-\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{d\+\_\+mem}
-\end{DoxyParamCaption}
-)}\hypertarget{radau2a__init_8cu_a30a747ce9a24af37c39f0ccbc093e13a}{}\label{radau2a__init_8cu_a30a747ce9a24af37c39f0ccbc093e13a}
-\index{radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}!required\+\_\+solver\+\_\+size@{required\+\_\+solver\+\_\+size}}
-\index{required\+\_\+solver\+\_\+size@{required\+\_\+solver\+\_\+size}!radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}}
-\subsubsection[{\texorpdfstring{required\+\_\+solver\+\_\+size()}{required_solver_size()}}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t required\+\_\+solver\+\_\+size (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\hypertarget{radau2a__init_8cu_ab75ba2ae0b04dfd786322e7b34f49d84}{}\label{radau2a__init_8cu_ab75ba2ae0b04dfd786322e7b34f49d84}
-\index{radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}!solver\+\_\+log@{solver\+\_\+log}}
-\index{solver\+\_\+log@{solver\+\_\+log}!radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}}
-\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void solver\+\_\+log (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\hypertarget{radau2a__init_8cu_ae95cbe81062a829668c5fa8e28b2e2c7}{}\label{radau2a__init_8cu_ae95cbe81062a829668c5fa8e28b2e2c7}
-\index{radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}!solver\+\_\+name@{solver\+\_\+name}}
-\index{solver\+\_\+name@{solver\+\_\+name}!radau2a\+\_\+init.\+cu@{radau2a\+\_\+init.\+cu}}
-\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ solver\+\_\+name (
-\begin{DoxyParamCaption}
-{}
-\end{DoxyParamCaption}
-)}\hypertarget{radau2a__init_8cu_a4ca568c33c1f8f478970cc5eec5d1d81}{}\label{radau2a__init_8cu_a4ca568c33c1f8f478970cc5eec5d1d81}
+\subsection{Detailed Description}
+Implementation of the necessary initialization for the Radau-\/\+I\+IA solver. 
 
-
-Returns the C\+V\+O\+DE solver name. 
-
-Returns a descriptive solver name for the C\+V\+O\+DE solver, indicating use of Finite Difference Jacobian (or not) 
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/09/2015 
+\end{DoxyDate}

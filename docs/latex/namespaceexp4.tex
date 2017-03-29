@@ -8,15 +8,15 @@ int \hyperlink{namespaceexp4_a8d03ab917f8736a37474362beeff9391}{integrate} (cons
 void \hyperlink{namespaceexp4_a1ef7b39a9ac7da4247fd05807f000b07}{init\+\_\+solver\+\_\+log} ()
 \begin{DoxyCompactList}\small\item\em Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexp4_adc563232bff1c62e2068039175a6f428}{solver\+\_\+log} ()
-\item 
+\begin{DoxyCompactList}\small\item\em Executes solver specific logging tasks. \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexp4_ab5d3c8262078fd94e511c54eb766f46c}{initialize\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initializes the solver. \end{DoxyCompactList}\item 
 const char $\ast$ \hyperlink{namespaceexp4_aecc47dad1f4379532ab54b896a5e3771}{solver\+\_\+name} ()
-\begin{DoxyCompactList}\small\item\em Returns the E\+X\+P4 solver name. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexp4_a0a595493de14a8f82826268b344339a8}{cleanup\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Cleans up the created C\+V\+O\+DE solvers. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Cleans up the created solvers. \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexp4_a40f949e51fd1c796b23f6d81612720fb}{check\+\_\+error} (int tid, int code)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Checks the return code of the given thread (I\+VP) for an error, and exits if found. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
@@ -31,7 +31,18 @@ Include common code.
 \item[{int}]{code}
 \end{DoxyParamCaption}
 )}\hypertarget{namespaceexp4_a40f949e51fd1c796b23f6d81612720fb}{}\label{namespaceexp4_a40f949e51fd1c796b23f6d81612720fb}
-/fn void \hyperlink{namespaceexp4_a40f949e51fd1c796b23f6d81612720fb}{check\+\_\+error(int tid, int code)} /brief Checks the return code of the given thread (I\+VP) for an error, and exits if found /param tid The thread (I\+VP) index /param code The return code of the thread \begin{DoxySeeAlso}{See also}
+
+
+Checks the return code of the given thread (I\+VP) for an error, and exits if found. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tid} & The thread (I\+VP) index \\
+\hline
+{\em code} & The return code of the thread \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
 \hyperlink{group__exp4__ErrCodes}{Return codes of E\+X\+P4 integrator} 
 \end{DoxySeeAlso}
 \index{exp4@{exp4}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
@@ -43,14 +54,21 @@ Include common code.
 )}\hypertarget{namespaceexp4_a0a595493de14a8f82826268b344339a8}{}\label{namespaceexp4_a0a595493de14a8f82826268b344339a8}
 
 
-Cleans up the created C\+V\+O\+DE solvers. 
+Cleans up the created solvers. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em num\+\_\+threads} & The number of Open\+MP threads to use (and C\+V\+O\+DE solver objects to destroy)\\
+{\em num\+\_\+threads} & The number of Open\+MP threads used\\
 \hline
 \end{DoxyParams}
-Frees and cleans up allocated C\+V\+O\+DE memory. \index{exp4@{exp4}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+Frees and cleans up allocated C\+V\+O\+DE memory.
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads used\\
+\hline
+\end{DoxyParams}
+Frees and cleans up allocated R\+K78 memory. \index{exp4@{exp4}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
 \index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!exp4@{exp4}}
 \subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}exp4\+::init\+\_\+solver\+\_\+log (
 \begin{DoxyParamCaption}
@@ -60,6 +78,8 @@ Frees and cleans up allocated C\+V\+O\+DE memory. \index{exp4@{exp4}!init\+\_\+s
 
 
 Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+
+Initializes solver specific items for logging.
 
 \begin{DoxySeeAlso}{See also}
 \hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
@@ -73,13 +93,11 @@ Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT 
 )}\hypertarget{namespaceexp4_ab5d3c8262078fd94e511c54eb766f46c}{}\label{namespaceexp4_ab5d3c8262078fd94e511c54eb766f46c}
 
 
-Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods. 
-
-Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads.
+Initializes the solver. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em num\+\_\+threads} & Unused \\
+{\em num\+\_\+threads} & The number of Open\+MP threads to use \\
 \hline
 \end{DoxyParams}
 \index{exp4@{exp4}!integrate@{integrate}}
@@ -95,6 +113,8 @@ Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads.
 
 
 4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation 
+
+A header definition of the integrate method, that must be implemented by various solvers.
 
 
 \begin{DoxyParams}{Parameters}
@@ -120,6 +140,10 @@ The result of this integration step
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{namespaceexp4_adc563232bff1c62e2068039175a6f428}{}\label{namespaceexp4_adc563232bff1c62e2068039175a6f428}
+
+
+Executes solver specific logging tasks. 
+
 \index{exp4@{exp4}!solver\+\_\+name@{solver\+\_\+name}}
 \index{solver\+\_\+name@{solver\+\_\+name}!exp4@{exp4}}
 \subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ exp4\+::solver\+\_\+name (
@@ -129,8 +153,5 @@ The result of this integration step
 )}\hypertarget{namespaceexp4_aecc47dad1f4379532ab54b896a5e3771}{}\label{namespaceexp4_aecc47dad1f4379532ab54b896a5e3771}
 
 
-Returns the E\+X\+P4 solver name. 
+Returns a descriptive solver name. 
 
-Returns the C\+V\+O\+DE solver name.
-
-Returns a descriptive solver name for the E\+X\+P4 solver 

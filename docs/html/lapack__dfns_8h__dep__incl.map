@@ -1,5 +1,5 @@
 <map id="generic/lapack_dfns.h" name="generic/lapack_dfns.h">
 <area shape="rect" id="node2" href="$phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="5,80,161,121"/>
-<area shape="rect" id="node3" href="$complexInverse_8c.html" title="generic/complexInverse.c" alt="" coords="186,87,357,114"/>
-<area shape="rect" id="node4" href="$radau2a_8c.html" title="radau2a/radau2a.c" alt="" coords="381,87,511,114"/>
+<area shape="rect" id="node3" href="$complexInverse_8c.html" title="Implementation of LU factorization of complex (variable&#45;sized) matricies. " alt="" coords="186,87,357,114"/>
+<area shape="rect" id="node4" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="381,87,511,114"/>
 </map>

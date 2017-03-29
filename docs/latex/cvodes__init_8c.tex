@@ -30,16 +30,12 @@ Include dependency graph for cvodes\+\_\+init.\+c\+:\nopagebreak
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-int \hyperlink{namespacecvode_aa10a063b2a82d5b49c2bb338f16ddae4}{cvode\+::dydt\+\_\+cvodes} (double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, void $\ast$f)
-\begin{DoxyCompactList}\small\item\em The C\+V\+O\+D\+Es R\+HS interface. \end{DoxyCompactList}\item 
-int \hyperlink{namespacecvode_ab2efc395730d25bedc496a62e7896d24}{cvode\+::eval\+\_\+jacob\+\_\+cvodes} (long int N, double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, Dls\+Mat Jac, void $\ast$f, N\+\_\+\+Vector tmp1, N\+\_\+\+Vector tmp2, N\+\_\+\+Vector tmp3)
-\begin{DoxyCompactList}\small\item\em The C\+V\+O\+D\+Es Jacobian interface for a direct dense Jacobian. \end{DoxyCompactList}\item 
 void \hyperlink{namespacecvode_abe146525cea80d8032cd30b4441b5872}{cvode\+::initialize\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initializes the solver. \end{DoxyCompactList}\item 
 void \hyperlink{namespacecvode_ac9bc4957bff6721dae9d7e4cc470d184}{cvode\+::cleanup\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Cleans up the created C\+V\+O\+DE solvers. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Cleans up the created solvers. \end{DoxyCompactList}\item 
 const char $\ast$ \hyperlink{namespacecvode_a3a26024b8dc2ce6f8b2afcfb7c82c79f}{cvode\+::solver\+\_\+name} ()
-\begin{DoxyCompactList}\small\item\em Returns the C\+V\+O\+DE solver name. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
 void \hyperlink{namespacecvode_a9113d5fb0e19fa927d73b64c397ecd09}{cvode\+::init\+\_\+solver\+\_\+log} ()
 \item 
 void \hyperlink{namespacecvode_af7eb796b6829fecab506fb6dfec39be0}{cvode\+::solver\+\_\+log} ()

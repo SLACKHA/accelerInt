@@ -1,4 +1,4 @@
 <map id="exponential_integrators/exprb43/exprb43_props.cuh" name="exponential_integrators/exprb43/exprb43_props.cuh">
 <area shape="rect" id="node2" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="5,95,161,136"/>
-<area shape="rect" id="node3" href="$exprb43__props_8cu.html" title="exponential_integrators\l/exprb43/exprb43_props.cu" alt="" coords="186,95,365,136"/>
+<area shape="rect" id="node3" href="$exprb43__props_8cu.html" title="Error checking for the EXPRB43 algorithm. " alt="" coords="186,95,365,136"/>
 </map>

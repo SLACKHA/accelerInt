@@ -1,8 +1,8 @@
 <map id="generic/solver_init.cuh" name="generic/solver_init.cuh">
-<area shape="rect" id="node2" href="$solver_8cuh.html" title="generic/solver.cuh" alt="" coords="120,87,248,114"/>
-<area shape="rect" id="node5" href="$radau2a__init_8cu.html" title="radau2a/radau2a_init.cu" alt="" coords="272,87,432,114"/>
+<area shape="rect" id="node2" href="$solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="120,87,248,114"/>
+<area shape="rect" id="node5" href="$radau2a__init_8cu.html" title="Implementation of the necessary initialization for the Radau&#45;IIA solver. " alt="" coords="272,87,432,114"/>
 <area shape="rect" id="node6" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="457,80,613,121"/>
 <area shape="rect" id="node7" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="637,80,793,121"/>
-<area shape="rect" id="node3" href="$solver__generic_8cu.html" title="generic/solver_generic.cu" alt="" coords="5,169,176,196"/>
-<area shape="rect" id="node4" href="$solver__main_8cu.html" title="generic/solver_main.cu" alt="" coords="201,169,357,196"/>
+<area shape="rect" id="node3" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="5,169,176,196"/>
+<area shape="rect" id="node4" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="201,169,357,196"/>
 </map>

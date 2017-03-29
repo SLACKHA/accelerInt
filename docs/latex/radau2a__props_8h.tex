@@ -1,5 +1,10 @@
 \hypertarget{radau2a__props_8h}{}\section{radau2a/radau2a\+\_\+props.h File Reference}
 \label{radau2a__props_8h}\index{radau2a/radau2a\+\_\+props.\+h@{radau2a/radau2a\+\_\+props.\+h}}
+
+
+Various macros controlling behaviour of R\+A\+D\+A\+U2A algorithm.  
+
+
 {\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
 {\ttfamily \#include $<$stdio.\+h$>$}\\*
 Include dependency graph for radau2a\+\_\+props.\+h\+:\nopagebreak
@@ -16,39 +21,44 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \includegraphics[width=206pt]{radau2a__props_8h__dep__incl}
 \end{center}
 \end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceradau2a}{radau2a}
+\end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
 \#define \hyperlink{radau2a__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE}~(N\+SP)
-\item 
-\#define \hyperlink{radau2a__props_8h_abd83bc0f9f475a2189a4db4a08b790ca}{E\+C\+\_\+success}~(0)
-\item 
-\#define \hyperlink{radau2a__props_8h_ae0287841c08f86f5709660fd731615ad}{E\+C\+\_\+consecutive\+\_\+steps}~(1)
-\item 
-\#define \hyperlink{radau2a__props_8h_a0f0275d9851ab5c19b79a963d5084df3}{E\+C\+\_\+max\+\_\+steps\+\_\+exceeded}~(2)
-\item 
-\#define \hyperlink{radau2a__props_8h_a9326efd544880e2683c4453365ca2704}{E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h}~(3)
-\item 
-\#define \hyperlink{radau2a__props_8h_aae2906abd9ae8a2791c2e8626ca73a32}{E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded}~(4)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em the matrix dimensions \end{DoxyCompactList}\item 
+\#define \hyperlink{group__RK__ErrCodes_gabd83bc0f9f475a2189a4db4a08b790ca}{E\+C\+\_\+success}~(0)
+\begin{DoxyCompactList}\small\item\em Successful time step. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__RK__ErrCodes_gae0287841c08f86f5709660fd731615ad}{E\+C\+\_\+consecutive\+\_\+steps}~(1)
+\begin{DoxyCompactList}\small\item\em Maximum number of consecutive internal timesteps with error reached. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__RK__ErrCodes_ga0f0275d9851ab5c19b79a963d5084df3}{E\+C\+\_\+max\+\_\+steps\+\_\+exceeded}~(2)
+\begin{DoxyCompactList}\small\item\em Maximum number of internal timesteps exceeded. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__RK__ErrCodes_ga9326efd544880e2683c4453365ca2704}{E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h}~(3)
+\begin{DoxyCompactList}\small\item\em Timescale reduced such that t + h == t in floating point math. \end{DoxyCompactList}\item 
+\#define \hyperlink{group__RK__ErrCodes_gaae2906abd9ae8a2791c2e8626ca73a32}{E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded}~(4)
+\begin{DoxyCompactList}\small\item\em Maximum allowed Newton Iteration steps exceeded. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Various macros controlling behaviour of R\+A\+D\+A\+U2A algorithm. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}
 
 
 \subsection{Macro Definition Documentation}
-\index{radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}!E\+C\+\_\+consecutive\+\_\+steps@{E\+C\+\_\+consecutive\+\_\+steps}}
-\index{E\+C\+\_\+consecutive\+\_\+steps@{E\+C\+\_\+consecutive\+\_\+steps}!radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}}
-\subsubsection[{\texorpdfstring{E\+C\+\_\+consecutive\+\_\+steps}{EC_consecutive_steps}}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+C\+\_\+consecutive\+\_\+steps~(1)}\hypertarget{radau2a__props_8h_ae0287841c08f86f5709660fd731615ad}{}\label{radau2a__props_8h_ae0287841c08f86f5709660fd731615ad}
-\index{radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}!E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h@{E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h}}
-\index{E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h@{E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h}!radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}}
-\subsubsection[{\texorpdfstring{E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h}{EC_h_plus_t_equals_h}}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+C\+\_\+h\+\_\+plus\+\_\+t\+\_\+equals\+\_\+h~(3)}\hypertarget{radau2a__props_8h_a9326efd544880e2683c4453365ca2704}{}\label{radau2a__props_8h_a9326efd544880e2683c4453365ca2704}
-\index{radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}!E\+C\+\_\+max\+\_\+steps\+\_\+exceeded@{E\+C\+\_\+max\+\_\+steps\+\_\+exceeded}}
-\index{E\+C\+\_\+max\+\_\+steps\+\_\+exceeded@{E\+C\+\_\+max\+\_\+steps\+\_\+exceeded}!radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}}
-\subsubsection[{\texorpdfstring{E\+C\+\_\+max\+\_\+steps\+\_\+exceeded}{EC_max_steps_exceeded}}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+C\+\_\+max\+\_\+steps\+\_\+exceeded~(2)}\hypertarget{radau2a__props_8h_a0f0275d9851ab5c19b79a963d5084df3}{}\label{radau2a__props_8h_a0f0275d9851ab5c19b79a963d5084df3}
-\index{radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}!E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded@{E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded}}
-\index{E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded@{E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded}!radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}}
-\subsubsection[{\texorpdfstring{E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded}{EC_newton_max_iterations_exceeded}}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+C\+\_\+newton\+\_\+max\+\_\+iterations\+\_\+exceeded~(4)}\hypertarget{radau2a__props_8h_aae2906abd9ae8a2791c2e8626ca73a32}{}\label{radau2a__props_8h_aae2906abd9ae8a2791c2e8626ca73a32}
-\index{radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}!E\+C\+\_\+success@{E\+C\+\_\+success}}
-\index{E\+C\+\_\+success@{E\+C\+\_\+success}!radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}}
-\subsubsection[{\texorpdfstring{E\+C\+\_\+success}{EC_success}}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+C\+\_\+success~(0)}\hypertarget{radau2a__props_8h_abd83bc0f9f475a2189a4db4a08b790ca}{}\label{radau2a__props_8h_abd83bc0f9f475a2189a4db4a08b790ca}
 \index{radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}!S\+T\+R\+I\+DE@{S\+T\+R\+I\+DE}}
 \index{S\+T\+R\+I\+DE@{S\+T\+R\+I\+DE}!radau2a\+\_\+props.\+h@{radau2a\+\_\+props.\+h}}
 \subsubsection[{\texorpdfstring{S\+T\+R\+I\+DE}{STRIDE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+T\+R\+I\+DE~(N\+SP)}\hypertarget{radau2a__props_8h_a351d54267048643c4365f6a24641d0cf}{}\label{radau2a__props_8h_a351d54267048643c4365f6a24641d0cf}
+
+
+the matrix dimensions 
+

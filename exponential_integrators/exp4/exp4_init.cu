@@ -1,6 +1,6 @@
-/*!
- * \file exp4.cu
- *  Implementation of the necessary initialization for the EXP4 method
+/**
+ * \file
+ * \brief Implementation of the necessary initialization for the EXP4 method
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
@@ -17,10 +17,10 @@ namespace exp4cu {
 #endif
 
 /*!
- * /fn void createAndZero(void** ptr, size_t size)
- * /brief Convienvience method to Cuda Malloc and memset a pointer to zero
- * /param ptr The address of the pointer to malloc
- * /param size The total size (in bytes) of the pointer to malloc
+ * \fn void createAndZero(void** ptr, size_t size)
+ * \brief Convienvience method to Cuda Malloc and memset a pointer to zero
+ * \param ptr The address of the pointer to malloc
+ * \param size The total size (in bytes) of the pointer to malloc
  */
 void createAndZero(void** ptr, size_t size)
 {
@@ -29,10 +29,12 @@ void createAndZero(void** ptr, size_t size)
 }
 
 /*! \fn void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
-   \brief Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes solver_memory
+   \brief Initializes the GPU solver
    \param padded The total (padded) number of GPU threads (IVPs) to solve
    \param h_mem The host solver_memory structure (to be copied to the GPU)
    \param d_mem The device solver_memory structure (to be operated on by the GPU)
+
+   Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes solver_memory
 */
 void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
     find_poles_and_residuals();
@@ -64,9 +66,7 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
 
 /*!
    \fn char* solver_name()
-   \brief Returns the EXP4 solver name
-
-   Returns a descriptive solver name for the GPU EXP4 solver
+   \brief Returns a descriptive solver name
 */
  const char* solver_name() {
     const char* name = "exp4-int-gpu";
@@ -98,7 +98,9 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
 
 /*!
    \fn solver_log()
-   \brief Logs errors, step-sizes, and krylov subspace size (if LOG_OUTPUT is defined)
+   \brief Executes solver specific logging tasks
+
+   Logs errors, step-sizes, and krylov subspace size (if #LOG_OUTPUT is defined)
    @see solver_options.cuh
 */
  void solver_log() {
@@ -130,9 +132,11 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
  #endif
  }
 
-/*!
+ /*!
    \fn init_solver_log()
-   \brief Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined)
+   \brief Initializes solver specific items for logging
+
+   Initializes the Krylov subspace logging files (if #LOG_OUTPUT is defined)
    @see solver_options.cuh
 */
  void init_solver_log() {
@@ -187,9 +191,11 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
 
 /*!
    \fn void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem)
-   \brief Cleans up solver memory, and closes Krylov subspace logfiles (if LOG_OUTPUT is defined)
+   \brief Cleans up solver memory
    @see solver_memory
    @see solver_options.cuh
+
+   Additionally closes Krylov subspace logfiles (if #LOG_OUTPUT is defined)
 */
  void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem) {
  #ifdef LOG_OUTPUT

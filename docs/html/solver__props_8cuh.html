@@ -89,39 +89,48 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">solver_props.cuh File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>simple convenience file to include the correct solver properties file  
+<a href="#details">More...</a></p>
 <div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="solver__props_8cuh__dep__incl.png" border="0" usemap="#generic_2solver__props_8cuhdep" alt=""/></div>
 <map name="generic_2solver__props_8cuhdep" id="generic_2solver__props_8cuhdep">
-<area shape="rect" id="node2" href="exponential__linear__algebra_8cuh.html" title="exponential_integrators\l/exponential_linear_algebra.cuh" alt="" coords="236,80,440,121"/>
+<area shape="rect" id="node2" href="exponential__linear__algebra_8cuh.html" title="Definitions of various linear algebra functions needed in the exponential integrators. " alt="" coords="236,80,440,121"/>
 <area shape="rect" id="node4" href="exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="84,259,240,300"/>
 <area shape="rect" id="node5" href="exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="427,259,583,300"/>
 <area shape="rect" id="node7" href="phiAHessenberg_8cu.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="820,80,976,121"/>
-<area shape="rect" id="node8" href="complexInverse_8cu.html" title="generic/complexInverse.cu" alt="" coords="1001,87,1180,114"/>
-<area shape="rect" id="node9" href="inverse_8cu.html" title="generic/inverse.cu" alt="" coords="1204,87,1332,114"/>
-<area shape="rect" id="node10" href="solver__init_8cuh.html" title="generic/solver_init.cuh" alt="" coords="593,87,745,114"/>
-<area shape="rect" id="node11" href="solver_8cuh.html" title="generic/solver.cuh" alt="" coords="828,177,956,203"/>
-<area shape="rect" id="node15" href="radau2a_8cu.html" title="radau2a/radau2a.cu" alt="" coords="1356,87,1492,114"/>
-<area shape="rect" id="node16" href="exp4__init_8cu.html" title="exponential_integrators\l/exp4/exp4_init.cu" alt="" coords="1516,80,1672,121"/>
-<area shape="rect" id="node17" href="exprb43__init_8cu.html" title="exponential_integrators\l/exprb43/exprb43_init.cu" alt="" coords="1696,80,1860,121"/>
+<area shape="rect" id="node8" href="complexInverse_8cu.html" title="Implementation of LU factorization of complex (variable&#45;sized) matricies for CUDA. " alt="" coords="1001,87,1180,114"/>
+<area shape="rect" id="node9" href="inverse_8cu.html" title="CUDA LU decomposition implementation. " alt="" coords="1204,87,1332,114"/>
+<area shape="rect" id="node10" href="solver__init_8cuh.html" title="Header definitions for solver initialization routins. " alt="" coords="593,87,745,114"/>
+<area shape="rect" id="node11" href="solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="828,177,956,203"/>
+<area shape="rect" id="node15" href="radau2a_8cu.html" title="A Radau2A IRK implementation for CUDA Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE..." alt="" coords="1356,87,1492,114"/>
+<area shape="rect" id="node16" href="exp4__init_8cu.html" title="Implementation of the necessary initialization for the EXP4 method. " alt="" coords="1516,80,1672,121"/>
+<area shape="rect" id="node17" href="exprb43__init_8cu.html" title="Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solv..." alt="" coords="1696,80,1860,121"/>
 <area shape="rect" id="node3" href="arnoldi_8cuh.html" title="exponential_integrators\l/arnoldi.cuh" alt="" coords="260,169,416,211"/>
 <area shape="rect" id="node6" href="exponential__linear__algebra_8cu.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="38,169,236,211"/>
-<area shape="rect" id="node14" href="radau2a__init_8cu.html" title="radau2a/radau2a_init.cu" alt="" coords="644,177,804,203"/>
-<area shape="rect" id="node12" href="solver__generic_8cu.html" title="generic/solver_generic.cu" alt="" coords="712,266,882,293"/>
-<area shape="rect" id="node13" href="solver__main_8cu.html" title="generic/solver_main.cu" alt="" coords="907,266,1063,293"/>
+<area shape="rect" id="node14" href="radau2a__init_8cu.html" title="Implementation of the necessary initialization for the Radau&#45;IIA solver. " alt="" coords="644,177,804,203"/>
+<area shape="rect" id="node12" href="solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="712,266,882,293"/>
+<area shape="rect" id="node13" href="solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="907,266,1063,293"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsolver__memory.html">solver_memory</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacegenericcu"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html">genericcu</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -131,10 +140,12 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a28fd85b20b0d1af38759f820ab5ec5dc"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__props_8cuh.html#a28fd85b20b0d1af38759f820ab5ec5dc">check_error</a> (int, int *)</td></tr>
-<tr class="separator:a28fd85b20b0d1af38759f820ab5ec5dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af403dabfc12de79ff9ab8575983d6f83"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#af403dabfc12de79ff9ab8575983d6f83">genericcu::check_error</a> (int num_conditions, int *code_arr)</td></tr>
+<tr class="separator:af403dabfc12de79ff9ab8575983d6f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>simple convenience file to include the correct solver properties file </p>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="abab1859a388294ac0be0474379ddc940"></a>
 <div class="memitem">
 <div class="memproto">
@@ -144,35 +155,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a28fd85b20b0d1af38759f820ab5ec5dc"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">__host__ void check_error </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>num_cond</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>codes</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>/fn void <a class="el" href="radau2a__props_8c.html#a12dd8b11e8bada5fbbcaf97b752e6ee1">check_error(int tid, int code)</a> /brief Checks the return code of the given thread (IVP) for an error, and exits if found /param num_cond The total number of IVPs to check /param codes The array of return codes </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exp4cu__ErrCodes.html">Return codes of GPU EXPRB43 integrator</a></dd></dl>
-<p>/fn void <a class="el" href="radau2a__props_8c.html#a12dd8b11e8bada5fbbcaf97b752e6ee1">check_error(int tid, int code)</a> /brief Checks the return code of the given thread (IVP) for an error, and exits if found /param num_cond The total number of IVPs to check /param codes The array of return codes </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exprb43cu__ErrCodes.html">Return codes of GPU EXP4 integrator</a> </dd></dl>
 
 </div>
 </div>

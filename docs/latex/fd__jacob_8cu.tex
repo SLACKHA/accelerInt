@@ -1,5 +1,10 @@
 \hypertarget{fd__jacob_8cu}{}\section{generic/fd\+\_\+jacob.cu File Reference}
 \label{fd__jacob_8cu}\index{generic/fd\+\_\+jacob.\+cu@{generic/fd\+\_\+jacob.\+cu}}
+
+
+Finite Difference Jacobian implementation based on C\+V\+O\+D\+Es.  
+
+
 {\ttfamily \#include \char`\"{}fd\+\_\+jacob.\+cuh\char`\"{}}\\*
 Include dependency graph for fd\+\_\+jacob.\+cu\+:\nopagebreak
 \begin{figure}[H]
@@ -12,18 +17,27 @@ Include dependency graph for fd\+\_\+jacob.\+cu\+:\nopagebreak
 \begin{DoxyCompactItemize}
 \item 
 \#define \hyperlink{fd__jacob_8cu_a5c00ed5d35f84424a9e4b2197bf21ac7}{F\+D\+\_\+\+O\+RD}~1
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em The finite difference order \mbox{[}Default\+: 1\mbox{]}. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{fd__jacob_8cu_ad1176739b8060ea7c37dc96b1b2d73c2}{eval\+\_\+jacob} (const double t, const double pres, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ cy, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ jac, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ d\+\_\+mem, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y\+\_\+temp, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ewt)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Computes a finite difference Jacobian of order F\+D\+\_\+\+O\+RD of the R\+HS function dydt at the given pressure and state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Finite Difference Jacobian implementation based on C\+V\+O\+D\+Es. 
+
 
 
 \subsection{Macro Definition Documentation}
 \index{fd\+\_\+jacob.\+cu@{fd\+\_\+jacob.\+cu}!F\+D\+\_\+\+O\+RD@{F\+D\+\_\+\+O\+RD}}
 \index{F\+D\+\_\+\+O\+RD@{F\+D\+\_\+\+O\+RD}!fd\+\_\+jacob.\+cu@{fd\+\_\+jacob.\+cu}}
 \subsubsection[{\texorpdfstring{F\+D\+\_\+\+O\+RD}{FD_ORD}}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+D\+\_\+\+O\+RD~1}\hypertarget{fd__jacob_8cu_a5c00ed5d35f84424a9e4b2197bf21ac7}{}\label{fd__jacob_8cu_a5c00ed5d35f84424a9e4b2197bf21ac7}
+
+
+The finite difference order \mbox{[}Default\+: 1\mbox{]}. 
+
 
 
 \subsection{Function Documentation}
@@ -40,3 +54,24 @@ Include dependency graph for fd\+\_\+jacob.\+cu\+:\nopagebreak
 \item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{ewt}
 \end{DoxyParamCaption}
 )}\hypertarget{fd__jacob_8cu_ad1176739b8060ea7c37dc96b1b2d73c2}{}\label{fd__jacob_8cu_ad1176739b8060ea7c37dc96b1b2d73c2}
+
+
+Computes a finite difference Jacobian of order F\+D\+\_\+\+O\+RD of the R\+HS function dydt at the given pressure and state. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em t} & the current system time \\
+\hline
+\mbox{\tt in}  & {\em pres} & the current system pressure \\
+\hline
+\mbox{\tt in}  & {\em cy} & the system state vector \\
+\hline
+\mbox{\tt out}  & {\em jac} & the resulting Jacobian \\
+\hline
+\mbox{\tt in}  & {\em d\+\_\+mem} & the mechanism\+\_\+memory object used in computing dydt \\
+\hline
+\mbox{\tt in}  & {\em y\+\_\+temp} & a work array for the state vector \\
+\hline
+\mbox{\tt in}  & {\em ewt} & a storage for the error weights in computing the Jacobian perturbation factor \\
+\hline
+\end{DoxyParams}

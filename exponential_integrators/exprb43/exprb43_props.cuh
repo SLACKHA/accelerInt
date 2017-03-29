@@ -34,21 +34,38 @@ namespace exprb43cu {
 
 struct solver_memory
 {
-	double* sc; /// the scaled error coefficients
-	double* work1; /// a work array
-	double* work2; /// a work array
-	double* work3; /// a work array
-	double* gy; /// The difference between RHS function and the Jacobian state vector product
-	double* Hm; /// The Hessenberg Kyrlov subspace array for EXP4, to take the exponential action on
-	double* phiHm; /// the exponential Krylov subspace array for EXP4
-	double* Vm; /// the Arnoldi basis array
-	double* savedActions; /// Saved stage results
-	int* ipiv; /// the pivot indicies
-	cuDoubleComplex* invA; /// the inverse of the Hessenberg Krylov subspace
-	cuDoubleComplex* work4;  /// a (complex) work array
-	int* result; /// an array of integration results for the various threads @see exprb43cu_ErrCodes
+	//! the scaled error coefficients
+	double* sc;
+	//! a work array
+	double* work1;
+	//! a work array
+	double* work2;
+	//! a work array
+	double* work3;
+	//! The difference between RHS function and the Jacobian state vector product
+	double* gy;
+	//! The Hessenberg Kyrlov subspace array for EXP4, to take the exponential action on
+	double* Hm;
+	//! the exponential Krylov subspace array for EXP4
+	double* phiHm;
+	//! the Arnoldi basis array
+	double* Vm;
+	//! Saved stage results
+	double* savedActions;
+	//! the pivot indicies
+	int* ipiv;
+	//! the inverse of the Hessenberg Krylov subspace
+	cuDoubleComplex* invA;
+	//! a (complex) work array
+	cuDoubleComplex* work4;
+	//! an array of integration results for the various threads @see exprb43cu_ErrCodes
+	int* result;
 };
 
+/**
+ * \addtogroup CUErrorCodes Return codes of Integrators
+ * @{
+ */
 /**
  * \defgroup exprb43cu_ErrCodes Return codes of GPU EXP4 integrator
  * @{
@@ -63,6 +80,9 @@ struct solver_memory
 //! Timestep reduced such that update would have no effect on simulation time
 #define EC_h_plus_t_equals_h (3)
 
+/**
+ * @}
+ */
 /**
  * @}
  */

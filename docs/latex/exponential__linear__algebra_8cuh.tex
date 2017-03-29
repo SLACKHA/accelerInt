@@ -1,5 +1,10 @@
 \hypertarget{exponential__linear__algebra_8cuh}{}\section{exponential\+\_\+integrators/exponential\+\_\+linear\+\_\+algebra.cuh File Reference}
 \label{exponential__linear__algebra_8cuh}\index{exponential\+\_\+integrators/exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+integrators/exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+
+
+Definitions of various linear algebra functions needed in the exponential integrators.  
+
+
 {\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+options.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
@@ -29,15 +34,15 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized MxM and a vector Mx1. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a6bc7e5c08b8e40b19ce05ea146c05307}{matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal} (const int m, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
 \begin{DoxyCompactList}\small\item\em Matrix-\/vector plus equals for a matrix of size MxM and vector of size Mx1. That is, it returns (A + I) $\ast$ v. \end{DoxyCompactList}\item 
-\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a03e37312683db492dc73e08c17fe40e7}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale} (const int m, const double \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a03e37312683db492dc73e08c17fe40e7}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale} (const int m, const double \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
 \begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor That is, it returns A $\ast$ v $\ast$ scale. \end{DoxyCompactList}\item 
-\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_aafe924c72a847b1d591e8fecb0efebdc}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$Av)
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_aafe924c72a847b1d591e8fecb0efebdc}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$Av)
 \begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor. \end{DoxyCompactList}\item 
-\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a6d511f330da8ea1a044ed327a132d290}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$Av)
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a6d511f330da8ea1a044ed327a132d290}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$Av)
 \begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor. \end{DoxyCompactList}\item 
-\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a28166d4c2569ab108219b8466bef8a77}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add} (const int m, const double \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ V, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a28166d4c2569ab108219b8466bef8a77}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add} (const int m, const double \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ V, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
 \begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor and added to another vector. \end{DoxyCompactList}\item 
-\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a0522be133cda40ce325a2af6d95daddb}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract} (const int m, const double \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sub)
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a0522be133cda40ce325a2af6d95daddb}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract} (const int m, const double \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sub)
 \begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor and adds and subtracts the specified vectors note, the addition is twice the specified vector. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_ace23ed149f65a9b90469b38ecd9ef01b}{scale} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
 \begin{DoxyCompactList}\small\item\em Get scaling for weighted norm. \end{DoxyCompactList}\item 
@@ -55,6 +60,17 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \begin{DoxyCompactList}\small\item\em Subtracts Vm scaled by s from w. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a5349e6f114398db5a19e212fc837f670}{scale\+\_\+mult} (const double s, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ w, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Vm)
 \begin{DoxyCompactList}\small\item\em Sets Vm to s $\ast$ w. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Definitions of various linear algebra functions needed in the exponential integrators. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/09/2015 
+\end{DoxyDate}
 
 
 \subsection{Macro Definition Documentation}

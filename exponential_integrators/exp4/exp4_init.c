@@ -1,6 +1,6 @@
 /*!
- * \file exp4.c
- *  Implementation of the necessary initialization for the EXP4 method
+ * \file
+ * \brief Implementation of the necessary initialization for the EXP4 method
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
@@ -44,18 +44,17 @@ void solver_log() {
 }
 
 /*! \fn void initialize_solver(int num_threads)
-   \brief Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods
-   \param num_threads Unused
+   \brief Initializes the solver
+   \param num_threads The number of OpenMP threads to use
 */
 void initialize_solver(int num_threads) {
+    //Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods
  	find_poles_and_residuals();
 }
 
 /*!
    \fn char* solver_name()
-   \brief Returns the EXP4 solver name
-
-   Returns a descriptive solver name for the EXP4 solver
+   \brief Returns a descriptive solver name
 */
 const char* solver_name() {
  	const char* name = "exp4-int";

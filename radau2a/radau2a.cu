@@ -1,15 +1,20 @@
-/** 
-* \file radau2a.cu
+/**
+* \file
 *
 * \author Nicholas J. Curtis
 * \date 03/16/2015
 *
-* A Radau2A IRK implementation for CUDA
-* Based off the work of Harier and Wanner (1996),
-* and the FATODE ODE integration library
-* 
+* \brief A Radau2A IRK implementation for CUDA
+* Adapted from Hairer and Wanner's [RADAU5 code](http://www.unige.ch/~hairer/prog/stiff/radau5.f)
+* and the [FATODE](http://people.cs.vt.edu/~asandu/Software/FATODE/index.html) ODE integration library
+*
+* For full reference see:\n
+* G. Wanner, E. Hairer, Solving Ordinary Differential Equations II: Stiff and DifferentialAlgebraic
+Problems, 2nd Edition, Springer-Verlag, Berlin, 1996. doi:10.1007/978-3-642-
+05221-7.
+*
 * NOTE: all matricies stored in column major format!
-* 
+*
 */
 
 #include <cuComplex.h>
@@ -33,6 +38,10 @@
 #include "dydt.cuh"
 #include "gpu_macros.cuh"
 
+#ifdef GENERATE_DOCS
+namespace radau2acu {
+#endif
+
 //#define WARP_VOTING
 #ifdef WARP_VOTING
 	#define ANY(X) (__any((X)))
@@ -41,25 +50,48 @@
 	#define ANY(X) ((X))
 	#define ALL(X) ((X))
 #endif
+
+//! Maximum number of allowed internal timesteps before error
 #define Max_no_steps (200000)
+//! Maximum number of allowed Newton iteration steps before error
 #define NewtonMaxit (8)
+//! Use quadratic interpolation from previous step if possible
 #define StartNewton (true)
+//! Use gustafsson time stepping control
 #define Gustafsson
+//! Smallist representable double precision number
 #define Roundoff (EPS)
+//! Controls maximum decrease in timestep size
 #define FacMin (0.2)
+//! Controls maximum increase in timestep size
 #define FacMax (8)
+//! Safety factor for Gustafsson time stepping control
 #define FacSafe (0.9)
+//! Time step factor on rejected step
 #define FacRej (0.1)
+//! Minimum Newton convergence rate
 #define ThetaMin (0.001)
+//! Newton convergence tolerance
 #define NewtonTol (0.03)
+//! Min Timestep ratio to skip LU decomposition
 #define Qmin (1.0)
+//! Max Timestep ratio to skip LU decomposition
 #define Qmax (1.2)
-#define UNROLL (8)
+//#define UNROLL (8)
+//! Error allowed on this many consecutive internal timesteps before exit
+#define Max_consecutive_errs (5)
+//#define UNROLL (8)
 #ifdef DIVERGENCE_TEST
  	extern __device__ int integrator_steps[DIVERGENCE_TEST];
 #endif
 //#define SDIRK_ERROR
 
+/**
+ * \brief Computes error weight scaling from initial and current state
+ * \param[in]		y0			the initial state vector to use
+ * \param[in]		y			the current state vector
+ * \param[out]		sc			the populated error weight scalings
+ */
 __device__
 void scale (double const * const __restrict__ y0,
 			double const * const __restrict__ y,
@@ -70,6 +102,11 @@ void scale (double const * const __restrict__ y0,
 	}
 }
 
+/**
+ * \brief Computes error weight scaling from initial state
+ * \param[in]		y0			the initial state vector to use
+ * \param[out]		sc			the populated error weight scalings
+ */
 __device__
 void scale_init (double const * const __restrict__ y0,
 				 double * const __restrict__ sc) {
@@ -79,6 +116,11 @@ void scale_init (double const * const __restrict__ y0,
 	}
 }
 
+/**
+ * \brief A convienence method that provides an unrolled memcpy for CUDA code
+ * \param[out]		dest			The destination vector
+ * \param[in]		source			The source vector
+ */
 __device__
 void safe_memcpy(double * const __restrict__ dest,
 				 double const * const __restrict__ source)
@@ -89,6 +131,14 @@ void safe_memcpy(double * const __restrict__ dest,
 		dest[INDEX(i)] = source[INDEX(i)];
 	}
 }
+
+/**
+ * \brief A convienence method that provides an unrolled memset three vectors in CUDA code
+ * \param[out]		dest1			The first destination vector
+ * \param[out]		dest2			The second destination vector
+ * \param[out]		dest3			The third destination vector
+ * \param[in]		val				The value to use in memset
+ */
 __device__
 void safe_memset3(double * const __restrict__ dest1,
 				  double * const __restrict__ dest2,
@@ -102,6 +152,12 @@ void safe_memset3(double * const __restrict__ dest1,
 		dest3[INDEX(i)] = val;
 	}
 }
+
+/**
+ * \brief A convienence method that provides an unrolled memset of a single vector in CUDA code
+ * \param[out]		dest			The destination vector
+ * \param[in]		val				The value to use in memset
+ */
 __device__
 void safe_memset(double * const __restrict__ dest1, const double val)
 {
@@ -111,6 +167,12 @@ void safe_memset(double * const __restrict__ dest1, const double val)
 		dest1[INDEX(i)] = val;
 	}
 }
+
+/**
+ * \brief A convienence method that provides an unrolled memset of 2D (NSP x NSP) matrix in CUDA code
+ * \param[out]		dest1			The destination vector
+ * \param[in]		val				The value to use in memset
+ */
 __device__
 void safe_memset_jac(double * const __restrict__ dest1, const double val)
 {
@@ -120,6 +182,11 @@ void safe_memset_jac(double * const __restrict__ dest1, const double val)
 		dest1[INDEX(i)] = val;
 	}
 }
+
+/**
+ * \defgroup RK_Params Various parameters for the RadauIIA method
+ * @{
+ */
 
 __constant__ double rkA[3][3] = { {
 	 1.968154772236604258683861429918299e-1,
@@ -148,11 +215,11 @@ __constant__ double rkC[3] = {
 1.0
 };
 
-//Local order of error estimator 
+//Local order of error estimator
 /*
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~> Diagonalize the RK matrix:               
-! rkTinv * inv(rkA) * rkT =          
+!~~~> Diagonalize the RK matrix:
+! rkTinv * inv(rkA) * rkT =
 !           |  rkGamma      0           0     |
 !           |      0      rkAlpha   -rkBeta   |
 !           |      0      rkBeta     rkAlpha  |
@@ -211,7 +278,7 @@ __constant__ double rkAinvT[3][3] = {
 -3.050430199247410569426377624787569e0}
 };
 
-// Classical error estimator: 
+// Classical error estimator:
 // H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
 __constant__ double rkE[4] = {
 0.05,
@@ -229,12 +296,17 @@ const static double rkTheta[3] = {
 
 __constant__ double rkELO = 4;
 
+/**
+ @}
+ */
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
 * calculate E1 & E2 matricies and their LU Decomposition
 */
-__device__ void RK_Decomp(double H, const double* const __restrict__ Jac, 
+__device__ void RK_Decomp(double H, const double* const __restrict__ Jac,
 							const solver_memory* const __restrict__ solver,
 							int* __restrict__ info) {
 	double* const __restrict__ E1 = solver->E1;
@@ -252,7 +324,7 @@ __device__ void RK_Decomp(double H, const double* const __restrict__ Jac,
 			E2[INDEX(i + j * NSP)] = make_cuDoubleComplex(-Jac[INDEX(i + j * NSP)], 0);
 		}
 		E1[INDEX(i + i * NSP)] += rkGamma / H;
-		E2[INDEX(i + i * NSP)] = cuCadd(E2[INDEX(i + i * NSP)], temp); 
+		E2[INDEX(i + i * NSP)] = cuCadd(E2[INDEX(i + i * NSP)], temp);
 	}
 	getLU(NSP, E1, ipiv1, info);
 	if (*info != 0) {
@@ -263,16 +335,16 @@ __device__ void RK_Decomp(double H, const double* const __restrict__ Jac,
 
 __device__ void RK_Make_Interpolate(const double* __restrict__ Z1, const double* __restrict__ Z2,
 										const double* __restrict__ Z3, double* __restrict__ CONT) {
-	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]); 
+	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]);
 	#pragma unroll 8
 	for (int i = 0; i < NSP; i++) {
 		CONT[INDEX(i)] = ((-rkC[2] * rkC[2] * rkC[1] * Z1[INDEX(i)] + Z3[INDEX(i)] * rkC[1]* rkC[0] * rkC[0]
-                    + rkC[1] * rkC[1] * rkC[2] * Z1[INDEX(i)] - rkC[1] * rkC[1] * rkC[0] * Z3[INDEX(i)] 
+                    + rkC[1] * rkC[1] * rkC[2] * Z1[INDEX(i)] - rkC[1] * rkC[1] * rkC[0] * Z3[INDEX(i)]
                     + rkC[2] * rkC[2] * rkC[0] * Z2[INDEX(i)] - Z2[INDEX(i)] * rkC[2] * rkC[0] * rkC[0])
                     /den) - Z3[INDEX(i)];
-        CONT[INDEX(NSP + i)] = -( rkC[0] * rkC[0] * (Z3[INDEX(i)] - Z2[INDEX(i)]) + rkC[1] * rkC[1] * (Z1[INDEX(i)] - Z3[INDEX(i)]) 
+        CONT[INDEX(NSP + i)] = -( rkC[0] * rkC[0] * (Z3[INDEX(i)] - Z2[INDEX(i)]) + rkC[1] * rkC[1] * (Z1[INDEX(i)] - Z3[INDEX(i)])
         				 + rkC[2] * rkC[2] * (Z2[INDEX(i)] - Z1[INDEX(i)]) )/den;
-        CONT[INDEX(NSP + NSP + i)] = ( rkC[0] * (Z3[INDEX(i)] - Z2[INDEX(i)]) + rkC[1] * (Z1[INDEX(i)] - Z3[INDEX(i)]) 
+        CONT[INDEX(NSP + NSP + i)] = ( rkC[0] * (Z3[INDEX(i)] - Z2[INDEX(i)]) + rkC[1] * (Z1[INDEX(i)] - Z3[INDEX(i)])
                            + rkC[2] * (Z2[INDEX(i)] - Z1[INDEX(i)]) ) / den;
 	}
 }
@@ -315,7 +387,7 @@ __device__ void DAXPY3(double DA1, double DA2, double DA3,
 *Prepare the right-hand side for Newton iterations
 *     R = Z - hA * F
 */
-__device__ void RK_PrepareRHS(double t, double pr, double H, 
+__device__ void RK_PrepareRHS(double t, double pr, double H,
 								double const * const __restrict__ Y,
 								const solver_memory* __restrict__ solver,
 								const mechanism_memory* __restrict__ mech,
@@ -364,7 +436,7 @@ __device__ void dlaswp(double * const __restrict__ A,
 			A[INDEX(i)] = A[INDEX(ip)];
 			A[INDEX(ip)] = temp;
 		}
-	}	
+	}
 }
 
 //diag == 'n' -> nounit = true
@@ -420,7 +492,7 @@ __device__ void zlaswp(cuDoubleComplex * const __restrict__ A, int const * const
 			A[INDEX(i)] = A[INDEX(ip)];
 			A[INDEX(ip)] = temp;
 		}
-	}	
+	}
 }
 
 //diag == 'n' -> nounit = true
@@ -526,8 +598,8 @@ __device__ double RK_ErrorNorm(double const * const __restrict__ scale,
 	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
 
-__device__ double RK_ErrorEstimate(const double H, const double t, 
-											 const double pr, 
+__device__ double RK_ErrorEstimate(const double H, const double t,
+											 const double pr,
 											 double const * const __restrict__ Y,
 											 solver_memory const * const __restrict__ solver,
 											 mechanism_memory const * const __restrict__ mech,
@@ -538,7 +610,7 @@ __device__ double RK_ErrorEstimate(const double H, const double t,
     double HrkE3  = rkE[3]/H;
 
 	double * const __restrict__ E1 = mech->jac;
-	const double * const __restrict__ F0 = mech->dy;  
+	const double * const __restrict__ F0 = mech->dy;
     double * const __restrict__ F1 = solver->work1;
     double * const __restrict__ F2 = solver->work2;
     double * const __restrict__ TMP = solver->work3;
@@ -574,12 +646,12 @@ __device__ double RK_ErrorEstimate(const double H, const double t,
     return Err;
 }
 
-/** 
+/**
  *  5th-order Radau2A implementation
- * 
+ *
  */
 __device__ void integrate (const double t_start,
-							const double t_end, 
+							const double t_end,
 							const double var,
 							double * const __restrict__ y,
 							mechanism_memory const * const __restrict__ mech,
@@ -634,7 +706,7 @@ __device__ void integrate (const double t_start,
 		if(!Reject) {
 			dydt (t, var, y, F0, mech);
 		}
-		if(!SkipLU) { 
+		if(!SkipLU) {
 			//need to update Jac/LU
 			if(!SkipJac) {
 #ifndef FINITE_DIFFERENCE
@@ -683,7 +755,7 @@ __device__ void integrate (const double t_start,
 		double Fac = 0.5; //Step reduction if too many iterations
 		int NewtonIter = 0;
 		double Theta = 0;
-		
+
 		//reuse previous NewtonRate
 		NewtonRate = pow(fmax(NewtonRate, EPS), 0.8);
 
@@ -696,14 +768,14 @@ __device__ void integrate (const double t_start,
 			double NewtonIncrement = sqrt((d1 * d1 + d2 * d2 + d3 * d3) / 3.0);
 
 			Theta = ThetaMin;
-			if (NewtonIter > 0) 
+			if (NewtonIter > 0)
 			{
 				Theta = NewtonIncrement / NewtonIncrementOld;
 				if(Theta >= 0.99) //! Non-convergence of Newton: Theta too large
 					break;
 				else
 					NewtonRate = Theta / (1.0 - Theta);
-				//Predict error at the end of Newton process 
+				//Predict error at the end of Newton process
 				double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (1.0 - Theta);
 				if(NewtonPredictedErr >= NewtonTol) {
 					//Non-convergence of Newton: predicted error too large
@@ -740,7 +812,7 @@ __device__ void integrate (const double t_start,
 			continue;
 		}
 
-		double Err = RK_ErrorEstimate(H, t, var, y, 
+		double Err = RK_ErrorEstimate(H, t, var, y,
 						solver, mech, FirstStep, Reject);
 
 		//!~~~> Computation of new step size Hnew

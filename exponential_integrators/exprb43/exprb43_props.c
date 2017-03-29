@@ -13,11 +13,11 @@
 namespace exprb43 {
 #endif
 
-/*! /fn void check_error(int tid, int code)
-	/brief Checks the return code of the given thread (IVP) for an error, and exits if found
-	/param tid The thread (IVP) index
-	/param code The return code of the thread
-	@see exprb43_ErrCodes
+/*! \fn void check_error(int tid, int code)
+	\brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	\param tid The thread (IVP) index
+	\param code The return code of the thread
+	@see ErrorCodes
  */
 void check_error(int tid, int code)
 {

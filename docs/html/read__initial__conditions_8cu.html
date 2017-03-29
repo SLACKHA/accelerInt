@@ -93,6 +93,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">read_initial_conditions.cu File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>the generic CUDA initial condition reader  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;header.cuh&quot;</code><br />
 <code>#include &quot;gpu_memory.cuh&quot;</code><br />
 <code>#include &quot;gpu_macros.cuh&quot;</code><br />
@@ -109,9 +112,14 @@ Include dependency graph for read_initial_conditions.cu:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a79be377a219a9ab2ae5c3a313b33afed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="read__initial__conditions_8cu.html#a79be377a219a9ab2ae5c3a313b33afed">read_initial_conditions</a> (const char *filename, int NUM, double **y_host, double **variable_host)</td></tr>
+<tr class="memdesc:a79be377a219a9ab2ae5c3a313b33afed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads initial conditions for IVPs from binary file.  <a href="#a79be377a219a9ab2ae5c3a313b33afed">More...</a><br /></td></tr>
 <tr class="separator:a79be377a219a9ab2ae5c3a313b33afed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>the generic CUDA initial condition reader </p>
+<dl class="section author"><dt>Author</dt><dd>Nicholas Curtis </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>03/10/2015 </dd></dl>
+</div><h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a79be377a219a9ab2ae5c3a313b33afed"></a>
 <div class="memitem">
 <div class="memproto">
@@ -147,6 +155,20 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Reads initial conditions for IVPs from binary file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">filename</td><td>the file to read from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">NUM</td><td>the number of IVP initial conditions to read </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">y_host</td><td>Address of the host state vector pointer. This is initialized and populated by this method </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">variable_host</td><td>Address of the host pressure/density pointer. This is initialized and populated by this method</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Note: the data file is expected to be in the following format:<br />
+ time, Temperature, Pressure, mass fractions (State #1) <br />
+ time, Temperature, Pressure, mass fractions (State #2) ... </p>
 
 </div>
 </div>

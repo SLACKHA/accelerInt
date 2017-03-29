@@ -88,11 +88,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">solver_props.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>simple convenience file to include the correct solver properties file  
+<a href="#details">More...</a></p>
 <div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
@@ -100,56 +104,35 @@ This graph shows which files directly or indirectly include this file:</div>
 <map name="generic_2solver__props_8hdep" id="generic_2solver__props_8hdep">
 <area shape="rect" id="node2" href="exponential__linear__algebra_8h.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="79,80,269,121"/>
 <area shape="rect" id="node6" href="phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="293,80,449,121"/>
-<area shape="rect" id="node7" href="complexInverse_8c.html" title="generic/complexInverse.c" alt="" coords="474,87,645,114"/>
-<area shape="rect" id="node8" href="solver_8h.html" title="generic/solver.h" alt="" coords="669,87,783,114"/>
-<area shape="rect" id="node13" href="radau2a_8c.html" title="radau2a/radau2a.c" alt="" coords="808,87,937,114"/>
+<area shape="rect" id="node7" href="complexInverse_8c.html" title="Implementation of LU factorization of complex (variable&#45;sized) matricies. " alt="" coords="474,87,645,114"/>
+<area shape="rect" id="node8" href="solver_8h.html" title="Contains skeleton of all methods that need to be defined on a per solver basis. " alt="" coords="669,87,783,114"/>
+<area shape="rect" id="node13" href="radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="808,87,937,114"/>
 <area shape="rect" id="node3" href="arnoldi_8h.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="96,169,252,211"/>
 <area shape="rect" id="node4" href="exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="5,259,161,300"/>
 <area shape="rect" id="node5" href="exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="199,259,355,300"/>
-<area shape="rect" id="node9" href="solver__cvodes_8c.html" title="cvodes/solver_cvodes.c" alt="" coords="393,177,555,203"/>
-<area shape="rect" id="node10" href="solver__generic_8c.html" title="generic/solver_generic.c" alt="" coords="579,177,742,203"/>
-<area shape="rect" id="node11" href="solver__main_8c.html" title="generic/solver_main.c" alt="" coords="766,177,915,203"/>
-<area shape="rect" id="node12" href="solver__rk78_8cpp.html" title="rk78/solver_rk78.cpp" alt="" coords="939,177,1081,203"/>
+<area shape="rect" id="node9" href="solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="393,177,555,203"/>
+<area shape="rect" id="node10" href="solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="579,177,742,203"/>
+<area shape="rect" id="node11" href="solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="766,177,915,203"/>
+<area shape="rect" id="node12" href="solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="939,177,1081,203"/>
 </map>
 </div>
 </div>
 <p><a href="solver__props_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacegeneric"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html">generic</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1d93e7dae4fbe553a66368ae2901533f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__props_8h.html#a1d93e7dae4fbe553a66368ae2901533f">check_error</a> (int, int)</td></tr>
-<tr class="separator:a1d93e7dae4fbe553a66368ae2901533f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a251b270d1230f00d835580810e4be7bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a251b270d1230f00d835580810e4be7bd">generic::check_error</a> (int, int)</td></tr>
+<tr class="memdesc:a251b270d1230f00d835580810e4be7bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the return code of the given thread (IVP) for an error, and exits if found.  <a href="namespacegeneric.html#a251b270d1230f00d835580810e4be7bd">More...</a><br /></td></tr>
+<tr class="separator:a251b270d1230f00d835580810e4be7bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a1d93e7dae4fbe553a66368ae2901533f"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void check_error </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>tid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>code</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>/fn void <a class="el" href="radau2a__props_8c.html#a12dd8b11e8bada5fbbcaf97b752e6ee1">check_error(int tid, int code)</a> /brief Checks the return code of the given thread (IVP) for an error, and exits if found /param tid The thread (IVP) index /param code The return code of the thread </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exp4__ErrCodes.html">Return codes of EXP4 integrator</a></dd></dl>
-<p>/fn void <a class="el" href="radau2a__props_8c.html#a12dd8b11e8bada5fbbcaf97b752e6ee1">check_error(int tid, int code)</a> /brief Checks the return code of the given thread (IVP) for an error, and exits if found /param tid The thread (IVP) index /param code The return code of the thread </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exprb43__ErrCodes.html">Return codes of EXPRB43 integrator</a> </dd></dl>
-
-</div>
-</div>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>simple convenience file to include the correct solver properties file </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

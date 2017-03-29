@@ -94,13 +94,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">exp4_init.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Implementation of the necessary initialization for the EXP4 method.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="rational__approximant_8h_source.html">rational_approximant.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for exp4_init.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="exp4__init_8c__incl.png" border="0" usemap="#exponential__integrators_2exp4_2exp4__init_8c" alt=""/></div>
 <map name="exponential__integrators_2exp4_2exp4__init_8c" id="exponential__integrators_2exp4_2exp4__init_8c">
-<area shape="rect" id="node2" href="rational__approximant_8h.html" title="rational_approximant.h" alt="" coords="7,95,160,121"/>
+<area shape="rect" id="node2" href="rational__approximant_8h.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="7,95,160,121"/>
 </map>
 </div>
 </div><table class="memberdecls">
@@ -115,18 +118,23 @@ Functions</h2></td></tr>
 <tr class="memdesc:a1ef7b39a9ac7da4247fd05807f000b07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined)  <a href="namespaceexp4.html#a1ef7b39a9ac7da4247fd05807f000b07">More...</a><br /></td></tr>
 <tr class="separator:a1ef7b39a9ac7da4247fd05807f000b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc563232bff1c62e2068039175a6f428"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#adc563232bff1c62e2068039175a6f428">exp4::solver_log</a> ()</td></tr>
+<tr class="memdesc:adc563232bff1c62e2068039175a6f428"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes solver specific logging tasks.  <a href="namespaceexp4.html#adc563232bff1c62e2068039175a6f428">More...</a><br /></td></tr>
 <tr class="separator:adc563232bff1c62e2068039175a6f428"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5d3c8262078fd94e511c54eb766f46c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#ab5d3c8262078fd94e511c54eb766f46c">exp4::initialize_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:ab5d3c8262078fd94e511c54eb766f46c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods.  <a href="namespaceexp4.html#ab5d3c8262078fd94e511c54eb766f46c">More...</a><br /></td></tr>
+<tr class="memdesc:ab5d3c8262078fd94e511c54eb766f46c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the solver.  <a href="namespaceexp4.html#ab5d3c8262078fd94e511c54eb766f46c">More...</a><br /></td></tr>
 <tr class="separator:ab5d3c8262078fd94e511c54eb766f46c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecc47dad1f4379532ab54b896a5e3771"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#aecc47dad1f4379532ab54b896a5e3771">exp4::solver_name</a> ()</td></tr>
-<tr class="memdesc:aecc47dad1f4379532ab54b896a5e3771"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the EXP4 solver name.  <a href="namespaceexp4.html#aecc47dad1f4379532ab54b896a5e3771">More...</a><br /></td></tr>
+<tr class="memdesc:aecc47dad1f4379532ab54b896a5e3771"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a descriptive solver name.  <a href="namespaceexp4.html#aecc47dad1f4379532ab54b896a5e3771">More...</a><br /></td></tr>
 <tr class="separator:aecc47dad1f4379532ab54b896a5e3771"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a595493de14a8f82826268b344339a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#a0a595493de14a8f82826268b344339a8">exp4::cleanup_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:a0a595493de14a8f82826268b344339a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created CVODE solvers.  <a href="namespaceexp4.html#a0a595493de14a8f82826268b344339a8">More...</a><br /></td></tr>
+<tr class="memdesc:a0a595493de14a8f82826268b344339a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created solvers.  <a href="namespaceexp4.html#a0a595493de14a8f82826268b344339a8">More...</a><br /></td></tr>
 <tr class="separator:a0a595493de14a8f82826268b344339a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implementation of the necessary initialization for the EXP4 method. </p>
+<dl class="section author"><dt>Author</dt><dd>Nicholas Curtis </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>03/09/2015 </dd></dl>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

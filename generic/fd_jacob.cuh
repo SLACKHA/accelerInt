@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Header definition of CUDA Finite Difference Jacobian
+ */
+
 #ifndef FD_JACOB_CU_HEAD
 #define FD_JACOB_CU_HEAD
 

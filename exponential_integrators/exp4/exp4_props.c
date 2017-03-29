@@ -1,10 +1,10 @@
-/*!
- * \file exp4_props.c
+/**
+ * \file
+ * \brief Contains error checking for EXP4 return codes
  *
  * \author Nicholas J. Curtis
  * \date 09/02/2014
  *
- * \brief Contains error checking for EXP4 return codes
  */
 
 #include "exp4_props.h"
@@ -14,10 +14,10 @@ namespace exp4 {
 #endif
 
 
-/*! /fn void check_error(int tid, int code)
-	/brief Checks the return code of the given thread (IVP) for an error, and exits if found
-	/param tid The thread (IVP) index
-	/param code The return code of the thread
+/*! \fn void check_error(int tid, int code)
+	\brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	\param tid The thread (IVP) index
+	\param code The return code of the thread
 	@see exp4_ErrCodes
  */
 void check_error(int tid, int code)

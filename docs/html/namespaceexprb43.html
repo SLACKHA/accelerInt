@@ -99,18 +99,19 @@ Functions</h2></td></tr>
 <tr class="memdesc:adb214180d920bd67592be89b6264aa90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined)  <a href="#adb214180d920bd67592be89b6264aa90">More...</a><br /></td></tr>
 <tr class="separator:adb214180d920bd67592be89b6264aa90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad02d94a3cc25e03cf47a6903559f4262"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexprb43.html#ad02d94a3cc25e03cf47a6903559f4262">solver_log</a> ()</td></tr>
-<tr class="memdesc:ad02d94a3cc25e03cf47a6903559f4262"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs errors, step-sizes, and krylov subspace size (if LOG_OUTPUT is defined)  <a href="#ad02d94a3cc25e03cf47a6903559f4262">More...</a><br /></td></tr>
+<tr class="memdesc:ad02d94a3cc25e03cf47a6903559f4262"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes solver specific logging tasks.  <a href="#ad02d94a3cc25e03cf47a6903559f4262">More...</a><br /></td></tr>
 <tr class="separator:ad02d94a3cc25e03cf47a6903559f4262"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a923d03974bd3461619b71ac8fb34abd8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexprb43.html#a923d03974bd3461619b71ac8fb34abd8">initialize_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:a923d03974bd3461619b71ac8fb34abd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods.  <a href="#a923d03974bd3461619b71ac8fb34abd8">More...</a><br /></td></tr>
+<tr class="memdesc:a923d03974bd3461619b71ac8fb34abd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the solver.  <a href="#a923d03974bd3461619b71ac8fb34abd8">More...</a><br /></td></tr>
 <tr class="separator:a923d03974bd3461619b71ac8fb34abd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5357a692b80a08edee50c4073763422b"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexprb43.html#a5357a692b80a08edee50c4073763422b">solver_name</a> ()</td></tr>
-<tr class="memdesc:a5357a692b80a08edee50c4073763422b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the EXPRB43 solver name.  <a href="#a5357a692b80a08edee50c4073763422b">More...</a><br /></td></tr>
+<tr class="memdesc:a5357a692b80a08edee50c4073763422b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a descriptive solver name.  <a href="#a5357a692b80a08edee50c4073763422b">More...</a><br /></td></tr>
 <tr class="separator:a5357a692b80a08edee50c4073763422b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7bbc3b8b5f2627e89908cdec0750523"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexprb43.html#ad7bbc3b8b5f2627e89908cdec0750523">cleanup_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:ad7bbc3b8b5f2627e89908cdec0750523"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created CVODE solvers.  <a href="#ad7bbc3b8b5f2627e89908cdec0750523">More...</a><br /></td></tr>
+<tr class="memdesc:ad7bbc3b8b5f2627e89908cdec0750523"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created solvers.  <a href="#ad7bbc3b8b5f2627e89908cdec0750523">More...</a><br /></td></tr>
 <tr class="separator:ad7bbc3b8b5f2627e89908cdec0750523"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa165b73c13e21b53f0713c4c5ec5fd7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexprb43.html#aa165b73c13e21b53f0713c4c5ec5fd7c">check_error</a> (int tid, int code)</td></tr>
+<tr class="memdesc:aa165b73c13e21b53f0713c4c5ec5fd7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the return code of the given thread (IVP) for an error, and exits if found.  <a href="#aa165b73c13e21b53f0713c4c5ec5fd7c">More...</a><br /></td></tr>
 <tr class="separator:aa165b73c13e21b53f0713c4c5ec5fd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -139,7 +140,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>/fn void <a class="el" href="namespaceexprb43.html#aa165b73c13e21b53f0713c4c5ec5fd7c">check_error(int tid, int code)</a> /brief Checks the return code of the given thread (IVP) for an error, and exits if found /param tid The thread (IVP) index /param code The return code of the thread </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exprb43__ErrCodes.html">Return codes of EXPRB43 integrator</a> </dd></dl>
+
+<p>Checks the return code of the given thread (IVP) for an error, and exits if found. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tid</td><td>The thread (IVP) index </td></tr>
+    <tr><td class="paramname">code</td><td>The return code of the thread </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__ErrorCodes.html">Return codes of Integrators</a> </dd></dl>
 
 </div>
 </div>
@@ -157,14 +167,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Cleans up the created CVODE solvers. </p>
+<p>Cleans up the created solvers. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads to use (and CVODE solver objects to destroy)</td></tr>
+    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads used</td></tr>
   </table>
   </dd>
 </dl>
-<p>Frees and cleans up allocated CVODE memory. </p>
+<p>Frees and cleans up allocated CVODE memory.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads used</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Frees and cleans up allocated RK78 memory. </p>
 
 </div>
 </div>
@@ -182,6 +199,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined) </p>
+<p>Initializes solver specific items for logging.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
 
 </div>
@@ -200,8 +218,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods. </p>
-<p>Creates/Checks the CVODE solvers for the specified number of threads.</p>
+<p>Initializes the solver. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">num_threads</td><td>Unused </td></tr>
@@ -248,6 +265,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation </p>
+<p>A header definition of the integrate method, that must be implemented by various solvers.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">t_start</td><td>The initial integration time </td></tr>
@@ -275,8 +293,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Logs errors, step-sizes, and krylov subspace size (if LOG_OUTPUT is defined) </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
+<p>Executes solver specific logging tasks. </p>
+<p>Logs errors, step-sizes, and krylov subspace size (if <a class="el" href="solver__options_8h.html#ac786f5f1963363a48eed565f7cbc6931">LOG_OUTPUT</a> is defined) </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
 
 </div>
 </div>
@@ -293,9 +311,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the EXPRB43 solver name. </p>
-<p>Returns the CVODE solver name.</p>
-<p>Returns a descriptive solver name for the EXPRB43 solver </p>
+<p>Returns a descriptive solver name. </p>
 
 </div>
 </div>

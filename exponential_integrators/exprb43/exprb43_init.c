@@ -1,5 +1,5 @@
-/*!
- *	\file exprb43.cu
+/**
+ *	\file
  *  \brief Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
  *
  * \author Nicholas Curtis
@@ -42,18 +42,17 @@ namespace exprb43 {
  void solver_log() {}
 
  /*! \fn void initialize_solver(int num_threads)
-   \brief Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods
+   \brief 
    \param num_threads Unused
 */
  void initialize_solver(int num_threads) {
+    //Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods
  	find_poles_and_residuals();
  }
 
- /*!
+/*!
    \fn char* solver_name()
-   \brief Returns the EXPRB43 solver name
-
-   Returns a descriptive solver name for the EXPRB43 solver
+   \brief Returns a descriptive solver name
 */
  const char* solver_name() {
  	const char* name = "exprb43-int";

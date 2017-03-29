@@ -103,24 +103,25 @@ Functions</h2></td></tr>
 <tr class="memdesc:aac3abe15ef50061cdfe24ed7d9d64b7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation  <a href="#aac3abe15ef50061cdfe24ed7d9d64b7a">More...</a><br /></td></tr>
 <tr class="separator:aac3abe15ef50061cdfe24ed7d9d64b7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abcdabb48b002afcaf4520f85bb06c156"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#abcdabb48b002afcaf4520f85bb06c156">createAndZero</a> (void **ptr, size_t size)</td></tr>
+<tr class="memdesc:abcdabb48b002afcaf4520f85bb06c156"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convienvience method to Cuda Malloc and memset a pointer to zero.  <a href="#abcdabb48b002afcaf4520f85bb06c156">More...</a><br /></td></tr>
 <tr class="separator:abcdabb48b002afcaf4520f85bb06c156"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa57e5681ad1b4e46c67d24d12d64e435"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#aa57e5681ad1b4e46c67d24d12d64e435">initialize_solver</a> (int padded, <a class="el" href="structexp4cu_1_1solver__memory.html">solver_memory</a> **h_mem, <a class="el" href="structexp4cu_1_1solver__memory.html">solver_memory</a> **d_mem)</td></tr>
-<tr class="memdesc:aa57e5681ad1b4e46c67d24d12d64e435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes <a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a>.  <a href="#aa57e5681ad1b4e46c67d24d12d64e435">More...</a><br /></td></tr>
+<tr class="memdesc:aa57e5681ad1b4e46c67d24d12d64e435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the GPU solver.  <a href="#aa57e5681ad1b4e46c67d24d12d64e435">More...</a><br /></td></tr>
 <tr class="separator:aa57e5681ad1b4e46c67d24d12d64e435"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9fad26aa869ef1c6b7fc061e1e6abc3"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#ad9fad26aa869ef1c6b7fc061e1e6abc3">solver_name</a> ()</td></tr>
-<tr class="memdesc:ad9fad26aa869ef1c6b7fc061e1e6abc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the EXP4 solver name.  <a href="#ad9fad26aa869ef1c6b7fc061e1e6abc3">More...</a><br /></td></tr>
+<tr class="memdesc:ad9fad26aa869ef1c6b7fc061e1e6abc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a descriptive solver name.  <a href="#ad9fad26aa869ef1c6b7fc061e1e6abc3">More...</a><br /></td></tr>
 <tr class="separator:ad9fad26aa869ef1c6b7fc061e1e6abc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a042f555823c136890f60ab28454daf9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#a042f555823c136890f60ab28454daf9e">solver_log</a> ()</td></tr>
-<tr class="memdesc:a042f555823c136890f60ab28454daf9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs errors, step-sizes, and krylov subspace size (if LOG_OUTPUT is defined)  <a href="#a042f555823c136890f60ab28454daf9e">More...</a><br /></td></tr>
+<tr class="memdesc:a042f555823c136890f60ab28454daf9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes solver specific logging tasks.  <a href="#a042f555823c136890f60ab28454daf9e">More...</a><br /></td></tr>
 <tr class="separator:a042f555823c136890f60ab28454daf9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a128b314d7c6b2521bbd64653dc8b9826"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#a128b314d7c6b2521bbd64653dc8b9826">init_solver_log</a> ()</td></tr>
-<tr class="memdesc:a128b314d7c6b2521bbd64653dc8b9826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined)  <a href="#a128b314d7c6b2521bbd64653dc8b9826">More...</a><br /></td></tr>
+<tr class="memdesc:a128b314d7c6b2521bbd64653dc8b9826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes solver specific items for logging.  <a href="#a128b314d7c6b2521bbd64653dc8b9826">More...</a><br /></td></tr>
 <tr class="separator:a128b314d7c6b2521bbd64653dc8b9826"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d5db66ace53978d01e1975e47e30655"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#a4d5db66ace53978d01e1975e47e30655">required_solver_size</a> ()</td></tr>
 <tr class="memdesc:a4d5db66ace53978d01e1975e47e30655"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total size (in bytes) required for memory storage for a single GPU thread Used in calculation of the maximum number of possible GPU threads to launch, this method returns the size of the <a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a> structure (per-GPU thread)  <a href="#a4d5db66ace53978d01e1975e47e30655">More...</a><br /></td></tr>
 <tr class="separator:a4d5db66ace53978d01e1975e47e30655"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa775ac1fc1a96522483d9878718cdbf2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#aa775ac1fc1a96522483d9878718cdbf2">cleanup_solver</a> (<a class="el" href="structexp4cu_1_1solver__memory.html">solver_memory</a> **h_mem, <a class="el" href="structexp4cu_1_1solver__memory.html">solver_memory</a> **d_mem)</td></tr>
-<tr class="memdesc:aa775ac1fc1a96522483d9878718cdbf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up solver memory, and closes Krylov subspace logfiles (if LOG_OUTPUT is defined)  <a href="#aa775ac1fc1a96522483d9878718cdbf2">More...</a><br /></td></tr>
+<tr class="memdesc:aa775ac1fc1a96522483d9878718cdbf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up solver memory.  <a href="#aa775ac1fc1a96522483d9878718cdbf2">More...</a><br /></td></tr>
 <tr class="separator:aa775ac1fc1a96522483d9878718cdbf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d5234f5e9971aec336ac64ce719f1f4"><td class="memItemLeft" align="right" valign="top">__host__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4cu.html#a2d5234f5e9971aec336ac64ce719f1f4">check_error</a> (int num_cond, int *codes)</td></tr>
 <tr class="separator:a2d5234f5e9971aec336ac64ce719f1f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,7 +152,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>/fn void <a class="el" href="radau2a__props_8c.html#a12dd8b11e8bada5fbbcaf97b752e6ee1">check_error(int tid, int code)</a> /brief Checks the return code of the given thread (IVP) for an error, and exits if found /param num_cond The total number of IVPs to check /param codes The array of return codes </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exp4cu__ErrCodes.html">Return codes of GPU EXPRB43 integrator</a> </dd></dl>
 
 </div>
 </div>
@@ -179,10 +179,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Cleans up solver memory, and closes Krylov subspace logfiles (if LOG_OUTPUT is defined) </p>
+<p>Cleans up solver memory. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a> </dd>
 <dd>
-<a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
+<a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a></dd></dl>
+<p>Additionally closes Krylov subspace logfiles (if <a class="el" href="solver__options_8h.html#ac786f5f1963363a48eed565f7cbc6931">LOG_OUTPUT</a> is defined) </p>
 
 </div>
 </div>
@@ -209,7 +210,15 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>/fn void <a class="el" href="namespaceexp4cu.html#abcdabb48b002afcaf4520f85bb06c156">createAndZero(void** ptr, size_t size)</a> /brief Convienvience method to Cuda Malloc and memset a pointer to zero /param ptr The address of the pointer to malloc /param size The total size (in bytes) of the pointer to malloc </p>
+
+<p>Convienvience method to Cuda Malloc and memset a pointer to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ptr</td><td>The address of the pointer to malloc </td></tr>
+    <tr><td class="paramname">size</td><td>The total size (in bytes) of the pointer to malloc </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -226,8 +235,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined) </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
+<p>Initializes solver specific items for logging. </p>
+<p>Initializes the Krylov subspace logging files (if <a class="el" href="solver__options_8h.html#ac786f5f1963363a48eed565f7cbc6931">LOG_OUTPUT</a> is defined) </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
 
 </div>
 </div>
@@ -261,15 +270,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes <a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a>. </p>
+<p>Initializes the GPU solver. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">padded</td><td>The total (padded) number of GPU threads (IVPs) to solve </td></tr>
     <tr><td class="paramname">h_mem</td><td>The host <a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a> structure (to be copied to the GPU) </td></tr>
-    <tr><td class="paramname">d_mem</td><td>The device <a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a> structure (to be operated on by the GPU) </td></tr>
+    <tr><td class="paramname">d_mem</td><td>The device <a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a> structure (to be operated on by the GPU)</td></tr>
   </table>
   </dd>
 </dl>
+<p>Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes <a class="el" href="structexp4cu_1_1solver__memory.html" title="Structure containing memory needed for EXP4 algorithm. ">solver_memory</a> </p>
 
 </div>
 </div>
@@ -333,7 +343,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The result of this integration step (see enum in <a class="el" href="exp4__props_8cuh.html" title="Error checking for the EXP4 algorithm. ">exp4_props.cuh</a>) will be stored in solver-&gt;result for each thread </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The result of this integration step (see enum in <a class="el" href="exp4__props_8cuh.html" title="Various macros controlling behaviour of EXP4 algorithm. ">exp4_props.cuh</a>) will be stored in solver-&gt;result for each thread </dd></dl>
 
 </div>
 </div>
@@ -368,8 +378,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Logs errors, step-sizes, and krylov subspace size (if LOG_OUTPUT is defined) </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
+<p>Executes solver specific logging tasks. </p>
+<p>Logs errors, step-sizes, and krylov subspace size (if <a class="el" href="solver__options_8h.html#ac786f5f1963363a48eed565f7cbc6931">LOG_OUTPUT</a> is defined) </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
 
 </div>
 </div>
@@ -386,9 +396,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the EXP4 solver name. </p>
-<p>Returns the CVODE solver name.</p>
-<p>Returns a descriptive solver name for the GPU EXP4 solver </p>
+<p>Returns a descriptive solver name. </p>
 
 </div>
 </div>

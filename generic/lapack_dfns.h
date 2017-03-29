@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief External lapack routine definitions
+ */
+
 #ifndef LAPACK_DFNS_H
 #define LAPACK_DFNS_H
 

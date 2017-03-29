@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['wadd',['WADD',['../namespaceradau2a.html#afbf6ff499a4ff97db4b27df63b6fbffd',1,'radau2a::WADD()'],['../radau2a_8cu.html#aff01576484bab84fa153493d0aa0833f',1,'WADD():&#160;radau2a.cu']]],
-  ['work1',['work1',['../structsolver__memory.html#a57f447c07f363c462e91716393df0b3c',1,'solver_memory::work1()'],['../structexp4cu_1_1solver__memory.html#aecfb53728ed87d6857212dd1e19345a8',1,'exp4cu::solver_memory::work1()'],['../structexprb43cu_1_1solver__memory.html#a97191dca9ff8d04d16d37b26fbea4906',1,'exprb43cu::solver_memory::work1()']]],
-  ['work2',['work2',['../structsolver__memory.html#a8f8a7539530bd566a5c241c5a9a5930a',1,'solver_memory::work2()'],['../structexp4cu_1_1solver__memory.html#a571d5da694382eb078504242f69c4b78',1,'exp4cu::solver_memory::work2()'],['../structexprb43cu_1_1solver__memory.html#a9339316b1097345efa3b55832b3d0d1c',1,'exprb43cu::solver_memory::work2()']]],
-  ['work3',['work3',['../structsolver__memory.html#a5f1625152446318c7489bb9a0eaadf02',1,'solver_memory::work3()'],['../structexp4cu_1_1solver__memory.html#a1798b2513a1d21e9beaa998f1dc1df89',1,'exp4cu::solver_memory::work3()'],['../structexprb43cu_1_1solver__memory.html#ae3a2fe062018c4b7f97f039feceeb003',1,'exprb43cu::solver_memory::work3()']]],
-  ['work4',['work4',['../structsolver__memory.html#a2d1926f048b79b2a7cffc29dc5db187d',1,'solver_memory::work4()'],['../structexp4cu_1_1solver__memory.html#a8b2943ea29259b541a9143409bc8317d',1,'exp4cu::solver_memory::work4()'],['../structexprb43cu_1_1solver__memory.html#a7db0969d6909faa9beb4965290c52a63',1,'exprb43cu::solver_memory::work4()']]],
-  ['write_5flog',['write_log',['../solver__main_8c.html#a4f005e7918ecc7f1cd2424fb1708b2ca',1,'write_log(int NUM, double t, const double *y_host, FILE *pFile):&#160;solver_main.c'],['../solver__main_8cu.html#a4f005e7918ecc7f1cd2424fb1708b2ca',1,'write_log(int NUM, double t, const double *y_host, FILE *pFile):&#160;solver_main.cu']]]
+  ['z1',['Z1',['../structradau2acu_1_1solver__memory.html#a3920a2e20d5145ffe2b1ecdca5c7fa22',1,'radau2acu::solver_memory']]],
+  ['z2',['Z2',['../structradau2acu_1_1solver__memory.html#a01e0b1a2d05bcd51d00cb1418a790d79',1,'radau2acu::solver_memory']]],
+  ['z3',['Z3',['../structradau2acu_1_1solver__memory.html#ac4d01cd67d75acfe199be4d4676c0bf7',1,'radau2acu::solver_memory']]],
+  ['zgetrf_5f',['zgetrf_',['../lapack__dfns_8h.html#a2ebf716defd6efd95412d03c56df2858',1,'lapack_dfns.h']]],
+  ['zgetri_5f',['zgetri_',['../lapack__dfns_8h.html#ac2ad5fa4cc71e72154f005477e0968a2',1,'lapack_dfns.h']]],
+  ['zgetrs_5f',['zgetrs_',['../lapack__dfns_8h.html#a96c5c8afefcf5472aca9e85a647c085c',1,'lapack_dfns.h']]]
 ];

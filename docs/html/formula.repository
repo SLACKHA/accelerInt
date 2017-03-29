@@ -15,3 +15,14 @@
 \form#14:$\phi_2(c*A)$
 \form#15:$\phi_1(c*A)$
 \form#16:$\phi_0(c*A)$
+\form#17:$x_v:= A*xv$
+\form#18:$x_v:= A*x_v$
+\form#19:$x_v$
+\form#20:$alpha*A*x + y$
+\form#21:$A = P * L * U$
+\form#22:$A := alpha * arrX * arrY **T + A$
+\form#23:$Z:= X + Y$
+\form#24:$DY1:= DA1 * DX$
+\form#25:$DY2:= DA2 * DX$
+\form#26:$DY3:= DA3 * DX$
+\form#27:$R = Z - hA * F$

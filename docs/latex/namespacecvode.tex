@@ -3,20 +3,18 @@
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-int \hyperlink{namespacecvode_aa10a063b2a82d5b49c2bb338f16ddae4}{dydt\+\_\+cvodes} (double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, void $\ast$f)
-\begin{DoxyCompactList}\small\item\em The C\+V\+O\+D\+Es R\+HS interface. \end{DoxyCompactList}\item 
-int \hyperlink{namespacecvode_ab2efc395730d25bedc496a62e7896d24}{eval\+\_\+jacob\+\_\+cvodes} (long int N, double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, Dls\+Mat Jac, void $\ast$f, N\+\_\+\+Vector tmp1, N\+\_\+\+Vector tmp2, N\+\_\+\+Vector tmp3)
-\begin{DoxyCompactList}\small\item\em The C\+V\+O\+D\+Es Jacobian interface for a direct dense Jacobian. \end{DoxyCompactList}\item 
 void \hyperlink{namespacecvode_abe146525cea80d8032cd30b4441b5872}{initialize\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initializes the solver. \end{DoxyCompactList}\item 
 void \hyperlink{namespacecvode_ac9bc4957bff6721dae9d7e4cc470d184}{cleanup\+\_\+solver} (int num\+\_\+threads)
-\begin{DoxyCompactList}\small\item\em Cleans up the created C\+V\+O\+DE solvers. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Cleans up the created solvers. \end{DoxyCompactList}\item 
 const char $\ast$ \hyperlink{namespacecvode_a3a26024b8dc2ce6f8b2afcfb7c82c79f}{solver\+\_\+name} ()
-\begin{DoxyCompactList}\small\item\em Returns the C\+V\+O\+DE solver name. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
 void \hyperlink{namespacecvode_a9113d5fb0e19fa927d73b64c397ecd09}{init\+\_\+solver\+\_\+log} ()
 \item 
 void \hyperlink{namespacecvode_af7eb796b6829fecab506fb6dfec39be0}{solver\+\_\+log} ()
-\end{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacecvode_ae8209853c343190233f2500020b1cd5f}{int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)
+\begin{DoxyCompactList}\small\item\em Integration driver for the C\+PU integrators. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
@@ -38,85 +36,14 @@ void $\ast$$\ast$ \hyperlink{namespacecvode_a9290e27651628dff03f82f42eafd3079}{i
 )}\hypertarget{namespacecvode_ac9bc4957bff6721dae9d7e4cc470d184}{}\label{namespacecvode_ac9bc4957bff6721dae9d7e4cc470d184}
 
 
-Cleans up the created C\+V\+O\+DE solvers. 
+Cleans up the created solvers. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em num\+\_\+threads} & The number of Open\+MP threads to use (and C\+V\+O\+DE solver objects to destroy)\\
+{\em num\+\_\+threads} & The number of Open\+MP threads used\\
 \hline
 \end{DoxyParams}
-Frees and cleans up allocated C\+V\+O\+DE memory. \index{cvode@{cvode}!dydt\+\_\+cvodes@{dydt\+\_\+cvodes}}
-\index{dydt\+\_\+cvodes@{dydt\+\_\+cvodes}!cvode@{cvode}}
-\subsubsection[{\texorpdfstring{dydt\+\_\+cvodes(double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, void $\ast$f)}{dydt_cvodes(double t, N_Vector y, N_Vector ydot, void *f)}}]{\setlength{\rightskip}{0pt plus 5cm}int cvode\+::dydt\+\_\+cvodes (
-\begin{DoxyParamCaption}
-\item[{double}]{t, }
-\item[{N\+\_\+\+Vector}]{y, }
-\item[{N\+\_\+\+Vector}]{ydot, }
-\item[{void $\ast$}]{f}
-\end{DoxyParamCaption}
-)}\hypertarget{namespacecvode_aa10a063b2a82d5b49c2bb338f16ddae4}{}\label{namespacecvode_aa10a063b2a82d5b49c2bb338f16ddae4}
-
-
-The C\+V\+O\+D\+Es R\+HS interface. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em t} & The current time of the system \\
-\hline
-{\em y} & The current state vector (in C\+V\+O\+DE format) \\
-\hline
-{\em ydot} & The R\+HS vector to be populated (in C\+V\+O\+DE format) \\
-\hline
-{\em f} & User data set during C\+V\+O\+D\+Es setup (e.\+g. the system pressure) \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-cvode\+\_\+return\+\_\+code The C\+V\+O\+DE output constant returned (see sec B.\+2 of C\+V\+O\+DE documentation), currently always returns C\+V\+\_\+\+S\+U\+C\+C\+E\+SS 
-\end{DoxyReturn}
-\index{cvode@{cvode}!eval\+\_\+jacob\+\_\+cvodes@{eval\+\_\+jacob\+\_\+cvodes}}
-\index{eval\+\_\+jacob\+\_\+cvodes@{eval\+\_\+jacob\+\_\+cvodes}!cvode@{cvode}}
-\subsubsection[{\texorpdfstring{eval\+\_\+jacob\+\_\+cvodes(long int N, double t, N\+\_\+\+Vector y, N\+\_\+\+Vector ydot, Dls\+Mat Jac, void $\ast$f, N\+\_\+\+Vector tmp1, N\+\_\+\+Vector tmp2, N\+\_\+\+Vector tmp3)}{eval_jacob_cvodes(long int N, double t, N_Vector y, N_Vector ydot, DlsMat Jac, void *f, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)}}]{\setlength{\rightskip}{0pt plus 5cm}int cvode\+::eval\+\_\+jacob\+\_\+cvodes (
-\begin{DoxyParamCaption}
-\item[{long int}]{N, }
-\item[{double}]{t, }
-\item[{N\+\_\+\+Vector}]{y, }
-\item[{N\+\_\+\+Vector}]{ydot, }
-\item[{Dls\+Mat}]{jac, }
-\item[{void $\ast$}]{f, }
-\item[{N\+\_\+\+Vector}]{tmp1, }
-\item[{N\+\_\+\+Vector}]{tmp2, }
-\item[{N\+\_\+\+Vector}]{tmp3}
-\end{DoxyParamCaption}
-)}\hypertarget{namespacecvode_ab2efc395730d25bedc496a62e7896d24}{}\label{namespacecvode_ab2efc395730d25bedc496a62e7896d24}
-
-
-The C\+V\+O\+D\+Es Jacobian interface for a direct dense Jacobian. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em N} & the problem size \\
-\hline
-{\em t} & The current time of the system \\
-\hline
-{\em y} & The current state vector (in C\+V\+O\+DE format) \\
-\hline
-{\em ydot} & The R\+HS vector to be populated (in C\+V\+O\+DE format) \\
-\hline
-{\em jac} & The Jacobian matrix (in C\+V\+O\+DE format) to output to \\
-\hline
-{\em f} & User data set during C\+V\+O\+D\+Es setup (e.\+g. the system pressure) \\
-\hline
-{\em tmp1} & Temporary storage used by C\+V\+O\+D\+Es \\
-\hline
-{\em tmp2} & Temporary storage used by C\+V\+O\+D\+Es \\
-\hline
-{\em tmp3} & Temporary storage used by C\+V\+O\+D\+Es \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-cvode\+\_\+return\+\_\+code The C\+V\+O\+DE output constant returned (see sec B.\+2 of C\+V\+O\+DE documentation), currently always returns C\+V\+\_\+\+S\+U\+C\+C\+E\+SS
-\end{DoxyReturn}
-This function converts the N\+\_\+\+Vectors {\ttfamily y} and {\ttfamily y\+\_\+dot} to simple double pointers, the user data {\ttfamily f} to a double and outputs the Jacobian supplied by {\ttfamily eval\+\_\+jacob} to the C\+V\+O\+DE jacobian {\ttfamily jac} Currently, C\+V\+\_\+\+S\+U\+C\+C\+E\+SS is always returned. \index{cvode@{cvode}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+Frees and cleans up allocated C\+V\+O\+DE memory. \index{cvode@{cvode}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
 \index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!cvode@{cvode}}
 \subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::init\+\_\+solver\+\_\+log (
 \begin{DoxyParamCaption}
@@ -132,18 +59,47 @@ This function converts the N\+\_\+\+Vectors {\ttfamily y} and {\ttfamily y\+\_\+
 )}\hypertarget{namespacecvode_abe146525cea80d8032cd30b4441b5872}{}\label{namespacecvode_abe146525cea80d8032cd30b4441b5872}
 
 
-Creates/\+Checks the C\+V\+O\+DE solvers for the specified number of threads. 
+Initializes the solver. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em num\+\_\+threads} & The number of Open\+MP threads to use (and C\+V\+O\+DE solver objects to create)\\
+{\em num\+\_\+threads} & The number of Open\+MP threads to use\\
 \hline
 \end{DoxyParams}
-Various definitions in the generated options (\hyperlink{solver__options_8h}{solver\+\_\+options.\+h}, \hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh}), e.\+g. F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE, C\+V\+\_\+\+M\+A\+X\+\_\+\+E\+R\+R\+T\+E\+S\+T\+\_\+\+F\+A\+I\+LS, etc. affect the options set for the C\+V\+O\+D\+Es solver.
+Various definitions in the generated options, e.\+g. \hyperlink{solver__options_8h_a9e28db46fb24c2d46dbfe205c6a11236}{F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE}, \hyperlink{solver__options_8h_ac42e0287ba619ab25b7d767a81f48082}{C\+V\+\_\+\+M\+A\+X\+\_\+\+E\+R\+R\+T\+E\+S\+T\+\_\+\+F\+A\+I\+LS}, etc. affect the options set for the C\+V\+O\+D\+Es solver. \begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8h}{solver\+\_\+options.\+h}
+\end{DoxySeeAlso}
+The R\+HS function \hyperlink{cvodes__dydt_8c_a82cd83daa4f10afee055813435c6f5b1}{dydt\+\_\+cvodes()} will be used in the solver.
 
-The R\+HS function \hyperlink{namespacecvode_aa10a063b2a82d5b49c2bb338f16ddae4}{dydt\+\_\+cvodes()} will be used in the solver.
+If \hyperlink{solver__options_8h_a9e28db46fb24c2d46dbfe205c6a11236}{F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE} is not defined, the jacobian function in eval\+\_\+jacob\+\_\+cvodes will be used in the C\+V\+O\+DE solver. Else, the C\+V\+O\+DE finite difference based on the R\+HS function will be used. \index{cvode@{cvode}!int\+Driver@{int\+Driver}}
+\index{int\+Driver@{int\+Driver}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{int\+Driver(const int N\+U\+M, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)}{intDriver(const int NUM, const double t, const double t_end, const double *pr_global, double *y_global)}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::int\+Driver (
+\begin{DoxyParamCaption}
+\item[{const int}]{N\+UM, }
+\item[{const double}]{t, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double $\ast$}]{pr\+\_\+global, }
+\item[{double $\ast$}]{y\+\_\+global}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacecvode_ae8209853c343190233f2500020b1cd5f}{}\label{namespacecvode_ae8209853c343190233f2500020b1cd5f}
 
-If F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE is not defined, the jacobian function in eval\+\_\+jacob\+\_\+cvodes will be used in the C\+V\+O\+DE solver. Else, the C\+V\+O\+DE finite difference based on the R\+HS function will be used. \index{cvode@{cvode}!solver\+\_\+log@{solver\+\_\+log}}
+
+Integration driver for the C\+PU integrators. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em N\+UM} & the number of I\+V\+Ps to solve \\
+\hline
+\mbox{\tt in}  & {\em t} & the current I\+VP time \\
+\hline
+\mbox{\tt in}  & {\em t\+\_\+end} & the time to integrate the I\+VP to \\
+\hline
+\mbox{\tt in}  & {\em pr\+\_\+global} & the pressure value for the I\+V\+Ps \\
+\hline
+\mbox{\tt in,out}  & {\em y\+\_\+global} & the state vectors\\
+\hline
+\end{DoxyParams}
+The integration driver for the C\+V\+O\+D\+Es solver \index{cvode@{cvode}!solver\+\_\+log@{solver\+\_\+log}}
 \index{solver\+\_\+log@{solver\+\_\+log}!cvode@{cvode}}
 \subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::solver\+\_\+log (
 \begin{DoxyParamCaption}
@@ -159,9 +115,9 @@ If F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE is not defined, the jacobi
 )}\hypertarget{namespacecvode_a3a26024b8dc2ce6f8b2afcfb7c82c79f}{}\label{namespacecvode_a3a26024b8dc2ce6f8b2afcfb7c82c79f}
 
 
-Returns the C\+V\+O\+DE solver name. 
+Returns a descriptive solver name. 
 
-Returns a descriptive solver name for the C\+V\+O\+DE solver, indicating use of Finite Difference Jacobian (or not) 
+
 
 \subsection{Variable Documentation}
 \index{cvode@{cvode}!integrators@{integrators}}

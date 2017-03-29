@@ -99,17 +99,19 @@ Functions</h2></td></tr>
 <tr class="memdesc:a1ef7b39a9ac7da4247fd05807f000b07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined)  <a href="#a1ef7b39a9ac7da4247fd05807f000b07">More...</a><br /></td></tr>
 <tr class="separator:a1ef7b39a9ac7da4247fd05807f000b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc563232bff1c62e2068039175a6f428"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#adc563232bff1c62e2068039175a6f428">solver_log</a> ()</td></tr>
+<tr class="memdesc:adc563232bff1c62e2068039175a6f428"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes solver specific logging tasks.  <a href="#adc563232bff1c62e2068039175a6f428">More...</a><br /></td></tr>
 <tr class="separator:adc563232bff1c62e2068039175a6f428"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5d3c8262078fd94e511c54eb766f46c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#ab5d3c8262078fd94e511c54eb766f46c">initialize_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:ab5d3c8262078fd94e511c54eb766f46c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods.  <a href="#ab5d3c8262078fd94e511c54eb766f46c">More...</a><br /></td></tr>
+<tr class="memdesc:ab5d3c8262078fd94e511c54eb766f46c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the solver.  <a href="#ab5d3c8262078fd94e511c54eb766f46c">More...</a><br /></td></tr>
 <tr class="separator:ab5d3c8262078fd94e511c54eb766f46c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecc47dad1f4379532ab54b896a5e3771"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#aecc47dad1f4379532ab54b896a5e3771">solver_name</a> ()</td></tr>
-<tr class="memdesc:aecc47dad1f4379532ab54b896a5e3771"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the EXP4 solver name.  <a href="#aecc47dad1f4379532ab54b896a5e3771">More...</a><br /></td></tr>
+<tr class="memdesc:aecc47dad1f4379532ab54b896a5e3771"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a descriptive solver name.  <a href="#aecc47dad1f4379532ab54b896a5e3771">More...</a><br /></td></tr>
 <tr class="separator:aecc47dad1f4379532ab54b896a5e3771"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a595493de14a8f82826268b344339a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#a0a595493de14a8f82826268b344339a8">cleanup_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:a0a595493de14a8f82826268b344339a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created CVODE solvers.  <a href="#a0a595493de14a8f82826268b344339a8">More...</a><br /></td></tr>
+<tr class="memdesc:a0a595493de14a8f82826268b344339a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created solvers.  <a href="#a0a595493de14a8f82826268b344339a8">More...</a><br /></td></tr>
 <tr class="separator:a0a595493de14a8f82826268b344339a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40f949e51fd1c796b23f6d81612720fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceexp4.html#a40f949e51fd1c796b23f6d81612720fb">check_error</a> (int tid, int code)</td></tr>
+<tr class="memdesc:a40f949e51fd1c796b23f6d81612720fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the return code of the given thread (IVP) for an error, and exits if found.  <a href="#a40f949e51fd1c796b23f6d81612720fb">More...</a><br /></td></tr>
 <tr class="separator:a40f949e51fd1c796b23f6d81612720fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -138,7 +140,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>/fn void <a class="el" href="namespaceexp4.html#a40f949e51fd1c796b23f6d81612720fb">check_error(int tid, int code)</a> /brief Checks the return code of the given thread (IVP) for an error, and exits if found /param tid The thread (IVP) index /param code The return code of the thread </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exp4__ErrCodes.html">Return codes of EXP4 integrator</a> </dd></dl>
+
+<p>Checks the return code of the given thread (IVP) for an error, and exits if found. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tid</td><td>The thread (IVP) index </td></tr>
+    <tr><td class="paramname">code</td><td>The return code of the thread </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__exp4__ErrCodes.html">Return codes of EXP4 integrator</a> </dd></dl>
 
 </div>
 </div>
@@ -156,14 +167,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Cleans up the created CVODE solvers. </p>
+<p>Cleans up the created solvers. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads to use (and CVODE solver objects to destroy)</td></tr>
+    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads used</td></tr>
   </table>
   </dd>
 </dl>
-<p>Frees and cleans up allocated CVODE memory. </p>
+<p>Frees and cleans up allocated CVODE memory.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads used</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Frees and cleans up allocated RK78 memory. </p>
 
 </div>
 </div>
@@ -181,6 +199,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined) </p>
+<p>Initializes solver specific items for logging.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
 
 </div>
@@ -199,11 +218,10 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods. </p>
-<p>Creates/Checks the CVODE solvers for the specified number of threads.</p>
+<p>Initializes the solver. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">num_threads</td><td>Unused </td></tr>
+    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads to use </td></tr>
   </table>
   </dd>
 </dl>
@@ -247,6 +265,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation </p>
+<p>A header definition of the integrate method, that must be implemented by various solvers.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">t_start</td><td>The initial integration time </td></tr>
@@ -274,6 +293,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Executes solver specific logging tasks. </p>
+
 </div>
 </div>
 <a class="anchor" id="aecc47dad1f4379532ab54b896a5e3771"></a>
@@ -289,9 +310,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the EXP4 solver name. </p>
-<p>Returns the CVODE solver name.</p>
-<p>Returns a descriptive solver name for the EXP4 solver </p>
+<p>Returns a descriptive solver name. </p>
 
 </div>
 </div>

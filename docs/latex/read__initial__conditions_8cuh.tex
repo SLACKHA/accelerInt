@@ -1,5 +1,10 @@
 \hypertarget{read__initial__conditions_8cuh}{}\section{generic/read\+\_\+initial\+\_\+conditions.cuh File Reference}
 \label{read__initial__conditions_8cuh}\index{generic/read\+\_\+initial\+\_\+conditions.\+cuh@{generic/read\+\_\+initial\+\_\+conditions.\+cuh}}
+
+
+definition of the generic initial condition reader  
+
+
 This graph shows which files directly or indirectly include this file\+:\nopagebreak
 \begin{figure}[H]
 \begin{center}
@@ -16,7 +21,18 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \begin{DoxyCompactItemize}
 \item 
 int \hyperlink{read__initial__conditions_8cuh_af316c999bd8f21073480df848cca5225}{read\+\_\+initial\+\_\+conditions} (const char $\ast$, int, double $\ast$$\ast$, double $\ast$$\ast$)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Reads initial conditions for I\+V\+Ps from binary file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+definition of the generic initial condition reader 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}
 
 
 \subsection{Macro Definition Documentation}
@@ -30,9 +46,27 @@ int \hyperlink{read__initial__conditions_8cuh_af316c999bd8f21073480df848cca5225}
 \index{read\+\_\+initial\+\_\+conditions@{read\+\_\+initial\+\_\+conditions}!read\+\_\+initial\+\_\+conditions.\+cuh@{read\+\_\+initial\+\_\+conditions.\+cuh}}
 \subsubsection[{\texorpdfstring{read\+\_\+initial\+\_\+conditions(const char $\ast$, int, double $\ast$$\ast$, double $\ast$$\ast$)}{read_initial_conditions(const char *, int, double **, double **)}}]{\setlength{\rightskip}{0pt plus 5cm}int read\+\_\+initial\+\_\+conditions (
 \begin{DoxyParamCaption}
-\item[{const char $\ast$}]{, }
-\item[{int}]{, }
-\item[{double $\ast$$\ast$}]{, }
-\item[{double $\ast$$\ast$}]{}
+\item[{const char $\ast$}]{filename, }
+\item[{int}]{N\+UM, }
+\item[{double $\ast$$\ast$}]{y\+\_\+host, }
+\item[{double $\ast$$\ast$}]{variable\+\_\+host}
 \end{DoxyParamCaption}
 )}\hypertarget{read__initial__conditions_8cuh_af316c999bd8f21073480df848cca5225}{}\label{read__initial__conditions_8cuh_af316c999bd8f21073480df848cca5225}
+
+
+Reads initial conditions for I\+V\+Ps from binary file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & the file to read from \\
+\hline
+\mbox{\tt in}  & {\em N\+UM} & the number of I\+VP initial conditions to read \\
+\hline
+\mbox{\tt in,out}  & {\em y\+\_\+host} & Address of the host state vector pointer. This is initialized and populated by this method \\
+\hline
+\mbox{\tt in,out}  & {\em variable\+\_\+host} & Address of the host pressure/density pointer. This is initialized and populated by this method\\
+\hline
+\end{DoxyParams}
+Note\+: the data file is expected to be in the following format\+:~\newline
+ time, Temperature, Pressure, mass fractions (State \#1) ~\newline
+ time, Temperature, Pressure, mass fractions (State \#2) ... 

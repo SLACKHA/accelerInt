@@ -11,19 +11,19 @@ struct \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory}
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{namespaceexprb43cu_ad98c42138e12fe026951999e87b1ceb4}{integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ mech, const \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver)
 \item 
 const char $\ast$ \hyperlink{namespaceexprb43cu_adb32cc589856026fca36d47f1982ee00}{solver\+\_\+name} ()
-\begin{DoxyCompactList}\small\item\em Returns the E\+X\+P\+B43 solver name. \end{DoxyCompactList}\item 
-void \hyperlink{namespaceexprb43cu_a77622bf304d732c5402474fe69dbb4a2}{solver\+\_\+log} ()
-\begin{DoxyCompactList}\small\item\em Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
-void \hyperlink{namespaceexprb43cu_a61e02bb434629c817de6934d514fc96c}{init\+\_\+solver\+\_\+log} ()
-\begin{DoxyCompactList}\small\item\em Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43cu_a4cf705b7d338850571b92dcae3e1654c}{solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Executes solver specific logging tasks. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexprb43cu_aa82c3608832f5b5891f2f3a992aaf8c7}{init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes solver specific items for logging. \end{DoxyCompactList}\item 
 size\+\_\+t \hyperlink{namespaceexprb43cu_ad837089abb4cfc3819786aad86440da0}{required\+\_\+solver\+\_\+size} ()
 \begin{DoxyCompactList}\small\item\em Returns the total size (in bytes) required for memory storage for a single G\+PU thread Used in calculation of the maximum number of possible G\+PU threads to launch, this method returns the size of the \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} structure (per-\/\+G\+PU thread) \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexprb43cu_a411c61dc481c439d2a19e8f17ec5af63}{create\+And\+Zero} (void $\ast$$\ast$ptr, size\+\_\+t size)
-\item 
+\begin{DoxyCompactList}\small\item\em Convienvience method to Cuda Malloc and memset a pointer to zero. \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexprb43cu_a6c8137b2fd79c625faa2773ea26deb10}{initialize\+\_\+solver} (int padded, \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} $\ast$$\ast$h\+\_\+mem, \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} $\ast$$\ast$d\+\_\+mem)
-\begin{DoxyCompactList}\small\item\em Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory}. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initializes the G\+PU solver. \end{DoxyCompactList}\item 
 void \hyperlink{namespaceexprb43cu_a2a93d9ac22d074a6003cb959e74fae61}{cleanup\+\_\+solver} (\hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} $\ast$$\ast$h\+\_\+mem, \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} $\ast$$\ast$d\+\_\+mem)
-\begin{DoxyCompactList}\small\item\em Cleans up solver memory, and closes Krylov subspace logfiles (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Cleans up solver memory. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{namespaceexprb43cu_aea2a90f02f654f5e485a7bea9c34985f}{check\+\_\+error} (int num\+\_\+cond, int $\ast$codes)
 \end{DoxyCompactItemize}
 
@@ -40,9 +40,6 @@ Include common code.
 \item[{int $\ast$}]{codes}
 \end{DoxyParamCaption}
 )}\hypertarget{namespaceexprb43cu_aea2a90f02f654f5e485a7bea9c34985f}{}\label{namespaceexprb43cu_aea2a90f02f654f5e485a7bea9c34985f}
-/fn void \hyperlink{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{check\+\_\+error(int tid, int code)} /brief Checks the return code of the given thread (I\+VP) for an error, and exits if found /param num\+\_\+cond The total number of I\+V\+Ps to check /param codes The array of return codes \begin{DoxySeeAlso}{See also}
-\hyperlink{group__exprb43cu__ErrCodes}{Return codes of G\+P\+U E\+X\+P4 integrator} 
-\end{DoxySeeAlso}
 \index{exprb43cu@{exprb43cu}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
 \index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!exprb43cu@{exprb43cu}}
 \subsubsection[{\texorpdfstring{cleanup\+\_\+solver(solver\+\_\+memory $\ast$$\ast$h\+\_\+mem, solver\+\_\+memory $\ast$$\ast$d\+\_\+mem)}{cleanup_solver(solver_memory **h_mem, solver_memory **d_mem)}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43cu\+::cleanup\+\_\+solver (
@@ -53,14 +50,14 @@ Include common code.
 )}\hypertarget{namespaceexprb43cu_a2a93d9ac22d074a6003cb959e74fae61}{}\label{namespaceexprb43cu_a2a93d9ac22d074a6003cb959e74fae61}
 
 
-Cleans up solver memory, and closes Krylov subspace logfiles (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+Cleans up solver memory. 
 
 \begin{DoxySeeAlso}{See also}
 \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} 
 
-\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh}
 \end{DoxySeeAlso}
-\index{exprb43cu@{exprb43cu}!create\+And\+Zero@{create\+And\+Zero}}
+Additionally closes Krylov subspace logfiles (if \hyperlink{solver__options_8h_ac786f5f1963363a48eed565f7cbc6931}{L\+O\+G\+\_\+\+O\+U\+T\+P\+UT} is defined) \index{exprb43cu@{exprb43cu}!create\+And\+Zero@{create\+And\+Zero}}
 \index{create\+And\+Zero@{create\+And\+Zero}!exprb43cu@{exprb43cu}}
 \subsubsection[{\texorpdfstring{create\+And\+Zero(void $\ast$$\ast$ptr, size\+\_\+t size)}{createAndZero(void **ptr, size_t size)}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43cu\+::create\+And\+Zero (
 \begin{DoxyParamCaption}
@@ -68,18 +65,29 @@ Cleans up solver memory, and closes Krylov subspace logfiles (if L\+O\+G\+\_\+\+
 \item[{size\+\_\+t}]{size}
 \end{DoxyParamCaption}
 )}\hypertarget{namespaceexprb43cu_a411c61dc481c439d2a19e8f17ec5af63}{}\label{namespaceexprb43cu_a411c61dc481c439d2a19e8f17ec5af63}
-/fn void \hyperlink{namespaceexprb43cu_a411c61dc481c439d2a19e8f17ec5af63}{create\+And\+Zero(void$\ast$$\ast$ ptr, size\+\_\+t size)} /brief Convienvience method to Cuda Malloc and memset a pointer to zero /param ptr The address of the pointer to malloc /param size The total size (in bytes) of the pointer to malloc \index{exprb43cu@{exprb43cu}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+
+
+Convienvience method to Cuda Malloc and memset a pointer to zero. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ptr} & The address of the pointer to malloc \\
+\hline
+{\em size} & The total size (in bytes) of the pointer to malloc \\
+\hline
+\end{DoxyParams}
+\index{exprb43cu@{exprb43cu}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
 \index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!exprb43cu@{exprb43cu}}
-\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43cu\+::init\+\_\+solver\+\_\+log (
+\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}exprb43cu\+::init\+\_\+solver\+\_\+log (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
-)}\hypertarget{namespaceexprb43cu_a61e02bb434629c817de6934d514fc96c}{}\label{namespaceexprb43cu_a61e02bb434629c817de6934d514fc96c}
+)}\hypertarget{namespaceexprb43cu_aa82c3608832f5b5891f2f3a992aaf8c7}{}\label{namespaceexprb43cu_aa82c3608832f5b5891f2f3a992aaf8c7}
 
 
-Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+Initializes solver specific items for logging. 
 
-\begin{DoxySeeAlso}{See also}
+Initializes the Krylov subspace logging files (if \hyperlink{solver__options_8h_ac786f5f1963363a48eed565f7cbc6931}{L\+O\+G\+\_\+\+O\+U\+T\+P\+UT} is defined) \begin{DoxySeeAlso}{See also}
 \hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
 \end{DoxySeeAlso}
 \index{exprb43cu@{exprb43cu}!initialize\+\_\+solver@{initialize\+\_\+solver}}
@@ -93,7 +101,7 @@ Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT 
 )}\hypertarget{namespaceexprb43cu_a6c8137b2fd79c625faa2773ea26deb10}{}\label{namespaceexprb43cu_a6c8137b2fd79c625faa2773ea26deb10}
 
 
-Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory}. 
+Initializes the G\+PU solver. 
 
 
 \begin{DoxyParams}{Parameters}
@@ -101,10 +109,10 @@ Solves for the poles and residuals used for the Rational Approximants in the Kry
 \hline
 {\em h\+\_\+mem} & The host \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} structure (to be copied to the G\+PU) \\
 \hline
-{\em d\+\_\+mem} & The device \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} structure (to be operated on by the G\+PU) \\
+{\em d\+\_\+mem} & The device \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} structure (to be operated on by the G\+PU)\\
 \hline
 \end{DoxyParams}
-\index{exprb43cu@{exprb43cu}!integrate@{integrate}}
+Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes \hyperlink{structexprb43cu_1_1solver__memory}{solver\+\_\+memory} \index{exprb43cu@{exprb43cu}!integrate@{integrate}}
 \index{integrate@{integrate}!exprb43cu@{exprb43cu}}
 \subsubsection[{\texorpdfstring{integrate(const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ mech, const solver\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver)}{integrate(const double t_start, const double t_end, const double pr, double *__restrict__ y, const mechanism_memory *__restrict__ mech, const solver_memory *__restrict__ solver)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void exprb43cu\+::integrate (
 \begin{DoxyParamCaption}
@@ -132,16 +140,16 @@ Returns the total size (in bytes) required for memory storage for a single G\+PU
 \end{DoxySeeAlso}
 \index{exprb43cu@{exprb43cu}!solver\+\_\+log@{solver\+\_\+log}}
 \index{solver\+\_\+log@{solver\+\_\+log}!exprb43cu@{exprb43cu}}
-\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void exprb43cu\+::solver\+\_\+log (
+\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}exprb43cu\+::solver\+\_\+log (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
-)}\hypertarget{namespaceexprb43cu_a77622bf304d732c5402474fe69dbb4a2}{}\label{namespaceexprb43cu_a77622bf304d732c5402474fe69dbb4a2}
+)}\hypertarget{namespaceexprb43cu_a4cf705b7d338850571b92dcae3e1654c}{}\label{namespaceexprb43cu_a4cf705b7d338850571b92dcae3e1654c}
 
 
-Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+Executes solver specific logging tasks. 
 
-\begin{DoxySeeAlso}{See also}
+Logs errors, step-\/sizes, and krylov subspace size (if \hyperlink{solver__options_8h_ac786f5f1963363a48eed565f7cbc6931}{L\+O\+G\+\_\+\+O\+U\+T\+P\+UT} is defined) \begin{DoxySeeAlso}{See also}
 \hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
 \end{DoxySeeAlso}
 \index{exprb43cu@{exprb43cu}!solver\+\_\+name@{solver\+\_\+name}}
@@ -153,8 +161,5 @@ Logs errors, step-\/sizes, and krylov subspace size (if L\+O\+G\+\_\+\+O\+U\+T\+
 )}\hypertarget{namespaceexprb43cu_adb32cc589856026fca36d47f1982ee00}{}\label{namespaceexprb43cu_adb32cc589856026fca36d47f1982ee00}
 
 
-Returns the E\+X\+P\+B43 solver name. 
+Returns a descriptive solver name. 
 
-Returns the C\+V\+O\+DE solver name.
-
-Returns a descriptive solver name for the G\+PU E\+X\+P\+B43 solver 

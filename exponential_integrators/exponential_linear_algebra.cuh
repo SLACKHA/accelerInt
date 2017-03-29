@@ -1,4 +1,4 @@
-/*
+/**
  * \file exponential_linear_algebra.cuh
  * \brief Definitions of various linear algebra functions needed in the exponential integrators
  *

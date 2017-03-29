@@ -87,190 +87,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">radau2a_init.cu File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Implementation of the necessary initialization for the Radau-IIA solver.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="solver__init_8cuh.html">solver_init.cuh</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for radau2a_init.cu:</div>
 <div class="dyncontent">
 <div class="center"><img src="radau2a__init_8cu__incl.png" border="0" usemap="#radau2a_2radau2a__init_8cu" alt=""/></div>
 <map name="radau2a_2radau2a__init_8cu" id="radau2a_2radau2a__init_8cu">
-<area shape="rect" id="node2" href="solver__init_8cuh.html" title="solver_init.cuh" alt="" coords="77,80,183,107"/>
-<area shape="rect" id="node3" href="solver__props_8cuh.html" title="solver_props.cuh" alt="" coords="5,155,127,181"/>
+<area shape="rect" id="node2" href="solver__init_8cuh.html" title="Header definitions for solver initialization routins. " alt="" coords="77,80,183,107"/>
+<area shape="rect" id="node3" href="solver__props_8cuh.html" title="simple convenience file to include the correct solver properties file " alt="" coords="5,155,127,181"/>
 </map>
 </div>
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a39c825543042903f579cd9c35a279dca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__init_8cu.html#a39c825543042903f579cd9c35a279dca">init_solver_log</a> ()</td></tr>
-<tr class="separator:a39c825543042903f579cd9c35a279dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae95cbe81062a829668c5fa8e28b2e2c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__init_8cu.html#ae95cbe81062a829668c5fa8e28b2e2c7">solver_log</a> ()</td></tr>
-<tr class="separator:ae95cbe81062a829668c5fa8e28b2e2c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ca568c33c1f8f478970cc5eec5d1d81"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__init_8cu.html#a4ca568c33c1f8f478970cc5eec5d1d81">solver_name</a> ()</td></tr>
-<tr class="memdesc:a4ca568c33c1f8f478970cc5eec5d1d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the CVODE solver name.  <a href="#a4ca568c33c1f8f478970cc5eec5d1d81">More...</a><br /></td></tr>
-<tr class="separator:a4ca568c33c1f8f478970cc5eec5d1d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab75ba2ae0b04dfd786322e7b34f49d84"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__init_8cu.html#ab75ba2ae0b04dfd786322e7b34f49d84">required_solver_size</a> ()</td></tr>
-<tr class="separator:ab75ba2ae0b04dfd786322e7b34f49d84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4559ac37af59319f0c28865a2efdef0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__init_8cu.html#aa4559ac37af59319f0c28865a2efdef0">createAndZero</a> (void **ptr, size_t size)</td></tr>
-<tr class="separator:aa4559ac37af59319f0c28865a2efdef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30a747ce9a24af37c39f0ccbc093e13a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__init_8cu.html#a30a747ce9a24af37c39f0ccbc093e13a">initialize_solver</a> (const int padded, <a class="el" href="structsolver__memory.html">solver_memory</a> **h_mem, <a class="el" href="structsolver__memory.html">solver_memory</a> **d_mem)</td></tr>
-<tr class="separator:a30a747ce9a24af37c39f0ccbc093e13a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61dcb06647ae55dd950a9ea354b330d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__init_8cu.html#a61dcb06647ae55dd950a9ea354b330d8">cleanup_solver</a> (<a class="el" href="structsolver__memory.html">solver_memory</a> **h_mem, <a class="el" href="structsolver__memory.html">solver_memory</a> **d_mem)</td></tr>
-<tr class="separator:a61dcb06647ae55dd950a9ea354b330d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a61dcb06647ae55dd950a9ea354b330d8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void cleanup_solver </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structsolver__memory.html">solver_memory</a> **&#160;</td>
-          <td class="paramname"><em>h_mem</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structsolver__memory.html">solver_memory</a> **&#160;</td>
-          <td class="paramname"><em>d_mem</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa4559ac37af59319f0c28865a2efdef0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void createAndZero </td>
-          <td>(</td>
-          <td class="paramtype">void **&#160;</td>
-          <td class="paramname"><em>ptr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a39c825543042903f579cd9c35a279dca"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void init_solver_log </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a30a747ce9a24af37c39f0ccbc093e13a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void initialize_solver </td>
-          <td>(</td>
-          <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>padded</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structsolver__memory.html">solver_memory</a> **&#160;</td>
-          <td class="paramname"><em>h_mem</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structsolver__memory.html">solver_memory</a> **&#160;</td>
-          <td class="paramname"><em>d_mem</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab75ba2ae0b04dfd786322e7b34f49d84"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t required_solver_size </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae95cbe81062a829668c5fa8e28b2e2c7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void solver_log </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4ca568c33c1f8f478970cc5eec5d1d81"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char* solver_name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the CVODE solver name. </p>
-<p>Returns a descriptive solver name for the CVODE solver, indicating use of Finite Difference Jacobian (or not) </p>
-
-</div>
-</div>
-</div><!-- contents -->
+</div><a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implementation of the necessary initialization for the Radau-IIA solver. </p>
+<dl class="section author"><dt>Author</dt><dd>Nicholas Curtis </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>03/09/2015 </dd></dl>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

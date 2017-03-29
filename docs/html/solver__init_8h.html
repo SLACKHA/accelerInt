@@ -88,169 +88,61 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">solver_init.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Header definitions for solver initialization routins.  
+<a href="#details">More...</a></p>
 <div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="solver__init_8h__dep__incl.png" border="0" usemap="#generic_2solver__init_8hdep" alt=""/></div>
 <map name="generic_2solver__init_8hdep" id="generic_2solver__init_8hdep">
-<area shape="rect" id="node2" href="solver_8h.html" title="generic/solver.h" alt="" coords="305,87,420,114"/>
+<area shape="rect" id="node2" href="solver_8h.html" title="Contains skeleton of all methods that need to be defined on a per solver basis. " alt="" coords="305,87,420,114"/>
 <area shape="rect" id="node7" href="exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="445,80,601,121"/>
 <area shape="rect" id="node8" href="exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="625,80,781,121"/>
-<area shape="rect" id="node3" href="solver__cvodes_8c.html" title="cvodes/solver_cvodes.c" alt="" coords="5,169,168,196"/>
-<area shape="rect" id="node4" href="solver__generic_8c.html" title="generic/solver_generic.c" alt="" coords="192,169,355,196"/>
-<area shape="rect" id="node5" href="solver__main_8c.html" title="generic/solver_main.c" alt="" coords="379,169,528,196"/>
-<area shape="rect" id="node6" href="solver__rk78_8cpp.html" title="rk78/solver_rk78.cpp" alt="" coords="551,169,694,196"/>
+<area shape="rect" id="node3" href="solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="5,169,168,196"/>
+<area shape="rect" id="node4" href="solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="192,169,355,196"/>
+<area shape="rect" id="node5" href="solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="379,169,528,196"/>
+<area shape="rect" id="node6" href="solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="551,169,694,196"/>
 </map>
 </div>
 </div>
 <p><a href="solver__init_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacegeneric"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html">generic</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a39c825543042903f579cd9c35a279dca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__init_8h.html#a39c825543042903f579cd9c35a279dca">init_solver_log</a> ()</td></tr>
-<tr class="memdesc:a39c825543042903f579cd9c35a279dca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined)  <a href="#a39c825543042903f579cd9c35a279dca">More...</a><br /></td></tr>
-<tr class="separator:a39c825543042903f579cd9c35a279dca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae95cbe81062a829668c5fa8e28b2e2c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__init_8h.html#ae95cbe81062a829668c5fa8e28b2e2c7">solver_log</a> ()</td></tr>
-<tr class="memdesc:ae95cbe81062a829668c5fa8e28b2e2c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs errors, step-sizes, and krylov subspace size (if LOG_OUTPUT is defined)  <a href="#ae95cbe81062a829668c5fa8e28b2e2c7">More...</a><br /></td></tr>
-<tr class="separator:ae95cbe81062a829668c5fa8e28b2e2c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7426609d0f4af2fd6d2ac6cc98f5995"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__init_8h.html#ad7426609d0f4af2fd6d2ac6cc98f5995">initialize_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:ad7426609d0f4af2fd6d2ac6cc98f5995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates/Checks the CVODE solvers for the specified number of threads.  <a href="#ad7426609d0f4af2fd6d2ac6cc98f5995">More...</a><br /></td></tr>
-<tr class="separator:ad7426609d0f4af2fd6d2ac6cc98f5995"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1a41619f661af5da4dfea21eaed85fd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__init_8h.html#af1a41619f661af5da4dfea21eaed85fd">cleanup_solver</a> (int num_threads)</td></tr>
-<tr class="memdesc:af1a41619f661af5da4dfea21eaed85fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created CVODE solvers.  <a href="#af1a41619f661af5da4dfea21eaed85fd">More...</a><br /></td></tr>
-<tr class="separator:af1a41619f661af5da4dfea21eaed85fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ca568c33c1f8f478970cc5eec5d1d81"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__init_8h.html#a4ca568c33c1f8f478970cc5eec5d1d81">solver_name</a> ()</td></tr>
-<tr class="memdesc:a4ca568c33c1f8f478970cc5eec5d1d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the CVODE solver name.  <a href="#a4ca568c33c1f8f478970cc5eec5d1d81">More...</a><br /></td></tr>
-<tr class="separator:a4ca568c33c1f8f478970cc5eec5d1d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a262501be5ff14645a2e61d407ddde344"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a262501be5ff14645a2e61d407ddde344">generic::init_solver_log</a> ()</td></tr>
+<tr class="memdesc:a262501be5ff14645a2e61d407ddde344"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes solver specific items for logging.  <a href="namespacegeneric.html#a262501be5ff14645a2e61d407ddde344">More...</a><br /></td></tr>
+<tr class="separator:a262501be5ff14645a2e61d407ddde344"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b90d29725f8fd6ceb9338ed125aa5f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#af0b90d29725f8fd6ceb9338ed125aa5f">generic::solver_log</a> ()</td></tr>
+<tr class="memdesc:af0b90d29725f8fd6ceb9338ed125aa5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes solver specific logging tasks.  <a href="namespacegeneric.html#af0b90d29725f8fd6ceb9338ed125aa5f">More...</a><br /></td></tr>
+<tr class="separator:af0b90d29725f8fd6ceb9338ed125aa5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82578fa45769fa8dd324e18a01f492d2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a82578fa45769fa8dd324e18a01f492d2">generic::initialize_solver</a> (int num_threads)</td></tr>
+<tr class="memdesc:a82578fa45769fa8dd324e18a01f492d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the solver.  <a href="namespacegeneric.html#a82578fa45769fa8dd324e18a01f492d2">More...</a><br /></td></tr>
+<tr class="separator:a82578fa45769fa8dd324e18a01f492d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a105e2cd1d3777b806e59d7725754867b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a105e2cd1d3777b806e59d7725754867b">generic::cleanup_solver</a> (int num_threads)</td></tr>
+<tr class="memdesc:a105e2cd1d3777b806e59d7725754867b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the created solvers.  <a href="namespacegeneric.html#a105e2cd1d3777b806e59d7725754867b">More...</a><br /></td></tr>
+<tr class="separator:a105e2cd1d3777b806e59d7725754867b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ea23497102dccb8aaf87ed6d27506fe"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a8ea23497102dccb8aaf87ed6d27506fe">generic::solver_name</a> ()</td></tr>
+<tr class="memdesc:a8ea23497102dccb8aaf87ed6d27506fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a descriptive solver name.  <a href="namespacegeneric.html#a8ea23497102dccb8aaf87ed6d27506fe">More...</a><br /></td></tr>
+<tr class="separator:a8ea23497102dccb8aaf87ed6d27506fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="af1a41619f661af5da4dfea21eaed85fd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void cleanup_solver </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>num_threads</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Cleans up the created CVODE solvers. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads to use (and CVODE solver objects to destroy)</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Frees and cleans up allocated CVODE memory. </p>
-
-</div>
-</div>
-<a class="anchor" id="a39c825543042903f579cd9c35a279dca"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void init_solver_log </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initializes the Krylov subspace logging files (if LOG_OUTPUT is defined) </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ad7426609d0f4af2fd6d2ac6cc98f5995"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void initialize_solver </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>num_threads</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Creates/Checks the CVODE solvers for the specified number of threads. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num_threads</td><td>The number of OpenMP threads to use (and CVODE solver objects to create)</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Various definitions in the generated options (<a class="el" href="solver__options_8h.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.h</a>, <a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a>), e.g. FINITE_DIFFERENCE, CV_MAX_ERRTEST_FAILS, etc. affect the options set for the CVODEs solver.</p>
-<p>The RHS function <a class="el" href="namespacecvode.html#aa10a063b2a82d5b49c2bb338f16ddae4" title="The CVODEs RHS interface. ">dydt_cvodes()</a> will be used in the solver.</p>
-<p>If FINITE_DIFFERENCE is not defined, the jacobian function in eval_jacob_cvodes will be used in the CVODE solver. Else, the CVODE finite difference based on the RHS function will be used.</p>
-<p>Creates/Checks the CVODE solvers for the specified number of threads.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num_threads</td><td>Unused </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ae95cbe81062a829668c5fa8e28b2e2c7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void solver_log </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Logs errors, step-sizes, and krylov subspace size (if LOG_OUTPUT is defined) </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__options_8cuh.html" title="A file generated by Scons that specifies various options to the solvers. ">solver_options.cuh</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a4ca568c33c1f8f478970cc5eec5d1d81"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char* solver_name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the CVODE solver name. </p>
-<p>Returns a descriptive solver name for the CVODE solver, indicating use of Finite Difference Jacobian (or not)</p>
-<p>Returns the CVODE solver name.</p>
-<p>Returns a descriptive solver name for the EXP4 solver</p>
-<p>Returns the CVODE solver name.</p>
-<p>Returns a descriptive solver name for the GPU EXP4 solver</p>
-<p>Returns the CVODE solver name.</p>
-<p>Returns a descriptive solver name for the EXPRB43 solver</p>
-<p>Returns the CVODE solver name.</p>
-<p>Returns a descriptive solver name for the GPU EXPB43 solver </p>
-
-</div>
-</div>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Header definitions for solver initialization routins. </p>
+<dl class="section author"><dt>Author</dt><dd>Nicholas Curtis </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>03/09/2015</dd></dl>
+<p>Contains declarations for initialization routines that all individual solvers must implement </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -89,11 +89,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">radau2a_props.cuh File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Various macros controlling behaviour of RADAU2A algorithm.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;header.cuh&quot;</code><br />
 <code>#include &lt;cuComplex.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
@@ -113,7 +117,13 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsolver__memory.html">solver_memory</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structradau2acu_1_1solver__memory.html">radau2acu::solver_memory</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory required for Radau-IIa GPU solver.  <a href="structradau2acu_1_1solver__memory.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceradau2acu"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceradau2acu.html">radau2acu</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -121,79 +131,29 @@ Macros</h2></td></tr>
 <tr class="memitem:acb5834e026c7d7045b16acfcb25a5f7d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8cuh.html#acb5834e026c7d7045b16acfcb25a5f7d">RADAU2A_PROPS_CUH</a></td></tr>
 <tr class="separator:acb5834e026c7d7045b16acfcb25a5f7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a351d54267048643c4365f6a24641d0cf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8cuh.html#a351d54267048643c4365f6a24641d0cf">STRIDE</a>&#160;&#160;&#160;(NSP)</td></tr>
+<tr class="memdesc:a351d54267048643c4365f6a24641d0cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">the matrix dimensions  <a href="#a351d54267048643c4365f6a24641d0cf">More...</a><br /></td></tr>
 <tr class="separator:a351d54267048643c4365f6a24641d0cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd83bc0f9f475a2189a4db4a08b790ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8cuh.html#abd83bc0f9f475a2189a4db4a08b790ca">EC_success</a>&#160;&#160;&#160;(0)</td></tr>
-<tr class="separator:abd83bc0f9f475a2189a4db4a08b790ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0287841c08f86f5709660fd731615ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8cuh.html#ae0287841c08f86f5709660fd731615ad">EC_consecutive_steps</a>&#160;&#160;&#160;(1)</td></tr>
-<tr class="separator:ae0287841c08f86f5709660fd731615ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f0275d9851ab5c19b79a963d5084df3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8cuh.html#a0f0275d9851ab5c19b79a963d5084df3">EC_max_steps_exceeded</a>&#160;&#160;&#160;(2)</td></tr>
-<tr class="separator:a0f0275d9851ab5c19b79a963d5084df3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9326efd544880e2683c4453365ca2704"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8cuh.html#a9326efd544880e2683c4453365ca2704">EC_h_plus_t_equals_h</a>&#160;&#160;&#160;(3)</td></tr>
-<tr class="separator:a9326efd544880e2683c4453365ca2704"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae2906abd9ae8a2791c2e8626ca73a32"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8cuh.html#aae2906abd9ae8a2791c2e8626ca73a32">EC_newton_max_iterations_exceeded</a>&#160;&#160;&#160;(4)</td></tr>
-<tr class="separator:aae2906abd9ae8a2791c2e8626ca73a32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabd83bc0f9f475a2189a4db4a08b790ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RKCU__ErrCodes.html#gabd83bc0f9f475a2189a4db4a08b790ca">EC_success</a>&#160;&#160;&#160;(0)</td></tr>
+<tr class="memdesc:gabd83bc0f9f475a2189a4db4a08b790ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Successful time step.  <a href="group__RKCU__ErrCodes.html#gabd83bc0f9f475a2189a4db4a08b790ca">More...</a><br /></td></tr>
+<tr class="separator:gabd83bc0f9f475a2189a4db4a08b790ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae0287841c08f86f5709660fd731615ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RKCU__ErrCodes.html#gae0287841c08f86f5709660fd731615ad">EC_consecutive_steps</a>&#160;&#160;&#160;(1)</td></tr>
+<tr class="memdesc:gae0287841c08f86f5709660fd731615ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of consecutive internal timesteps with error reached.  <a href="group__RKCU__ErrCodes.html#gae0287841c08f86f5709660fd731615ad">More...</a><br /></td></tr>
+<tr class="separator:gae0287841c08f86f5709660fd731615ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0f0275d9851ab5c19b79a963d5084df3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RKCU__ErrCodes.html#ga0f0275d9851ab5c19b79a963d5084df3">EC_max_steps_exceeded</a>&#160;&#160;&#160;(2)</td></tr>
+<tr class="memdesc:ga0f0275d9851ab5c19b79a963d5084df3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of internal timesteps exceeded.  <a href="group__RKCU__ErrCodes.html#ga0f0275d9851ab5c19b79a963d5084df3">More...</a><br /></td></tr>
+<tr class="separator:ga0f0275d9851ab5c19b79a963d5084df3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9326efd544880e2683c4453365ca2704"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RKCU__ErrCodes.html#ga9326efd544880e2683c4453365ca2704">EC_h_plus_t_equals_h</a>&#160;&#160;&#160;(3)</td></tr>
+<tr class="memdesc:ga9326efd544880e2683c4453365ca2704"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timescale reduced such that t + h == t in floating point math.  <a href="group__RKCU__ErrCodes.html#ga9326efd544880e2683c4453365ca2704">More...</a><br /></td></tr>
+<tr class="separator:ga9326efd544880e2683c4453365ca2704"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaae2906abd9ae8a2791c2e8626ca73a32"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__RKCU__ErrCodes.html#gaae2906abd9ae8a2791c2e8626ca73a32">EC_newton_max_iterations_exceeded</a>&#160;&#160;&#160;(4)</td></tr>
+<tr class="memdesc:gaae2906abd9ae8a2791c2e8626ca73a32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum allowed Newton Iteration steps exceeded.  <a href="group__RKCU__ErrCodes.html#gaae2906abd9ae8a2791c2e8626ca73a32">More...</a><br /></td></tr>
+<tr class="separator:gaae2906abd9ae8a2791c2e8626ca73a32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a class="anchor" id="ae0287841c08f86f5709660fd731615ad"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EC_consecutive_steps&#160;&#160;&#160;(1)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9326efd544880e2683c4453365ca2704"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EC_h_plus_t_equals_h&#160;&#160;&#160;(3)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0f0275d9851ab5c19b79a963d5084df3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EC_max_steps_exceeded&#160;&#160;&#160;(2)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aae2906abd9ae8a2791c2e8626ca73a32"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EC_newton_max_iterations_exceeded&#160;&#160;&#160;(4)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abd83bc0f9f475a2189a4db4a08b790ca"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EC_success&#160;&#160;&#160;(0)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Various macros controlling behaviour of RADAU2A algorithm. </p>
+<dl class="section author"><dt>Author</dt><dd>Nicholas Curtis </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>03/10/2015 </dd></dl>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="acb5834e026c7d7045b16acfcb25a5f7d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -215,6 +175,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>the matrix dimensions </p>
 
 </div>
 </div>

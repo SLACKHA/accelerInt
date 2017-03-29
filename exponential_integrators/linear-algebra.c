@@ -18,7 +18,6 @@
  *
  * \param[in]     n     order of matrix
  * \param[in]     A     the input matrix, size n*n
- * \param[out]    B     the output matrix, size n*n
  * \return        info  success/fail integer flag
  */
 void getInverseComplex (int n, double complex* A) {

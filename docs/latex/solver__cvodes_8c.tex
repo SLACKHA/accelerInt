@@ -1,5 +1,10 @@
 \hypertarget{solver__cvodes_8c}{}\section{cvodes/solver\+\_\+cvodes.c File Reference}
 \label{solver__cvodes_8c}\index{cvodes/solver\+\_\+cvodes.\+c@{cvodes/solver\+\_\+cvodes.\+c}}
+
+
+The integration driver for the C\+V\+O\+DE solver.  
+
+
 {\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver.\+h\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}sundials/sundials\+\_\+types.\+h\char`\"{}}\\*
@@ -15,11 +20,16 @@ Include dependency graph for solver\+\_\+cvodes.\+c\+:\nopagebreak
 \includegraphics[width=350pt]{solver__cvodes_8c__incl}
 \end{center}
 \end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacecvode}{cvode}
+\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{solver__cvodes_8c_a68bf42894bc3d748ef9d7e54e4ba4d30}{int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)
-\end{DoxyCompactItemize}
+void \hyperlink{namespacecvode_ae8209853c343190233f2500020b1cd5f}{cvode\+::int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)
+\begin{DoxyCompactList}\small\item\em Integration driver for the C\+PU integrators. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
@@ -31,18 +41,15 @@ void $\ast$$\ast$ \hyperlink{solver__cvodes_8c_a37bbe31792d35bffd1b6d28e1c6cee1b
 \end{DoxyCompactItemize}
 
 
-\subsection{Function Documentation}
-\index{solver\+\_\+cvodes.\+c@{solver\+\_\+cvodes.\+c}!int\+Driver@{int\+Driver}}
-\index{int\+Driver@{int\+Driver}!solver\+\_\+cvodes.\+c@{solver\+\_\+cvodes.\+c}}
-\subsubsection[{\texorpdfstring{int\+Driver(const int N\+U\+M, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)}{intDriver(const int NUM, const double t, const double t_end, const double *pr_global, double *y_global)}}]{\setlength{\rightskip}{0pt plus 5cm}void int\+Driver (
-\begin{DoxyParamCaption}
-\item[{const int}]{N\+UM, }
-\item[{const double}]{t, }
-\item[{const double}]{t\+\_\+end, }
-\item[{const double $\ast$}]{pr\+\_\+global, }
-\item[{double $\ast$}]{y\+\_\+global}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__cvodes_8c_a68bf42894bc3d748ef9d7e54e4ba4d30}{}\label{solver__cvodes_8c_a68bf42894bc3d748ef9d7e54e4ba4d30}
+\subsection{Detailed Description}
+The integration driver for the C\+V\+O\+DE solver. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}
 
 
 \subsection{Variable Documentation}

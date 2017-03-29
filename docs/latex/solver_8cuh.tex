@@ -1,5 +1,10 @@
 \hypertarget{solver_8cuh}{}\section{generic/solver.cuh File Reference}
 \label{solver_8cuh}\index{generic/solver.\+cuh@{generic/solver.\+cuh}}
+
+
+the generic main file for all G\+PU solvers  
+
+
 {\ttfamily \#include \char`\"{}solver\+\_\+options.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+init.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
@@ -17,6 +22,11 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \includegraphics[width=344pt]{solver_8cuh__dep__incl}
 \end{center}
 \end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacegenericcu}{genericcu}
+\end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
@@ -25,60 +35,26 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\+\_\+\+\_\+global\+\_\+\+\_\+ void \hyperlink{solver_8cuh_abfceb488cedffb4e9d8bc15e27749eb7}{int\+Driver} (const int, const double, const double, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, \hyperlink{structsolver__memory}{solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+)
+\+\_\+\+\_\+global\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_aff46876594be0dced04cee0173535519}{genericcu\+::int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ pr\+\_\+global, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y\+\_\+global, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ d\+\_\+mem, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ s\+\_\+mem)
+\begin{DoxyCompactList}\small\item\em Generic driver for the G\+PU integrators. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_ac62c1a51172ab7750c2f75688ca8e486}{genericcu\+::integrate} (const double, const double, const double, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, \hyperlink{structsolver__memory}{solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+)
 \item 
-\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{solver_8cuh_a2b95e49f2fdc977eaaa48848b25c7297}{integrate} (const double, const double, const double, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, \hyperlink{structsolver__memory}{solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+)
-\item 
-\+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{solver_8cuh_ad6056d049f56791cf3459e9ee5509026}{check\+\_\+error} (int num\+\_\+conditions, int $\ast$code\+\_\+arr)
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_af403dabfc12de79ff9ab8575983d6f83}{genericcu\+::check\+\_\+error} (int num\+\_\+conditions, int $\ast$code\+\_\+arr)
 \end{DoxyCompactItemize}
 
+
+\subsection{Detailed Description}
+the generic main file for all G\+PU solvers 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015
+\end{DoxyDate}
+Contains skeleton of all methods that need to be defined on a per solver basis. 
 
 \subsection{Macro Definition Documentation}
 \index{solver.\+cuh@{solver.\+cuh}!S\+O\+L\+V\+E\+R\+\_\+\+C\+UH@{S\+O\+L\+V\+E\+R\+\_\+\+C\+UH}}
 \index{S\+O\+L\+V\+E\+R\+\_\+\+C\+UH@{S\+O\+L\+V\+E\+R\+\_\+\+C\+UH}!solver.\+cuh@{solver.\+cuh}}
 \subsubsection[{\texorpdfstring{S\+O\+L\+V\+E\+R\+\_\+\+C\+UH}{SOLVER_CUH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+O\+L\+V\+E\+R\+\_\+\+C\+UH}\hypertarget{solver_8cuh_aeb5114b5c03776476cc8e7689face990}{}\label{solver_8cuh_aeb5114b5c03776476cc8e7689face990}
-
-
-\subsection{Function Documentation}
-\index{solver.\+cuh@{solver.\+cuh}!check\+\_\+error@{check\+\_\+error}}
-\index{check\+\_\+error@{check\+\_\+error}!solver.\+cuh@{solver.\+cuh}}
-\subsubsection[{\texorpdfstring{check\+\_\+error(int num\+\_\+conditions, int $\ast$code\+\_\+arr)}{check_error(int num_conditions, int *code_arr)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+host\+\_\+\+\_\+ void check\+\_\+error (
-\begin{DoxyParamCaption}
-\item[{int}]{num\+\_\+cond, }
-\item[{int $\ast$}]{codes}
-\end{DoxyParamCaption}
-)}\hypertarget{solver_8cuh_ad6056d049f56791cf3459e9ee5509026}{}\label{solver_8cuh_ad6056d049f56791cf3459e9ee5509026}
-/fn void \hyperlink{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{check\+\_\+error(int tid, int code)} /brief Checks the return code of the given thread (I\+VP) for an error, and exits if found /param num\+\_\+cond The total number of I\+V\+Ps to check /param codes The array of return codes \begin{DoxySeeAlso}{See also}
-\hyperlink{group__exp4cu__ErrCodes}{Return codes of G\+P\+U E\+X\+P\+R\+B43 integrator}
-\end{DoxySeeAlso}
-/fn void \hyperlink{radau2a__props_8c_a12dd8b11e8bada5fbbcaf97b752e6ee1}{check\+\_\+error(int tid, int code)} /brief Checks the return code of the given thread (I\+VP) for an error, and exits if found /param num\+\_\+cond The total number of I\+V\+Ps to check /param codes The array of return codes \begin{DoxySeeAlso}{See also}
-\hyperlink{group__exprb43cu__ErrCodes}{Return codes of G\+P\+U E\+X\+P4 integrator} 
-\end{DoxySeeAlso}
-\index{solver.\+cuh@{solver.\+cuh}!int\+Driver@{int\+Driver}}
-\index{int\+Driver@{int\+Driver}!solver.\+cuh@{solver.\+cuh}}
-\subsubsection[{\texorpdfstring{int\+Driver(const int, const double, const double, double const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, solver\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+)}{intDriver(const int, const double, const double, double const *const __restrict__, double *const __restrict__, mechanism_memory const *const __restrict__, solver_memory const *const __restrict__)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+global\+\_\+\+\_\+ void int\+Driver (
-\begin{DoxyParamCaption}
-\item[{const int}]{, }
-\item[{const double}]{, }
-\item[{const double}]{, }
-\item[{double const $\ast$const}]{\+\_\+\+\_\+restrict\+\_\+\+\_\+, }
-\item[{double $\ast$const}]{\+\_\+\+\_\+restrict\+\_\+\+\_\+, }
-\item[{mechanism\+\_\+memory const $\ast$const}]{\+\_\+\+\_\+restrict\+\_\+\+\_\+, }
-\item[{{\bf solver\+\_\+memory} const $\ast$const}]{\+\_\+\+\_\+restrict\+\_\+\+\_\+}
-\end{DoxyParamCaption}
-)}\hypertarget{solver_8cuh_abfceb488cedffb4e9d8bc15e27749eb7}{}\label{solver_8cuh_abfceb488cedffb4e9d8bc15e27749eb7}
-\index{solver.\+cuh@{solver.\+cuh}!integrate@{integrate}}
-\index{integrate@{integrate}!solver.\+cuh@{solver.\+cuh}}
-\subsubsection[{\texorpdfstring{integrate(const double, const double, const double, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, solver\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+)}{integrate(const double, const double, const double, double *const __restrict__, mechanism_memory const *const __restrict__, solver_memory const *const __restrict__)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void integrate (
-\begin{DoxyParamCaption}
-\item[{const double}]{t\+\_\+start, }
-\item[{const double}]{t\+\_\+end, }
-\item[{const double}]{var, }
-\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y, }
-\item[{mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{mech, }
-\item[{{\bf solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{solver}
-\end{DoxyParamCaption}
-)}\hypertarget{solver_8cuh_a2b95e49f2fdc977eaaa48848b25c7297}{}\label{solver_8cuh_a2b95e49f2fdc977eaaa48848b25c7297}
-5th-\/order Radau2A implementation Non-\/convergence of Newton\+: Theta too large
-
-$\sim$$\sim$$\sim$$>$ Computation of new step size Hnew 

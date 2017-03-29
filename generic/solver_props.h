@@ -1,5 +1,6 @@
-/*solver_props.h
- *simple convencience file to include the correct solver properties file
+/**
+ * \file
+ * \brief simple convenience file to include the correct solver properties file
  */
 
 #ifndef SOLVER_PROPS_H
@@ -13,6 +14,14 @@
  	#include "radau2a_props.h"
 #endif
 
+#ifdef GENERATE_DOCS
+namespace generic {
+#endif
+
 void check_error(int, int);
+
+#ifdef GENERATE_DOCS
+}
+#endif
 
 #endif

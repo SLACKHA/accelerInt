@@ -1,5 +1,10 @@
 \hypertarget{complexInverse_8cu}{}\section{generic/complex\+Inverse.cu File Reference}
 \label{complexInverse_8cu}\index{generic/complex\+Inverse.\+cu@{generic/complex\+Inverse.\+cu}}
+
+
+Implementation of LU factorization of complex (variable-\/sized) matricies for C\+U\+DA.  
+
+
 {\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
 {\ttfamily \#include $<$cu\+Complex.\+h$>$}\\*
@@ -14,27 +19,33 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \begin{DoxyCompactItemize}
 \item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{complexInverse_8cu_a8336c0132b5bf7f80e1a65443b2d9465}{get\+Complex\+Max} (const int n, const cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ complex\+Arr)
-\item 
+\begin{DoxyCompactList}\small\item\em get\+Complex\+Max finds the index of the first element having maximum absolute value. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_aedd1b59cd1eff341e90ba6c6aaada0fd}{scale\+Complex} (const int n, const cu\+Double\+Complex val, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrX)
-\item 
-\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_abfd17009f61cab83a388c2bd3eac58d9}{swap\+Complex} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrX, const int incX, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arrY, const int incY)
-\item 
+\begin{DoxyCompactList}\small\item\em scale\+Complex scales a vector (with increment equal to one) by a constant val. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a4a5ccfb63190cc88035612f5c4cbbe5f}{complex\+G\+E\+RU} (const int n, const cu\+Double\+Complex alpha, const cu\+Double\+Complex $\ast$arrX, const cu\+Double\+Complex $\ast$arrY, const int incY, cu\+Double\+Complex $\ast$A, const int lda)
-\item 
+\begin{DoxyCompactList}\small\item\em complex\+G\+E\+RU performs the rank 1 operation $A := alpha * arrX * arrY **T + A$ where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_ad83e7dc7b03a7837b20592aabcfe107c}{multiply\+Complex\+Upper\+MV} (const int n, cu\+Double\+Complex $\ast$x, const int lda, const cu\+Double\+Complex $\ast$A)
-\item 
+\begin{DoxyCompactList}\small\item\em Performs the matrix-\/vector operation $x_v:= A*x_v$. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_ab3e9e304c4d35955cf6f79d7a5a53369}{complex\+G\+E\+MV} (const int m, const int n, const int lda, const cu\+Double\+Complex alpha, const cu\+Double\+Complex $\ast$A, const cu\+Double\+Complex $\ast$arrX, cu\+Double\+Complex $\ast$arrY)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes the matrix-\/vector operation $alpha*A*x + y$ where alpha is a scalar, x and y are vectors and A is an m by n matrix. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a241fad7ccf21bf3c76f0e8f2235f9897}{get\+Complex\+LU} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes the LU factorization of a (n x n) matrix using partial pivoting with row interchanges. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{complexInverse_8cu_a33967d9901cc0d473f2ce9fdef02330e}{get\+Complex\+Inverse\+LU} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
-\item 
+\begin{DoxyCompactList}\small\item\em get\+Complex\+Inverse\+LU computes the inverse of a matrix using the LU factorization computed by get\+Hessenberg\+LU or get\+Complex\+LU. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a3afc82e5f26795c2a629efdfbfb0cc5d}{get\+Complex\+Inverse} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
-\item 
+\begin{DoxyCompactList}\small\item\em get\+Complex\+Inverse computes the inverse of an a general matrix A using a LU factorization method \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a2a51f149a6ed728b322071b39fc49ba9}{get\+Hessenberg\+LU} (const int n, cu\+Double\+Complex $\ast$A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes the LU factorization of a (n x S\+T\+R\+I\+DE) Hessenberg Matrix using partial pivoting with row interchanges. \end{DoxyCompactList}\item 
 \+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{complexInverse_8cu_a33419af3f2b7c5b53f2745d8b7f3cbe1}{get\+Complex\+Inverse\+Hessenberg} (const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em get\+Complex\+Inverse\+Hessenberg computes the inverse of an upper Hessenberg matrix A using a LU factorization method \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Implementation of LU factorization of complex (variable-\/sized) matricies for C\+U\+DA. 
+
+Adapted from \href{http://www.netlib.org/lapack/}{\tt Lapack} LU factorization and inversion routines \begin{DoxyAuthor}{Author}
+Nick Curtis 
+\end{DoxyAuthor}
 
 
 \subsection{Function Documentation}
@@ -51,7 +62,34 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{cu\+Double\+Complex $\ast$}]{arrY}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_ab3e9e304c4d35955cf6f79d7a5a53369}{}\label{complexInverse_8cu_ab3e9e304c4d35955cf6f79d7a5a53369}
-\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!complex\+G\+E\+RU@{complex\+G\+E\+RU}}
+
+
+Computes the matrix-\/vector operation $alpha*A*x + y$ where alpha is a scalar, x and y are vectors and A is an m by n matrix. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & On entry, M specifies the number of rows of the matrix A. Must be $>$= 0 \\
+\hline
+\mbox{\tt out}  & {\em n} & On entry, N specifies the number of columns of the matrix A. Must be $>$= 0 \\
+\hline
+\mbox{\tt in}  & {\em lda} & The stride of the matrix \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em alpha} & The scalar value \\
+\hline
+\mbox{\tt in}  & {\em A} & A is an array of dimension (lda, n). Before entry, the leading m by n part of the array A must contain the matrix of coefficients. \\
+\hline
+\mbox{\tt in}  & {\em arrX} & arrX is an array of dimension at least (n) Before entry, the incremented array arrX must contain the vector x. \\
+\hline
+\mbox{\tt in,out}  & {\em arrY} & arrY is an array of dimension at least (m). Before entry, the incremented array arrY must contain the vector y. On exit, arrY is overwritten by the updated vector y.\\
+\hline
+\end{DoxyParams}
+Note\+: These pointers cannot use the \+\_\+\+\_\+restrict\+\_\+\+\_\+ modifier, as they may overlap \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!complex\+G\+E\+RU@{complex\+G\+E\+RU}}
 \index{complex\+G\+E\+RU@{complex\+G\+E\+RU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{complex\+G\+E\+R\+U(const int n, const cu\+Double\+Complex alpha, const cu\+Double\+Complex $\ast$arr\+X, const cu\+Double\+Complex $\ast$arr\+Y, const int inc\+Y, cu\+Double\+Complex $\ast$\+A, const int lda)}{complexGERU(const int n, const cuDoubleComplex alpha, const cuDoubleComplex *arrX, const cuDoubleComplex *arrY, const int incY, cuDoubleComplex *A, const int lda)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void complex\+G\+E\+RU (
 \begin{DoxyParamCaption}
@@ -64,6 +102,27 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{const int}]{lda}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_a4a5ccfb63190cc88035612f5c4cbbe5f}{}\label{complexInverse_8cu_a4a5ccfb63190cc88035612f5c4cbbe5f}
+
+
+complex\+G\+E\+RU performs the rank 1 operation $A := alpha * arrX * arrY **T + A$ where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The matrix/vector size \\
+\hline
+\mbox{\tt in}  & {\em alpha} & The value to scale by \\
+\hline
+\mbox{\tt in}  & {\em arrX} & arrX is an array of dimension at least n. Before entry, the incremented array arrX must contain the n element vector x. \\
+\hline
+\mbox{\tt in}  & {\em arrY} & arrY is an array of dimension at least 1 + (n -\/ 1) $\ast$ incY. Before entry, the incremented array arrY must contain the n element vector y. \\
+\hline
+\mbox{\tt in}  & {\em incY} & On entry, I\+N\+CY specifies the increment for the elements of arrY. incY must not be zero. \\
+\hline
+\mbox{\tt out}  & {\em A} & A is an array of dimension (lda x n). Before entry, the leading n by n part of the array A must contain the matrix of coefficients. On exit, A is overwritten by the updated matrix. \\
+\hline
+\mbox{\tt in}  & {\em lda} & On entry, lda specifies the first dimension of A as declared in the calling (sub) program. lda must be at least max( 1, n ). \\
+\hline
+\end{DoxyParams}
 \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Inverse@{get\+Complex\+Inverse}}
 \index{get\+Complex\+Inverse@{get\+Complex\+Inverse}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{get\+Complex\+Inverse(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{getComplexInverse(const int n, cuDoubleComplex *__restrict__ A, int *__restrict__ ipiv, int *__restrict__ info, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Complex\+Inverse (
@@ -75,6 +134,29 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_a3afc82e5f26795c2a629efdfbfb0cc5d}{}\label{complexInverse_8cu_a3afc82e5f26795c2a629efdfbfb0cc5d}
+
+
+get\+Complex\+Inverse computes the inverse of an a general matrix A using a LU factorization method 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The order of the matrix A. n $>$= 0. \\
+\hline
+\mbox{\tt in,out}  & {\em A} & The array, dimension (S\+T\+R\+I\+DE, n) \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em ipiv} & ipiv is an array of dimension (n). The pivot indices from get\+Hessenberg\+LU; for 0$<$=i$<$=n-\/1, row i of the matrix was interchanged with row ind\+Piv\mbox{[}i\mbox{]}. \\
+\hline
+\mbox{\tt out}  & {\em info} & If not zero, an error occured during facotrization \\
+\hline
+\mbox{\tt out}  & {\em work} & A work array that will be overwritten \\
+\hline
+\end{DoxyParams}
 \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Inverse\+Hessenberg@{get\+Complex\+Inverse\+Hessenberg}}
 \index{get\+Complex\+Inverse\+Hessenberg@{get\+Complex\+Inverse\+Hessenberg}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{get\+Complex\+Inverse\+Hessenberg(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{getComplexInverseHessenberg(const int n, cuDoubleComplex *__restrict__ A, int *__restrict__ ipiv, int *__restrict__ info, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Complex\+Inverse\+Hessenberg (
@@ -86,6 +168,29 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_a33419af3f2b7c5b53f2745d8b7f3cbe1}{}\label{complexInverse_8cu_a33419af3f2b7c5b53f2745d8b7f3cbe1}
+
+
+get\+Complex\+Inverse\+Hessenberg computes the inverse of an upper Hessenberg matrix A using a LU factorization method 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The order of the matrix A. n $>$= 0. \\
+\hline
+\mbox{\tt in,out}  & {\em A} & The array, dimension (S\+T\+R\+I\+DE, n) \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em ipiv} & ipiv is an array of dimension (n). The pivot indices from get\+Hessenberg\+LU; for 0$<$=i$<$=n-\/1, row i of the matrix was interchanged with row ind\+Piv\mbox{[}i\mbox{]}. \\
+\hline
+\mbox{\tt out}  & {\em info} & If not zero, an error occured during factorization \\
+\hline
+\mbox{\tt out}  & {\em work} & A work array that will be overwritten \\
+\hline
+\end{DoxyParams}
 \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Inverse\+LU@{get\+Complex\+Inverse\+LU}}
 \index{get\+Complex\+Inverse\+LU@{get\+Complex\+Inverse\+LU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{get\+Complex\+Inverse\+L\+U(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{getComplexInverseLU(const int n, cuDoubleComplex *__restrict__ A, const int *__restrict__ indPivot, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int get\+Complex\+Inverse\+LU (
@@ -96,6 +201,29 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_a33967d9901cc0d473f2ce9fdef02330e}{}\label{complexInverse_8cu_a33967d9901cc0d473f2ce9fdef02330e}
+
+
+get\+Complex\+Inverse\+LU computes the inverse of a matrix using the LU factorization computed by get\+Hessenberg\+LU or get\+Complex\+LU. 
+
+This method inverts U and then computes inv(\+A) by solving the system inv(\+A)$\ast$L = inv(\+U) for inv(\+A).
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The order of the matrix A. n $>$= 0. \\
+\hline
+\mbox{\tt in,out}  & {\em A} & The array, dimension (S\+T\+R\+I\+DE, n) \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ind\+Pivot} & ind\+Pivot is an array of dimension (n). The pivot indices from get\+Hessenberg\+LU; for 0$<$=i$<$=n-\/1, row i of the matrix was interchanged with row ind\+Piv\mbox{[}i\mbox{]}. \\
+\hline
+\mbox{\tt out}  & {\em work} & A work array that will be overwritten \\
+\hline
+\end{DoxyParams}
 \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+LU@{get\+Complex\+LU}}
 \index{get\+Complex\+LU@{get\+Complex\+LU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{get\+Complex\+L\+U(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)}{getComplexLU(const int n, cuDoubleComplex *__restrict__ A, int *__restrict__ indPivot, int *__restrict__ info)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Complex\+LU (
@@ -106,7 +234,31 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{info}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_a241fad7ccf21bf3c76f0e8f2235f9897}{}\label{complexInverse_8cu_a241fad7ccf21bf3c76f0e8f2235f9897}
-\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Max@{get\+Complex\+Max}}
+
+
+Computes the LU factorization of a (n x n) matrix using partial pivoting with row interchanges. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The matrix size \\
+\hline
+\mbox{\tt in,out}  & {\em A} & The matrix to factorize (n x n) with stride defined in \hyperlink{solver__props_8h}{solver\+\_\+props.\+h} \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em ind\+Pivot} & ind\+Pivot is an array of dimension (n). The pivot indices from get\+Hessenberg\+LU; for 0$<$=i$<$=n-\/1, row i of the matrix was interchanged with row ind\+Piv\mbox{[}i\mbox{]}. \& \\
+\hline
+\mbox{\tt out}  & {\em info} & An information variable\\
+\hline
+\end{DoxyParams}
+The factorization has the form\+: $A = P * L * U$ where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m $>$ n), and U is upper triangular (upper trapezoidal if m $<$ n). \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Complex\+Max@{get\+Complex\+Max}}
 \index{get\+Complex\+Max@{get\+Complex\+Max}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{get\+Complex\+Max(const int n, const cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ complex\+Arr)}{getComplexMax(const int n, const cuDoubleComplex *__restrict__ complexArr)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int get\+Complex\+Max (
 \begin{DoxyParamCaption}
@@ -114,6 +266,17 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{const cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{complex\+Arr}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_a8336c0132b5bf7f80e1a65443b2d9465}{}\label{complexInverse_8cu_a8336c0132b5bf7f80e1a65443b2d9465}
+
+
+get\+Complex\+Max finds the index of the first element having maximum absolute value. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The size of complex\+Arr \\
+\hline
+\mbox{\tt in}  & {\em complex\+Arr} & The (nx1) vector to determine the maximum value of \\
+\hline
+\end{DoxyParams}
 \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!get\+Hessenberg\+LU@{get\+Hessenberg\+LU}}
 \index{get\+Hessenberg\+LU@{get\+Hessenberg\+LU}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{get\+Hessenberg\+L\+U(const int n, cu\+Double\+Complex $\ast$\+A, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ind\+Pivot, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)}{getHessenbergLU(const int n, cuDoubleComplex *A, int *__restrict__ indPivot, int *__restrict__ info)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void get\+Hessenberg\+LU (
@@ -124,7 +287,31 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{info}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_a2a51f149a6ed728b322071b39fc49ba9}{}\label{complexInverse_8cu_a2a51f149a6ed728b322071b39fc49ba9}
-\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!multiply\+Complex\+Upper\+MV@{multiply\+Complex\+Upper\+MV}}
+
+
+Computes the LU factorization of a (n x S\+T\+R\+I\+DE) Hessenberg Matrix using partial pivoting with row interchanges. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The matrix size \\
+\hline
+\mbox{\tt in,out}  & {\em A} & The matrix to factorize (nxn) with stride defined in \hyperlink{solver__props_8h}{solver\+\_\+props.\+h} \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em ind\+Pivot} & ind\+Pivot is an array of dimension (n). The pivot indices from get\+Hessenberg\+LU; for 0$<$=i$<$=n-\/1, row i of the matrix was interchanged with row ind\+Piv\mbox{[}i\mbox{]}. \\
+\hline
+\mbox{\tt out}  & {\em info} & If not zero, an error occured during factorization\\
+\hline
+\end{DoxyParams}
+The factorization has the form\+: $A = P * L * U$ where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m $>$ n), and U is upper triangular (upper trapezoidal if m $<$ n). For full reference see\+: G. W. Stewart, Matrix Algorithms\+: Volume 1\+: Basic Decompositions, S\+I\+AM, Philadelphia, 1998. doi\+:10.\+1137/1.9781611971408. \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!multiply\+Complex\+Upper\+MV@{multiply\+Complex\+Upper\+MV}}
 \index{multiply\+Complex\+Upper\+MV@{multiply\+Complex\+Upper\+MV}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{multiply\+Complex\+Upper\+M\+V(const int n, cu\+Double\+Complex $\ast$x, const int lda, const cu\+Double\+Complex $\ast$\+A)}{multiplyComplexUpperMV(const int n, cuDoubleComplex *x, const int lda, const cuDoubleComplex *A)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void multiply\+Complex\+Upper\+MV (
 \begin{DoxyParamCaption}
@@ -134,7 +321,28 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{const cu\+Double\+Complex $\ast$}]{A}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_ad83e7dc7b03a7837b20592aabcfe107c}{}\label{complexInverse_8cu_ad83e7dc7b03a7837b20592aabcfe107c}
-\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!scale\+Complex@{scale\+Complex}}
+
+
+Performs the matrix-\/vector operation $x_v:= A*x_v$. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & On entry, n specifies the order of the matrix A. n must be at least zero. \\
+\hline
+\mbox{\tt out}  & {\em x} & x is an array of dimension at least (n). Before entry, the incremented array X must contain the n element vector $x_v$. On exit, X is overwritten with the transformed vector $x_v$. \\
+\hline
+\mbox{\tt in}  & {\em lda} & The stride of the matrix \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{exprb43__props_8h_a351d54267048643c4365f6a24641d0cf}{S\+T\+R\+I\+DE} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em A} & A is an array of dimension (lda, n). Before entry the leading n by n upper triangular part of the array A must contain the upper triangular matrix and the strictly lower triangular part of A is not referenced.\\
+\hline
+\end{DoxyParams}
+Note\+: These pointers can\textquotesingle{}t use the \+\_\+\+\_\+restrict\+\_\+\+\_\+ attribute, as they may overlap \index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!scale\+Complex@{scale\+Complex}}
 \index{scale\+Complex@{scale\+Complex}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
 \subsubsection[{\texorpdfstring{scale\+Complex(const int n, const cu\+Double\+Complex val, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+X)}{scaleComplex(const int n, const cuDoubleComplex val, cuDoubleComplex *__restrict__ arrX)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale\+Complex (
 \begin{DoxyParamCaption}
@@ -143,14 +351,16 @@ Include dependency graph for complex\+Inverse.\+cu\+:\nopagebreak
 \item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrX}
 \end{DoxyParamCaption}
 )}\hypertarget{complexInverse_8cu_aedd1b59cd1eff341e90ba6c6aaada0fd}{}\label{complexInverse_8cu_aedd1b59cd1eff341e90ba6c6aaada0fd}
-\index{complex\+Inverse.\+cu@{complex\+Inverse.\+cu}!swap\+Complex@{swap\+Complex}}
-\index{swap\+Complex@{swap\+Complex}!complex\+Inverse.\+cu@{complex\+Inverse.\+cu}}
-\subsubsection[{\texorpdfstring{swap\+Complex(const int n, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+X, const int inc\+X, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ arr\+Y, const int inc\+Y)}{swapComplex(const int n, cuDoubleComplex *__restrict__ arrX, const int incX, cuDoubleComplex *__restrict__ arrY, const int incY)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void swap\+Complex (
-\begin{DoxyParamCaption}
-\item[{const int}]{n, }
-\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrX, }
-\item[{const int}]{incX, }
-\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{arrY, }
-\item[{const int}]{incY}
-\end{DoxyParamCaption}
-)}\hypertarget{complexInverse_8cu_abfd17009f61cab83a388c2bd3eac58d9}{}\label{complexInverse_8cu_abfd17009f61cab83a388c2bd3eac58d9}
+
+
+scale\+Complex scales a vector (with increment equal to one) by a constant val. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em n} & The vector size \\
+\hline
+\mbox{\tt out}  & {\em val} & The value to scale by \\
+\hline
+\mbox{\tt out}  & {\em arrX} & The vector to scale \\
+\hline
+\end{DoxyParams}

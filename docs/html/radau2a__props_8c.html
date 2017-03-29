@@ -93,22 +93,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">radau2a_props.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Error checking for the CPU Radua-IIa solver.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="radau2a__props_8h_source.html">radau2a_props.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for radau2a_props.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="radau2a__props_8c__incl.png" border="0" usemap="#radau2a_2radau2a__props_8c" alt=""/></div>
 <map name="radau2a_2radau2a__props_8c" id="radau2a_2radau2a__props_8c">
-<area shape="rect" id="node2" href="radau2a__props_8h.html" title="radau2a_props.h" alt="" coords="30,80,149,107"/>
+<area shape="rect" id="node2" href="radau2a__props_8h.html" title="Various macros controlling behaviour of RADAU2A algorithm. " alt="" coords="30,80,149,107"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a12dd8b11e8bada5fbbcaf97b752e6ee1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a__props_8c.html#a12dd8b11e8bada5fbbcaf97b752e6ee1">check_error</a> (int tid, int code)</td></tr>
+<tr class="memdesc:a12dd8b11e8bada5fbbcaf97b752e6ee1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the return code of the given thread (IVP) for an error, and exits if found.  <a href="#a12dd8b11e8bada5fbbcaf97b752e6ee1">More...</a><br /></td></tr>
 <tr class="separator:a12dd8b11e8bada5fbbcaf97b752e6ee1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Error checking for the CPU Radua-IIa solver. </p>
+</div><h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a12dd8b11e8bada5fbbcaf97b752e6ee1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -132,6 +138,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Checks the return code of the given thread (IVP) for an error, and exits if found. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tid</td><td>The thread (IVP) index </td></tr>
+    <tr><td class="paramname">code</td><td>The return code of the thread </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__ErrorCodes.html">Return codes of Integrators</a> </dd></dl>
 
 </div>
 </div>

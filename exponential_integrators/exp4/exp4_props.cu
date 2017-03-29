@@ -1,5 +1,5 @@
-/*!
- * \file exp4_props.cuh
+/**
+ * \file
  * \brief Error checking for the EXP4 algorithm
  * \author Nicholas Curtis
  * \date 03/10/2015
@@ -12,10 +12,10 @@ namespace exp4cu {
 #endif
 
 
-/*! /fn void check_error(int tid, int code)
-	/brief Checks the return code of the given thread (IVP) for an error, and exits if found
-	/param num_cond The total number of IVPs to check
-	/param codes The array of return codes
+/*! \fn void check_error(int tid, int code)
+	\brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	\param num_cond The total number of IVPs to check
+	\param codes The array of return codes
 	@see exp4cu_ErrCodes
  */
 __host__

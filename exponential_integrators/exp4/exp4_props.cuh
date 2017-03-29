@@ -16,7 +16,7 @@
 namespace exp4cu {
 #endif
 
-//#define USE_SMOOTHED_ERROR ///if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
+//#define USE_SMOOTHED_ERROR // if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
 
 //! max order of the phi functions (for error estimation)
 #define P 1
@@ -36,26 +36,48 @@ namespace exp4cu {
  */
 struct solver_memory
 {
-	double* sc; /// the scaled error coefficients
-	double* work1; /// a work array
-	double* work2; /// a work array
-	double* work3; /// a work array
-	cuDoubleComplex* work4; /// a (complex) work array
-	double* Hm; /// The Hessenberg Kyrlov subspace array for EXP4, to take the exponential action on
-	double* phiHm; /// the exponential Krylov subspace array for EXP4
-	double* Vm; /// the Arnoldi basis array
-	double* k1; /// the stage 1 results
-	double* k2; /// the stage 2 results
-	double* k3; /// the stage 3 results
-	double* k4; /// the stage 4 results
-	double* k5; /// the stage 5 results
-	double* k6; /// the stage 6 results
-	double* k7; /// the stage 7 results
-	int* ipiv; /// the pivot indicies
-	cuDoubleComplex* invA; /// the inverse of the Hessenberg Krylov subspace
-	int* result; /// an array of integration results for the various threads @see exp4cu_ErrCodes
+	//! the scaled error coefficients
+	double* sc;
+	//! a work array
+	double* work1;
+	//! a work array
+	double* work2;
+	//! a work array
+	double* work3;
+	//! a (complex) work array
+	cuDoubleComplex* work4;
+	//! The Hessenberg Kyrlov subspace array for EXP4, to take the exponential action on
+	double* Hm;
+	//! the exponential Krylov subspace array for EXP4
+	double* phiHm;
+	//! the Arnoldi basis array
+	double* Vm;
+	//! the stage 1 results
+	double* k1;
+	//! the stage 2 results
+	double* k2;
+	//! the stage 3 results
+	double* k3;
+	//! the stage 4 results
+	double* k4;
+	//! the stage 5 results
+	double* k5;
+	//! the stage 6 results
+	double* k6;
+	//! the stage 7 results
+	double* k7;
+	//! the pivot indicies
+	int* ipiv;
+	//! the inverse of the Hessenberg Krylov subspace
+	cuDoubleComplex* invA;
+	//! an array of integration results for the various threads @see exp4cu_ErrCodes
+	int* result;
 };
 
+/**
+ * \addtogroup CUErrorCodes Return codes of Integrators
+ * @{
+ */
 /**
  * \defgroup exp4cu_ErrCodes Return codes of GPU EXPRB43 integrator
  * @{
@@ -70,6 +92,9 @@ struct solver_memory
 //! Timestep reduced such that update would have no effect on simulation time
 #define EC_h_plus_t_equals_h (3)
 
+/**
+ * @}
+ */
 /**
  * @}
  */

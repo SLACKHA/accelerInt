@@ -1,5 +1,10 @@
 \hypertarget{solver__generic_8cu}{}\section{generic/solver\+\_\+generic.cu File Reference}
 \label{solver__generic_8cu}\index{generic/solver\+\_\+generic.\+cu@{generic/solver\+\_\+generic.\+cu}}
+
+
+the generic integration driver for the G\+PU solvers  
+
+
 {\ttfamily \#include \char`\"{}solver.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}gpu\+\_\+macros.\+cuh\char`\"{}}\\*
@@ -10,24 +15,24 @@ Include dependency graph for solver\+\_\+generic.\+cu\+:\nopagebreak
 \includegraphics[width=350pt]{solver__generic_8cu__incl}
 \end{center}
 \end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacegenericcu}{genericcu}
+\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\+\_\+\+\_\+global\+\_\+\+\_\+ void \hyperlink{solver__generic_8cu_a654eac52827012ca836581ce666f4f35}{int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ pr\+\_\+global, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y\+\_\+global, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ d\+\_\+mem, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ s\+\_\+mem)
-\end{DoxyCompactItemize}
+\+\_\+\+\_\+global\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_aff46876594be0dced04cee0173535519}{genericcu\+::int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ pr\+\_\+global, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y\+\_\+global, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ d\+\_\+mem, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ s\+\_\+mem)
+\begin{DoxyCompactList}\small\item\em Generic driver for the G\+PU integrators. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
-\subsection{Function Documentation}
-\index{solver\+\_\+generic.\+cu@{solver\+\_\+generic.\+cu}!int\+Driver@{int\+Driver}}
-\index{int\+Driver@{int\+Driver}!solver\+\_\+generic.\+cu@{solver\+\_\+generic.\+cu}}
-\subsubsection[{\texorpdfstring{int\+Driver(const int N\+U\+M, const double t, const double t\+\_\+end, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ pr\+\_\+global, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y\+\_\+global, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ d\+\_\+mem, const solver\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ s\+\_\+mem)}{intDriver(const int NUM, const double t, const double t_end, const double *__restrict__ pr_global, double *__restrict__ y_global, const mechanism_memory *__restrict__ d_mem, const solver_memory *__restrict__ s_mem)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+global\+\_\+\+\_\+ void int\+Driver (
-\begin{DoxyParamCaption}
-\item[{const int}]{N\+UM, }
-\item[{const double}]{t, }
-\item[{const double}]{t\+\_\+end, }
-\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{pr\+\_\+global, }
-\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y\+\_\+global, }
-\item[{const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{d\+\_\+mem, }
-\item[{const {\bf solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{s\+\_\+mem}
-\end{DoxyParamCaption}
-)}\hypertarget{solver__generic_8cu_a654eac52827012ca836581ce666f4f35}{}\label{solver__generic_8cu_a654eac52827012ca836581ce666f4f35}
+\subsection{Detailed Description}
+the generic integration driver for the G\+PU solvers 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}

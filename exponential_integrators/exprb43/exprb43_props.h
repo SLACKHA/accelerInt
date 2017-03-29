@@ -32,6 +32,10 @@ namespace exprb43 {
 #define MAX_CONSECUTIVE_ERRORS (5)
 
 /**
+ * \addtogroup ErrorCodes Return codes of Integrators
+ * @{
+ */
+/**
  * \defgroup exprb43_ErrCodes Return codes of EXPRB43 integrator
  * @{
  */
@@ -45,6 +49,9 @@ namespace exprb43 {
 //! Timestep reduced such that update would have no effect on simulation time
 #define EC_h_plus_t_equals_h (3)
 
+/**
+ * @}
+ */
 /**
  * @}
  */

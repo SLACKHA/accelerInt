@@ -1,5 +1,10 @@
 \hypertarget{radau2a_8c}{}\section{radau2a/radau2a.c File Reference}
 \label{radau2a_8c}\index{radau2a/radau2a.\+c@{radau2a/radau2a.\+c}}
+
+
+A Radau2A I\+RK implementation for C Adapted from Hairer and Wanner\textquotesingle{}s \href{http://www.unige.ch/~hairer/prog/stiff/radau5.f}{\tt R\+A\+D\+A\+U5 code} and the \href{http://people.cs.vt.edu/~asandu/Software/FATODE/index.html}{\tt F\+A\+T\+O\+DE} O\+DE integration library.  
+
+
 {\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+props.\+h\char`\"{}}\\*
 {\ttfamily \#include \char`\"{}solver\+\_\+options.\+h\char`\"{}}\\*
@@ -26,105 +31,108 @@ Include dependency graph for radau2a.\+c\+:\nopagebreak
 \begin{DoxyCompactItemize}
 \item 
 \#define \hyperlink{radau2a_8c_a4f5652e996f678da1b1b93c8aa4a7961}{Max\+\_\+no\+\_\+steps}~(200000)
-\item 
+\begin{DoxyCompactList}\small\item\em Maximum number of allowed internal timesteps before error. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_ab408861ee5149b85ac129cb8a3875743}{Newton\+Maxit}~(8)
-\item 
+\begin{DoxyCompactList}\small\item\em Maximum number of allowed Newton iteration steps before error. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_aa9c48bc3c2002ed4e6792dd7f526d783}{Start\+Newton}~(true)
-\item 
+\begin{DoxyCompactList}\small\item\em Use quadratic interpolation from previous step if possible. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_a619cdc11d911799dd674458eb84dc349}{Gustafsson}
-\item 
+\begin{DoxyCompactList}\small\item\em Use gustafsson time stepping control. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_a0628e9521e9961c49b173765f9d815d3}{Roundoff}~(\hyperlink{solver__options_8h_a6ebf6899d6c1c8b7b9d09be872c05aae}{E\+PS})
-\item 
+\begin{DoxyCompactList}\small\item\em Smallist representable double precision number. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_a2709085ffea146cba50846d860f7d945}{Fac\+Min}~(0.\+2)
-\item 
+\begin{DoxyCompactList}\small\item\em Controls maximum decrease in timestep size. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_a3ae724566d10e7ae2a48e1d340d6937b}{Fac\+Max}~(8)
-\item 
+\begin{DoxyCompactList}\small\item\em Controls maximum increase in timestep size. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_a29559e0d6fcf09d76688dbc471b01219}{Fac\+Safe}~(0.\+9)
-\item 
+\begin{DoxyCompactList}\small\item\em Safety factor for Gustafsson time stepping control. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_afb5b5659c29086c78a546a078c08238f}{Fac\+Rej}~(0.\+1)
-\item 
+\begin{DoxyCompactList}\small\item\em Time step factor on rejected step. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_a1dea03e748069283de9d62ca81b64e75}{Theta\+Min}~(0.\+001)
-\item 
+\begin{DoxyCompactList}\small\item\em Minimum Newton convergence rate. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_a5ea658585341bf26e79bbf1ed3497e6f}{Newton\+Tol}~(0.\+03)
-\item 
+\begin{DoxyCompactList}\small\item\em Newton convergence tolerance. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_ac523cd36edc6fc54a93dfdb10a772bc0}{Qmin}~(1.\+0)
-\item 
+\begin{DoxyCompactList}\small\item\em Min Timestep ratio to skip LU decomposition. \end{DoxyCompactList}\item 
 \#define \hyperlink{radau2a_8c_afcfd11ffcebe8a32d20dcacebefa7e6f}{Qmax}~(1.\+2)
-\item 
-\#define \hyperlink{radau2a_8c_a870020ccb79b9bf241010e975e029bde}{U\+N\+R\+O\+LL}~(8)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Max Timestep ratio to skip LU decomposition. \end{DoxyCompactList}\item 
+\#define \hyperlink{radau2a_8c_a172b5bc0830959ab49ca7cb9f0ae44bf}{Max\+\_\+consecutive\+\_\+errs}~(5)
+\begin{DoxyCompactList}\small\item\em Error allowed on this many consecutive internal timesteps before exit. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
 static void \hyperlink{namespaceradau2a_ad92aba1b979853cd2b6102916a402904}{radau2a\+::scale} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes error weight scaling from initial and current state. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_a093abea0d228c772d175be2927c5e80b}{radau2a\+::scale\+\_\+init} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
-\item 
+\begin{DoxyCompactList}\small\item\em Computes error weight scaling from initial state. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_a3f1f64d323b61c19b47b8bd0670802bd}{radau2a\+::\+R\+K\+\_\+\+Decomp} (const double H, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ E1, double complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ E2, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Jac, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv1, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv2, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ info)
-\item 
+\begin{DoxyCompactList}\small\item\em Compute E1 \& E2 matricies and their LU Decomposition. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_a95409fe9e8a586b74e95cb084880daa5}{radau2a\+::\+R\+K\+\_\+\+Make\+\_\+\+Interpolate} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z1, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z2, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z3, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ C\+O\+NT)
-\item 
+\begin{DoxyCompactList}\small\item\em Compute Quadaratic interpolate. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_a5941fdd8c66eada16d6a0acaec4e1f78}{radau2a\+::\+R\+K\+\_\+\+Interpolate} (const double H, const double Hold, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z2, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z3, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ C\+O\+NT)
-\item 
+\begin{DoxyCompactList}\small\item\em Apply quadaratic interpolate to get initial values. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_afbf6ff499a4ff97db4b27df63b6fbffd}{radau2a\+::\+W\+A\+DD} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ X, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Y, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z)
-\item 
+\begin{DoxyCompactList}\small\item\em Performs $Z:= X + Y$ with unrolled (or at least bounds known at compile time) loops. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_accc366d693bc987d4e9f3e5fcc5721b1}{radau2a\+::\+D\+A\+X\+P\+Y3} (const double D\+A1, const double D\+A2, const double D\+A3, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ DX, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ D\+Y1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ D\+Y2, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ D\+Y3)
-\item 
+\begin{DoxyCompactList}\small\item\em Sepcialization of D\+A\+X\+PY with unrolled (or at least bounds known at compile time) loops. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_af5bc219a47482e040d93186def505f01}{radau2a\+::\+R\+K\+\_\+\+Prepare\+R\+HS} (const double t, const double pr, const double H, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Y, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z1, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z2, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z3, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ R1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ R2, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ R3)
-\item 
+\begin{DoxyCompactList}\small\item\em Prepare the right-\/hand side for Newton iterations\+: $R = Z - hA * F$. \end{DoxyCompactList}\item 
 static void \hyperlink{namespaceradau2a_ab9dfab43bd32440af1158bad0d91ade3}{radau2a\+::\+R\+K\+\_\+\+Solve} (const double H, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ E1, double complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ E2, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ R1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ R2, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ R3, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv1, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv2)
-\item 
-static double \hyperlink{namespaceradau2a_a3218b6d64f48cecafb78c71318c1ee9b}{radau2a\+::\+R\+K\+\_\+\+Error\+Norm} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ DY)
-\item 
-static double \hyperlink{namespaceradau2a_ac00b7bbdb38b0af9ab59a19bc1f5b3f9}{radau2a\+::\+R\+K\+\_\+\+Error\+Estimate} (const double H, const double t, const double pr, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Y, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ F0, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z1, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z2, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z3, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{radau2a_8cu_a4fab5866449108992478041d2e51a28c}{scale}, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ E1, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv1, const bool First\+Step, const bool Reject)
-\item 
+\begin{DoxyCompactList}\small\item\em Solves for the R\+HS values in the Newton iteration. \end{DoxyCompactList}\item 
+static double \hyperlink{namespaceradau2a_a3218b6d64f48cecafb78c71318c1ee9b}{radau2a\+::\+R\+K\+\_\+\+Error\+Norm} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ DY)
+\begin{DoxyCompactList}\small\item\em Computes the scaled error norm from the given {\ttfamily scale} and {\ttfamily DY} vectors. \end{DoxyCompactList}\item 
+static double \hyperlink{namespaceradau2a_ac00b7bbdb38b0af9ab59a19bc1f5b3f9}{radau2a\+::\+R\+K\+\_\+\+Error\+Estimate} (const double H, const double t, const double pr, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Y, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ F0, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z1, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z2, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Z3, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ E1, int $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ ipiv1, const bool First\+Step, const bool Reject)
+\begin{DoxyCompactList}\small\item\em Computes and returns the error estimate for this step. \end{DoxyCompactList}\item 
 int \hyperlink{namespaceradau2a_a978f385afc7643435035b4b4f198dc77}{radau2a\+::integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em 5th-\/order Radau2A C\+PU implementation \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
-static const double \hyperlink{namespaceradau2a_a37314d1d93d3f053f469c40c5d42a43e}{radau2a\+::rkA} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_ga37314d1d93d3f053f469c40c5d42a43e}{radau2a\+::rkA} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_aefb80779066572ac8b1e549cf1293de1}{radau2a\+::rkB} \mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_gaefb80779066572ac8b1e549cf1293de1}{radau2a\+::rkB} \mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_a7e8fecc1a981ceff1796a595b0ef5b4a}{radau2a\+::rkC} \mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_ga7e8fecc1a981ceff1796a595b0ef5b4a}{radau2a\+::rkC} \mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_ae792ec3177ed6d29903669bcde591f94}{radau2a\+::rkE} \mbox{[}4\mbox{]}
+static const double \hyperlink{group__RK__Params_gae792ec3177ed6d29903669bcde591f94}{radau2a\+::rkE} \mbox{[}4\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_a905a164e07054850af60562b36b1aa9f}{radau2a\+::rk\+Theta} \mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_ga905a164e07054850af60562b36b1aa9f}{radau2a\+::rk\+Theta} \mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_a188fa0b309eb2826403d911684735824}{radau2a\+::rk\+Gamma} = 3.\+637834252744495732208418513577775
+static const double \hyperlink{group__RK__Params_ga188fa0b309eb2826403d911684735824}{radau2a\+::rk\+Gamma} = 3.\+637834252744495732208418513577775
 \item 
-static const double \hyperlink{namespaceradau2a_ab60c47377f4985db23effa46e2239c24}{radau2a\+::rk\+Alpha} = 2.\+681082873627752133895790743211112
+static const double \hyperlink{group__RK__Params_gab60c47377f4985db23effa46e2239c24}{radau2a\+::rk\+Alpha} = 2.\+681082873627752133895790743211112
 \item 
-static const double \hyperlink{namespaceradau2a_a9a1ddba0cd8b29630b2c005af061c656}{radau2a\+::rk\+Beta} = 3.\+050430199247410569426377624787569
+static const double \hyperlink{group__RK__Params_ga9a1ddba0cd8b29630b2c005af061c656}{radau2a\+::rk\+Beta} = 3.\+050430199247410569426377624787569
 \item 
-static const double \hyperlink{namespaceradau2a_ac217dadb5a83f73958dba436ae4fa415}{radau2a\+::rkT} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_gac217dadb5a83f73958dba436ae4fa415}{radau2a\+::rkT} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_a967c2bc749d9b8cda1585bf4ee50b1c1}{radau2a\+::rk\+Tinv} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_ga967c2bc749d9b8cda1585bf4ee50b1c1}{radau2a\+::rk\+Tinv} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_a048232e984719eb1fed3f8ba7fb4c25b}{radau2a\+::rk\+Tinv\+Ainv} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_ga048232e984719eb1fed3f8ba7fb4c25b}{radau2a\+::rk\+Tinv\+Ainv} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_af7c73eb3be684541be92d125fef651bc}{radau2a\+::rk\+AinvT} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
+static const double \hyperlink{group__RK__Params_gaf7c73eb3be684541be92d125fef651bc}{radau2a\+::rk\+AinvT} \mbox{[}3\mbox{]}\mbox{[}3\mbox{]}
 \item 
-static const double \hyperlink{namespaceradau2a_a8f0bf108626219e500ffe0b78c01b246}{radau2a\+::rk\+E\+LO} = 4
+static const double \hyperlink{group__RK__Params_ga8f0bf108626219e500ffe0b78c01b246}{radau2a\+::rk\+E\+LO} = 4
 \item 
 static char \hyperlink{namespaceradau2a_ac3a739e01fca1200932ac123dc0bf0fa}{radau2a\+::\+T\+R\+A\+NS} = \textquotesingle{}N\textquotesingle{}
-\item 
+\begin{DoxyCompactList}\small\item\em Lapack -\/ non-\/transpose. \end{DoxyCompactList}\item 
 static int \hyperlink{namespaceradau2a_a67ae7402ff0a6a919cfc653405f513e0}{radau2a\+::\+N\+R\+HS} = 1
-\item 
+\begin{DoxyCompactList}\small\item\em Lapack -\/ 1 R\+HS solve. \end{DoxyCompactList}\item 
 static int \hyperlink{namespaceradau2a_ad00dd88322d09c410e8e5b9af87af14c}{radau2a\+::\+A\+R\+R\+S\+I\+ZE} = N\+SP
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Lapack -\/ Array size. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
+A Radau2A I\+RK implementation for C Adapted from Hairer and Wanner\textquotesingle{}s \href{http://www.unige.ch/~hairer/prog/stiff/radau5.f}{\tt R\+A\+D\+A\+U5 code} and the \href{http://people.cs.vt.edu/~asandu/Software/FATODE/index.html}{\tt F\+A\+T\+O\+DE} O\+DE integration library. 
+
 \begin{DoxyAuthor}{Author}
 Nicholas J. Curtis 
 \end{DoxyAuthor}
 \begin{DoxyDate}{Date}
 03/16/2015
 \end{DoxyDate}
-A Radau2A I\+RK implementation for C
+For full reference see\+:~\newline
+ G. Wanner, E. Hairer, Solving Ordinary Differential Equations II\+: Stiff and Differential\+Algebraic Problems, 2nd Edition, Springer-\/\+Verlag, Berlin, 1996. doi\+:10.\+1007/978-\/3-\/642-\/ 05221-\/7.
 
 N\+O\+TE\+: all matricies stored in column major format! 
 
@@ -132,42 +140,98 @@ N\+O\+TE\+: all matricies stored in column major format!
 \index{radau2a.\+c@{radau2a.\+c}!Fac\+Max@{Fac\+Max}}
 \index{Fac\+Max@{Fac\+Max}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Fac\+Max}{FacMax}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Fac\+Max~(8)}\hypertarget{radau2a_8c_a3ae724566d10e7ae2a48e1d340d6937b}{}\label{radau2a_8c_a3ae724566d10e7ae2a48e1d340d6937b}
+
+
+Controls maximum increase in timestep size. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Fac\+Min@{Fac\+Min}}
 \index{Fac\+Min@{Fac\+Min}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Fac\+Min}{FacMin}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Fac\+Min~(0.\+2)}\hypertarget{radau2a_8c_a2709085ffea146cba50846d860f7d945}{}\label{radau2a_8c_a2709085ffea146cba50846d860f7d945}
+
+
+Controls maximum decrease in timestep size. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Fac\+Rej@{Fac\+Rej}}
 \index{Fac\+Rej@{Fac\+Rej}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Fac\+Rej}{FacRej}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Fac\+Rej~(0.\+1)}\hypertarget{radau2a_8c_afb5b5659c29086c78a546a078c08238f}{}\label{radau2a_8c_afb5b5659c29086c78a546a078c08238f}
+
+
+Time step factor on rejected step. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Fac\+Safe@{Fac\+Safe}}
 \index{Fac\+Safe@{Fac\+Safe}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Fac\+Safe}{FacSafe}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Fac\+Safe~(0.\+9)}\hypertarget{radau2a_8c_a29559e0d6fcf09d76688dbc471b01219}{}\label{radau2a_8c_a29559e0d6fcf09d76688dbc471b01219}
+
+
+Safety factor for Gustafsson time stepping control. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Gustafsson@{Gustafsson}}
 \index{Gustafsson@{Gustafsson}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Gustafsson}{Gustafsson}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Gustafsson}\hypertarget{radau2a_8c_a619cdc11d911799dd674458eb84dc349}{}\label{radau2a_8c_a619cdc11d911799dd674458eb84dc349}
+
+
+Use gustafsson time stepping control. 
+
+\index{radau2a.\+c@{radau2a.\+c}!Max\+\_\+consecutive\+\_\+errs@{Max\+\_\+consecutive\+\_\+errs}}
+\index{Max\+\_\+consecutive\+\_\+errs@{Max\+\_\+consecutive\+\_\+errs}!radau2a.\+c@{radau2a.\+c}}
+\subsubsection[{\texorpdfstring{Max\+\_\+consecutive\+\_\+errs}{Max_consecutive_errs}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Max\+\_\+consecutive\+\_\+errs~(5)}\hypertarget{radau2a_8c_a172b5bc0830959ab49ca7cb9f0ae44bf}{}\label{radau2a_8c_a172b5bc0830959ab49ca7cb9f0ae44bf}
+
+
+Error allowed on this many consecutive internal timesteps before exit. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Max\+\_\+no\+\_\+steps@{Max\+\_\+no\+\_\+steps}}
 \index{Max\+\_\+no\+\_\+steps@{Max\+\_\+no\+\_\+steps}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Max\+\_\+no\+\_\+steps}{Max_no_steps}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Max\+\_\+no\+\_\+steps~(200000)}\hypertarget{radau2a_8c_a4f5652e996f678da1b1b93c8aa4a7961}{}\label{radau2a_8c_a4f5652e996f678da1b1b93c8aa4a7961}
+
+
+Maximum number of allowed internal timesteps before error. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Newton\+Maxit@{Newton\+Maxit}}
 \index{Newton\+Maxit@{Newton\+Maxit}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Newton\+Maxit}{NewtonMaxit}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Newton\+Maxit~(8)}\hypertarget{radau2a_8c_ab408861ee5149b85ac129cb8a3875743}{}\label{radau2a_8c_ab408861ee5149b85ac129cb8a3875743}
+
+
+Maximum number of allowed Newton iteration steps before error. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Newton\+Tol@{Newton\+Tol}}
 \index{Newton\+Tol@{Newton\+Tol}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Newton\+Tol}{NewtonTol}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Newton\+Tol~(0.\+03)}\hypertarget{radau2a_8c_a5ea658585341bf26e79bbf1ed3497e6f}{}\label{radau2a_8c_a5ea658585341bf26e79bbf1ed3497e6f}
+
+
+Newton convergence tolerance. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Qmax@{Qmax}}
 \index{Qmax@{Qmax}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Qmax}{Qmax}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Qmax~(1.\+2)}\hypertarget{radau2a_8c_afcfd11ffcebe8a32d20dcacebefa7e6f}{}\label{radau2a_8c_afcfd11ffcebe8a32d20dcacebefa7e6f}
+
+
+Max Timestep ratio to skip LU decomposition. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Qmin@{Qmin}}
 \index{Qmin@{Qmin}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Qmin}{Qmin}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Qmin~(1.\+0)}\hypertarget{radau2a_8c_ac523cd36edc6fc54a93dfdb10a772bc0}{}\label{radau2a_8c_ac523cd36edc6fc54a93dfdb10a772bc0}
+
+
+Min Timestep ratio to skip LU decomposition. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Roundoff@{Roundoff}}
 \index{Roundoff@{Roundoff}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Roundoff}{Roundoff}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Roundoff~({\bf E\+PS})}\hypertarget{radau2a_8c_a0628e9521e9961c49b173765f9d815d3}{}\label{radau2a_8c_a0628e9521e9961c49b173765f9d815d3}
+
+
+Smallist representable double precision number. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Start\+Newton@{Start\+Newton}}
 \index{Start\+Newton@{Start\+Newton}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Start\+Newton}{StartNewton}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Start\+Newton~(true)}\hypertarget{radau2a_8c_aa9c48bc3c2002ed4e6792dd7f526d783}{}\label{radau2a_8c_aa9c48bc3c2002ed4e6792dd7f526d783}
+
+
+Use quadratic interpolation from previous step if possible. 
+
 \index{radau2a.\+c@{radau2a.\+c}!Theta\+Min@{Theta\+Min}}
 \index{Theta\+Min@{Theta\+Min}!radau2a.\+c@{radau2a.\+c}}
 \subsubsection[{\texorpdfstring{Theta\+Min}{ThetaMin}}]{\setlength{\rightskip}{0pt plus 5cm}\#define Theta\+Min~(0.\+001)}\hypertarget{radau2a_8c_a1dea03e748069283de9d62ca81b64e75}{}\label{radau2a_8c_a1dea03e748069283de9d62ca81b64e75}
-\index{radau2a.\+c@{radau2a.\+c}!U\+N\+R\+O\+LL@{U\+N\+R\+O\+LL}}
-\index{U\+N\+R\+O\+LL@{U\+N\+R\+O\+LL}!radau2a.\+c@{radau2a.\+c}}
-\subsubsection[{\texorpdfstring{U\+N\+R\+O\+LL}{UNROLL}}]{\setlength{\rightskip}{0pt plus 5cm}\#define U\+N\+R\+O\+LL~(8)}\hypertarget{radau2a_8c_a870020ccb79b9bf241010e975e029bde}{}\label{radau2a_8c_a870020ccb79b9bf241010e975e029bde}
+
+
+Minimum Newton convergence rate. 
+

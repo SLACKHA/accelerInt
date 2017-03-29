@@ -1,5 +1,5 @@
-/*!
- * \file exprb43_props.cuh
+/**
+ * \file exprb43_props.cu
  * \brief Error checking for the EXPRB43 algorithm
  * \author Nicholas Curtis
  * \date 03/10/2015
@@ -11,10 +11,10 @@
 namespace exprb43cu {
 #endif
 
-/*! /fn void check_error(int tid, int code)
-	/brief Checks the return code of the given thread (IVP) for an error, and exits if found
-	/param num_cond The total number of IVPs to check
-	/param codes The array of return codes
+/*! \fn void check_error(int tid, int code)
+	\brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	\param num_cond The total number of IVPs to check
+	\param codes The array of return codes
 	@see exprb43cu_ErrCodes
  */
 __host__
