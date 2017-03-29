@@ -1,0 +1,73 @@
+\hypertarget{read__initial__conditions_8cuh}{}\section{/home/nick/\+Dropbox/acceler\+Int/generic/read\+\_\+initial\+\_\+conditions.cuh File Reference}
+\label{read__initial__conditions_8cuh}\index{/home/nick/\+Dropbox/acceler\+Int/generic/read\+\_\+initial\+\_\+conditions.\+cuh@{/home/nick/\+Dropbox/acceler\+Int/generic/read\+\_\+initial\+\_\+conditions.\+cuh}}
+
+
+definition of the generic initial condition reader  
+
+
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{read__initial__conditions_8cuh__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{read__initial__conditions_8cuh_aa94bd31760d037d12c0cfce818fa6ca4}{R\+E\+A\+D\+\_\+\+I\+N\+I\+T\+I\+A\+L\+\_\+\+C\+O\+N\+D\+I\+T\+I\+O\+N\+S\+\_\+\+C\+UH}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{read__initial__conditions_8cuh_af316c999bd8f21073480df848cca5225}{read\+\_\+initial\+\_\+conditions} (const char $\ast$, int, double $\ast$$\ast$, double $\ast$$\ast$)
+\begin{DoxyCompactList}\small\item\em Reads initial conditions for I\+V\+Ps from binary file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+definition of the generic initial condition reader 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}
+
+
+\subsection{Macro Definition Documentation}
+\index{read\+\_\+initial\+\_\+conditions.\+cuh@{read\+\_\+initial\+\_\+conditions.\+cuh}!R\+E\+A\+D\+\_\+\+I\+N\+I\+T\+I\+A\+L\+\_\+\+C\+O\+N\+D\+I\+T\+I\+O\+N\+S\+\_\+\+C\+UH@{R\+E\+A\+D\+\_\+\+I\+N\+I\+T\+I\+A\+L\+\_\+\+C\+O\+N\+D\+I\+T\+I\+O\+N\+S\+\_\+\+C\+UH}}
+\index{R\+E\+A\+D\+\_\+\+I\+N\+I\+T\+I\+A\+L\+\_\+\+C\+O\+N\+D\+I\+T\+I\+O\+N\+S\+\_\+\+C\+UH@{R\+E\+A\+D\+\_\+\+I\+N\+I\+T\+I\+A\+L\+\_\+\+C\+O\+N\+D\+I\+T\+I\+O\+N\+S\+\_\+\+C\+UH}!read\+\_\+initial\+\_\+conditions.\+cuh@{read\+\_\+initial\+\_\+conditions.\+cuh}}
+\subsubsection[{\texorpdfstring{R\+E\+A\+D\+\_\+\+I\+N\+I\+T\+I\+A\+L\+\_\+\+C\+O\+N\+D\+I\+T\+I\+O\+N\+S\+\_\+\+C\+UH}{READ_INITIAL_CONDITIONS_CUH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\+E\+A\+D\+\_\+\+I\+N\+I\+T\+I\+A\+L\+\_\+\+C\+O\+N\+D\+I\+T\+I\+O\+N\+S\+\_\+\+C\+UH}\hypertarget{read__initial__conditions_8cuh_aa94bd31760d037d12c0cfce818fa6ca4}{}\label{read__initial__conditions_8cuh_aa94bd31760d037d12c0cfce818fa6ca4}
+
+
+\subsection{Function Documentation}
+\index{read\+\_\+initial\+\_\+conditions.\+cuh@{read\+\_\+initial\+\_\+conditions.\+cuh}!read\+\_\+initial\+\_\+conditions@{read\+\_\+initial\+\_\+conditions}}
+\index{read\+\_\+initial\+\_\+conditions@{read\+\_\+initial\+\_\+conditions}!read\+\_\+initial\+\_\+conditions.\+cuh@{read\+\_\+initial\+\_\+conditions.\+cuh}}
+\subsubsection[{\texorpdfstring{read\+\_\+initial\+\_\+conditions(const char $\ast$, int, double $\ast$$\ast$, double $\ast$$\ast$)}{read_initial_conditions(const char *, int, double **, double **)}}]{\setlength{\rightskip}{0pt plus 5cm}int read\+\_\+initial\+\_\+conditions (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{filename, }
+\item[{int}]{N\+UM, }
+\item[{double $\ast$$\ast$}]{y\+\_\+host, }
+\item[{double $\ast$$\ast$}]{variable\+\_\+host}
+\end{DoxyParamCaption}
+)}\hypertarget{read__initial__conditions_8cuh_af316c999bd8f21073480df848cca5225}{}\label{read__initial__conditions_8cuh_af316c999bd8f21073480df848cca5225}
+
+
+Reads initial conditions for I\+V\+Ps from binary file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & the file to read from \\
+\hline
+\mbox{\tt in}  & {\em N\+UM} & the number of I\+VP initial conditions to read \\
+\hline
+\mbox{\tt in,out}  & {\em y\+\_\+host} & Address of the host state vector pointer. This is initialized and populated by this method \\
+\hline
+\mbox{\tt in,out}  & {\em variable\+\_\+host} & Address of the host pressure/density pointer. This is initialized and populated by this method\\
+\hline
+\end{DoxyParams}
+Note\+: the data file is expected to be in the following format\+:~\newline
+ time, Temperature, Pressure, mass fractions (State \#1) ~\newline
+ time, Temperature, Pressure, mass fractions (State \#2) ... 

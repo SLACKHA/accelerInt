@@ -1,0 +1,186 @@
+\hypertarget{structexp4cu_1_1solver__memory}{}\section{exp4cu\+:\+:solver\+\_\+memory Struct Reference}
+\label{structexp4cu_1_1solver__memory}\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+
+
+Structure containing memory needed for E\+X\+P4 algorithm.  
+
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_afb9f6a3602a177e7283a45afade87695}{sc}
+\begin{DoxyCompactList}\small\item\em the scaled error coefficients \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_aecfb53728ed87d6857212dd1e19345a8}{work1}
+\begin{DoxyCompactList}\small\item\em a work array \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a571d5da694382eb078504242f69c4b78}{work2}
+\begin{DoxyCompactList}\small\item\em a work array \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a1798b2513a1d21e9beaa998f1dc1df89}{work3}
+\begin{DoxyCompactList}\small\item\em a work array \end{DoxyCompactList}\item 
+cu\+Double\+Complex $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a8b2943ea29259b541a9143409bc8317d}{work4}
+\begin{DoxyCompactList}\small\item\em a (complex) work array \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_aed9282a748435b4cc9e230bd92b9b91f}{Hm}
+\begin{DoxyCompactList}\small\item\em The Hessenberg Kyrlov subspace array for E\+X\+P4, to take the exponential action on. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a3278cfbb9029ad325ca304b995097c64}{phi\+Hm}
+\begin{DoxyCompactList}\small\item\em the exponential Krylov subspace array for E\+X\+P4 \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a089d1909b39f39551063214762c66e08}{Vm}
+\begin{DoxyCompactList}\small\item\em the Arnoldi basis array \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a184c23b8411b8772b53dae0e6fe99723}{k1}
+\begin{DoxyCompactList}\small\item\em the stage 1 results \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a8f4b3ca501187945e4620f44506f6882}{k2}
+\begin{DoxyCompactList}\small\item\em the stage 2 results \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_ad874f97ba264e3cefb19482eef2a729d}{k3}
+\begin{DoxyCompactList}\small\item\em the stage 3 results \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a060f44ce2caacb3fc536671b591e11a2}{k4}
+\begin{DoxyCompactList}\small\item\em the stage 4 results \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a749746fa09b01076ee56c0402d003fb7}{k5}
+\begin{DoxyCompactList}\small\item\em the stage 5 results \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a8ccbe7fd464f064245b77c2df44956ef}{k6}
+\begin{DoxyCompactList}\small\item\em the stage 6 results \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{structexp4cu_1_1solver__memory_aa2776a2d992080e4e4c3e557c26ba2f7}{k7}
+\begin{DoxyCompactList}\small\item\em the stage 7 results \end{DoxyCompactList}\item 
+int $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a906f92c7521970bb4682737769d0b854}{ipiv}
+\begin{DoxyCompactList}\small\item\em the pivot indicies \end{DoxyCompactList}\item 
+cu\+Double\+Complex $\ast$ \hyperlink{structexp4cu_1_1solver__memory_a7e113949ec6861bbdf232d99badd8ed9}{invA}
+\begin{DoxyCompactList}\small\item\em the inverse of the Hessenberg Krylov subspace \end{DoxyCompactList}\item 
+int $\ast$ \hyperlink{structexp4cu_1_1solver__memory_aa0f66d6db2a4db2d779ff4dc407821b5}{result}
+\begin{DoxyCompactList}\small\item\em an array of integration results for the various threads \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Structure containing memory needed for E\+X\+P4 algorithm. 
+
+\subsection{Member Data Documentation}
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!Hm@{Hm}}
+\index{Hm@{Hm}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{Hm}{Hm}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::\+Hm}\hypertarget{structexp4cu_1_1solver__memory_aed9282a748435b4cc9e230bd92b9b91f}{}\label{structexp4cu_1_1solver__memory_aed9282a748435b4cc9e230bd92b9b91f}
+
+
+The Hessenberg Kyrlov subspace array for E\+X\+P4, to take the exponential action on. 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!invA@{invA}}
+\index{invA@{invA}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{invA}{invA}}]{\setlength{\rightskip}{0pt plus 5cm}cu\+Double\+Complex$\ast$ exp4cu\+::solver\+\_\+memory\+::invA}\hypertarget{structexp4cu_1_1solver__memory_a7e113949ec6861bbdf232d99badd8ed9}{}\label{structexp4cu_1_1solver__memory_a7e113949ec6861bbdf232d99badd8ed9}
+
+
+the inverse of the Hessenberg Krylov subspace 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!ipiv@{ipiv}}
+\index{ipiv@{ipiv}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{ipiv}{ipiv}}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ exp4cu\+::solver\+\_\+memory\+::ipiv}\hypertarget{structexp4cu_1_1solver__memory_a906f92c7521970bb4682737769d0b854}{}\label{structexp4cu_1_1solver__memory_a906f92c7521970bb4682737769d0b854}
+
+
+the pivot indicies 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!k1@{k1}}
+\index{k1@{k1}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{k1}{k1}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::k1}\hypertarget{structexp4cu_1_1solver__memory_a184c23b8411b8772b53dae0e6fe99723}{}\label{structexp4cu_1_1solver__memory_a184c23b8411b8772b53dae0e6fe99723}
+
+
+the stage 1 results 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!k2@{k2}}
+\index{k2@{k2}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{k2}{k2}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::k2}\hypertarget{structexp4cu_1_1solver__memory_a8f4b3ca501187945e4620f44506f6882}{}\label{structexp4cu_1_1solver__memory_a8f4b3ca501187945e4620f44506f6882}
+
+
+the stage 2 results 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!k3@{k3}}
+\index{k3@{k3}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{k3}{k3}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::k3}\hypertarget{structexp4cu_1_1solver__memory_ad874f97ba264e3cefb19482eef2a729d}{}\label{structexp4cu_1_1solver__memory_ad874f97ba264e3cefb19482eef2a729d}
+
+
+the stage 3 results 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!k4@{k4}}
+\index{k4@{k4}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{k4}{k4}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::k4}\hypertarget{structexp4cu_1_1solver__memory_a060f44ce2caacb3fc536671b591e11a2}{}\label{structexp4cu_1_1solver__memory_a060f44ce2caacb3fc536671b591e11a2}
+
+
+the stage 4 results 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!k5@{k5}}
+\index{k5@{k5}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{k5}{k5}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::k5}\hypertarget{structexp4cu_1_1solver__memory_a749746fa09b01076ee56c0402d003fb7}{}\label{structexp4cu_1_1solver__memory_a749746fa09b01076ee56c0402d003fb7}
+
+
+the stage 5 results 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!k6@{k6}}
+\index{k6@{k6}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{k6}{k6}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::k6}\hypertarget{structexp4cu_1_1solver__memory_a8ccbe7fd464f064245b77c2df44956ef}{}\label{structexp4cu_1_1solver__memory_a8ccbe7fd464f064245b77c2df44956ef}
+
+
+the stage 6 results 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!k7@{k7}}
+\index{k7@{k7}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{k7}{k7}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::k7}\hypertarget{structexp4cu_1_1solver__memory_aa2776a2d992080e4e4c3e557c26ba2f7}{}\label{structexp4cu_1_1solver__memory_aa2776a2d992080e4e4c3e557c26ba2f7}
+
+
+the stage 7 results 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!phi\+Hm@{phi\+Hm}}
+\index{phi\+Hm@{phi\+Hm}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{phi\+Hm}{phiHm}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::phi\+Hm}\hypertarget{structexp4cu_1_1solver__memory_a3278cfbb9029ad325ca304b995097c64}{}\label{structexp4cu_1_1solver__memory_a3278cfbb9029ad325ca304b995097c64}
+
+
+the exponential Krylov subspace array for E\+X\+P4 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!result@{result}}
+\index{result@{result}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{result}{result}}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ exp4cu\+::solver\+\_\+memory\+::result}\hypertarget{structexp4cu_1_1solver__memory_aa0f66d6db2a4db2d779ff4dc407821b5}{}\label{structexp4cu_1_1solver__memory_aa0f66d6db2a4db2d779ff4dc407821b5}
+
+
+an array of integration results for the various threads 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__exp4cu__ErrCodes}{Return codes of G\+P\+U E\+X\+P\+R\+B43 integrator} 
+\end{DoxySeeAlso}
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!sc@{sc}}
+\index{sc@{sc}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{sc}{sc}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::sc}\hypertarget{structexp4cu_1_1solver__memory_afb9f6a3602a177e7283a45afade87695}{}\label{structexp4cu_1_1solver__memory_afb9f6a3602a177e7283a45afade87695}
+
+
+the scaled error coefficients 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!Vm@{Vm}}
+\index{Vm@{Vm}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{Vm}{Vm}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::\+Vm}\hypertarget{structexp4cu_1_1solver__memory_a089d1909b39f39551063214762c66e08}{}\label{structexp4cu_1_1solver__memory_a089d1909b39f39551063214762c66e08}
+
+
+the Arnoldi basis array 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!work1@{work1}}
+\index{work1@{work1}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{work1}{work1}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::work1}\hypertarget{structexp4cu_1_1solver__memory_aecfb53728ed87d6857212dd1e19345a8}{}\label{structexp4cu_1_1solver__memory_aecfb53728ed87d6857212dd1e19345a8}
+
+
+a work array 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!work2@{work2}}
+\index{work2@{work2}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{work2}{work2}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::work2}\hypertarget{structexp4cu_1_1solver__memory_a571d5da694382eb078504242f69c4b78}{}\label{structexp4cu_1_1solver__memory_a571d5da694382eb078504242f69c4b78}
+
+
+a work array 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!work3@{work3}}
+\index{work3@{work3}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{work3}{work3}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ exp4cu\+::solver\+\_\+memory\+::work3}\hypertarget{structexp4cu_1_1solver__memory_a1798b2513a1d21e9beaa998f1dc1df89}{}\label{structexp4cu_1_1solver__memory_a1798b2513a1d21e9beaa998f1dc1df89}
+
+
+a work array 
+
+\index{exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}!work4@{work4}}
+\index{work4@{work4}!exp4cu\+::solver\+\_\+memory@{exp4cu\+::solver\+\_\+memory}}
+\subsubsection[{\texorpdfstring{work4}{work4}}]{\setlength{\rightskip}{0pt plus 5cm}cu\+Double\+Complex$\ast$ exp4cu\+::solver\+\_\+memory\+::work4}\hypertarget{structexp4cu_1_1solver__memory_a8b2943ea29259b541a9143409bc8317d}{}\label{structexp4cu_1_1solver__memory_a8b2943ea29259b541a9143409bc8317d}
+
+
+a (complex) work array 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exp4/\hyperlink{exp4__props_8cuh}{exp4\+\_\+props.\+cuh}\end{DoxyCompactItemize}

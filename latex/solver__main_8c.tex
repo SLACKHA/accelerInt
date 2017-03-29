@@ -1,0 +1,49 @@
+\hypertarget{solver__main_8c}{}\section{/home/nick/\+Dropbox/acceler\+Int/generic/solver\+\_\+main.c File Reference}
+\label{solver__main_8c}\index{/home/nick/\+Dropbox/acceler\+Int/generic/solver\+\_\+main.\+c@{/home/nick/\+Dropbox/acceler\+Int/generic/solver\+\_\+main.\+c}}
+
+
+the generic main file for all C\+PU solvers  
+
+
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdbool.\+h$>$}\\*
+{\ttfamily \#include $<$complex.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}timer.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}read\+\_\+initial\+\_\+conditions.\+h\char`\"{}}\\*
+Include dependency graph for solver\+\_\+main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{solver__main_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacegeneric}{generic}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacegeneric_a46943f7ebab17c7fb16065c7ed8444ec}{generic\+::write\+\_\+log} (int N\+UM, double t, const double $\ast$y\+\_\+host, F\+I\+LE $\ast$p\+File)
+\begin{DoxyCompactList}\small\item\em Writes state vectors to file. \end{DoxyCompactList}\item 
+int \hyperlink{namespacegeneric_a2d4dd87ad738cd981eafc9cd69d86c70}{generic\+::main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+the generic main file for all C\+PU solvers 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/09/2015
+\end{DoxyDate}
+Contains main function, setup, initialization, logging, timing and driver functions 

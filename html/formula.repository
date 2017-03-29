@@ -1,0 +1,25 @@
+\form#0:$Av1 = A * V1 * scale[0]$
+\form#1:$Av2 = A * V2 * scale[1]$
+\form#2:$Av3 = A * V3 * scale[2] + V4 + V5$
+\form#3:$A * V * scale + add$
+\form#4:$scale * A * V + 2 * add - sub$
+\form#5:$\frac{1.0}{ATOL + \max\left(\left|y0\right|, \left|y1\right|) * RTOL\right)}$
+\form#6:$\left| nums * sc\right|_2$
+\form#7:$\sqrt{\sum{v^2}}$
+\form#8:$v_{out} = \frac{v}{\left| v \right|}_2$
+\form#9:$Vm \dot w$
+\form#10:$ w -= Vm * s$
+\form#11:$Vm = s * w$
+\form#12:$\phi_2(c*A)$
+\form#13:$\phi_1(c*A)$
+\form#14:$\phi_0(c*A)$
+\form#15:$A = P * L * U$
+\form#16:$x_v:= A*x_v$
+\form#17:$x_v$
+\form#18:$alpha*A*x + y$
+\form#19:$A := alpha * arrX * arrY **T + A$
+\form#20:$Z:= X + Y$
+\form#21:$DY1:= DA1 * DX$
+\form#22:$DY2:= DA2 * DX$
+\form#23:$DY3:= DA3 * DX$
+\form#24:$R = Z - hA * F$

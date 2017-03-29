@@ -1,0 +1,112 @@
+\hypertarget{phiAHessenberg_8h}{}\section{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/phi\+A\+Hessenberg.h File Reference}
+\label{phiAHessenberg_8h}\index{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/phi\+A\+Hessenberg.\+h@{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/phi\+A\+Hessenberg.\+h}}
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+Include dependency graph for phi\+A\+Hessenberg.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{phiAHessenberg_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{phiAHessenberg_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{phiAHessenberg_8h_a1515b373392005fc1adcacbc6201d6aa}{phi2\+Ac\+\_\+variable} (const int, const double $\ast$, const double, double $\ast$)
+\begin{DoxyCompactList}\small\item\em Compute the 2nd order Phi (exponential) matrix function. \end{DoxyCompactList}\item 
+int \hyperlink{phiAHessenberg_8h_a4572532ac096221f640dac604cefb82f}{phi\+Ac\+\_\+variable} (const int, const double $\ast$, const double, double $\ast$)
+\begin{DoxyCompactList}\small\item\em Compute the first order Phi (exponential) matrix function. \end{DoxyCompactList}\item 
+int \hyperlink{phiAHessenberg_8h_a2ff7e0b4c44197882484b7cef57b2511}{exp\+Ac\+\_\+variable} (const int, const double $\ast$, const double, double $\ast$)
+\begin{DoxyCompactList}\small\item\em Compute the zeroth order Phi (exponential) matrix function. This is the regular matrix exponential. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{phi\+A\+Hessenberg.\+h@{phi\+A\+Hessenberg.\+h}!exp\+Ac\+\_\+variable@{exp\+Ac\+\_\+variable}}
+\index{exp\+Ac\+\_\+variable@{exp\+Ac\+\_\+variable}!phi\+A\+Hessenberg.\+h@{phi\+A\+Hessenberg.\+h}}
+\subsubsection[{\texorpdfstring{exp\+Ac\+\_\+variable(const int, const double $\ast$, const double, double $\ast$)}{expAc_variable(const int, const double *, const double, double *)}}]{\setlength{\rightskip}{0pt plus 5cm}int exp\+Ac\+\_\+variable (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$}]{A, }
+\item[{const double}]{c, }
+\item[{double $\ast$}]{phiA}
+\end{DoxyParamCaption}
+)}\hypertarget{phiAHessenberg_8h_a2ff7e0b4c44197882484b7cef57b2511}{}\label{phiAHessenberg_8h_a2ff7e0b4c44197882484b7cef57b2511}
+
+
+Compute the zeroth order Phi (exponential) matrix function. This is the regular matrix exponential. 
+
+Computes $\phi_0(c*A)$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & The Hessenberg matrix size (mxm) \\
+\hline
+\mbox{\tt in}  & {\em A} & The input Hessenberg matrix \\
+\hline
+\mbox{\tt in}  & {\em c} & The scaling factor \\
+\hline
+\mbox{\tt out}  & {\em phiA} & The resulting exponential matrix \\
+\hline
+\end{DoxyParams}
+\index{phi\+A\+Hessenberg.\+h@{phi\+A\+Hessenberg.\+h}!phi2\+Ac\+\_\+variable@{phi2\+Ac\+\_\+variable}}
+\index{phi2\+Ac\+\_\+variable@{phi2\+Ac\+\_\+variable}!phi\+A\+Hessenberg.\+h@{phi\+A\+Hessenberg.\+h}}
+\subsubsection[{\texorpdfstring{phi2\+Ac\+\_\+variable(const int, const double $\ast$, const double, double $\ast$)}{phi2Ac_variable(const int, const double *, const double, double *)}}]{\setlength{\rightskip}{0pt plus 5cm}int phi2\+Ac\+\_\+variable (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$}]{A, }
+\item[{const double}]{c, }
+\item[{double $\ast$}]{phiA}
+\end{DoxyParamCaption}
+)}\hypertarget{phiAHessenberg_8h_a1515b373392005fc1adcacbc6201d6aa}{}\label{phiAHessenberg_8h_a1515b373392005fc1adcacbc6201d6aa}
+
+
+Compute the 2nd order Phi (exponential) matrix function. 
+
+Computes $\phi_2(c*A)$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & The Hessenberg matrix size (mxm) \\
+\hline
+\mbox{\tt in}  & {\em A} & The input Hessenberg matrix \\
+\hline
+\mbox{\tt in}  & {\em c} & The scaling factor \\
+\hline
+\mbox{\tt out}  & {\em phiA} & The resulting exponential matrix \\
+\hline
+\end{DoxyParams}
+\index{phi\+A\+Hessenberg.\+h@{phi\+A\+Hessenberg.\+h}!phi\+Ac\+\_\+variable@{phi\+Ac\+\_\+variable}}
+\index{phi\+Ac\+\_\+variable@{phi\+Ac\+\_\+variable}!phi\+A\+Hessenberg.\+h@{phi\+A\+Hessenberg.\+h}}
+\subsubsection[{\texorpdfstring{phi\+Ac\+\_\+variable(const int, const double $\ast$, const double, double $\ast$)}{phiAc_variable(const int, const double *, const double, double *)}}]{\setlength{\rightskip}{0pt plus 5cm}int phi\+Ac\+\_\+variable (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$}]{A, }
+\item[{const double}]{c, }
+\item[{double $\ast$}]{phiA}
+\end{DoxyParamCaption}
+)}\hypertarget{phiAHessenberg_8h_a4572532ac096221f640dac604cefb82f}{}\label{phiAHessenberg_8h_a4572532ac096221f640dac604cefb82f}
+
+
+Compute the first order Phi (exponential) matrix function. 
+
+Computes $\phi_1(c*A)$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & The Hessenberg matrix size (mxm) \\
+\hline
+\mbox{\tt in}  & {\em A} & The input Hessenberg matrix \\
+\hline
+\mbox{\tt in}  & {\em c} & The scaling factor \\
+\hline
+\mbox{\tt out}  & {\em phiA} & The resulting exponential matrix \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,152 @@
+\hypertarget{phiAHessenberg_8cu}{}\section{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/phi\+A\+Hessenberg.cu File Reference}
+\label{phiAHessenberg_8cu}\index{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/phi\+A\+Hessenberg.\+cu@{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/phi\+A\+Hessenberg.\+cu}}
+
+
+Computes various matrix exponential functions on the Krylov Hessenberg matricies.  
+
+
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}complex\+Inverse.\+cuh\char`\"{}}\\*
+Include dependency graph for phi\+A\+Hessenberg.\+cu\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{phiAHessenberg_8cu__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{phiAHessenberg_8cu_ae7972d89009078777211b58162f2dd76}{phi2\+Ac\+\_\+variable} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double c, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ phiA, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
+\begin{DoxyCompactList}\small\item\em Compute the 2nd order Phi (exponential) matrix function. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{phiAHessenberg_8cu_abbb130c60c0fdda920f46468175a7904}{phi\+Ac\+\_\+variable} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double c, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ phiA, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
+\begin{DoxyCompactList}\small\item\em Compute the first order Phi (exponential) matrix function. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ int \hyperlink{phiAHessenberg_8cu_acf9f2fca33bcd8e9729601ed3761292a}{exp\+Ac\+\_\+variable} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double c, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ phiA, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)
+\begin{DoxyCompactList}\small\item\em Compute the zeroth order Phi (exponential) matrix function. This is the regular matrix exponential. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+constant\+\_\+\+\_\+ cu\+Double\+Complex \hyperlink{phiAHessenberg_8cu_a4a123ce887b4a39c29859b77db90e7e2}{poles} \mbox{[}\hyperlink{solver__options_8h_a69f5533c684b73d07a7e20146a285cb1}{N\+\_\+\+RA}\mbox{]}
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+constant\+\_\+\+\_\+ cu\+Double\+Complex \hyperlink{phiAHessenberg_8cu_af309432c3d053cc809c36518fb7d7f00}{res} \mbox{[}\hyperlink{solver__options_8h_a69f5533c684b73d07a7e20146a285cb1}{N\+\_\+\+RA}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Computes various matrix exponential functions on the Krylov Hessenberg matricies. 
+
+
+
+\subsection{Function Documentation}
+\index{phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}!exp\+Ac\+\_\+variable@{exp\+Ac\+\_\+variable}}
+\index{exp\+Ac\+\_\+variable@{exp\+Ac\+\_\+variable}!phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}}
+\subsubsection[{\texorpdfstring{exp\+Ac\+\_\+variable(const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double c, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ phi\+A, const solver\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{expAc_variable(const int m, const double *__restrict__ A, const double c, double *__restrict__ phiA, const solver_memory *__restrict__ solver, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int exp\+Ac\+\_\+variable (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const double}]{c, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{phiA, }
+\item[{const {\bf solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{solver, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
+\end{DoxyParamCaption}
+)}\hypertarget{phiAHessenberg_8cu_acf9f2fca33bcd8e9729601ed3761292a}{}\label{phiAHessenberg_8cu_acf9f2fca33bcd8e9729601ed3761292a}
+
+
+Compute the zeroth order Phi (exponential) matrix function. This is the regular matrix exponential. 
+
+Computes $\phi_0(c*A)$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & The Hessenberg matrix size (mxm) \\
+\hline
+\mbox{\tt in}  & {\em A} & The input Hessenberg matrix \\
+\hline
+\mbox{\tt in}  & {\em c} & The scaling factor \\
+\hline
+\mbox{\tt out}  & {\em phiA} & The resulting exponential matrix \\
+\hline
+\mbox{\tt in}  & {\em solver} & The \hyperlink{structsolver__memory}{solver\+\_\+memory} object \\
+\hline
+\mbox{\tt in}  & {\em work} & A complex work array \\
+\hline
+\end{DoxyParams}
+\index{phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}!phi2\+Ac\+\_\+variable@{phi2\+Ac\+\_\+variable}}
+\index{phi2\+Ac\+\_\+variable@{phi2\+Ac\+\_\+variable}!phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}}
+\subsubsection[{\texorpdfstring{phi2\+Ac\+\_\+variable(const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double c, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ phi\+A, const solver\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{phi2Ac_variable(const int m, const double *__restrict__ A, const double c, double *__restrict__ phiA, const solver_memory *__restrict__ solver, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int phi2\+Ac\+\_\+variable (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const double}]{c, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{phiA, }
+\item[{const {\bf solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{solver, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
+\end{DoxyParamCaption}
+)}\hypertarget{phiAHessenberg_8cu_ae7972d89009078777211b58162f2dd76}{}\label{phiAHessenberg_8cu_ae7972d89009078777211b58162f2dd76}
+
+
+Compute the 2nd order Phi (exponential) matrix function. 
+
+Computes $\phi_2(c*A)$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & The Hessenberg matrix size (mxm) \\
+\hline
+\mbox{\tt in}  & {\em A} & The input Hessenberg matrix \\
+\hline
+\mbox{\tt in}  & {\em c} & The scaling factor \\
+\hline
+\mbox{\tt out}  & {\em phiA} & The resulting exponential matrix \\
+\hline
+\mbox{\tt in}  & {\em solver} & The \hyperlink{structsolver__memory}{solver\+\_\+memory} object \\
+\hline
+\mbox{\tt in}  & {\em work} & A complex work array \\
+\hline
+\end{DoxyParams}
+\index{phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}!phi\+Ac\+\_\+variable@{phi\+Ac\+\_\+variable}}
+\index{phi\+Ac\+\_\+variable@{phi\+Ac\+\_\+variable}!phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}}
+\subsubsection[{\texorpdfstring{phi\+Ac\+\_\+variable(const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double c, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ phi\+A, const solver\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ solver, cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ work)}{phiAc_variable(const int m, const double *__restrict__ A, const double c, double *__restrict__ phiA, const solver_memory *__restrict__ solver, cuDoubleComplex *__restrict__ work)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ int phi\+Ac\+\_\+variable (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const double}]{c, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{phiA, }
+\item[{const {\bf solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{solver, }
+\item[{cu\+Double\+Complex $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{work}
+\end{DoxyParamCaption}
+)}\hypertarget{phiAHessenberg_8cu_abbb130c60c0fdda920f46468175a7904}{}\label{phiAHessenberg_8cu_abbb130c60c0fdda920f46468175a7904}
+
+
+Compute the first order Phi (exponential) matrix function. 
+
+Computes $\phi_1(c*A)$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & The Hessenberg matrix size (mxm) \\
+\hline
+\mbox{\tt in}  & {\em A} & The input Hessenberg matrix \\
+\hline
+\mbox{\tt in}  & {\em c} & The scaling factor \\
+\hline
+\mbox{\tt out}  & {\em phiA} & The resulting exponential matrix \\
+\hline
+\mbox{\tt in}  & {\em solver} & The \hyperlink{structsolver__memory}{solver\+\_\+memory} object \\
+\hline
+\mbox{\tt in}  & {\em work} & A complex work array \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Variable Documentation}
+\index{phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}!poles@{poles}}
+\index{poles@{poles}!phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}}
+\subsubsection[{\texorpdfstring{poles}{poles}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+constant\+\_\+\+\_\+ cu\+Double\+Complex poles\mbox{[}{\bf N\+\_\+\+RA}\mbox{]}}\hypertarget{phiAHessenberg_8cu_a4a123ce887b4a39c29859b77db90e7e2}{}\label{phiAHessenberg_8cu_a4a123ce887b4a39c29859b77db90e7e2}
+\index{phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}!res@{res}}
+\index{res@{res}!phi\+A\+Hessenberg.\+cu@{phi\+A\+Hessenberg.\+cu}}
+\subsubsection[{\texorpdfstring{res}{res}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ \+\_\+\+\_\+constant\+\_\+\+\_\+ cu\+Double\+Complex res\mbox{[}{\bf N\+\_\+\+RA}\mbox{]}}\hypertarget{phiAHessenberg_8cu_af309432c3d053cc809c36518fb7d7f00}{}\label{phiAHessenberg_8cu_af309432c3d053cc809c36518fb7d7f00}

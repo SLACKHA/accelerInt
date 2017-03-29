@@ -1,0 +1,49 @@
+\hypertarget{solver_8h}{}\section{/home/nick/\+Dropbox/acceler\+Int/generic/solver.h File Reference}
+\label{solver_8h}\index{/home/nick/\+Dropbox/acceler\+Int/generic/solver.\+h@{/home/nick/\+Dropbox/acceler\+Int/generic/solver.\+h}}
+
+
+Contains skeleton of all methods that need to be defined on a per solver basis.  
+
+
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+init.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+h\char`\"{}}\\*
+Include dependency graph for solver.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{solver_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{solver_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacegeneric}{generic}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacegeneric_a7560bdf00532a30210fe30b64e6d803c}{generic\+::int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)
+\begin{DoxyCompactList}\small\item\em Integration driver for the C\+PU integrators. \end{DoxyCompactList}\item 
+int \hyperlink{namespacegeneric_a9b46bc3b376aa379ce6981bc285b442b}{generic\+::integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
+\begin{DoxyCompactList}\small\item\em A header definition of the integrate method, that must be implemented by various solvers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Contains skeleton of all methods that need to be defined on a per solver basis. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/10/2015 
+\end{DoxyDate}

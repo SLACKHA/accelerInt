@@ -1,0 +1,157 @@
+\hypertarget{namespaceexp4}{}\section{exp4 Namespace Reference}
+\label{namespaceexp4}\index{exp4@{exp4}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespaceexp4_a8d03ab917f8736a37474362beeff9391}{integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
+\begin{DoxyCompactList}\small\item\em 4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexp4_a1ef7b39a9ac7da4247fd05807f000b07}{init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexp4_adc563232bff1c62e2068039175a6f428}{solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Executes solver specific logging tasks. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexp4_ab5d3c8262078fd94e511c54eb766f46c}{initialize\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Initializes the solver. \end{DoxyCompactList}\item 
+const char $\ast$ \hyperlink{namespaceexp4_aecc47dad1f4379532ab54b896a5e3771}{solver\+\_\+name} ()
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexp4_a0a595493de14a8f82826268b344339a8}{cleanup\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Cleans up the created solvers. \end{DoxyCompactList}\item 
+void \hyperlink{namespaceexp4_a40f949e51fd1c796b23f6d81612720fb}{check\+\_\+error} (int tid, int code)
+\begin{DoxyCompactList}\small\item\em Checks the return code of the given thread (I\+VP) for an error, and exits if found. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Include common code. 
+
+\subsection{Function Documentation}
+\index{exp4@{exp4}!check\+\_\+error@{check\+\_\+error}}
+\index{check\+\_\+error@{check\+\_\+error}!exp4@{exp4}}
+\subsubsection[{\texorpdfstring{check\+\_\+error(int tid, int code)}{check_error(int tid, int code)}}]{\setlength{\rightskip}{0pt plus 5cm}void exp4\+::check\+\_\+error (
+\begin{DoxyParamCaption}
+\item[{int}]{tid, }
+\item[{int}]{code}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexp4_a40f949e51fd1c796b23f6d81612720fb}{}\label{namespaceexp4_a40f949e51fd1c796b23f6d81612720fb}
+
+
+Checks the return code of the given thread (I\+VP) for an error, and exits if found. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tid} & The thread (I\+VP) index \\
+\hline
+{\em code} & The return code of the thread \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__exp4__ErrCodes}{Return codes of E\+X\+P4 integrator} 
+\end{DoxySeeAlso}
+\index{exp4@{exp4}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
+\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!exp4@{exp4}}
+\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(int num\+\_\+threads)}{cleanup_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void exp4\+::cleanup\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexp4_a0a595493de14a8f82826268b344339a8}{}\label{namespaceexp4_a0a595493de14a8f82826268b344339a8}
+
+
+Cleans up the created solvers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads used\\
+\hline
+\end{DoxyParams}
+Frees and cleans up allocated C\+V\+O\+DE memory.
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads used\\
+\hline
+\end{DoxyParams}
+Frees and cleans up allocated R\+K78 memory. \index{exp4@{exp4}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!exp4@{exp4}}
+\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}exp4\+::init\+\_\+solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexp4_a1ef7b39a9ac7da4247fd05807f000b07}{}\label{namespaceexp4_a1ef7b39a9ac7da4247fd05807f000b07}
+
+
+Initializes the Krylov subspace logging files (if L\+O\+G\+\_\+\+O\+U\+T\+P\+UT is defined) 
+
+Initializes solver specific items for logging.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\end{DoxySeeAlso}
+\index{exp4@{exp4}!initialize\+\_\+solver@{initialize\+\_\+solver}}
+\index{initialize\+\_\+solver@{initialize\+\_\+solver}!exp4@{exp4}}
+\subsubsection[{\texorpdfstring{initialize\+\_\+solver(int num\+\_\+threads)}{initialize_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void exp4\+::initialize\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexp4_ab5d3c8262078fd94e511c54eb766f46c}{}\label{namespaceexp4_ab5d3c8262078fd94e511c54eb766f46c}
+
+
+Initializes the solver. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads to use \\
+\hline
+\end{DoxyParams}
+\index{exp4@{exp4}!integrate@{integrate}}
+\index{integrate@{integrate}!exp4@{exp4}}
+\subsubsection[{\texorpdfstring{integrate(const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)}{integrate(const double t_start, const double t_end, const double pr, double *y)}}]{\setlength{\rightskip}{0pt plus 5cm}int exp4\+::integrate (
+\begin{DoxyParamCaption}
+\item[{const double}]{t\+\_\+start, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double}]{pr, }
+\item[{double $\ast$}]{y}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexp4_a8d03ab917f8736a37474362beeff9391}{}\label{namespaceexp4_a8d03ab917f8736a37474362beeff9391}
+
+
+4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation 
+
+A header definition of the integrate method, that must be implemented by various solvers.
+
+
+\begin{DoxyParams}{Parameters}
+{\em t\+\_\+start} & The initial integration time \\
+\hline
+{\em t\+\_\+end} & The final integration timestep \\
+\hline
+{\em pr} & User data passed to the R\+HS function dydt() -\/ commonly used for the Pressure term \\
+\hline
+{\em y} & The state vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The result of this integration step 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{group__exp4__ErrCodes}{Return codes of E\+X\+P4 integrator} 
+\end{DoxySeeAlso}
+\index{exp4@{exp4}!solver\+\_\+log@{solver\+\_\+log}}
+\index{solver\+\_\+log@{solver\+\_\+log}!exp4@{exp4}}
+\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void exp4\+::solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexp4_adc563232bff1c62e2068039175a6f428}{}\label{namespaceexp4_adc563232bff1c62e2068039175a6f428}
+
+
+Executes solver specific logging tasks. 
+
+\index{exp4@{exp4}!solver\+\_\+name@{solver\+\_\+name}}
+\index{solver\+\_\+name@{solver\+\_\+name}!exp4@{exp4}}
+\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ exp4\+::solver\+\_\+name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespaceexp4_aecc47dad1f4379532ab54b896a5e3771}{}\label{namespaceexp4_aecc47dad1f4379532ab54b896a5e3771}
+
+
+Returns a descriptive solver name. 
+

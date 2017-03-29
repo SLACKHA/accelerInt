@@ -1,0 +1,51 @@
+\hypertarget{exprb43_8c}{}\section{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exprb43/exprb43.c File Reference}
+\label{exprb43_8c}\index{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exprb43/exprb43.\+c@{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exprb43/exprb43.\+c}}
+
+
+A krylov subspace integrator using a 4th order (3rd-\/order embedded) exponential Rosenbrock method of Hochbruck et al. (2009)  
+
+
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$stdbool.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}dydt.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}jacob.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}exprb43\+\_\+props.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}arnoldi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}exponential\+\_\+linear\+\_\+algebra.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+init.\+h\char`\"{}}\\*
+Include dependency graph for exprb43.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{exprb43_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceexprb43}{exprb43}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespaceexprb43_a67d60af836938be17821d7ca32fa31fa}{exprb43\+::integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
+\begin{DoxyCompactList}\small\item\em 4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A krylov subspace integrator using a 4th order (3rd-\/order embedded) exponential Rosenbrock method of Hochbruck et al. (2009) 
+
+\begin{DoxyAuthor}{Author}
+Nicholas J. Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+09/02/2014
+\end{DoxyDate}
+See full reference\+: M. Hochbruck, A. Ostermann, J. Schweitzer, Exponential Rosenbrock-\/type methods, S\+I\+AM J. Numer. Anal. 47 (1) (2009) 786–803. doi\+:10.\+1137/080717717.
+
+N\+O\+TE\+: all matricies stored in column major format! 

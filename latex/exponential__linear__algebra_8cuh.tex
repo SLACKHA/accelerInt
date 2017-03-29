@@ -1,0 +1,471 @@
+\hypertarget{exponential__linear__algebra_8cuh}{}\section{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exponential\+\_\+linear\+\_\+algebra.cuh File Reference}
+\label{exponential__linear__algebra_8cuh}\index{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exponential\+\_\+linear\+\_\+algebra.\+cuh@{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+
+
+Definitions of various linear algebra functions needed in the exponential integrators.  
+
+
+{\ttfamily \#include \char`\"{}header.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+options.\+cuh\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+props.\+cuh\char`\"{}}\\*
+Include dependency graph for exponential\+\_\+linear\+\_\+algebra.\+cuh\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{exponential__linear__algebra_8cuh__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{exponential__linear__algebra_8cuh__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{exponential__linear__algebra_8cuh_a681edd700cfabbc96d9bafca7cc69049}{E\+X\+P\+O\+N\+E\+N\+T\+I\+A\+L\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+L\+G\+E\+B\+R\+A\+\_\+\+C\+UH}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a2e59348b99908b5918de88097e15d5ff}{matvec\+\_\+m\+\_\+by\+\_\+m} (const int m, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
+\begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized MxM and a vector Mx1. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a6bc7e5c08b8e40b19ce05ea146c05307}{matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal} (const int m, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
+\begin{DoxyCompactList}\small\item\em Matrix-\/vector plus equals for a matrix of size MxM and vector of size Mx1. That is, it returns (A + I) $\ast$ v. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a03e37312683db492dc73e08c17fe40e7}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale} (const int m, const double \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
+\begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor That is, it returns A $\ast$ v $\ast$ scale. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_aafe924c72a847b1d591e8fecb0efebdc}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$Av)
+\begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a6d511f330da8ea1a044ed327a132d290}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2} (const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$Av)
+\begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a28166d4c2569ab108219b8466bef8a77}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add} (const int m, const double \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ V, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)
+\begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor and added to another vector. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a0522be133cda40ce325a2af6d95daddb}{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract} (const int m, const double \hyperlink{inverse_8cu_adbb4f3f3af5f968a94f717729803c88d}{scale}, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sub)
+\begin{DoxyCompactList}\small\item\em Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor and adds and subtracts the specified vectors note, the addition is twice the specified vector. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_ace23ed149f65a9b90469b38ecd9ef01b}{scale} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
+\begin{DoxyCompactList}\small\item\em Get scaling for weighted norm. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a2e7ea5b129b2e703fcc6aeb3affadd64}{scale\+\_\+init} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
+\begin{DoxyCompactList}\small\item\em Get scaling for weighted norm for the initial timestep (used in krylov process) \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ double \hyperlink{exponential__linear__algebra_8cuh_a0c015672153032287ee1abbde6487d41}{sc\+\_\+norm} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ nums, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)
+\begin{DoxyCompactList}\small\item\em Perform weighted norm. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ double \hyperlink{exponential__linear__algebra_8cuh_aa0074f06fcc396f12514f858ab825ca8}{two\+\_\+norm} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ v)
+\begin{DoxyCompactList}\small\item\em Computes and returns the two norm of a vector. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ double \hyperlink{exponential__linear__algebra_8cuh_ae01ed1392756734c2d6996554cb20176}{normalize} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ v, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ v\+\_\+out)
+\begin{DoxyCompactList}\small\item\em Normalize the input vector using a 2-\/norm. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ double \hyperlink{exponential__linear__algebra_8cuh_a43b8d535f44e58015de9b6ea37561bd7}{dotproduct} (const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ w, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Vm)
+\begin{DoxyCompactList}\small\item\em Performs the dot product of the w (N\+SP x 1) vector with the given subspace vector (N\+SP x 1) \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a6b815eec17077505cb9313d6c380e036}{scale\+\_\+subtract} (const double s, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Vm, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ w)
+\begin{DoxyCompactList}\small\item\em Subtracts Vm scaled by s from w. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{exponential__linear__algebra_8cuh_a5349e6f114398db5a19e212fc837f670}{scale\+\_\+mult} (const double s, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ w, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Vm)
+\begin{DoxyCompactList}\small\item\em Sets Vm to s $\ast$ w. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Definitions of various linear algebra functions needed in the exponential integrators. 
+
+\begin{DoxyAuthor}{Author}
+Nicholas Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+03/09/2015 
+\end{DoxyDate}
+
+
+\subsection{Macro Definition Documentation}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!E\+X\+P\+O\+N\+E\+N\+T\+I\+A\+L\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+L\+G\+E\+B\+R\+A\+\_\+\+C\+UH@{E\+X\+P\+O\+N\+E\+N\+T\+I\+A\+L\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+L\+G\+E\+B\+R\+A\+\_\+\+C\+UH}}
+\index{E\+X\+P\+O\+N\+E\+N\+T\+I\+A\+L\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+L\+G\+E\+B\+R\+A\+\_\+\+C\+UH@{E\+X\+P\+O\+N\+E\+N\+T\+I\+A\+L\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+L\+G\+E\+B\+R\+A\+\_\+\+C\+UH}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{E\+X\+P\+O\+N\+E\+N\+T\+I\+A\+L\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+L\+G\+E\+B\+R\+A\+\_\+\+C\+UH}{EXPONENTIAL_LINEAR_ALGEBRA_CUH}}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+X\+P\+O\+N\+E\+N\+T\+I\+A\+L\+\_\+\+L\+I\+N\+E\+A\+R\+\_\+\+A\+L\+G\+E\+B\+R\+A\+\_\+\+C\+UH}\hypertarget{exponential__linear__algebra_8cuh_a681edd700cfabbc96d9bafca7cc69049}{}\label{exponential__linear__algebra_8cuh_a681edd700cfabbc96d9bafca7cc69049}
+
+
+\subsection{Function Documentation}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!dotproduct@{dotproduct}}
+\index{dotproduct@{dotproduct}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{dotproduct(const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ w, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Vm)}{dotproduct(const double *__restrict__ w, const double *__restrict__ Vm)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ double dotproduct (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{w, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Vm}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a43b8d535f44e58015de9b6ea37561bd7}{}\label{exponential__linear__algebra_8cuh_a43b8d535f44e58015de9b6ea37561bd7}
+
+
+Performs the dot product of the w (N\+SP x 1) vector with the given subspace vector (N\+SP x 1) 
+
+returns $Vm \dot w$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em w} & the vector with with to dot \\
+\hline
+\mbox{\tt in}  & {\em Vm} & the subspace vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+sum -\/ the dot product of the specified vectors 
+\end{DoxyReturn}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!matvec\+\_\+m\+\_\+by\+\_\+m@{matvec\+\_\+m\+\_\+by\+\_\+m}}
+\index{matvec\+\_\+m\+\_\+by\+\_\+m@{matvec\+\_\+m\+\_\+by\+\_\+m}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{matvec\+\_\+m\+\_\+by\+\_\+m(const int m, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)}{matvec_m_by_m(const int m, const double *const __restrict__ A, const double *const __restrict__ V, double *const __restrict__ Av)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void matvec\+\_\+m\+\_\+by\+\_\+m (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{V, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Av}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a2e59348b99908b5918de88097e15d5ff}{}\label{exponential__linear__algebra_8cuh_a2e59348b99908b5918de88097e15d5ff}
+
+
+Matrix-\/vector multiplication of a matrix sized MxM and a vector Mx1. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & size of the matrix \\
+\hline
+\mbox{\tt in}  & {\em A} & matrix of size MxM \\
+\hline
+\mbox{\tt in}  & {\em V} & vector of size Mx1 \\
+\hline
+\mbox{\tt out}  & {\em Av} & vector that is A $\ast$ v \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal@{matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal}}
+\index{matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal@{matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal(const int m, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)}{matvec_m_by_m_plusequal(const int m, const double *const __restrict__ A, const double *const __restrict__ V, double *const __restrict__ Av)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void matvec\+\_\+m\+\_\+by\+\_\+m\+\_\+plusequal (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{V, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Av}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a6bc7e5c08b8e40b19ce05ea146c05307}{}\label{exponential__linear__algebra_8cuh_a6bc7e5c08b8e40b19ce05ea146c05307}
+
+
+Matrix-\/vector plus equals for a matrix of size MxM and vector of size Mx1. That is, it returns (A + I) $\ast$ v. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & size of the matrix \\
+\hline
+\mbox{\tt in}  & {\em A} & matrix of size MxM \\
+\hline
+\mbox{\tt in}  & {\em V} & vector of size Mx1 \\
+\hline
+\mbox{\tt out}  & {\em Av} & vector that is (A + I) $\ast$ v \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale}}
+\index{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale(const int m, const double scale, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ V, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)}{matvec_n_by_m_scale(const int m, const double scale, const double *const __restrict__ A, const double *const __restrict__ V, double *const __restrict__ Av)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double}]{scale, }
+\item[{const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{V, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Av}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a03e37312683db492dc73e08c17fe40e7}{}\label{exponential__linear__algebra_8cuh_a03e37312683db492dc73e08c17fe40e7}
+
+
+Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor That is, it returns A $\ast$ v $\ast$ scale. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & size of the matrix \\
+\hline
+\mbox{\tt in}  & {\em scale} & a number to scale the multplication by \\
+\hline
+\mbox{\tt in}  & {\em A} & matrix \\
+\hline
+\mbox{\tt in}  & {\em V} & the vector \\
+\hline
+\mbox{\tt out}  & {\em Av} & vector that is A $\ast$ V $\ast$ scale \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add}}
+\index{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add(const int m, const double scale, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ V, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av)}{matvec_n_by_m_scale_add(const int m, const double scale, const double *__restrict__ add, const double *__restrict__ A, double *__restrict__ V, const double *__restrict__ Av)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double}]{scale, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{add, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{V, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Av}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a28166d4c2569ab108219b8466bef8a77}{}\label{exponential__linear__algebra_8cuh_a28166d4c2569ab108219b8466bef8a77}
+
+
+Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor and added to another vector. 
+
+Computes $A * V * scale + add$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & size of the matrix \\
+\hline
+\mbox{\tt in}  & {\em scale} & a number to scale the multplication by \\
+\hline
+\mbox{\tt in}  & {\em add} & the vector to add to the result \\
+\hline
+\mbox{\tt in}  & {\em A} & matrix \\
+\hline
+\mbox{\tt in}  & {\em V} & the vector \\
+\hline
+\mbox{\tt out}  & {\em Av} & vector that is A $\ast$ V $\ast$ scale + add \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract}}
+\index{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract(const int m, const double scale, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, const double $\ast$\+V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Av, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ add, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sub)}{matvec_n_by_m_scale_add_subtract(const int m, const double scale, const double *__restrict__ A, const double *V, double *__restrict__ Av, const double *__restrict__ add, const double *__restrict__ sub)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+add\+\_\+subtract (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double}]{scale, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{const double $\ast$}]{V, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Av, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{add, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{sub}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a0522be133cda40ce325a2af6d95daddb}{}\label{exponential__linear__algebra_8cuh_a0522be133cda40ce325a2af6d95daddb}
+
+
+Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor and adds and subtracts the specified vectors note, the addition is twice the specified vector. 
+
+Computes $scale * A * V + 2 * add - sub$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & size of the matrix \\
+\hline
+\mbox{\tt in}  & {\em scale} & a number to scale the multplication by \\
+\hline
+\mbox{\tt in}  & {\em A} & matrix \\
+\hline
+\mbox{\tt in}  & {\em V} & the vector \\
+\hline
+\mbox{\tt out}  & {\em Av} & vector that is scale $\ast$ A $\ast$ V + 2 $\ast$ add -\/ sub \\
+\hline
+\mbox{\tt in}  & {\em add} & the vector to add to the result \\
+\hline
+\mbox{\tt in}  & {\em sub} & the vector to subtract from the result \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special}}
+\index{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special(const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ scale, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$\+V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$\+Av)}{matvec_n_by_m_scale_special(const int m, const double *__restrict__ scale, const double *__restrict__ A, double *const __restrict__ *V, double *__restrict__ *Av)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{scale, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$}]{V, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$}]{Av}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_aafe924c72a847b1d591e8fecb0efebdc}{}\label{exponential__linear__algebra_8cuh_aafe924c72a847b1d591e8fecb0efebdc}
+
+
+Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor. 
+
+Computes the following\+: $Av1 = A * V1 * scale[0]$, $Av2 = A * V2 * scale[1]$, and $Av3 = A * V3 * scale[2] + V4 + V5$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & size of the matrix \\
+\hline
+\mbox{\tt in}  & {\em scale} & a list of numbers to scale the multplication by \\
+\hline
+\mbox{\tt in}  & {\em A} & matrix \\
+\hline
+\mbox{\tt in}  & {\em V} & a list of 5 pointers corresponding to V1, V2, V3, V4, V5 \\
+\hline
+\mbox{\tt out}  & {\em Av} & a list of 3 pointers corresponding to Av1, Av2, Av3 \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2}}
+\index{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2@{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2(const int m, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ scale, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ A, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$\+V, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$\+Av)}{matvec_n_by_m_scale_special2(const int m, const double *__restrict__ scale, const double *__restrict__ A, double *const __restrict__ *V, double *__restrict__ *Av)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void matvec\+\_\+n\+\_\+by\+\_\+m\+\_\+scale\+\_\+special2 (
+\begin{DoxyParamCaption}
+\item[{const int}]{m, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{scale, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{A, }
+\item[{double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$}]{V, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ $\ast$}]{Av}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a6d511f330da8ea1a044ed327a132d290}{}\label{exponential__linear__algebra_8cuh_a6d511f330da8ea1a044ed327a132d290}
+
+
+Matrix-\/vector multiplication of a matrix sized N\+S\+PxM and a vector of size Mx1 scaled by a specified factor. 
+
+Computes the following\+: $Av1 = A * V1 * scale[0]$ and\+: $Av2 = A * V2 * scale[1]$
+
+Performs inline matrix-\/vector multiplication (with unrolled loops)
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em m} & size of the matrix \\
+\hline
+\mbox{\tt in}  & {\em scale} & a list of numbers to scale the multplication by \\
+\hline
+\mbox{\tt in}  & {\em A} & matrix \\
+\hline
+\mbox{\tt in}  & {\em V} & a list of 2 pointers corresponding to V1, V2 \\
+\hline
+\mbox{\tt out}  & {\em Av} & a list of 2 pointers corresponding to Av1, Av2 \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!normalize@{normalize}}
+\index{normalize@{normalize}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{normalize(const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ v, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ v\+\_\+out)}{normalize(const double *__restrict__ v, double *__restrict__ v_out)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ double normalize (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{v, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{v\+\_\+out}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_ae01ed1392756734c2d6996554cb20176}{}\label{exponential__linear__algebra_8cuh_ae01ed1392756734c2d6996554cb20176}
+
+
+Normalize the input vector using a 2-\/norm. 
+
+$v_{out} = \frac{v}{\left| v \right|}_2$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em v} & vector to be normalized \\
+\hline
+\mbox{\tt out}  & {\em v\+\_\+out} & where to stick the normalized part of v (in a column) \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!sc\+\_\+norm@{sc\+\_\+norm}}
+\index{sc\+\_\+norm@{sc\+\_\+norm}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{sc\+\_\+norm(const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ nums, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)}{sc_norm(const double *__restrict__ nums, const double *__restrict__ sc)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ double sc\+\_\+norm (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{nums, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{sc}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a0c015672153032287ee1abbde6487d41}{}\label{exponential__linear__algebra_8cuh_a0c015672153032287ee1abbde6487d41}
+
+
+Perform weighted norm. 
+
+Computes $\left| nums * sc\right|_2$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em nums} & values to be normed \\
+\hline
+\mbox{\tt in}  & {\em sc} & scaling array for norm \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+norm weighted norm 
+\end{DoxyReturn}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!scale@{scale}}
+\index{scale@{scale}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{scale(const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y1, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)}{scale(const double *__restrict__ y0, const double *__restrict__ y1, double *__restrict__ sc)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y0, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y1, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{sc}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_ace23ed149f65a9b90469b38ecd9ef01b}{}\label{exponential__linear__algebra_8cuh_ace23ed149f65a9b90469b38ecd9ef01b}
+
+
+Get scaling for weighted norm. 
+
+Computes $\frac{1.0}{ATOL + \max\left(\left|y0\right|, \left|y1\right|) * RTOL\right)}$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em y0} & values at current timestep \\
+\hline
+\mbox{\tt in}  & {\em y1} & values at next timestep \\
+\hline
+\mbox{\tt out}  & {\em sc} & array of scaling values \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!scale\+\_\+init@{scale\+\_\+init}}
+\index{scale\+\_\+init@{scale\+\_\+init}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{scale\+\_\+init(const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y0, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ sc)}{scale_init(const double *__restrict__ y0, double *__restrict__ sc)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y0, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{sc}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a2e7ea5b129b2e703fcc6aeb3affadd64}{}\label{exponential__linear__algebra_8cuh_a2e7ea5b129b2e703fcc6aeb3affadd64}
+
+
+Get scaling for weighted norm for the initial timestep (used in krylov process) 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em y0} & values at current timestep \\
+\hline
+\mbox{\tt out}  & {\em sc} & array of scaling values \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!scale\+\_\+mult@{scale\+\_\+mult}}
+\index{scale\+\_\+mult@{scale\+\_\+mult}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{scale\+\_\+mult(const double s, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ w, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Vm)}{scale_mult(const double s, const double *__restrict__ w, double *__restrict__ Vm)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale\+\_\+mult (
+\begin{DoxyParamCaption}
+\item[{const double}]{s, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{w, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Vm}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a5349e6f114398db5a19e212fc837f670}{}\label{exponential__linear__algebra_8cuh_a5349e6f114398db5a19e212fc837f670}
+
+
+Sets Vm to s $\ast$ w. 
+
+$Vm = s * w$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & the scale multiplier to use \\
+\hline
+\mbox{\tt in}  & {\em w} & the vector to use as a base \\
+\hline
+\mbox{\tt out}  & {\em Vm} & the subspace matrix to set \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!scale\+\_\+subtract@{scale\+\_\+subtract}}
+\index{scale\+\_\+subtract@{scale\+\_\+subtract}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{scale\+\_\+subtract(const double s, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ Vm, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ w)}{scale_subtract(const double s, const double *__restrict__ Vm, double *__restrict__ w)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void scale\+\_\+subtract (
+\begin{DoxyParamCaption}
+\item[{const double}]{s, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{Vm, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{w}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_a6b815eec17077505cb9313d6c380e036}{}\label{exponential__linear__algebra_8cuh_a6b815eec17077505cb9313d6c380e036}
+
+
+Subtracts Vm scaled by s from w. 
+
+$ w -= Vm * s$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em s} & the scale multiplier to use \\
+\hline
+\mbox{\tt in}  & {\em Vm} & the subspace matrix \\
+\hline
+\mbox{\tt out}  & {\em w} & the vector to subtract from \\
+\hline
+\end{DoxyParams}
+\index{exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}!two\+\_\+norm@{two\+\_\+norm}}
+\index{two\+\_\+norm@{two\+\_\+norm}!exponential\+\_\+linear\+\_\+algebra.\+cuh@{exponential\+\_\+linear\+\_\+algebra.\+cuh}}
+\subsubsection[{\texorpdfstring{two\+\_\+norm(const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ v)}{two_norm(const double *__restrict__ v)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ double two\+\_\+norm (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{v}
+\end{DoxyParamCaption}
+)}\hypertarget{exponential__linear__algebra_8cuh_aa0074f06fcc396f12514f858ab825ca8}{}\label{exponential__linear__algebra_8cuh_aa0074f06fcc396f12514f858ab825ca8}
+
+
+Computes and returns the two norm of a vector. 
+
+Computes $\sqrt{\sum{v^2}}$
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em v} & the vector \\
+\hline
+\end{DoxyParams}

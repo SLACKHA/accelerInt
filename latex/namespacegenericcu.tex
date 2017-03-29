@@ -1,0 +1,157 @@
+\hypertarget{namespacegenericcu}{}\section{genericcu Namespace Reference}
+\label{namespacegenericcu}\index{genericcu@{genericcu}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+global\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_aff46876594be0dced04cee0173535519}{int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ pr\+\_\+global, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y\+\_\+global, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ d\+\_\+mem, const \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ s\+\_\+mem)
+\begin{DoxyCompactList}\small\item\em Generic driver for the G\+PU integrators. \end{DoxyCompactList}\item 
+\+\_\+\+\_\+device\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_ac62c1a51172ab7750c2f75688ca8e486}{integrate} (const double, const double, const double, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, \hyperlink{structsolver__memory}{solver\+\_\+memory} const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+)
+\item 
+\+\_\+\+\_\+host\+\_\+\+\_\+ void \hyperlink{namespacegenericcu_af403dabfc12de79ff9ab8575983d6f83}{check\+\_\+error} (int num\+\_\+conditions, int $\ast$code\+\_\+arr)
+\item 
+size\+\_\+t \hyperlink{namespacegenericcu_a95e70ae54ccfc5eb00792846ca80ecde}{required\+\_\+solver\+\_\+size} ()
+\begin{DoxyCompactList}\small\item\em Returns the total size (in bytes) required for memory storage for a single G\+PU thread Used in calculation of the maximum number of possible G\+PU threads to launch, this method returns the size of the \hyperlink{structsolver__memory}{solver\+\_\+memory} structure (per-\/\+G\+PU thread) \end{DoxyCompactList}\item 
+void \hyperlink{namespacegenericcu_a358f079f3935e43979b5f56c1571e337}{init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes solver specific items for logging. \end{DoxyCompactList}\item 
+void \hyperlink{namespacegenericcu_a5decadd4be249498055f5de06892563c}{solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Executes solver specific logging tasks. \end{DoxyCompactList}\item 
+void \hyperlink{namespacegenericcu_af3d7e7d6a3b751c0fb942b20bc1ab296}{initialize\+\_\+solver} (const int, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$)
+\item 
+void \hyperlink{namespacegenericcu_ab44369c2115282f0907eea035ff453ad}{cleanup\+\_\+solver} (\hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$, \hyperlink{structsolver__memory}{solver\+\_\+memory} $\ast$$\ast$)
+\item 
+const char $\ast$ \hyperlink{namespacegenericcu_a21cc3f48896c010b61e283a6f4c82409}{solver\+\_\+name} ()
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{genericcu@{genericcu}!check\+\_\+error@{check\+\_\+error}}
+\index{check\+\_\+error@{check\+\_\+error}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{check\+\_\+error(int num\+\_\+conditions, int $\ast$code\+\_\+arr)}{check_error(int num_conditions, int *code_arr)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+host\+\_\+\+\_\+ void genericcu\+::check\+\_\+error (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+conditions, }
+\item[{int $\ast$}]{code\+\_\+arr}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_af403dabfc12de79ff9ab8575983d6f83}{}\label{namespacegenericcu_af403dabfc12de79ff9ab8575983d6f83}
+\index{genericcu@{genericcu}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
+\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(solver\+\_\+memory $\ast$$\ast$, solver\+\_\+memory $\ast$$\ast$)}{cleanup_solver(solver_memory **, solver_memory **)}}]{\setlength{\rightskip}{0pt plus 5cm}void genericcu\+::cleanup\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{, }
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_ab44369c2115282f0907eea035ff453ad}{}\label{namespacegenericcu_ab44369c2115282f0907eea035ff453ad}
+\index{genericcu@{genericcu}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void genericcu\+::init\+\_\+solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_a358f079f3935e43979b5f56c1571e337}{}\label{namespacegenericcu_a358f079f3935e43979b5f56c1571e337}
+
+
+Initializes solver specific items for logging. 
+
+Initializes stepsize logging for stiffness measurement
+
+Initializes solver specific items for logging.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh}
+\end{DoxySeeAlso}
+Initializes the Krylov subspace logging files (if \hyperlink{solver__options_8h_ac786f5f1963363a48eed565f7cbc6931}{L\+O\+G\+\_\+\+O\+U\+T\+P\+UT} is defined) \begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\end{DoxySeeAlso}
+\index{genericcu@{genericcu}!initialize\+\_\+solver@{initialize\+\_\+solver}}
+\index{initialize\+\_\+solver@{initialize\+\_\+solver}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{initialize\+\_\+solver(const int, solver\+\_\+memory $\ast$$\ast$, solver\+\_\+memory $\ast$$\ast$)}{initialize_solver(const int, solver_memory **, solver_memory **)}}]{\setlength{\rightskip}{0pt plus 5cm}void genericcu\+::initialize\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{const int}]{, }
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{, }
+\item[{{\bf solver\+\_\+memory} $\ast$$\ast$}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_af3d7e7d6a3b751c0fb942b20bc1ab296}{}\label{namespacegenericcu_af3d7e7d6a3b751c0fb942b20bc1ab296}
+\index{genericcu@{genericcu}!int\+Driver@{int\+Driver}}
+\index{int\+Driver@{int\+Driver}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{int\+Driver(const int N\+U\+M, const double t, const double t\+\_\+end, const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ pr\+\_\+global, double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ y\+\_\+global, const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ d\+\_\+mem, const solver\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+ s\+\_\+mem)}{intDriver(const int NUM, const double t, const double t_end, const double *__restrict__ pr_global, double *__restrict__ y_global, const mechanism_memory *__restrict__ d_mem, const solver_memory *__restrict__ s_mem)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+global\+\_\+\+\_\+ void genericcu\+::int\+Driver (
+\begin{DoxyParamCaption}
+\item[{const int}]{N\+UM, }
+\item[{const double}]{t, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{pr\+\_\+global, }
+\item[{double $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{y\+\_\+global, }
+\item[{const mechanism\+\_\+memory $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{d\+\_\+mem, }
+\item[{const {\bf solver\+\_\+memory} $\ast$\+\_\+\+\_\+restrict\+\_\+\+\_\+}]{s\+\_\+mem}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_aff46876594be0dced04cee0173535519}{}\label{namespacegenericcu_aff46876594be0dced04cee0173535519}
+
+
+Generic driver for the G\+PU integrators. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em N\+UM} & The (non-\/padded) number of I\+V\+Ps to integrate \\
+\hline
+\mbox{\tt in}  & {\em t} & The current system time \\
+\hline
+\mbox{\tt in}  & {\em t\+\_\+end} & The I\+VP integration end time \\
+\hline
+\mbox{\tt in}  & {\em pr\+\_\+global} & The system constant variable (pressures / densities) \\
+\hline
+\mbox{\tt in,out}  & {\em y\+\_\+global} & The system state vectors at time t. Returns system state vectors at time t\+\_\+end \\
+\hline
+\mbox{\tt in}  & {\em d\+\_\+mem} & The mechanism\+\_\+memory struct that contains the pre-\/allocated memory for the R\+HS \textbackslash{} Jacobian evaluation \\
+\hline
+\mbox{\tt in}  & {\em s\+\_\+mem} & The \hyperlink{structsolver__memory}{solver\+\_\+memory} struct that contains the pre-\/allocated memory for the solver \\
+\hline
+\end{DoxyParams}
+\index{genericcu@{genericcu}!integrate@{integrate}}
+\index{integrate@{integrate}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{integrate(const double, const double, const double, double $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, mechanism\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+, solver\+\_\+memory const $\ast$const \+\_\+\+\_\+restrict\+\_\+\+\_\+)}{integrate(const double, const double, const double, double *const __restrict__, mechanism_memory const *const __restrict__, solver_memory const *const __restrict__)}}]{\setlength{\rightskip}{0pt plus 5cm}\+\_\+\+\_\+device\+\_\+\+\_\+ void genericcu\+::integrate (
+\begin{DoxyParamCaption}
+\item[{const double}]{, }
+\item[{const double}]{, }
+\item[{const double}]{, }
+\item[{double $\ast$const}]{\+\_\+\+\_\+restrict\+\_\+\+\_\+, }
+\item[{mechanism\+\_\+memory const $\ast$const}]{\+\_\+\+\_\+restrict\+\_\+\+\_\+, }
+\item[{{\bf solver\+\_\+memory} const $\ast$const}]{\+\_\+\+\_\+restrict\+\_\+\+\_\+}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_ac62c1a51172ab7750c2f75688ca8e486}{}\label{namespacegenericcu_ac62c1a51172ab7750c2f75688ca8e486}
+\index{genericcu@{genericcu}!required\+\_\+solver\+\_\+size@{required\+\_\+solver\+\_\+size}}
+\index{required\+\_\+solver\+\_\+size@{required\+\_\+solver\+\_\+size}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{required\+\_\+solver\+\_\+size()}{required_solver_size()}}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t genericcu\+::required\+\_\+solver\+\_\+size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_a95e70ae54ccfc5eb00792846ca80ecde}{}\label{namespacegenericcu_a95e70ae54ccfc5eb00792846ca80ecde}
+
+
+Returns the total size (in bytes) required for memory storage for a single G\+PU thread Used in calculation of the maximum number of possible G\+PU threads to launch, this method returns the size of the \hyperlink{structsolver__memory}{solver\+\_\+memory} structure (per-\/\+G\+PU thread) 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{structsolver__memory}{solver\+\_\+memory} 
+\end{DoxySeeAlso}
+\index{genericcu@{genericcu}!solver\+\_\+log@{solver\+\_\+log}}
+\index{solver\+\_\+log@{solver\+\_\+log}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void genericcu\+::solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_a5decadd4be249498055f5de06892563c}{}\label{namespacegenericcu_a5decadd4be249498055f5de06892563c}
+
+
+Executes solver specific logging tasks. 
+
+Logs errors, step-\/sizes, and krylov subspace size (if \hyperlink{solver__options_8h_ac786f5f1963363a48eed565f7cbc6931}{L\+O\+G\+\_\+\+O\+U\+T\+P\+UT} is defined) \begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8cuh}{solver\+\_\+options.\+cuh} 
+\end{DoxySeeAlso}
+\index{genericcu@{genericcu}!solver\+\_\+name@{solver\+\_\+name}}
+\index{solver\+\_\+name@{solver\+\_\+name}!genericcu@{genericcu}}
+\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ genericcu\+::solver\+\_\+name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacegenericcu_a21cc3f48896c010b61e283a6f4c82409}{}\label{namespacegenericcu_a21cc3f48896c010b61e283a6f4c82409}
+
+
+Returns a descriptive solver name. 
+

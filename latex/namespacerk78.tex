@@ -1,0 +1,193 @@
+\hypertarget{namespacerk78}{}\section{rk78 Namespace Reference}
+\label{namespacerk78}\index{rk78@{rk78}}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classrk78_1_1rhs__eval}{rhs\+\_\+eval}
+\begin{DoxyCompactList}\small\item\em A wrapper class to evaluate the rhs function y\textquotesingle{} = f(y) stores the state variable, and provides to dydt. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::vector$<$ double $>$ \hyperlink{namespacerk78_adee5ce562c6782cdcf0bd77d751c739a}{state\+\_\+type}
+\begin{DoxyCompactList}\small\item\em state vector \end{DoxyCompactList}\item 
+typedef runge\+\_\+kutta\+\_\+fehlberg78$<$ \hyperlink{namespacerk78_adee5ce562c6782cdcf0bd77d751c739a}{state\+\_\+type}, double $>$ \hyperlink{namespacerk78_ac6e4b40bcf9a8f507a0bb1260f92777e}{stepper}
+\begin{DoxyCompactList}\small\item\em solver type \end{DoxyCompactList}\item 
+typedef controlled\+\_\+runge\+\_\+kutta$<$ \hyperlink{namespacerk78_ac6e4b40bcf9a8f507a0bb1260f92777e}{stepper} $>$ \hyperlink{namespacerk78_aba972d6260988e04e23d64437536c04c}{controller}
+\begin{DoxyCompactList}\small\item\em controller type \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacerk78_a8edc859ecb5c707a08c7f10ead955880}{initialize\+\_\+solver} (int)
+\begin{DoxyCompactList}\small\item\em Initializes the solver. \end{DoxyCompactList}\item 
+void \hyperlink{namespacerk78_abb59d768a9870c26038d4e944409b1ac}{cleanup\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Cleans up the created solvers. \end{DoxyCompactList}\item 
+const char $\ast$ \hyperlink{namespacerk78_a71c1f52dbcd48f7915d8bff3f80963ec}{solver\+\_\+name} ()
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
+void \hyperlink{namespacerk78_a44eaccf6eb7ece7bd7c7ea9cc49eaf2a}{init\+\_\+solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Initializes solver specific items for logging. \end{DoxyCompactList}\item 
+void \hyperlink{namespacerk78_ab0bfc30dd5d95d03d4b43730e057991b}{solver\+\_\+log} ()
+\begin{DoxyCompactList}\small\item\em Executes solver specific logging tasks. \end{DoxyCompactList}\item 
+void \hyperlink{namespacerk78_adc535dcbcf694d2efe1484d3a4d0d814}{int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)
+\begin{DoxyCompactList}\small\item\em Integration driver for the C\+PU integrators. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \hyperlink{namespacerk78_adee5ce562c6782cdcf0bd77d751c739a}{state\+\_\+type} $\ast$ $>$ \hyperlink{namespacerk78_a96d3a36cb53b773f2aa1a538ba9bdad1}{state\+\_\+vectors}
+\begin{DoxyCompactList}\small\item\em State vector containers for boost. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{classrk78_1_1rhs__eval}{rhs\+\_\+eval} $\ast$ $>$ \hyperlink{namespacerk78_a83c99482273a838fc2d7305a362cae21}{evaluators}
+\begin{DoxyCompactList}\small\item\em R\+HS wrappers for boost. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{namespacerk78_ac6e4b40bcf9a8f507a0bb1260f92777e}{stepper} $\ast$ $>$ \hyperlink{namespacerk78_a15830d3d7a5bea311980fcb1ccec9c91}{steppers}
+\begin{DoxyCompactList}\small\item\em Addaptive timesteppers. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{namespacerk78_aba972d6260988e04e23d64437536c04c}{controller} $\ast$ $>$ \hyperlink{namespacerk78_a7f7ff39cbfddcdc41eb68fd64749997f}{controllers}
+\begin{DoxyCompactList}\small\item\em O\+DE controllers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\index{rk78@{rk78}!controller@{controller}}
+\index{controller@{controller}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{controller}{controller}}]{\setlength{\rightskip}{0pt plus 5cm}typedef controlled\+\_\+runge\+\_\+kutta$<$ {\bf stepper} $>$ {\bf rk78\+::controller}}\hypertarget{namespacerk78_aba972d6260988e04e23d64437536c04c}{}\label{namespacerk78_aba972d6260988e04e23d64437536c04c}
+
+
+controller type 
+
+\index{rk78@{rk78}!state\+\_\+type@{state\+\_\+type}}
+\index{state\+\_\+type@{state\+\_\+type}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{state\+\_\+type}{state_type}}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::vector$<$ double $>$ {\bf rk78\+::state\+\_\+type}}\hypertarget{namespacerk78_adee5ce562c6782cdcf0bd77d751c739a}{}\label{namespacerk78_adee5ce562c6782cdcf0bd77d751c739a}
+
+
+state vector 
+
+\index{rk78@{rk78}!stepper@{stepper}}
+\index{stepper@{stepper}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{stepper}{stepper}}]{\setlength{\rightskip}{0pt plus 5cm}typedef runge\+\_\+kutta\+\_\+fehlberg78$<$ {\bf state\+\_\+type} , double $>$ {\bf rk78\+::stepper}}\hypertarget{namespacerk78_ac6e4b40bcf9a8f507a0bb1260f92777e}{}\label{namespacerk78_ac6e4b40bcf9a8f507a0bb1260f92777e}
+
+
+solver type 
+
+
+
+\subsection{Function Documentation}
+\index{rk78@{rk78}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
+\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(int num\+\_\+threads)}{cleanup_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void rk78\+::cleanup\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacerk78_abb59d768a9870c26038d4e944409b1ac}{}\label{namespacerk78_abb59d768a9870c26038d4e944409b1ac}
+
+
+Cleans up the created solvers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads used\\
+\hline
+\end{DoxyParams}
+Frees and cleans up allocated R\+K78 memory. \index{rk78@{rk78}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void rk78\+::init\+\_\+solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacerk78_a44eaccf6eb7ece7bd7c7ea9cc49eaf2a}{}\label{namespacerk78_a44eaccf6eb7ece7bd7c7ea9cc49eaf2a}
+
+
+Initializes solver specific items for logging. 
+
+Initializes stepsize logging for stiffness measurement \index{rk78@{rk78}!initialize\+\_\+solver@{initialize\+\_\+solver}}
+\index{initialize\+\_\+solver@{initialize\+\_\+solver}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{initialize\+\_\+solver(int)}{initialize_solver(int)}}]{\setlength{\rightskip}{0pt plus 5cm}void rk78\+::initialize\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacerk78_a8edc859ecb5c707a08c7f10ead955880}{}\label{namespacerk78_a8edc859ecb5c707a08c7f10ead955880}
+
+
+Initializes the solver. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads to use \\
+\hline
+\end{DoxyParams}
+\index{rk78@{rk78}!int\+Driver@{int\+Driver}}
+\index{int\+Driver@{int\+Driver}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{int\+Driver(const int N\+U\+M, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)}{intDriver(const int NUM, const double t, const double t_end, const double *pr_global, double *y_global)}}]{\setlength{\rightskip}{0pt plus 5cm}void rk78\+::int\+Driver (
+\begin{DoxyParamCaption}
+\item[{const int}]{N\+UM, }
+\item[{const double}]{t, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double $\ast$}]{pr\+\_\+global, }
+\item[{double $\ast$}]{y\+\_\+global}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacerk78_adc535dcbcf694d2efe1484d3a4d0d814}{}\label{namespacerk78_adc535dcbcf694d2efe1484d3a4d0d814}
+
+
+Integration driver for the C\+PU integrators. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em N\+UM} & the number of I\+V\+Ps to solve \\
+\hline
+\mbox{\tt in}  & {\em t} & the current I\+VP time \\
+\hline
+\mbox{\tt in}  & {\em t\+\_\+end} & the time to integrate the I\+VP to \\
+\hline
+\mbox{\tt in}  & {\em pr\+\_\+global} & the pressure value for the I\+V\+Ps \\
+\hline
+\mbox{\tt in,out}  & {\em y\+\_\+global} & the state vectors\\
+\hline
+\end{DoxyParams}
+The integration driver for the R\+K78 solver \index{rk78@{rk78}!solver\+\_\+log@{solver\+\_\+log}}
+\index{solver\+\_\+log@{solver\+\_\+log}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void rk78\+::solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacerk78_ab0bfc30dd5d95d03d4b43730e057991b}{}\label{namespacerk78_ab0bfc30dd5d95d03d4b43730e057991b}
+
+
+Executes solver specific logging tasks. 
+
+\index{rk78@{rk78}!solver\+\_\+name@{solver\+\_\+name}}
+\index{solver\+\_\+name@{solver\+\_\+name}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ rk78\+::solver\+\_\+name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacerk78_a71c1f52dbcd48f7915d8bff3f80963ec}{}\label{namespacerk78_a71c1f52dbcd48f7915d8bff3f80963ec}
+
+
+Returns a descriptive solver name. 
+
+
+
+\subsection{Variable Documentation}
+\index{rk78@{rk78}!controllers@{controllers}}
+\index{controllers@{controllers}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{controllers}{controllers}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ {\bf controller} $\ast$ $>$ rk78\+::controllers}\hypertarget{namespacerk78_a7f7ff39cbfddcdc41eb68fd64749997f}{}\label{namespacerk78_a7f7ff39cbfddcdc41eb68fd64749997f}
+
+
+O\+DE controllers. 
+
+\index{rk78@{rk78}!evaluators@{evaluators}}
+\index{evaluators@{evaluators}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{evaluators}{evaluators}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ {\bf rhs\+\_\+eval} $\ast$ $>$ rk78\+::evaluators}\hypertarget{namespacerk78_a83c99482273a838fc2d7305a362cae21}{}\label{namespacerk78_a83c99482273a838fc2d7305a362cae21}
+
+
+R\+HS wrappers for boost. 
+
+\index{rk78@{rk78}!state\+\_\+vectors@{state\+\_\+vectors}}
+\index{state\+\_\+vectors@{state\+\_\+vectors}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{state\+\_\+vectors}{state_vectors}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ {\bf state\+\_\+type} $\ast$ $>$ rk78\+::state\+\_\+vectors}\hypertarget{namespacerk78_a96d3a36cb53b773f2aa1a538ba9bdad1}{}\label{namespacerk78_a96d3a36cb53b773f2aa1a538ba9bdad1}
+
+
+State vector containers for boost. 
+
+\index{rk78@{rk78}!steppers@{steppers}}
+\index{steppers@{steppers}!rk78@{rk78}}
+\subsubsection[{\texorpdfstring{steppers}{steppers}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<${\bf stepper}$\ast$$>$ rk78\+::steppers}\hypertarget{namespacerk78_a15830d3d7a5bea311980fcb1ccec9c91}{}\label{namespacerk78_a15830d3d7a5bea311980fcb1ccec9c91}
+
+
+Addaptive timesteppers. 
+

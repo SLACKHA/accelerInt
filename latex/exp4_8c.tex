@@ -1,0 +1,52 @@
+\hypertarget{exp4_8c}{}\section{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exp4/exp4.c File Reference}
+\label{exp4_8c}\index{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exp4/exp4.\+c@{/home/nick/\+Dropbox/acceler\+Int/exponential\+\_\+integrators/exp4/exp4.\+c}}
+
+
+A krylov subspace integrator using the fourth-\/order (3rd order embedded) Rosenbrock-\/like solver of Hochbruck et al. (1998)  
+
+
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$stdbool.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}header.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}dydt.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}jacob.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}arnoldi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}exp4\+\_\+props.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}exponential\+\_\+linear\+\_\+algebra.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}solver\+\_\+init.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sparse\+\_\+multiplier.\+h\char`\"{}}\\*
+Include dependency graph for exp4.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{exp4_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceexp4}{exp4}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespaceexp4_a8d03ab917f8736a37474362beeff9391}{exp4\+::integrate} (const double t\+\_\+start, const double t\+\_\+end, const double pr, double $\ast$y)
+\begin{DoxyCompactList}\small\item\em 4th-\/order exponential integrator function w/ adaptive Kyrlov subspace approximation \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A krylov subspace integrator using the fourth-\/order (3rd order embedded) Rosenbrock-\/like solver of Hochbruck et al. (1998) 
+
+\begin{DoxyAuthor}{Author}
+Nicholas J. Curtis 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+09/02/2014
+\end{DoxyDate}
+See full reference\+: M. Hochbruck, C. Lubich, H. Selhofer, Exponential integrators for large systems of differential equations, S\+I\+AM J. Sci. Comput. 19 (5) (1998) 1552–1574. doi\+:10.\+1137/\+S1064827595295337
+
+N\+O\+TE\+: all matricies stored in column major format! 

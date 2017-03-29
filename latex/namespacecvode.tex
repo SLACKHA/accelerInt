@@ -1,0 +1,132 @@
+\hypertarget{namespacecvode}{}\section{cvode Namespace Reference}
+\label{namespacecvode}\index{cvode@{cvode}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacecvode_abe146525cea80d8032cd30b4441b5872}{initialize\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Initializes the solver. \end{DoxyCompactList}\item 
+void \hyperlink{namespacecvode_ac9bc4957bff6721dae9d7e4cc470d184}{cleanup\+\_\+solver} (int num\+\_\+threads)
+\begin{DoxyCompactList}\small\item\em Cleans up the created solvers. \end{DoxyCompactList}\item 
+const char $\ast$ \hyperlink{namespacecvode_a3a26024b8dc2ce6f8b2afcfb7c82c79f}{solver\+\_\+name} ()
+\begin{DoxyCompactList}\small\item\em Returns a descriptive solver name. \end{DoxyCompactList}\item 
+void \hyperlink{namespacecvode_a9113d5fb0e19fa927d73b64c397ecd09}{init\+\_\+solver\+\_\+log} ()
+\item 
+void \hyperlink{namespacecvode_af7eb796b6829fecab506fb6dfec39be0}{solver\+\_\+log} ()
+\item 
+void \hyperlink{namespacecvode_ae8209853c343190233f2500020b1cd5f}{int\+Driver} (const int N\+UM, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)
+\begin{DoxyCompactList}\small\item\em Integration driver for the C\+PU integrators. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+N\+\_\+\+Vector $\ast$ \hyperlink{namespacecvode_a84c47b6a9f2bedf2c5c80429079fc8e3}{y\+\_\+locals}
+\item 
+double $\ast$ \hyperlink{namespacecvode_adae183039534044ead74e1c1a786a36c}{y\+\_\+local\+\_\+vectors}
+\item 
+void $\ast$$\ast$ \hyperlink{namespacecvode_a9290e27651628dff03f82f42eafd3079}{integrators}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{cvode@{cvode}!cleanup\+\_\+solver@{cleanup\+\_\+solver}}
+\index{cleanup\+\_\+solver@{cleanup\+\_\+solver}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{cleanup\+\_\+solver(int num\+\_\+threads)}{cleanup_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::cleanup\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacecvode_ac9bc4957bff6721dae9d7e4cc470d184}{}\label{namespacecvode_ac9bc4957bff6721dae9d7e4cc470d184}
+
+
+Cleans up the created solvers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads used\\
+\hline
+\end{DoxyParams}
+Frees and cleans up allocated C\+V\+O\+DE memory. \index{cvode@{cvode}!init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}}
+\index{init\+\_\+solver\+\_\+log@{init\+\_\+solver\+\_\+log}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{init\+\_\+solver\+\_\+log()}{init_solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::init\+\_\+solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacecvode_a9113d5fb0e19fa927d73b64c397ecd09}{}\label{namespacecvode_a9113d5fb0e19fa927d73b64c397ecd09}
+\index{cvode@{cvode}!initialize\+\_\+solver@{initialize\+\_\+solver}}
+\index{initialize\+\_\+solver@{initialize\+\_\+solver}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{initialize\+\_\+solver(int num\+\_\+threads)}{initialize_solver(int num_threads)}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::initialize\+\_\+solver (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+\_\+threads}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacecvode_abe146525cea80d8032cd30b4441b5872}{}\label{namespacecvode_abe146525cea80d8032cd30b4441b5872}
+
+
+Initializes the solver. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+threads} & The number of Open\+MP threads to use\\
+\hline
+\end{DoxyParams}
+Various definitions in the generated options, e.\+g. \hyperlink{solver__options_8h_a9e28db46fb24c2d46dbfe205c6a11236}{F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE}, \hyperlink{solver__options_8h_ac42e0287ba619ab25b7d767a81f48082}{C\+V\+\_\+\+M\+A\+X\+\_\+\+E\+R\+R\+T\+E\+S\+T\+\_\+\+F\+A\+I\+LS}, etc. affect the options set for the C\+V\+O\+D\+Es solver. \begin{DoxySeeAlso}{See also}
+\hyperlink{solver__options_8h}{solver\+\_\+options.\+h}
+\end{DoxySeeAlso}
+The R\+HS function \hyperlink{cvodes__dydt_8c_a82cd83daa4f10afee055813435c6f5b1}{dydt\+\_\+cvodes()} will be used in the solver.
+
+If \hyperlink{solver__options_8h_a9e28db46fb24c2d46dbfe205c6a11236}{F\+I\+N\+I\+T\+E\+\_\+\+D\+I\+F\+F\+E\+R\+E\+N\+CE} is not defined, the jacobian function in eval\+\_\+jacob\+\_\+cvodes will be used in the C\+V\+O\+DE solver. Else, the C\+V\+O\+DE finite difference based on the R\+HS function will be used. \index{cvode@{cvode}!int\+Driver@{int\+Driver}}
+\index{int\+Driver@{int\+Driver}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{int\+Driver(const int N\+U\+M, const double t, const double t\+\_\+end, const double $\ast$pr\+\_\+global, double $\ast$y\+\_\+global)}{intDriver(const int NUM, const double t, const double t_end, const double *pr_global, double *y_global)}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::int\+Driver (
+\begin{DoxyParamCaption}
+\item[{const int}]{N\+UM, }
+\item[{const double}]{t, }
+\item[{const double}]{t\+\_\+end, }
+\item[{const double $\ast$}]{pr\+\_\+global, }
+\item[{double $\ast$}]{y\+\_\+global}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacecvode_ae8209853c343190233f2500020b1cd5f}{}\label{namespacecvode_ae8209853c343190233f2500020b1cd5f}
+
+
+Integration driver for the C\+PU integrators. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em N\+UM} & the number of I\+V\+Ps to solve \\
+\hline
+\mbox{\tt in}  & {\em t} & the current I\+VP time \\
+\hline
+\mbox{\tt in}  & {\em t\+\_\+end} & the time to integrate the I\+VP to \\
+\hline
+\mbox{\tt in}  & {\em pr\+\_\+global} & the pressure value for the I\+V\+Ps \\
+\hline
+\mbox{\tt in,out}  & {\em y\+\_\+global} & the state vectors\\
+\hline
+\end{DoxyParams}
+The integration driver for the C\+V\+O\+D\+Es solver \index{cvode@{cvode}!solver\+\_\+log@{solver\+\_\+log}}
+\index{solver\+\_\+log@{solver\+\_\+log}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{solver\+\_\+log()}{solver_log()}}]{\setlength{\rightskip}{0pt plus 5cm}void cvode\+::solver\+\_\+log (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacecvode_af7eb796b6829fecab506fb6dfec39be0}{}\label{namespacecvode_af7eb796b6829fecab506fb6dfec39be0}
+\index{cvode@{cvode}!solver\+\_\+name@{solver\+\_\+name}}
+\index{solver\+\_\+name@{solver\+\_\+name}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{solver\+\_\+name()}{solver_name()}}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ cvode\+::solver\+\_\+name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacecvode_a3a26024b8dc2ce6f8b2afcfb7c82c79f}{}\label{namespacecvode_a3a26024b8dc2ce6f8b2afcfb7c82c79f}
+
+
+Returns a descriptive solver name. 
+
+
+
+\subsection{Variable Documentation}
+\index{cvode@{cvode}!integrators@{integrators}}
+\index{integrators@{integrators}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{integrators}{integrators}}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$$\ast$ cvode\+::integrators}\hypertarget{namespacecvode_a9290e27651628dff03f82f42eafd3079}{}\label{namespacecvode_a9290e27651628dff03f82f42eafd3079}
+The stored C\+V\+O\+DE integrator objects \index{cvode@{cvode}!y\+\_\+local\+\_\+vectors@{y\+\_\+local\+\_\+vectors}}
+\index{y\+\_\+local\+\_\+vectors@{y\+\_\+local\+\_\+vectors}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{y\+\_\+local\+\_\+vectors}{y_local_vectors}}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ cvode\+::y\+\_\+local\+\_\+vectors}\hypertarget{namespacecvode_adae183039534044ead74e1c1a786a36c}{}\label{namespacecvode_adae183039534044ead74e1c1a786a36c}
+The base state vectors used in N\+\_\+\+Vector creation \index{cvode@{cvode}!y\+\_\+locals@{y\+\_\+locals}}
+\index{y\+\_\+locals@{y\+\_\+locals}!cvode@{cvode}}
+\subsubsection[{\texorpdfstring{y\+\_\+locals}{y_locals}}]{\setlength{\rightskip}{0pt plus 5cm}N\+\_\+\+Vector$\ast$ cvode\+::y\+\_\+locals}\hypertarget{namespacecvode_a84c47b6a9f2bedf2c5c80429079fc8e3}{}\label{namespacecvode_a84c47b6a9f2bedf2c5c80429079fc8e3}
+The state vectors used in C\+V\+O\+DE operation 
