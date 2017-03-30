@@ -7,5 +7,6 @@ var searchData=
   ['arnoldi_2eh',['arnoldi.h',['../arnoldi_8h.html',1,'']]],
   ['arnoldi_5fcuh',['ARNOLDI_CUH',['../arnoldi_8cuh.html#abeda2f8ea38aa8f4d7bd240e22181d1c',1,'arnoldi.cuh']]],
   ['arrsize',['ARRSIZE',['../namespaceradau2a.html#ad00dd88322d09c410e8e5b9af87af14c',1,'radau2a']]],
-  ['atol',['ATOL',['../solver__options_8cuh.html#a29a15cd00b37b1f4a5b4ec9f07c742f4',1,'ATOL():&#160;solver_options.cuh'],['../solver__options_8h.html#a29a15cd00b37b1f4a5b4ec9f07c742f4',1,'ATOL():&#160;solver_options.h']]]
+  ['atol',['ATOL',['../solver__options_8cuh.html#a29a15cd00b37b1f4a5b4ec9f07c742f4',1,'ATOL():&#160;solver_options.cuh'],['../solver__options_8h.html#a29a15cd00b37b1f4a5b4ec9f07c742f4',1,'ATOL():&#160;solver_options.h']]],
+  ['accelerint',['accelerInt',['../index.html',1,'']]]
 ];

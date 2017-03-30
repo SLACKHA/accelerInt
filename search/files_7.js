@@ -1,21 +1,7 @@
 var searchData=
 [
-  ['radau2a_2ec',['radau2a.c',['../radau2a_8c.html',1,'']]],
-  ['radau2a_2ecu',['radau2a.cu',['../radau2a_8cu.html',1,'']]],
-  ['radau2a_5finit_2ec',['radau2a_init.c',['../radau2a__init_8c.html',1,'']]],
-  ['radau2a_5finit_2ecu',['radau2a_init.cu',['../radau2a__init_8cu.html',1,'']]],
-  ['radau2a_5fprops_2ec',['radau2a_props.c',['../radau2a__props_8c.html',1,'']]],
-  ['radau2a_5fprops_2ecu',['radau2a_props.cu',['../radau2a__props_8cu.html',1,'']]],
-  ['radau2a_5fprops_2ecuh',['radau2a_props.cuh',['../radau2a__props_8cuh.html',1,'']]],
-  ['radau2a_5fprops_2eh',['radau2a_props.h',['../radau2a__props_8h.html',1,'']]],
-  ['rational_5fapproximant_2ec',['rational_approximant.c',['../rational__approximant_8c.html',1,'']]],
-  ['rational_5fapproximant_2ecu',['rational_approximant.cu',['../rational__approximant_8cu.html',1,'']]],
-  ['rational_5fapproximant_2ecuh',['rational_approximant.cuh',['../rational__approximant_8cuh.html',1,'']]],
-  ['rational_5fapproximant_2eh',['rational_approximant.h',['../rational__approximant_8h.html',1,'']]],
-  ['read_5finitial_5fconditions_2ec',['read_initial_conditions.c',['../read__initial__conditions_8c.html',1,'']]],
-  ['read_5finitial_5fconditions_2ecu',['read_initial_conditions.cu',['../read__initial__conditions_8cu.html',1,'']]],
-  ['read_5finitial_5fconditions_2ecuh',['read_initial_conditions.cuh',['../read__initial__conditions_8cuh.html',1,'']]],
-  ['read_5finitial_5fconditions_2eh',['read_initial_conditions.h',['../read__initial__conditions_8h.html',1,'']]],
-  ['rk78_5finit_2ecpp',['rk78_init.cpp',['../rk78__init_8cpp.html',1,'']]],
-  ['rk78_5ftypedefs_2ehpp',['rk78_typedefs.hpp',['../rk78__typedefs_8hpp.html',1,'']]]
+  ['phiahessenberg_2ec',['phiAHessenberg.c',['../phiAHessenberg_8c.html',1,'']]],
+  ['phiahessenberg_2ecu',['phiAHessenberg.cu',['../phiAHessenberg_8cu.html',1,'']]],
+  ['phiahessenberg_2ecuh',['phiAHessenberg.cuh',['../phiAHessenberg_8cuh.html',1,'']]],
+  ['phiahessenberg_2eh',['phiAHessenberg.h',['../phiAHessenberg_8h.html',1,'']]]
 ];

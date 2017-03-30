@@ -3,12 +3,13 @@ var indexSectionsWithContent =
   0: "_acdefghiklmnopqrstvwyz",
   1: "rs",
   2: "cegr",
-  3: "acefilprst",
+  3: "acefilmprst",
   4: "acdefgilmnoprstwz",
   5: "acdeghiknprstvwyz",
   6: "cs",
   7: "_acdefgilmnopqrst",
-  8: "rv"
+  8: "rv",
+  9: "a"
 };
 
 var indexSectionNames =
@@ -21,7 +22,8 @@ var indexSectionNames =
   5: "variables",
   6: "typedefs",
   7: "defines",
-  8: "groups"
+  8: "groups",
+  9: "pages"
 };
 
 var indexSectionLabels =
@@ -34,6 +36,7 @@ var indexSectionLabels =
   5: "Variables",
   6: "Typedefs",
   7: "Macros",
-  8: "Modules"
+  8: "Modules",
+  9: "Pages"
 };
 
