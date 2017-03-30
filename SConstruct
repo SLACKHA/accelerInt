@@ -1,6 +1,8 @@
 #! /usr/env/bin python2.7
 
-#A SConstruct file for accerlerInt, heavily adapted from Cantera
+# A SConstruct file for accerlerInt, heavily adapted from Cantera
+
+from __future__ import print_function
 
 import os
 import re
@@ -15,10 +17,10 @@ valid_commands = ('build', 'test', 'cpu', 'gpu', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
-        print 'ERROR: unrecognized command line target: %r' % command
+        print('ERROR: unrecognized command line target: %r' % command)
         sys.exit(0)
 
-print 'INFO: SCons is using the following Python interpreter:', sys.executable
+print('INFO: SCons is using the following Python interpreter:', sys.executable)
 
 home = os.getcwd()
 
@@ -32,10 +34,13 @@ try:
     env = Environment(tools=['default', 'cuda'])
 except:
     env = Environment(tools=['default'])
-    print 'CUDA not found, no GPU integrators will be built'
+    print('CUDA not found, no GPU integrators will be built')
     build_cuda = False
 
-class defaults: pass
+
+class defaults:
+    pass
+
 
 compiler_options = [
     ('toolchain',
@@ -53,8 +58,9 @@ elif env['toolchain'] == 'clang':
     env['CC'] = 'clang'
     env['CXX'] = 'clang++'
 else:
-    print 'Invalid toolchain specified {}, accepted values are {}'.format(env['toolchain'],
-        ', '.join('intel', 'gnu', 'clang'))    
+    print('Invalid toolchain specified {}, accepted values are {}'.format(
+        env['toolchain'],
+        ', '.join(['intel', 'gnu', 'clang'])))
 
 defaults.CFlags = '-std=c99'
 defaults.CCFlags = '-m64'
@@ -89,7 +95,7 @@ elif env['toolchain'] == 'clang':
 
 env['OS'] = platform.system()
 if env['OS'] == 'Windows':
-    print 'Windows is unsupported'
+    print('Windows is unsupported')
     sys.exit(-1)
 if env['OS'] == 'Darwin':
     defaults.threadFlags = ''
@@ -101,7 +107,7 @@ defaults.env_vars = 'LD_LIBRARY_PATH'
 defaults.mechanism_dir = os.path.join(home, 'mechanism')
 
 # Transform lists into strings to keep accelerInt.conf clean
-for key,value in defaults.__dict__.items():
+for key, value in defaults.__dict__.items():
     if isinstance(value, (list, tuple)):
         defaults.__dict__[key] = ' '.join(value)
 
@@ -113,7 +119,7 @@ except:
 
 config_options = [
     ('blas_lapack_libs',
-        """Comma separated list of blas/lapack libraries to use for the various solvers, 
+        """Comma separated list of blas/lapack libraries to use for the various solvers,
         set blas_lapack_libs to the the list of libraries that should be passed to the linker,
          separated by commas,
         e.g. "lapack,blas" or "lapack,f77blas,cblas,atlas".""",
@@ -201,7 +207,7 @@ opts.Save('accelerInt.conf', env)
 
 if 'help' in COMMAND_LINE_TARGETS:
     ### Print help about configuration options and exit.
-    print """
+    print ("""
         *****************************************************
         *   Configuration options for building accelerInt   *
         *****************************************************
@@ -215,7 +221,7 @@ running 'scons build'. The format of this file is:
     option1 = 'value1'
     option2 = 'value2'
         **************************************************
-"""
+""")
 
     for opt in opts.options:
         print '\n'.join(formatOption(env, opt))
@@ -225,10 +231,10 @@ valid_arguments = (set(opt[0] for opt in compiler_options) |
                    set(opt[0] for opt in config_options))
 for arg in ARGUMENTS:
     if arg not in valid_arguments:
-        print 'Encountered unexpected command line argument: %r' % arg
+        print('Encountered unexpected command line argument: %r' % arg)
         sys.exit(0)
 
-#now finalize flags
+# now finalize flags
 
 CFlags = listify(env['CFLAGS'])
 CCFlags = listify(env['CCFLAGS'])
@@ -246,11 +252,11 @@ else:
     CCFlags.extend(listify(defaults.optimizeCCFlags))
     NVCCFlags.extend(listify(defaults.optimizeNVCCFlags))
 
-#open mp and reg counts
+# open mp and reg counts
 CCFlags.append(env['openmp_flags'])
 LinkFlags.append(env['openmp_flags'])
 
-#directories
+# directories
 mech_dir = os.path.join(home, env['mechanism_dir'])
 generic_dir = os.path.join(home, 'generic')
 radau2a_dir = os.path.join(home, 'radau2a')
@@ -270,7 +276,9 @@ if build_cuda:
     except:
         print('Register count not found, skipping cuda integrators')
         build_cuda = False
-NVCCFlags.append(['-maxrregcount {}'.format(reg_count), '-Xcompiler {}'.format(env['openmp_flags'])])
+NVCCFlags.append(['-maxrregcount {}'.format(reg_count), '-Xcompiler {}'.format(
+    env['openmp_flags'])])
+
 
 def check_extras(lang, subdir, check_str, check_file, list_file):
     if check_file is None:
@@ -294,30 +302,33 @@ def check_extras(lang, subdir, check_str, check_file, list_file):
                     file.readline().strip().split()]
         env['extra_{}_{}'.format(lang, subdir)] = vals
 
-        #copy a good SConscript into the mechanism dir
+        # copy a good SConscript into the mechanism dir
         try:
-            shutil.copyfile(os.path.join(defaults.mechanism_dir, subdir, 'SConscript'),
-                                os.path.join(mech_dir, subdir, 'SConscript'))
+            shutil.copyfile(os.path.join(
+                                defaults.mechanism_dir, subdir, 'SConscript'),
+                            os.path.join(mech_dir, subdir, 'SConscript'))
         except shutil.Error:
             pass
         except IOError, e:
             if e.errno == 2:
                 pass
 
-#check for additional files
+# check for additional files
+
+
 if not env['FINITE_DIFFERENCE']:
     check_extras('c', 'jacobs', 'jacobs/jac_include.h', 'jacob.h', 'jac_list_c')
     check_extras('cuda', 'jacobs', 'jacobs/jac_include.cuh', 'jacob.cuh', 'jac_list_cuda')
 check_extras('c', 'rates', 'rates/rates_include.h', 'rxn_rates.c', 'rate_list_c')
 check_extras('cuda', 'rates', 'rates/rates_include.cuh', 'rxn_rates.cu', 'rate_list_cuda')
 
-#link lines
+# link lines
 LibDirs = listify(env['blas_lapack_dir'])
 Libs += listify(env['blas_lapack_libs'])
 if build_cuda:
     NVCCLinkFlags.append([env['openmp_flags'], '-Xlinker -rpath {}/lib64'.format(env['CUDA_TOOLKIT_PATH'])])
 
-#options
+# options
 if not env['FAST_MATH']:
     if env['toolchain'] == 'intel':
         CCFlags += ['-fp-model precise']
@@ -329,10 +340,11 @@ else:
         CCFlags += ['-ffast-math']
     NVCCFlags += ['--use_fast_math']
 
+
 def write_options(lang, dir):
-    #write the solver_options file
-    #scons will automagically decide what needs recompilation based on this
-    #hooray!
+    # write the solver_options file
+    # scons will automagically decide what needs recompilation based on this
+    # hooray!
     with open(os.path.join(dir, 'solver_options{}'.format(utils.header_ext[lang])), 'w') as file:
         file.write("""
         /*
@@ -360,10 +372,10 @@ def write_options(lang, dir):
         #define N_RA ({})
 
         """.format(env['ATOL'], env['RTOL'], env['t_step'], env['t_end'], env['N_RA'])
-        )
+                   )
 
         file.write(
-        """
+                   """
         /* CVodes Parameters */
         //#define CV_MAX_ORD (5) //maximum order for method, default for BDF is 5
         #define CV_MAX_STEPS ({}) // maximum steps the solver will take in one timestep
@@ -372,23 +384,22 @@ def write_options(lang, dir):
         #define CV_MAX_HNIL (1) //maximum number of t + h = t warnings
         #define CV_MAX_ERRTEST_FAILS (5) //maximum number of error test fails before an error is thrown
         """.format(env['CV_MAX_STEPS'],
-            '//#define CV_HMAX (0)' if env['CV_HMAX'] == '0' else
-            '#define CV_HMAX ({})'.format(env['CV_HMAX'])))
+                   '//#define CV_HMAX (0)' if env['CV_HMAX'] == '0' else
+                   '#define CV_HMAX ({})'.format(env['CV_HMAX']))
+                  )
 
         if env['SAME_IC']:
             file.write("""
         // load same initial conditions for all threads
         #define SAME_IC
-            """
-            )
+            """)
 
         if env['DEBUG']:
             file.write("""
         // load same initial conditions for all threads
         #define DEBUG
         #include <fenv.h>
-            """
-            )
+            """)
 
         if env['SHUFFLE']:
             file.write("""
@@ -447,6 +458,7 @@ def write_options(lang, dir):
         #endif
             """)
 
+
 write_options('c', generic_dir)
 if build_cuda:
     write_options('cuda', generic_dir)
@@ -475,52 +487,56 @@ variant = 'release' if not env['DEBUG'] else 'debug'
 env['variant'] = variant
 
 env['CPPPATH'] = common_dir_list
-if not 'NVCC_INC_PATH' in env:
+if 'NVCC_INC_PATH' not in env:
     env['NVCC_INC_PATH'] = []
 if build_cuda:
     env['NVCC_INC_PATH'] += common_dir_list
 
 target_list = {}
 
-#copy a good SConscript into the mechanism dir
+# copy a good SConscript into the mechanism dir
 try:
-    shutil.copyfile(os.path.join(defaults.mechanism_dir, 'SConscript'), os.path.join(mech_dir, 'SConscript'))
+    shutil.copyfile(os.path.join(defaults.mechanism_dir, 'SConscript'),
+                    os.path.join(mech_dir, 'SConscript'))
 except shutil.Error:
     pass
 except IOError, e:
     if e.errno == 2:
         pass
 
-def builder(env_save, cmech, cumech, newdict, mydir, variant,
-             target_base, target_list, additional_sconstructs=None,
-             filter_out=None):
 
-    #update the env
+def builder(env_save, cmech, cumech, newdict, mydir, variant,
+            target_base, target_list, additional_sconstructs=None,
+            filter_out=None):
+
+    # update the env
     env = env_save.Clone()
     for key, value in newdict.iteritems():
         if not isinstance(value, list):
             value = list(value)
-        if not key in env:
+        if key not in env:
             env[key] = value
         else:
             env[key] += value
 
     Export('env')
 
-    mygendir = os.path.join(generic_dir, os.path.basename(os.path.normpath(mydir)))
+    mygendir = os.path.join(generic_dir,
+                            os.path.basename(os.path.normpath(mydir)))
     cgen, cugen = SConscript(os.path.join(generic_dir, 'SConscript'),
-        variant_dir=os.path.join(mygendir, variant),
-        src_dir=generic_dir)
+                             variant_dir=os.path.join(mygendir, variant),
+                             src_dir=generic_dir)
 
     cint, cuint = SConscript(os.path.join(mydir, 'SConscript'),
-        variant_dir=os.path.join(mydir, variant),
-        src_dir=mydir)
-    #check for additional sconstructs
+                             variant_dir=os.path.join(mydir, variant),
+                             src_dir=mydir)
+    # check for additional sconstructs
     if additional_sconstructs is not None:
         for thedir in additional_sconstructs:
             ctemp, cutemp = SConscript(os.path.join(thedir, 'SConscript'),
-                variant_dir=os.path.join(thedir, variant),
-                src_dir=thedir)
+                                       variant_dir=os.path.join(thedir,
+                                                                variant),
+                                       src_dir=thedir)
             cint += ctemp
             cuint += cutemp
     if filter_out is not None:
@@ -542,46 +558,47 @@ def builder(env_save, cmech, cumech, newdict, mydir, variant,
     if env['build_cuda'] and cumech:
         target_list[target_base + '-gpu'] = []
         dlink = env.CUDADLink(
-            target=target_base+'-gpu', 
+            target=target_base+'-gpu',
             source=cumech + cugen + cuint,
             variant_dir=os.path.join(mydir, variant))
         target_list[target_base + '-gpu'].append(dlink)
         target_list[target_base + '-gpu'].append(
             env.CUDAProgram(target=target_base+'-gpu',
-             source=cumech + cugen + cuint + dlink,
-             variant_dir=os.path.join(mydir, variant)))
+                            source=cumech + cugen + cuint + dlink,
+                            variant_dir=os.path.join(mydir, variant)))
         cuint += dlink
     return cgen + cint, cugen + cuint
+
 
 env['build_cuda'] = build_cuda
 env_save = env.Clone()
 Export('env')
 
-mech_c, mech_cuda = SConscript(os.path.join(mech_dir, 'SConscript'), variant_dir=os.path.join(mech_dir, variant))
+mech_c, mech_cuda = SConscript(os.path.join(mech_dir, 'SConscript'),
+                               variant_dir=os.path.join(mech_dir, variant))
 if 'extra_c_jacobs' in env or 'extra_cuda_jacobs' in env:
-    cJacs, cudaJacs = SConscript(os.path.join(mech_dir, 'jacobs', 'SConscript'), 
-        variant_dir=os.path.join(mech_dir, 'jacobs', variant))
-    
+    cJacs, cudaJacs = SConscript(os.path.join(mech_dir, 'jacobs', 'SConscript'),
+                                 variant_dir=os.path.join(mech_dir, 'jacobs', variant))
     mech_c += cJacs
     mech_cuda += cudaJacs
 if 'extra_c_rates' in env or 'extra_cuda_rates' in env:
     cRates, cudaRates = SConscript(os.path.join(mech_dir, 'rates', 'SConscript'),
-        variant_dir=os.path.join(mech_dir, 'rates', variant))
+                                   variant_dir=os.path.join(mech_dir, 'rates', variant))
     mech_c += cRates
     mech_cuda += cudaRates
 
-#radua
+# radua
 new_defines = {}
 new_defines['CPPDEFINES'] = ['RADAU2A']
 new_defines['CPPPATH'] = [radau2a_dir]
 new_defines['NVCCDEFINES'] = ['RADAU2A']
 new_defines['NVCC_INC_PATH'] = [radau2a_dir]
-radau_c, radau_cuda = builder(env_save, mech_c, 
-    mech_cuda if build_cuda else None,
-    new_defines, radau2a_dir,
-    variant, 'radau2a-int', target_list)
+radau_c, radau_cuda = builder(env_save, mech_c,
+                              mech_cuda if build_cuda else None,
+                              new_defines, radau2a_dir,
+                              variant, 'radau2a-int', target_list)
 
-#exp4
+# exp4
 new_defines = {}
 new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
 new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
@@ -590,11 +607,11 @@ new_defines['NVCC_INC_PATH'] = [exp_int_dir, exp4_int_dir]
 new_defines['CPPDEFINES'] = ['EXP4']
 new_defines['NVCCDEFINES'] = ['EXP4']
 exp4_c, exp4_cuda = builder(env_save, mech_c, mech_cuda,
-    new_defines, exp4_int_dir,
-    variant, 'exp4-int', target_list,
-    [exp_int_dir])
+                            new_defines, exp4_int_dir,
+                            variant, 'exp4-int', target_list,
+                            [exp_int_dir])
 
-#exprb43
+# exprb43
 new_defines = {}
 new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exprb43_int_dir]
 new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
@@ -603,35 +620,37 @@ new_defines['NVCC_INC_PATH'] = [exp_int_dir, exprb43_int_dir]
 new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
 rb43c, rb43cu = builder(env_save, mech_c, mech_cuda,
-    new_defines, exprb43_int_dir,
-    variant, 'exprb43-int', target_list,
-    [exp_int_dir])
+                        new_defines, exprb43_int_dir,
+                        variant, 'exprb43-int', target_list,
+                        [exp_int_dir])
 
-#cvodes
+# cvodes
 new_defines = {}
 new_defines['CPPDEFINES'] = ['CVODES']
 new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
 cvodesc, dummy = builder(env_save, mech_c, None, new_defines,
-    cvodes_dir, variant, 'cvodes-int', 
-    target_list, None, filter_out=['solver_generic', 'nverse'])
+                         cvodes_dir, variant, 'cvodes-int',
+                         target_list, None,
+                         filter_out=['solver_generic', 'nverse'])
 
-#rk78
+# rk78
 new_defines = {}
 env_cpp = env_save.Clone()
 env_cpp['CCFLAGS'] = []
 new_defines['CPPDEFINES'] = ['RK78']
 new_defines['CPPPATH'] = [rk78_dir, env['boost_inc_dir']]
 builder(env_save, mech_c, None, new_defines,
-    rk78_dir, variant, 'rk78-int', target_list, filter_out=['solver_generic', 'nverse'])
+        rk78_dir, variant, 'rk78-int', target_list,
+        filter_out=['solver_generic', 'nverse'])
 
 flat_values = []
 cpu_vals = []
 gpu_vals = []
 for key, value in target_list.iteritems():
     flat_values.extend(value)
-    if not 'gpu' in key:
+    if 'gpu' not in key:
         cpu_vals.extend(value)
     else:
         gpu_vals.extend(value)

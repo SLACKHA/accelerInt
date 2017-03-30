@@ -1,4 +1,7 @@
-/*
+/**
+ * \file
+ * \brief Timer interface for Linux
+ *
  *  Copyright 2012 NVIDIA Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");

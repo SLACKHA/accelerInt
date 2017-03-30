@@ -1,10 +1,10 @@
-/** File containing functions for best rational approximation to matrix exponential.
- * \file cf.c
- *
+/**
+ * \file
+ * \brief File containing functions for best rational approximation to matrix exponential.
  * \author Kyle E. Niemeyer
  * \date 07/19/2012
  *
- * Contains main and linear algebra functions.
+ * Contains main and linear algebra functions for Carathéodory-Fejér method of Rational Approximants
  */
 
 #include <stdlib.h>

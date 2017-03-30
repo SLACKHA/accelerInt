@@ -1,5 +1,5 @@
 /*!
- * \file arnoldi.h
+ * \file
  * \brief Implementation of the GPU arnoldi iteration methods
  *
  * \author Nicholas Curtis

@@ -6,15 +6,15 @@ CUDA Tool for SCons
 """
 
 import os
-import sys
 import SCons.Action
 import SCons.Builder
 import SCons.Util
 import SCons.Scanner
 
+
 def CUDAObjCmdDefine(env):
     # create OBJ command
-    #'$NVCC $NVCCPATH $NVCCFLAGS $NVCCDEFINES -dc -o $TARGET $SOURCES'
+    # '$NVCC $NVCCPATH $NVCCFLAGS $NVCCDEFINES -dc -o $TARGET $SOURCES'
     command = '$NVCC'
     if 'NVCCPATH' in env:
         if not isinstance(env['NVCCPATH'], list):
@@ -35,10 +35,11 @@ def CUDAObjCmdDefine(env):
     command += ' -dc -o $TARGET $SOURCES'
     env['NVCC_OBJ_CMD'] = command
 
+
 def CUDADLinkCmdDefine(env, dname):
     # create OBJ command
-    #NVCC_DLINK_CMD = '$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -dlink -o dlink.o'
-    #NVCC_PROG_CMD = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
+    # NVCC_DLINK_CMD = '$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -dlink -o dlink.o'
+    # NVCC_PROG_CMD = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
     command = '$NVCC $SOURCES'
     if 'NVCCLIBPATH' in env:
         if not isinstance(env['NVCCLIBPATH'], list):
@@ -50,6 +51,7 @@ def CUDADLinkCmdDefine(env, dname):
         command += ' ' + ' '.join(['-l{}'.format(f) for f in env['NVCCLIBS']])
     command += ' -dlink -o ' + dname
     env['NVCC_DLINK_CMD'] = command
+
 
 def CUDAProgCmdDefine(env):
     command = '$NLINK '
@@ -77,18 +79,20 @@ def CUDAProgCmdDefine(env):
     command += ' -o $TARGET'
     env['NVCC_PROG_CMD'] = command
 
+
 _cuda_dlink_builder = SCons.Builder.Builder(
-    action = SCons.Action.Action('$NVCC_DLINK_CMD', ''),
-    suffix = '',
-    src_suffix = '$NVCC_OBJ_SUFFIX')
+    action=SCons.Action.Action('$NVCC_DLINK_CMD', ''),
+    suffix='',
+    src_suffix='$NVCC_OBJ_SUFFIX')
 _cuda_prog_builder = SCons.Builder.Builder(
-    action = SCons.Action.Action('$NVCC_PROG_CMD', ''),
-    suffix = '',
-    src_suffix = '$NVCC_OBJ_SUFFIX')
+    action=SCons.Action.Action('$NVCC_PROG_CMD', ''),
+    suffix='',
+    src_suffix='$NVCC_OBJ_SUFFIX')
 _cuda_obj_builder = SCons.Builder.Builder(
-      action = SCons.Action.Action('$NVCC_OBJ_CMD', ''),
-      suffix = '$NVCC_OBJ_SUFFIX',
-      src_suffix = '$NVCC_SUFFIX')
+      action=SCons.Action.Action('$NVCC_OBJ_CMD', ''),
+      suffix='$NVCC_OBJ_SUFFIX',
+      src_suffix='$NVCC_SUFFIX')
+
 
 def CUDAObject(env, src, target=None, *args, **kw):
     use_env = env
@@ -98,7 +102,7 @@ def CUDAObject(env, src, target=None, *args, **kw):
         cenv['NVCCFLAGS'] += ['-Xcompiler -std=c99']
         CUDAObjCmdDefine(cenv)
         use_env = cenv
-    
+
     CUDAObjCmdDefine(use_env)
     result = []
     if not target:
@@ -110,6 +114,7 @@ def CUDAObject(env, src, target=None, *args, **kw):
     env.Clean(obj, name)
 
     return result
+
 
 def CUDADLink(env, target, source, *args, **kw):
     name = '{}_dlink.o'.format(target)
@@ -123,6 +128,7 @@ def CUDADLink(env, target, source, *args, **kw):
     result.append(obj)
     env.Clean(target, name)
     return result
+
 
 def CUDAProgram(env, target, source, *args, **kw):
     CUDAProgCmdDefine(env)
@@ -155,39 +161,39 @@ def generate(env):
         env['NVCC_PROG_CMD'] = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
 
         # helpers
-        home=os.environ.get('HOME', '')
-        programfiles=os.environ.get('PROGRAMFILES', '')
-        homedrive=os.environ.get('HOMEDRIVE', '')
+        home = os.environ.get('HOME', '')
+        programfiles = os.environ.get('PROGRAMFILES', '')
+        homedrive = os.environ.get('HOMEDRIVE', '')
 
         # find CUDA Toolkit path and set CUDA_TOOLKIT_PATH
         try:
                 cudaToolkitPath = env['CUDA_TOOLKIT_PATH']
         except:
-                paths=[home + '/NVIDIA_CUDA_TOOLKIT',
-                       home + '/Apps/NVIDIA_CUDA_TOOLKIT',
-                           home + '/Apps/NVIDIA_CUDA_TOOLKIT',
-                           home + '/Apps/CudaToolkit',
-                           home + '/Apps/CudaTK',
-                           '/usr/local/NVIDIA_CUDA_TOOLKIT',
-                           '/usr/local/CUDA_TOOLKIT',
-                           '/usr/local/cuda_toolkit',
-                           '/usr/local/CUDA',
-                           '/usr/local/cuda',
-                           '/Developer/NVIDIA CUDA TOOLKIT',
-                           '/Developer/CUDA TOOLKIT',
-                           '/Developer/CUDA',
-                           programfiles + 'NVIDIA Corporation/NVIDIA CUDA TOOLKIT',
-                           programfiles + 'NVIDIA Corporation/NVIDIA CUDA',
-                           programfiles + 'NVIDIA Corporation/CUDA TOOLKIT',
-                           programfiles + 'NVIDIA Corporation/CUDA',
-                           programfiles + 'NVIDIA/NVIDIA CUDA TOOLKIT',
-                           programfiles + 'NVIDIA/NVIDIA CUDA',
-                           programfiles + 'NVIDIA/CUDA TOOLKIT',
-                           programfiles + 'NVIDIA/CUDA',
-                           programfiles + 'CUDA TOOLKIT',
-                           programfiles + 'CUDA',
-                           homedrive + '/CUDA TOOLKIT',
-                           homedrive + '/CUDA']
+                paths = [home + '/NVIDIA_CUDA_TOOLKIT',
+                         home + '/Apps/NVIDIA_CUDA_TOOLKIT',
+                         home + '/Apps/NVIDIA_CUDA_TOOLKIT',
+                         home + '/Apps/CudaToolkit',
+                         home + '/Apps/CudaTK',
+                         '/usr/local/NVIDIA_CUDA_TOOLKIT',
+                         '/usr/local/CUDA_TOOLKIT',
+                         '/usr/local/cuda_toolkit',
+                         '/usr/local/CUDA',
+                         '/usr/local/cuda',
+                         '/Developer/NVIDIA CUDA TOOLKIT',
+                         '/Developer/CUDA TOOLKIT',
+                         '/Developer/CUDA',
+                         programfiles + 'NVIDIA Corporation/NVIDIA CUDA TOOLKIT',
+                         programfiles + 'NVIDIA Corporation/NVIDIA CUDA',
+                         programfiles + 'NVIDIA Corporation/CUDA TOOLKIT',
+                         programfiles + 'NVIDIA Corporation/CUDA',
+                         programfiles + 'NVIDIA/NVIDIA CUDA TOOLKIT',
+                         programfiles + 'NVIDIA/NVIDIA CUDA',
+                         programfiles + 'NVIDIA/CUDA TOOLKIT',
+                         programfiles + 'NVIDIA/CUDA',
+                         programfiles + 'CUDA TOOLKIT',
+                         programfiles + 'CUDA',
+                         homedrive + '/CUDA TOOLKIT',
+                         homedrive + '/CUDA']
                 pathFound = False
                 for path in paths:
                         if os.path.isdir(path):
@@ -203,24 +209,24 @@ def generate(env):
         try:
                 cudaSDKPath = env['CUDA_SDK_PATH']
         except:
-                paths=[home + '/NVIDIA_CUDA_SDK', # i am just guessing here
-                       home + '/Apps/NVIDIA_CUDA_SDK',
-                           home + '/Apps/CudaSDK',
-                           '/usr/local/NVIDIA_CUDA_SDK',
-                           '/usr/local/CUDASDK',
-                           '/usr/local/cuda_sdk',
-                           '/usr/local/cuda/samples',
-                           '/Developer/NVIDIA CUDA SDK',
-                           '/Developer/CUDA SDK',
-                           '/Developer/CUDA',
-                           '/Developer/GPU Computing/C',
-                           programfiles + 'NVIDIA Corporation/NVIDIA CUDA SDK',
-                           programfiles + 'NVIDIA/NVIDIA CUDA SDK',
-                           programfiles + 'NVIDIA CUDA SDK',
-                           programfiles + 'CudaSDK',
-                           homedrive + '/NVIDIA CUDA SDK',
-                           homedrive + '/CUDA SDK',
-                           homedrive + '/CUDA/SDK']
+                paths = [home + '/NVIDIA_CUDA_SDK',  # i am just guessing here
+                         home + '/Apps/NVIDIA_CUDA_SDK',
+                         home + '/Apps/CudaSDK',
+                         '/usr/local/NVIDIA_CUDA_SDK',
+                         '/usr/local/CUDASDK',
+                         '/usr/local/cuda_sdk',
+                         '/usr/local/cuda/samples',
+                         '/Developer/NVIDIA CUDA SDK',
+                         '/Developer/CUDA SDK',
+                         '/Developer/CUDA',
+                         '/Developer/GPU Computing/C',
+                         programfiles + 'NVIDIA Corporation/NVIDIA CUDA SDK',
+                         programfiles + 'NVIDIA/NVIDIA CUDA SDK',
+                         programfiles + 'NVIDIA CUDA SDK',
+                         programfiles + 'CudaSDK',
+                         homedrive + '/NVIDIA CUDA SDK',
+                         homedrive + '/CUDA SDK',
+                         homedrive + '/CUDA/SDK']
                 pathFound = False
                 for path in paths:
                         if os.path.isdir(path):
@@ -249,8 +255,9 @@ def generate(env):
 
         # add required libraries
         env.Append(NVCCPATH=[cudaSDKPath + '/common/inc', cudaToolkitPath + '/include'])
-        env.Append(NVCCLIBPATH=[cudaSDKPath + '/common/lib/linux/x86_64/' + cudaSDKSubLibDir, cudaToolkitPath + '/lib64'])
-        if not 'NVCCLIBS' in env:
+        env.Append(NVCCLIBPATH=[cudaSDKPath + '/common/lib/linux/x86_64/' +
+                                cudaSDKSubLibDir, cudaToolkitPath + '/lib64'])
+        if 'NVCCLIBS' not in env:
             env.Append(NVCCLIBS=['cudart'])
 
         cuda_scan = SCons.Scanner.ClassicCPP('CScanner',
@@ -259,5 +266,6 @@ def generate(env):
                                              '^[ \t]*#[ \t]*(?:include|import)[ \t]*(<|")([^>"]+)(>|")')
         env.Append(SCANNERS=cuda_scan)
 
+
 def exists(env):
-        return env.Detect('nvcc')
+    return env.Detect('nvcc')

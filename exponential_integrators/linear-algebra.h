@@ -1,3 +1,9 @@
+/**
+ * \file
+ * \brief Header definitions of linear algebra routines needed for the Carathéodory-Fejér method
+ */
+
+
 #ifndef LINEAR_ALGEBRA_HEAD
 #define LINEAR_ALGEBRA_HEAD
 
