@@ -1068,7 +1068,7 @@ GENERATE_HTML          = YES
 # The default directory is: html.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_OUTPUT            = html
+HTML_OUTPUT            = ./
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for each
 # generated HTML page (for example: .htm, .php, .asp).
@@ -1449,7 +1449,7 @@ EXT_LINKS_IN_WINDOW    = NO
 # Minimum value: 8, maximum value: 50, default value: 10.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-FORMULA_FONTSIZE       = 10
+FORMULA_FONTSIZE       = 14
 
 # Use the FORMULA_TRANPARENT tag to determine whether or not the images
 # generated for formulas are transparent PNGs. Transparent PNGs are not
@@ -1604,7 +1604,7 @@ EXTRA_SEARCH_MAPPINGS  =
 # If the GENERATE_LATEX tag is set to YES, doxygen will generate LaTeX output.
 # The default value is: YES.
 
-GENERATE_LATEX         = YES
+GENERATE_LATEX         = NO
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
