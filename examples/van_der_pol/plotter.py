@@ -14,8 +14,8 @@ colorwheel = ['r', 'g', 'b', 'k']
 # load data
 for i, file in enumerate(files):
     arr = np.fromfile(file)
-    # reshape to a 2000 x 3 matrix (time, y1, y2)
-    arr = np.reshape(arr, (2000, 3))
+    # reshape to a 2001 x 3 matrix (time, y1, y2)
+    arr = np.reshape(arr, (2001, 3))
 
     # get the solver name
     label = file.split('-')[0]

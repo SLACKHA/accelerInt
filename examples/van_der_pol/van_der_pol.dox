@@ -96,7 +96,7 @@ This is used by the exponential solvers (and may provide speedups if a sparse Ja
 
 We compile the problem with the SCons call:
 
-        scons SAME_IC=True LOG_OUTPUT=True LOG_ONLY_END=False t_end=2000 t_step=1
+        scons SAME_IC=True LOG_OUTPUT=True LOG_END_ONLY=False t_end=2000 t_step=1
 
 This turns on the initial conditions discussed in \ref defn.
 
@@ -118,7 +118,7 @@ While the GPU solvers are called via:
 
 For example, we call:
 
-        ./exprb43 1 1
+        ./exprb43-int 1 1
         ./cvodes-int 1 1
         ./radau2a-int 1 1
 
