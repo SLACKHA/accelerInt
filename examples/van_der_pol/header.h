@@ -7,6 +7,17 @@
 #ifndef HEADER_H
 #define HEADER_H
 
+#include <stdlib.h>
+
+//include OpenMP if available
+#ifdef _OPENMP
+ #include <omp.h>
+#else
+ #define omp_get_max_threads() 1
+ #define omp_get_num_threads() 1
+#endif
+#endif
+
 #ifdef GENERATE_DOCS
 //put this in the van der Pol namespace for documentation
 namespace van_der_pol {
@@ -35,7 +46,7 @@ void set_same_initial_conditions(int NUM, double** y_host, double** var_host)
         //set mu
         (*var_host)[i] = 500;
         //set y1, y2
-        (*y_host)[i] = 2
+        (*y_host)[i] = 2;
         (*y_host)[i + NUM] = 0;
     }
 }
