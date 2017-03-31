@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['phiahessenberg_2ec',['phiAHessenberg.c',['../phiAHessenberg_8c.html',1,'']]],
-  ['phiahessenberg_2ecu',['phiAHessenberg.cu',['../phiAHessenberg_8cu.html',1,'']]],
-  ['phiahessenberg_2ecuh',['phiAHessenberg.cuh',['../phiAHessenberg_8cuh.html',1,'']]],
-  ['phiahessenberg_2eh',['phiAHessenberg.h',['../phiAHessenberg_8h.html',1,'']]]
+  ['ics_2ec',['ics.c',['../ics_8c.html',1,'']]],
+  ['inverse_2ecu',['inverse.cu',['../inverse_8cu.html',1,'']]],
+  ['inverse_2ecuh',['inverse.cuh',['../inverse_8cuh.html',1,'']]]
 ];

@@ -1,6 +1,22 @@
 var searchData=
 [
-  ['fd_5fjacob_2ec',['fd_jacob.c',['../fd__jacob_8c.html',1,'']]],
-  ['fd_5fjacob_2ecu',['fd_jacob.cu',['../fd__jacob_8cu.html',1,'']]],
-  ['fd_5fjacob_2ecuh',['fd_jacob.cuh',['../fd__jacob_8cuh.html',1,'']]]
+  ['exp4_2ec',['exp4.c',['../exp4_8c.html',1,'']]],
+  ['exp4_2ecu',['exp4.cu',['../exp4_8cu.html',1,'']]],
+  ['exp4_5finit_2ec',['exp4_init.c',['../exp4__init_8c.html',1,'']]],
+  ['exp4_5finit_2ecu',['exp4_init.cu',['../exp4__init_8cu.html',1,'']]],
+  ['exp4_5fprops_2ec',['exp4_props.c',['../exp4__props_8c.html',1,'']]],
+  ['exp4_5fprops_2ecu',['exp4_props.cu',['../exp4__props_8cu.html',1,'']]],
+  ['exp4_5fprops_2ecuh',['exp4_props.cuh',['../exp4__props_8cuh.html',1,'']]],
+  ['exp4_5fprops_2eh',['exp4_props.h',['../exp4__props_8h.html',1,'']]],
+  ['exponential_5flinear_5falgebra_2ecu',['exponential_linear_algebra.cu',['../exponential__linear__algebra_8cu.html',1,'']]],
+  ['exponential_5flinear_5falgebra_2ecuh',['exponential_linear_algebra.cuh',['../exponential__linear__algebra_8cuh.html',1,'']]],
+  ['exponential_5flinear_5falgebra_2eh',['exponential_linear_algebra.h',['../exponential__linear__algebra_8h.html',1,'']]],
+  ['exprb43_2ec',['exprb43.c',['../exprb43_8c.html',1,'']]],
+  ['exprb43_2ecu',['exprb43.cu',['../exprb43_8cu.html',1,'']]],
+  ['exprb43_5finit_2ec',['exprb43_init.c',['../exprb43__init_8c.html',1,'']]],
+  ['exprb43_5finit_2ecu',['exprb43_init.cu',['../exprb43__init_8cu.html',1,'']]],
+  ['exprb43_5fprops_2ec',['exprb43_props.c',['../exprb43__props_8c.html',1,'']]],
+  ['exprb43_5fprops_2ecu',['exprb43_props.cu',['../exprb43__props_8cu.html',1,'']]],
+  ['exprb43_5fprops_2ecuh',['exprb43_props.cuh',['../exprb43__props_8cuh.html',1,'']]],
+  ['exprb43_5fprops_2eh',['exprb43_props.h',['../exprb43__props_8h.html',1,'']]]
 ];

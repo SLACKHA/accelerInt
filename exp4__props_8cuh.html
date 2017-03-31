@@ -15,6 +15,7 @@
   $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -39,6 +40,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -116,7 +118,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <area shape="rect" id="node2" href="exp4__props_8cu.html" title="Error checking for the EXP4 algorithm. " alt="" coords="5,124,160,195"/>
 </map>
 </div>
-</div><table class="memberdecls">
+</div>
+<p><a href="exp4__props_8cuh_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structexp4cu_1_1solver__memory.html">exp4cu::solver_memory</a></td></tr>
@@ -138,7 +142,7 @@ Macros</h2></td></tr>
 <tr class="memitem:ac5232262b17b940a7b54e6e56439aa24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="exp4__props_8cuh.html#ac5232262b17b940a7b54e6e56439aa24">ORD</a>&#160;&#160;&#160;3.0</td></tr>
 <tr class="memdesc:ac5232262b17b940a7b54e6e56439aa24"><td class="mdescLeft">&#160;</td><td class="mdescRight">order of embedded methods  <a href="#ac5232262b17b940a7b54e6e56439aa24">More...</a><br /></td></tr>
 <tr class="separator:ac5232262b17b940a7b54e6e56439aa24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61819141b0164a35f4d791b0e696721f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="exp4__props_8cuh.html#a61819141b0164a35f4d791b0e696721f">M_MAX</a>&#160;&#160;&#160;NSP</td></tr>
+<tr class="memitem:a61819141b0164a35f4d791b0e696721f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="exp4__props_8cuh.html#a61819141b0164a35f4d791b0e696721f">M_MAX</a>&#160;&#160;&#160;<a class="el" href="header_8h.html#aa86864581d2574ded23a182874b81f4c">NSP</a></td></tr>
 <tr class="memdesc:a61819141b0164a35f4d791b0e696721f"><td class="mdescLeft">&#160;</td><td class="mdescRight">maximum Krylov dimension (without phi order)  <a href="#a61819141b0164a35f4d791b0e696721f">More...</a><br /></td></tr>
 <tr class="separator:a61819141b0164a35f4d791b0e696721f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a351d54267048643c4365f6a24641d0cf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="exp4__props_8cuh.html#a351d54267048643c4365f6a24641d0cf">STRIDE</a>&#160;&#160;&#160;(<a class="el" href="exprb43__props_8h.html#a61819141b0164a35f4d791b0e696721f">M_MAX</a> + <a class="el" href="exprb43__props_8h.html#a2748566f4c443ee77aa831e63dbb5ebe">P</a>)</td></tr>
@@ -167,6 +171,8 @@ Macros</h2></td></tr>
 <div class="textblock"><p>Various macros controlling behaviour of EXP4 algorithm. </p>
 <dl class="section author"><dt>Author</dt><dd>Nicholas Curtis </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>03/10/2015 </dd></dl>
+
+<p>Definition in file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="a012706e43fb2a3e4102cae6222cccf91"></a>
 <div class="memitem">
@@ -178,6 +184,8 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Definition at line <a class="el" href="exp4__props_8cuh_source.html#l00009">9</a> of file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a61819141b0164a35f4d791b0e696721f"></a>
@@ -185,12 +193,14 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define M_MAX&#160;&#160;&#160;NSP</td>
+          <td class="memname">#define M_MAX&#160;&#160;&#160;<a class="el" href="header_8h.html#aa86864581d2574ded23a182874b81f4c">NSP</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>maximum Krylov dimension (without phi order) </p>
+
+<p>Definition at line <a class="el" href="exp4__props_8cuh_source.html#l00026">26</a> of file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
 
 </div>
 </div>
@@ -206,6 +216,8 @@ Macros</h2></td></tr>
 
 <p>Number of consecutive errors on internal integration steps allowed before exit. </p>
 
+<p>Definition at line <a class="el" href="exp4__props_8cuh_source.html#l00032">32</a> of file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="aa0414caef00a64a51d4c6c0711d9e70a"></a>
@@ -219,6 +231,8 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Maximum allowed internal timesteps per integration step. </p>
+
+<p>Definition at line <a class="el" href="exp4__props_8cuh_source.html#l00030">30</a> of file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
 
 </div>
 </div>
@@ -234,6 +248,8 @@ Macros</h2></td></tr>
 
 <p>order of embedded methods </p>
 
+<p>Definition at line <a class="el" href="exp4__props_8cuh_source.html#l00024">24</a> of file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a2748566f4c443ee77aa831e63dbb5ebe"></a>
@@ -248,6 +264,8 @@ Macros</h2></td></tr>
 
 <p>max order of the phi functions (for error estimation) </p>
 
+<p>Definition at line <a class="el" href="exp4__props_8cuh_source.html#l00022">22</a> of file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a351d54267048643c4365f6a24641d0cf"></a>
@@ -261,6 +279,8 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Krylov matrix stride. </p>
+
+<p>Definition at line <a class="el" href="exp4__props_8cuh_source.html#l00028">28</a> of file <a class="el" href="exp4__props_8cuh_source.html">exp4_props.cuh</a>.</p>
 
 </div>
 </div>

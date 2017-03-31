@@ -3,6 +3,7 @@ Adding custom extension mapping: .cuh will be treated as language c++
 Searching for include files...
 Searching for example files...
 Searching for images...
+Searching for files in directory /home/nick/Dropbox/accelerInt/examples/van_der_pol
 Searching for dot files...
 Searching for msc files...
 Searching for dia files...
@@ -17,6 +18,7 @@ Searching for files in directory /home/nick/Dropbox/accelerInt/rk78
 Searching for files in directory /home/nick/Dropbox/accelerInt/exponential_integrators/exp4
 Searching for files in directory /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43
 Searching for files in directory /home/nick/Dropbox/accelerInt/examples
+Searching for files in directory /home/nick/Dropbox/accelerInt/examples/van_der_pol
 Reading and parsing tag files
 Parsing files
 Preprocessing /home/nick/Dropbox/accelerInt/cvodes/cvodes_dydt.c...
@@ -107,12 +109,12 @@ Preprocessing /home/nick/Dropbox/accelerInt/generic/solver_init.h...
 Parsing file /home/nick/Dropbox/accelerInt/generic/solver_init.h...
 Preprocessing /home/nick/Dropbox/accelerInt/generic/solver_main.c...
 Parsing file /home/nick/Dropbox/accelerInt/generic/solver_main.c...
-Preprocessing /home/nick/Dropbox/accelerInt/generic/solver_main.cu...
+Preprocessing /home/nick/Dropbox/accelerInt/generic/solver_main./home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
+/home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
+cu...
 Parsing file /home/nick/Dropbox/accelerInt/generic/solver_main.cu...
 Preprocessing /home/nick/Dropbox/accelerInt/generic/solver_options.cuh...
-Parsing file /home//home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
-/home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
-nick/Dropbox/accelerInt/generic/solver_options.cuh...
+Parsing file /home/nick/Dropbox/accelerInt/generic/solver_options.cuh...
 Preprocessing /home/nick/Dropbox/accelerInt/generic/solver_options.h...
 Parsing file /home/nick/Dropbox/accelerInt/generic/solver_options.h...
 Preprocessing /home/nick/Dropbox/accelerInt/generic/solver_props.cuh...
@@ -177,6 +179,30 @@ Preprocessing /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/expr
 Parsing file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.h...
 Preprocessing /home/nick/Dropbox/accelerInt/examples/main.dox...
 Parsing file /home/nick/Dropbox/accelerInt/examples/main.dox...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/scons_options.dox...
+Parsing file /home/nick/Dropbox/accelerInt/examples/scons_options.dox...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.c...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.c...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.h...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.h...
+Reading /home/nick/Dropbox/accelerInt/examples/van_der_pol/generate_ics.py...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/generate_ics.py...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/header.h...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/header.h...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/ics.c...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/ics.c...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.c...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.c...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.h...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.h...
+Reading /home/nick/Dropbox/accelerInt/examples/van_der_pol/plotter.py...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/plotter.py...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.c...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.c...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.h...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.h...
+Preprocessing /home/nick/Dropbox/accelerInt/examples/van_der_pol/van_der_pol.dox...
+Parsing file /home/nick/Dropbox/accelerInt/examples/van_der_pol/van_der_pol.dox...
 Building group list...
 Building directory list...
 Building namespace list...
@@ -229,26 +255,93 @@ Generating style sheet...
 Generating search indices...
 Generating example documentation...
 Generating file sources...
+Generating code for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_dydt.c...
 Generating code for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_dydt.h...
+Generating code for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_init.c...
+Generating code for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_jac.c...
 Generating code for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_jac.h...
+Generating code for file /home/nick/Dropbox/accelerInt/cvodes/solver_cvodes.c...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.c...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.h...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/generate_ics.py...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/header.h...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/ics.c...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.c...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.h...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/plotter.py...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.c...
+Generating code for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/arnoldi.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/arnoldi.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/cf.c...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/cf.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_init.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_init.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exponential_linear_algebra.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exponential_linear_algebra.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exponential_linear_algebra.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_init.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_init.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/linear-algebra.c...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/linear-algebra.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/phiAHessenberg.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/phiAHessenberg.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/phiAHessenberg.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/phiAHessenberg.h...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/rational_approximant.c...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/rational_approximant.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/rational_approximant.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/exponential_integrators/rational_approximant.h...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/complexInverse.c...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/complexInverse.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/complexInverse.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/complexInverse.h...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/fd_jacob.c...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/fd_jacob.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/fd_jacob.cuh...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/inverse.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/inverse.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/lapack_dfns.h...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/read_initial_conditions.c...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/read_initial_conditions.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/read_initial_conditions.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/read_initial_conditions.h...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/solver.h...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_generic.c...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_generic.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_init.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_init.h...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_main.c...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_main.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_options.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_options.h...
+Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_props.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/solver_props.h...
 Generating code for file /home/nick/Dropbox/accelerInt/generic/timer.h...
+Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a.c...
+Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_init.c...
+Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_init.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.c...
+Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.cu...
+Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.cuh...
 Generating code for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.h...
+Generating code for file /home/nick/Dropbox/accelerInt/rk78/rk78_init.cpp...
 Generating code for file /home/nick/Dropbox/accelerInt/rk78/rk78_typedefs.hpp...
+Generating code for file /home/nick/Dropbox/accelerInt/rk78/solver_rk78.cpp...
 Generating file documentation...
 Generating docs for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_dydt.c...
 Generating docs for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_dydt.h...
@@ -257,6 +350,18 @@ Generating docs for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_jac.c...
 Generating docs for file /home/nick/Dropbox/accelerInt/cvodes/cvodes_jac.h...
 Generating docs for file /home/nick/Dropbox/accelerInt/cvodes/solver_cvodes.c...
 Generating docs for file /home/nick/Dropbox/accelerInt/examples/main.dox...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/scons_options.dox...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.c...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/dydt.h...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/generate_ics.py...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/header.h...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/ics.c...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.c...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/jacob.h...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/plotter.py...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.c...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/sparse_multiplier.h...
+Generating docs for file /home/nick/Dropbox/accelerInt/examples/van_der_pol/van_der_pol.dox...
 Generating docs for file /home/nick/Dropbox/accelerInt/exponential_integrators/arnoldi.cuh...
 Generating docs for file /home/nick/Dropbox/accelerInt/exponential_integrators/arnoldi.h...
 Generating docs for file /home/nick/Dropbox/accelerInt/exponential_integrators/cf.c...
@@ -324,27 +429,7 @@ Generating docs for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_init.cu..
 Generating docs for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.c...
 Generating docs for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.cu...
 Generating docs for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.cuh...
-Generating docs for file /home/nick/Dropbox/accelerInt/radau2a/radau2a_props.h...
-Generating docs for file /home/nick/Dropbox/accelerInt/rk78/rk78_init.cpp...
-Generating docs for file /home/nick/Dropbox/accelerInt/rk78/rk78_typedefs.hpp...
-Generating docs for file /home/nick/Dropbox/accelerInt/rk78/solver_rk78.cpp...
-Generating page documentation...
-Generating group documentation...
-Generating dependency graph for group RKCU_ErrCodes
-Generating dependency graph for group RK_ErrCodes
-Generating dependency graph for group exp4cu_ErrCodes
-Generating dependency graph for group exp4_ErrCodes
-Generating dependency graph for group exprb43cu_ErrCodes
-Generating dependency graph for group exprb43_ErrCodes
-Generating dependency graph for group CUErrorCodes
-Generating dependency graph for group ErrorCodes
-Generating class documentation...
-Generating docs for compound solver_memory...
-Generating namespace index...
-Generating docs for namespace cvode
-Generating docs for namespace exp4
-Generating docs for namespace exp4cu
-Generating docs for compound exp4cu::solThis is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=latex)
+Generating docs for file /home/nick/Dropbox/accelerInt/radau2a/radauThis is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=latex)
  restricted \write18 enabled.
 entering extended mode
 (./_formulas.tex
@@ -366,29 +451,69 @@ For additional information on amsmath, use the `?' option.
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amsgen.sty))
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amsbsy.sty)
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2016/texmf-dist/tex/latex/siunitx/siunitx.sty
+(/usr/local/texlive/2016/texmf-dist/tex/latex/l3kernel/expl3.sty
+(/usr/local/texlive/2016/texmf-dist/tex/latex/l3kernel/expl3-code.tex)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/l3kernel/l3dvips.def))
+(/usr/local/texlive/2016/texmf-dist/tex/latex/l3packages/xparse/xparse.sty)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/tools/array.sty)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/beamer/translator/translator.sty
+(/usr/local/texlive/2016/texmf-dist/tex/latex/beamer/translator/translator-lang
+uage-mappings.tex)))
 No file _formulas.aux.
-[1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16] [17]
-[18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] (./_formulas.aux) )
-Output written on _formulas.dvi (28 pages, 4156 bytes).
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/beamer/translator/dicts/translato
+r-basic-dictionary/translator-basic-dictionary-English.dict)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/siunitx/siunitx-abbreviations.cfg
+) [1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16]
+[17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31]
+[32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] (./_formulas.aux) )
+Output written on _formulas.dvi (43 pages, 6672 bytes).
 Transcript written on _formulas.log.
-/home/nick/Dropbox/accelerInt/examples/main.dox:83: warning: unable to resolve reference to `non-existant' for \ref command
-ver_memory...
+2a_props.h...
+Generating docs for file /home/nick/Dropbox/accelerInt/rk78/rk78_init.cpp...
+Generating docs for file /home/nick/Dropbox/accelerInt/rk78/rk78_typedefs.hpp...
+Generating docs for file /home/nick/Dropbox/accelerInt/rk78/solver_rk78.cpp...
+Generating page documentation...
+Generating docs for page scons_opts...
+Generating docs for page vdp...
+Generating group documentation...
+Generating dependency graph for group RKCU_ErrCodes
+Generating dependency graph for group RK_ErrCodes
+Generating dependency graph for group exp4cu_ErrCodes
+Generating dependency graph for group exp4_ErrCodes
+Generating dependency graph for group exprb43cu_ErrCodes
+Generating dependency graph for group exprb43_ErrCodes
+Generating dependency graph for group CUErrorCodes
+Generating dependency graph for group ErrorCodes
+Generating class documentation...
+Generating docs for compound solver_memory...
+Generating namespace index...
+Generating docs for namespace cvode
+Generating docs for namespace exp4
+Generating docs for namespace exp4cu
+Generating docs for compound exp4cu::solver_memory...
 Generating docs for namespace exprb43
 Generating docs for namespace exprb43cu
 Generating docs for compound exprb43cu::solver_memory...
+Generating docs for namespace generate_ics
 Generating docs for namespace generic
 Generating docs for namespace genericcu
+Generating docs for namespace plotter
 Generating docs for namespace radau2a
 Generating docs for namespace radau2acu
 Generating docs for compound radau2acu::solver_memory...
 Generating docs for namespace rk78
 Generating docs for compound rk78::rhs_eval...
+Generating docs for namespace van_der_pol
 Generating graph info page...
 Generating directory documentation...
 Generating dependency graph for directory /home/nick/Dropbox/accelerInt/cvodes
 Generating dependency graph for directory /home/nick/Dropbox/accelerInt/exponential_integrators/exp4
 Generating dependency graph for directory /home/nick/Dropbox/accelerInt/exponential_integrators
 Generating dependency graph for directory /home/nick/Dropbox/accelerInt/exponential_integrators/exprb43
+Generating dependency graph for directory /home/nick/Dropbox/accelerInt/generic
 Generating dependency graph for directory /home/nick/Dropbox/accelerInt/radau2a
 Generating dependency graph for directory /home/nick/Dropbox/accelerInt/rk78
 Generating bitmaps for formulas in HTML...
@@ -420,6 +545,21 @@ Generating image form_24.png for formula
 Generating image form_25.png for formula
 Generating image form_26.png for formula
 Generating image form_27.png for formula
+Generating image form_28.png for formula
+Generating image form_29.png for formula
+Generating image form_30.png for formula
+Generating image form_31.png for formula
+Generating image form_32.png for formula
+Generating image form_33.png for formula
+Generating image form_34.png for formula
+Generating image form_35.png for formula
+Generating image form_36.png for formula
+Generating image form_37.png for formula
+Generating image form_38.png for formula
+Generating image form_39.png for formula
+Generating image form_40.png for formula
+Generating image form_41.png for formula
+Generating image form_42.png for formula
 Generating index page...
 Generating page index...
 Generating module index...
@@ -437,211 +577,231 @@ finalizing index lists...
 writing tag file...
 Running dot...
 Generating dot graphs using 3 parallel threads...
-Running dot for graph 1/116
-Running dot for graph 2/116
-Running dot for graph 3/116
-Running dot for graph 4/116
-Running dot for graph 5/116
-Running dot for graph 6/116
-Running dot for graph 7/116
-Running dot for graph 8/116
-Running dot for graph 9/116
-Running dot for graph 10/116
-Running dot for graph 11/116
-Running dot for graph 12/116
-Running dot for graph 13/116
-Running dot for graph 14/116
-Running dot for graph 15/116
-Running dot for graph 16/116
-Running dot for graph 17/116
-Running dot for graph 18/116
-Running dot for graph 19/116
-Running dot for graph 20/116
-Running dot for graph 21/116
-Running dot for graph 22/116
-Running dot for graph 23/116
-Running dot for graph 24/116
-Running dot for graph 25/116
-Running dot for graph 26/116
-Running dot for graph 27/116
-Running dot for graph 28/116
-Running dot for graph 29/116
-Running dot for graph 30/116
-Running dot for graph 31/116
-Running dot for graph 32/116
-Running dot for graph 33/116
-Running dot for graph 34/116
-Running dot for graph 35/116
-Running dot for graph 36/116
-Running dot for graph 37/116
-Running dot for graph 38/116
-Running dot for graph 39/116
-Running dot for graph 40/116
-Running dot for graph 41/116
-Running dot for graph 42/116
-Running dot for graph 43/116
-Running dot for graph 44/116
-Running dot for graph 45/116
-Running dot for graph 46/116
-Running dot for graph 47/116
-Running dot for graph 48/116
-Running dot for graph 49/116
-Running dot for graph 50/116
-Running dot for graph 51/116
-Running dot for graph 52/116
-Running dot for graph 53/116
-Running dot for graph 54/116
-Running dot for graph 55/116
-Running dot for graph 56/116
-Running dot for graph 57/116
-Running dot for graph 58/116
-Running dot for graph 59/116
-Running dot for graph 60/116
-Running dot for graph 61/116
-Running dot for graph 62/116
-Running dot for graph 63/116
-Running dot for graph 64/116
-Running dot for graph 65/116
-Running dot for graph 66/116
-Running dot for graph 67/116
-Running dot for graph 68/116
-Running dot for graph 69/116
-Running dot for graph 70/116
-Running dot for graph 71/116
-Running dot for graph 72/116
-Running dot for graph 73/116
-Running dot for graph 74/116
-Running dot for graph 75/116
-Running dot for graph 76/116
-Running dot for graph 77/116
-Running dot for graph 78/116
-Running dot for graph 79/116
-Running dot for graph 80/116
-Running dot for graph 81/116
-Running dot for graph 82/116
-Running dot for graph 83/116
-Running dot for graph 84/116
-Running dot for graph 85/116
-Running dot for graph 86/116
-Running dot for graph 87/116
-Running dot for graph 88/116
-Running dot for graph 89/116
-Running dot for graph 90/116
-Running dot for graph 91/116
-Running dot for graph 92/116
-Running dot for graph 93/116
-Running dot for graph 94/116
-Running dot for graph 95/116
-Running dot for graph 96/116
-Running dot for graph 97/116
-Running dot for graph 98/116
-Running dot for graph 99/116
-Running dot for graph 100/116
-Running dot for graph 101/116
-Running dot for graph 102/116
-Running dot for graph 103/116
-Running dot for graph 104/116
-Running dot for graph 105/116
-Running dot for graph 106/116
-Running dot for graph 107/116
-Running dot for graph 108/116
-Running dot for graph 109/116
-Running dot for graph 110/116
-Running dot for graph 111/116
-Running dot for graph 112/116
-Running dot for graph 113/116
-Running dot for graph 114/116
-Running dot for graph 115/116
-Running dot for graph 116/116
-Patching output file 1/90
-Patching output file 2/90
-Patching output file 3/90
-Patching output file 4/90
-Patching output file 5/90
-Patching output file 6/90
-Patching output file 7/90
-Patching output file 8/90
-Patching output file 9/90
-Patching output file 10/90
-Patching output file 11/90
-Patching output file 12/90
-Patching output file 13/90
-Patching output file 14/90
-Patching output file 15/90
-Patching output file 16/90
-Patching output file 17/90
-Patching output file 18/90
-Patching output file 19/90
-Patching output file 20/90
-Patching output file 21/90
-Patching output file 22/90
-Patching output file 23/90
-Patching output file 24/90
-Patching output file 25/90
-Patching output file 26/90
-Patching output file 27/90
-Patching output file 28/90
-Patching output file 29/90
-Patching output file 30/90
-Patching output file 31/90
-Patching output file 32/90
-Patching output file 33/90
-Patching output file 34/90
-Patching output file 35/90
-Patching output file 36/90
-Patching output file 37/90
-Patching output file 38/90
-Patching output file 39/90
-Patching output file 40/90
-Patching output file 41/90
-Patching output file 42/90
-Patching output file 43/90
-Patching output file 44/90
-Patching output file 45/90
-Patching output file 46/90
-Patching output file 47/90
-Patching output file 48/90
-Patching output file 49/90
-Patching output file 50/90
-Patching output file 51/90
-Patching output file 52/90
-Patching output file 53/90
-Patching output file 54/90
-Patching output file 55/90
-Patching output file 56/90
-Patching output file 57/90
-Patching output file 58/90
-Patching output file 59/90
-Patching output file 60/90
-Patching output file 61/90
-Patching output file 62/90
-Patching output file 63/90
-Patching output file 64/90
-Patching output file 65/90
-Patching output file 66/90
-Patching output file 67/90
-Patching output file 68/90
-Patching output file 69/90
-Patching output file 70/90
-Patching output file 71/90
-Patching output file 72/90
-Patching output file 73/90
-Patching output file 74/90
-Patching output file 75/90
-Patching output file 76/90
-Patching output file 77/90
-Patching output file 78/90
-Patching output file 79/90
-Patching output file 80/90
-Patching output file 81/90
-Patching output file 82/90
-Patching output file 83/90
-Patching output file 84/90
-Patching output file 85/90
-Patching output file 86/90
-Patching output file 87/90
-Patching output file 88/90
-Patching output file 89/90
-Patching output file 90/90
-lookup cache used 348/65536 hits=867 misses=350
+Running dot for graph 1/127
+Running dot for graph 2/127
+Running dot for graph 3/127
+Running dot for graph 4/127
+Running dot for graph 5/127
+Running dot for graph 6/127
+Running dot for graph 7/127
+Running dot for graph 8/127
+Running dot for graph 9/127
+Running dot for graph 10/127
+Running dot for graph 11/127
+Running dot for graph 12/127
+Running dot for graph 13/127
+Running dot for graph 14/127
+Running dot for graph 15/127
+Running dot for graph 16/127
+Running dot for graph 17/127
+Running dot for graph 18/127
+Running dot for graph 19/127
+Running dot for graph 20/127
+Running dot for graph 21/127
+Running dot for graph 22/127
+Running dot for graph 23/127
+Running dot for graph 24/127
+Running dot for graph 25/127
+Running dot for graph 26/127
+Running dot for graph 27/127
+Running dot for graph 28/127
+Running dot for graph 29/127
+Running dot for graph 30/127
+Running dot for graph 31/127
+Running dot for graph 32/127
+Running dot for graph 33/127
+Running dot for graph 34/127
+Running dot for graph 35/127
+Running dot for graph 36/127
+Running dot for graph 37/127
+Running dot for graph 38/127
+Running dot for graph 39/127
+Running dot for graph 40/127
+Running dot for graph 41/127
+Running dot for graph 42/127
+Running dot for graph 43/127
+Running dot for graph 44/127
+Running dot for graph 45/127
+Running dot for graph 46/127
+Running dot for graph 47/127
+Running dot for graph 48/127
+Running dot for graph 49/127
+Running dot for graph 50/127
+Running dot for graph 51/127
+Running dot for graph 52/127
+Running dot for graph 53/127
+Running dot for graph 54/127
+Running dot for graph 55/127
+Running dot for graph 56/127
+Running dot for graph 57/127
+Running dot for graph 58/127
+Running dot for graph 59/127
+Running dot for graph 60/127
+Running dot for graph 61/127
+Running dot for graph 62/127
+Running dot for graph 63/127
+Running dot for graph 64/127
+Running dot for graph 65/127
+Running dot for graph 66/127
+Running dot for graph 67/127
+Running dot for graph 68/127
+Running dot for graph 69/127
+Running dot for graph 70/127
+Running dot for graph 71/127
+Running dot for graph 72/127
+Running dot for graph 73/127
+Running dot for graph 74/127
+Running dot for graph 75/127
+Running dot for graph 76/127
+Running dot for graph 77/127
+Running dot for graph 78/127
+Running dot for graph 79/127
+Running dot for graph 80/127
+Running dot for graph 81/127
+Running dot for graph 82/127
+Running dot for graph 83/127
+Running dot for graph 84/127
+Running dot for graph 85/127
+Running dot for graph 86/127
+Running dot for graph 87/127
+Running dot for graph 88/127
+Running dot for graph 89/127
+Running dot for graph 90/127
+Running dot for graph 91/127
+Running dot for graph 92/127
+Running dot for graph 93/127
+Running dot for graph 94/127
+Running dot for graph 95/127
+Running dot for graph 96/127
+Running dot for graph 97/127
+Running dot for graph 98/127
+Running dot for graph 99/127
+Running dot for graph 100/127
+Running dot for graph 101/127
+Running dot for graph 102/127
+Running dot for graph 103/127
+Running dot for graph 104/127
+Running dot for graph 105/127
+Running dot for graph 106/127
+Running dot for graph 107/127
+Running dot for graph 108/127
+Running dot for graph 109/127
+Running dot for graph 110/127
+Running dot for graph 111/127
+Running dot for graph 112/127
+Running dot for graph 113/127
+Running dot for graph 114/127
+Running dot for graph 115/127
+Running dot for graph 116/127
+Running dot for graph 117/127
+Running dot for graph 118/127
+Running dot for graph 119/127
+Running dot for graph 120/127
+Running dot for graph 121/127
+Running dot for graph 122/127
+Running dot for graph 123/127
+Running dot for graph 124/127
+Running dot for graph 125/127
+Running dot for graph 126/127
+Running dot for graph 127/127
+Patching output file 1/99
+Patching output file 2/99
+Patching output file 3/99
+Patching output file 4/99
+Patching output file 5/99
+Patching output file 6/99
+Patching output file 7/99
+Patching output file 8/99
+Patching output file 9/99
+Patching output file 10/99
+Patching output file 11/99
+Patching output file 12/99
+Patching output file 13/99
+Patching output file 14/99
+Patching output file 15/99
+Patching output file 16/99
+Patching output file 17/99
+Patching output file 18/99
+Patching output file 19/99
+Patching output file 20/99
+Patching output file 21/99
+Patching output file 22/99
+Patching output file 23/99
+Patching output file 24/99
+Patching output file 25/99
+Patching output file 26/99
+Patching output file 27/99
+Patching output file 28/99
+Patching output file 29/99
+Patching output file 30/99
+Patching output file 31/99
+Patching output file 32/99
+Patching output file 33/99
+Patching output file 34/99
+Patching output file 35/99
+Patching output file 36/99
+Patching output file 37/99
+Patching output file 38/99
+Patching output file 39/99
+Patching output file 40/99
+Patching output file 41/99
+Patching output file 42/99
+Patching output file 43/99
+Patching output file 44/99
+Patching output file 45/99
+Patching output file 46/99
+Patching output file 47/99
+Patching output file 48/99
+Patching output file 49/99
+Patching output file 50/99
+Patching output file 51/99
+Patching output file 52/99
+Patching output file 53/99
+Patching output file 54/99
+Patching output file 55/99
+Patching output file 56/99
+Patching output file 57/99
+Patching output file 58/99
+Patching output file 59/99
+Patching output file 60/99
+Patching output file 61/99
+Patching output file 62/99
+Patching output file 63/99
+Patching output file 64/99
+Patching output file 65/99
+Patching output file 66/99
+Patching output file 67/99
+Patching output file 68/99
+Patching output file 69/99
+Patching output file 70/99
+Patching output file 71/99
+Patching output file 72/99
+Patching output file 73/99
+Patching output file 74/99
+Patching output file 75/99
+Patching output file 76/99
+Patching output file 77/99
+Patching output file 78/99
+Patching output file 79/99
+Patching output file 80/99
+Patching output file 81/99
+Patching output file 82/99
+Patching output file 83/99
+Patching output file 84/99
+Patching output file 85/99
+Patching output file 86/99
+Patching output file 87/99
+Patching output file 88/99
+Patching output file 89/99
+Patching output file 90/99
+Patching output file 91/99
+Patching output file 92/99
+Patching output file 93/99
+Patching output file 94/99
+Patching output file 95/99
+Patching output file 96/99
+Patching output file 97/99
+Patching output file 98/99
+Patching output file 99/99
+lookup cache used 566/65536 hits=1970 misses=568
 finished...

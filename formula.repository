@@ -26,3 +26,18 @@
 \form#25:$\vec{y} = \{ y_1, y_1, \ldots y_N \}$
 \form#26:$1, 2, \ldots N_{\text{state}}$
 \form#27:\begin{align} \nonumber y_{1,1}, y_{1,2},& \ldots y_{1,N_{\text{state}}} \\ \nonumber y_{2,1}, y_{2,2},& \ldots y_{2,N_{\text{state}}} \\ \nonumber \vdots& \\ \nonumber y_{N,1}, y_{N,2},& \ldots y_{N,N_{\text{state}}} \\ \nonumber \end{align}
+\form#28:$\dot{\vec{y}}$
+\form#29:$y_1$
+\form#30:$y_2$
+\form#31:$mu$
+\form#32:$\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}$
+\form#33:$\frac{\partial \dot{y_1}}{\partial y_1}$
+\form#34:$\frac{\partial \dot{y_2}}{\partial y_1}$
+\form#35:$\frac{\partial \dot{y_1}}{\partial y_2}$
+\form#36:$\frac{\partial \dot{y_2}}{\partial y_2}$
+\form#37:$w := A * Vm$
+\form#38:$\mu$
+\form#39:\begin{align} & y_1^\prime =&& y_2 \, & y_1(0) =&& y_1^\circ \nonumber \\ & y_2^\prime =&& \mu \left(1 - y_1^2y_2\right) - y_1 \, & y_2(0) =&& y_2^\circ \nonumber \end{align}
+\form#40:\begin{align} y_1^\circ &= 2 \nonumber \\ y_2^\circ &= 0 \nonumber \\ \mu&= 1000 \nonumber \end{align}
+\form#41:\begin{align} \nonumber \text{time}, y_1, \text{parameter}, y_2,& y_3, ... y_{NSP} \text{ (State 1)}\\ \nonumber \text{time}, y_1, \text{parameter}, y_2,& y_3, ... y_{NSP} \text{ (State 2)}\\ \nonumber \vdots& \end{align}
+\form#42:$\num{e-10}\text{ and }\num{e-6}$

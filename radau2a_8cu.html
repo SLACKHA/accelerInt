@@ -15,6 +15,7 @@
   $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -39,6 +40,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -98,10 +100,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;cuComplex.h&gt;</code><br />
 <code>#include &quot;header.cuh&quot;</code><br />
-<code>#include &quot;<a class="el" href="solver__options_8cuh.html">solver_options.cuh</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="solver__props_8cuh.html">solver_props.cuh</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="inverse_8cuh.html">inverse.cuh</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="complexInverse_8cuh.html">complexInverse.cuh</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="solver__options_8cuh_source.html">solver_options.cuh</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="solver__props_8cuh_source.html">solver_props.cuh</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="inverse_8cuh_source.html">inverse.cuh</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="complexInverse_8cuh_source.html">complexInverse.cuh</a>&quot;</code><br />
 <code>#include &quot;jacob.cuh&quot;</code><br />
 <code>#include &quot;dydt.cuh&quot;</code><br />
 <code>#include &quot;gpu_macros.cuh&quot;</code><br />
@@ -116,7 +118,9 @@ Include dependency graph for radau2a.cu:</div>
 <area shape="rect" id="node9" href="complexInverse_8cuh.html" title="Header definitions for CUDA LU factorization routines. " alt="" coords="277,109,416,136"/>
 </map>
 </div>
-</div><table class="memberdecls">
+</div>
+<p><a href="radau2a_8cu_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a1fb079c51babe820cd76885d3c519446"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="radau2a_8cu.html#a1fb079c51babe820cd76885d3c519446">ANY</a>(X)&#160;&#160;&#160;((X))</td></tr>
@@ -159,6 +163,8 @@ Macros</h2></td></tr>
 <p>For full reference see:<br />
  G. Wanner, E. Hairer, Solving Ordinary Differential Equations II: Stiff and DifferentialAlgebraic Problems, 2nd Edition, Springer-Verlag, Berlin, 1996. doi:10.1007/978-3-642- 05221-7.</p>
 <p>NOTE: all matricies stored in column major format! </p>
+
+<p>Definition in file <a class="el" href="radau2a_8cu_source.html">radau2a.cu</a>.</p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="ada568356af1dada57942e4b6e5d271b0"></a>
 <div class="memitem">

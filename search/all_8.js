@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['ics',['ICs',['../namespacegenerate__ics.html#afa21519d727ddbea8e79df0b87b5b33d',1,'generate_ics']]],
+  ['ics_2ec',['ics.c',['../ics_8c.html',1,'']]],
   ['ign',['IGN',['../solver__options_8cuh.html#af5cccef89d39980a452b7f3a7c59fb53',1,'IGN():&#160;solver_options.cuh'],['../solver__options_8h.html#af5cccef89d39980a452b7f3a7c59fb53',1,'IGN():&#160;solver_options.h']]],
   ['index_5flist',['index_list',['../arnoldi_8cuh.html#a3e638b2302ac9e7f341e07f7eb51ec5d',1,'index_list():&#160;arnoldi.cuh'],['../arnoldi_8h.html#ac4b10b70a18d8ce035332064894b9b99',1,'index_list():&#160;arnoldi.h']]],
   ['init_5fsolver_5flog',['init_solver_log',['../namespacecvode.html#a9113d5fb0e19fa927d73b64c397ecd09',1,'cvode::init_solver_log()'],['../namespacegenericcu.html#a358f079f3935e43979b5f56c1571e337',1,'genericcu::init_solver_log()'],['../namespacegeneric.html#a262501be5ff14645a2e61d407ddde344',1,'generic::init_solver_log()'],['../namespaceradau2a.html#ab51ab30fb2af013ef60bc2adb30d9ffe',1,'radau2a::init_solver_log()'],['../namespacerk78.html#a44eaccf6eb7ece7bd7c7ea9cc49eaf2a',1,'rk78::init_solver_log()'],['../namespaceexp4.html#a1ef7b39a9ac7da4247fd05807f000b07',1,'exp4::init_solver_log()'],['../namespaceexp4cu.html#a128b314d7c6b2521bbd64653dc8b9826',1,'exp4cu::init_solver_log()'],['../namespaceexprb43.html#adb214180d920bd67592be89b6264aa90',1,'exprb43::init_solver_log()'],['../namespaceexprb43cu.html#aa82c3608832f5b5891f2f3a992aaf8c7',1,'exprb43cu::init_solver_log()']]],

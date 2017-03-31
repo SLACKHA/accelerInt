@@ -15,6 +15,7 @@
   $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -39,6 +40,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -109,9 +111,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;cuComplex.h&gt;</code><br />
 <code>#include &quot;header.cuh&quot;</code><br />
 <code>#include &quot;<a class="el" href="timer_8h_source.html">timer.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="solver_8cuh.html">solver.cuh</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="solver_8cuh_source.html">solver.cuh</a>&quot;</code><br />
 <code>#include &quot;gpu_memory.cuh&quot;</code><br />
-<code>#include &quot;<a class="el" href="read__initial__conditions_8cuh.html">read_initial_conditions.cuh</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="read__initial__conditions_8cuh_source.html">read_initial_conditions.cuh</a>&quot;</code><br />
 <code>#include &quot;launch_bounds.cuh&quot;</code><br />
 <code>#include &lt;assert.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -127,7 +129,9 @@ Include dependency graph for solver_main.cu:</div>
 <area shape="rect" id="node21" href="solver__props_8cuh.html" title="simple convenience file to include the correct solver properties file " alt="" coords="1123,259,1245,285"/>
 </map>
 </div>
-</div><table class="memberdecls">
+</div>
+<p><a href="solver__main_8cu_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a4f005e7918ecc7f1cd2424fb1708b2ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="solver__main_8cu.html#a4f005e7918ecc7f1cd2424fb1708b2ca">write_log</a> (int NUM, double t, const double *y_host, FILE *pFile)</td></tr>
@@ -153,6 +157,8 @@ Variables</h2></td></tr>
 <dl class="section author"><dt>Author</dt><dd>Nicholas Curtis </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>03/09/2015</dd></dl>
 <p>Contains main function, setup, initialization, logging, timing and driver functions </p>
+
+<p>Definition in file <a class="el" href="solver__main_8cu_source.html">solver_main.cu</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a0ddf1224851353fc92bfbff6f499fa97"></a>
 <div class="memitem">
@@ -190,7 +196,7 @@ Variables</h2></td></tr>
 </p><ul>
 <li>num_threads [Optional, Default:1]<ul>
 <li>The number OpenMP threads to utilize</li>
-<li>The number of threads cannot be greater than recognized by OpenMP via <code>omp_get_max_threads()</code></li>
+<li>The number of threads cannot be greater than recognized by OpenMP via <code><a class="el" href="header_8h.html#a59e73060d1552ccda56039c7f3d25a84">omp_get_max_threads()</a></code></li>
 </ul>
 </li>
 <li>num_IVPs [Optional, Default:1]<ul>
@@ -201,6 +207,8 @@ Variables</h2></td></tr>
 </li>
 </ul>
 <p>Number of independent systems </p>
+
+<p>Definition at line <a class="el" href="solver__main_8cu_source.html#l00146">146</a> of file <a class="el" href="solver__main_8cu_source.html">solver_main.cu</a>.</p>
 
 </div>
 </div>
@@ -280,6 +288,8 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
+<p>Definition at line <a class="el" href="solver__main_8cu_source.html#l00092">92</a> of file <a class="el" href="solver__main_8cu_source.html">solver_main.cu</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="acfaf06165e3e00cb81ebbcd80ee9c23f"></a>
@@ -358,6 +368,8 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
+<p>Definition at line <a class="el" href="solver__main_8cu_source.html#l00118">118</a> of file <a class="el" href="solver__main_8cu_source.html">solver_main.cu</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a4f005e7918ecc7f1cd2424fb1708b2ca"></a>
@@ -410,6 +422,8 @@ Variables</h2></td></tr>
 temperature, mass fractions (State #1)<br />
 temperature, mass fractions (State #2)... </p>
 
+<p>Definition at line <a class="el" href="solver__main_8cu_source.html#l00057">57</a> of file <a class="el" href="solver__main_8cu_source.html">solver_main.cu</a>.</p>
+
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
@@ -424,6 +438,8 @@ temperature, mass fractions (State #2)... </p>
 </div><div class="memdoc">
 
 <p>If <a class="el" href="solver__options_8cuh.html#afd8c973bc66908100d15f47ae514ed41">DIVERGENCE_TEST</a> is defined, this creates a device array for tracking. </p>
+
+<p>Definition at line <a class="el" href="solver__main_8cu_source.html#l00042">42</a> of file <a class="el" href="solver__main_8cu_source.html">solver_main.cu</a>.</p>
 
 </div>
 </div>

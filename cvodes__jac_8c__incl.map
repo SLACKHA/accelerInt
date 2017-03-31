@@ -1,3 +1,5 @@
 <map id="/home/nick/Dropbox/accelerInt/cvodes/cvodes_jac.c" name="/home/nick/Dropbox/accelerInt/cvodes/cvodes_jac.c">
 <area shape="rect" id="node2" href="$cvodes__jac_8h.html" title="A simple wrapper, allowing for use of the analytical jacobian w/ CVODES. " alt="" coords="345,95,444,121"/>
+<area shape="rect" id="node3" href="$header_8h.html" title="An example header file that defines system size and other required methods for integration of the van..." alt="" coords="5,169,77,196"/>
+<area shape="rect" id="node8" href="$jacob_8h.html" title="Contains a header definition for the van der Pol Jacobian evaluation. " alt="" coords="691,169,755,196"/>
 </map>

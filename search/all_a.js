@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['lapack_5fdfns_2eh',['lapack_dfns.h',['../lapack__dfns_8h.html',1,'']]],
-  ['linear_2dalgebra_2ec',['linear-algebra.c',['../linear-algebra_8c.html',1,'']]],
-  ['linear_2dalgebra_2eh',['linear-algebra.h',['../linear-algebra_8h.html',1,'']]],
-  ['linsolvecomplex',['linSolveComplex',['../linear-algebra_8c.html#abe341bea743e72f19228e55d3fc02170',1,'linSolveComplex(int n, double complex *A, double complex *B, double complex *x):&#160;linear-algebra.c'],['../linear-algebra_8h.html#a3c19505e0d860542b51152f7037a6261',1,'linSolveComplex(int, double complex *, double complex *, double complex *):&#160;linear-algebra.c']]],
-  ['log_5fend_5fonly',['LOG_END_ONLY',['../solver__options_8cuh.html#a09cc461392fae3949d88392adf655db5',1,'LOG_END_ONLY():&#160;solver_options.cuh'],['../solver__options_8h.html#a09cc461392fae3949d88392adf655db5',1,'LOG_END_ONLY():&#160;solver_options.h']]],
-  ['log_5fkrylov_5fand_5fstepsizes',['LOG_KRYLOV_AND_STEPSIZES',['../solver__options_8cuh.html#a2adffa059bbd6f183ff7f63db602ac42',1,'LOG_KRYLOV_AND_STEPSIZES():&#160;solver_options.cuh'],['../solver__options_8h.html#a2adffa059bbd6f183ff7f63db602ac42',1,'LOG_KRYLOV_AND_STEPSIZES():&#160;solver_options.h']]],
-  ['log_5foutput',['LOG_OUTPUT',['../solver__options_8cuh.html#ac786f5f1963363a48eed565f7cbc6931',1,'LOG_OUTPUT():&#160;solver_options.cuh'],['../solver__options_8h.html#ac786f5f1963363a48eed565f7cbc6931',1,'LOG_OUTPUT():&#160;solver_options.h']]]
+  ['k1',['k1',['../structexp4cu_1_1solver__memory.html#a184c23b8411b8772b53dae0e6fe99723',1,'exp4cu::solver_memory']]],
+  ['k2',['k2',['../structexp4cu_1_1solver__memory.html#a8f4b3ca501187945e4620f44506f6882',1,'exp4cu::solver_memory']]],
+  ['k3',['k3',['../structexp4cu_1_1solver__memory.html#ad874f97ba264e3cefb19482eef2a729d',1,'exp4cu::solver_memory']]],
+  ['k4',['k4',['../structexp4cu_1_1solver__memory.html#a060f44ce2caacb3fc536671b591e11a2',1,'exp4cu::solver_memory']]],
+  ['k5',['k5',['../structexp4cu_1_1solver__memory.html#a749746fa09b01076ee56c0402d003fb7',1,'exp4cu::solver_memory']]],
+  ['k6',['k6',['../structexp4cu_1_1solver__memory.html#a8ccbe7fd464f064245b77c2df44956ef',1,'exp4cu::solver_memory']]],
+  ['k7',['k7',['../structexp4cu_1_1solver__memory.html#aa2776a2d992080e4e4c3e557c26ba2f7',1,'exp4cu::solver_memory']]]
 ];

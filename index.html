@@ -15,6 +15,7 @@
   $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -39,6 +40,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -109,10 +111,11 @@ Currently available Integrators</h1>
 <h1><a class="anchor" id="install"></a>
 Compilation and Dependencies</h1>
 <p><code>accelerInt</code> is a collection of C and CUDA-C code compiled via <a href="http://scons.org/">SCons</a>. We again encourage feedback on the compilation process as it has not been widely tested.</p>
-<h2><a class="anchor" id="scons"></a>
+<h2><a class="anchor" id="using_scons"></a>
 Specifying SCons options</h2>
-<p>SCons is a flexible build system that allows the user to specify many options via the command line controlling the build. Options may be specified via, e.g: </p><pre class="fragment">scons toolchain=gnu
-</pre><p>This will store the specified option (in this case, using the GNU toolchain) in a file <code>accelerInt.conf</code>. Alternatively, this file may be created directly by the user to specify many options</p>
+<p>SCons is a flexible build system that allows the user to specify many options via the command line controlling the compilation process. Options may be specified via, e.g: </p><pre class="fragment">scons toolchain=gnu
+</pre><p>This will store the specified option (in this case, using the GNU toolchain) in a file <code>accelerInt.conf</code>. Alternatively, this file may be created directly by the user to specify many options.</p>
+<p>See <a class="el" href="scons_opts.html">Configuration options for building accelerInt</a> for a full listing of command line options and their effects.</p>
 <h2><a class="anchor" id="deps"></a>
 Dependencies</h2>
 <p><code>accelerInt</code> has a number of dependencies required to run:</p><ol type="1">
@@ -121,7 +124,7 @@ Dependencies</h2>
 </ul>
 </li>
 <li>A working CUDA installation [Optional]<ul>
-<li><code>accelerInt</code> will attempt to find a valid CUDA installation in a number of common install locations. If it cannot be found, the GPU integrators will be turned off. To manually specify the CUDA path, the environment (or SCons options) <code>CUDA_TOOLKIT_PATH</code> and <code>CUDA_SDK_PATH</code> may be set.</li>
+<li><code>accelerInt</code> will attempt to find a valid CUDA installation in a number of common install locations. If it cannot be found, the GPU integrators will be turned off. To manually specify the CUDA path, the environment (or <a class="el" href="scons_opts.html">SCons options</a>) <code>CUDA_TOOLKIT_PATH</code> and <code>CUDA_SDK_PATH</code> may be set.</li>
 </ul>
 </li>
 <li>CVODE<ul>
@@ -129,7 +132,7 @@ Dependencies</h2>
 </ul>
 </li>
 <li>BLAS/LAPACK<ul>
-<li>A working BLAS/LAPACK implementation is required for linear algebra routines for the CPU solvers (LU Factorization, Inversion, etc.) By default <code>accelerInt</code> looks for <a href="https://software.intel.com/en-us/intel-mkl">Intel's MKL Library</a>, however other libraries and directories may be specified via the <code>blas_lapack_libs</code> and <code>blas_lapack_dir</code> SCons configuration options.</li>
+<li>A working BLAS/LAPACK implementation is required for linear algebra routines for the CPU solvers (LU Factorization, Inversion, etc.) By default <code>accelerInt</code> looks for <a href="https://software.intel.com/en-us/intel-mkl">Intel's MKL Library</a>, however other libraries and directories may be specified via the <code>blas_lapack_libs</code> and <code>blas_lapack_dir</code> <a class="el" href="scons_opts.html">SCons configuration options</a>.</li>
 </ul>
 </li>
 <li>FFTW3<ul>
@@ -138,14 +141,14 @@ Dependencies</h2>
 </li>
 </ol>
 <p>Disabling solvers based on available libaries is a feature that may be added to future versions.</p>
-<h1><a class="anchor" id="mem"></a>
+<h1><a class="anchor" id="main_mem"></a>
 Memory Format</h1>
 <p><code>accelerInt</code> uses a Column-major (Fortran) data formatting scheme, future versions will include optional use of the Row-major (C) data ordering.</p>
 <p>For a state vector entry <img class="formulaInl" alt="$\vec{y} = \{ y_1, y_1, \ldots y_N \}$" src="form_25.png"/> and IVPs <img class="formulaInl" alt="$1, 2, \ldots N_{\text{state}}$" src="form_26.png"/>, this equates to storing the state vectors in memory as:</p>
 <p class="formulaDsp">
 <img class="formulaDsp" alt="\begin{align} \nonumber y_{1,1}, y_{1,2},&amp; \ldots y_{1,N_{\text{state}}} \\ \nonumber y_{2,1}, y_{2,2},&amp; \ldots y_{2,N_{\text{state}}} \\ \nonumber \vdots&amp; \\ \nonumber y_{N,1}, y_{N,2},&amp; \ldots y_{N,N_{\text{state}}} \\ \nonumber \end{align}" src="form_27.png"/>
 </p>
-<p> For a pratical example see non-existant example </p>
+<p> For a pratical example see the <a class="el" href="vdp.html#accelerint_indx">van der Pol equation example</a> </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['z1',['Z1',['../structradau2acu_1_1solver__memory.html#a3920a2e20d5145ffe2b1ecdca5c7fa22',1,'radau2acu::solver_memory']]],
-  ['z2',['Z2',['../structradau2acu_1_1solver__memory.html#a01e0b1a2d05bcd51d00cb1418a790d79',1,'radau2acu::solver_memory']]],
-  ['z3',['Z3',['../structradau2acu_1_1solver__memory.html#ac4d01cd67d75acfe199be4d4676c0bf7',1,'radau2acu::solver_memory']]]
+  ['vm',['Vm',['../structexp4cu_1_1solver__memory.html#a089d1909b39f39551063214762c66e08',1,'exp4cu::solver_memory::Vm()'],['../structexprb43cu_1_1solver__memory.html#a3b68c5a632fe265037cd25195e266c65',1,'exprb43cu::solver_memory::Vm()']]]
 ];
