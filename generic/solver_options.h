@@ -72,7 +72,7 @@ but it is done here for documentation purposes.
 /*! Log output to binary file only on final timestep */
 #define LOG_END_ONLY
 
-/*! Use a Finite Difference Jaobian */
+/*! Use a Finite Difference Jacobian */
 #define FINITE_DIFFERENCE
 
 /*! Define to turn off adaptive time stepping */
