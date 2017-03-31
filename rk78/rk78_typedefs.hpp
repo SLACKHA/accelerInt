@@ -17,6 +17,7 @@ using namespace boost::numeric::odeint;
 //our code
 extern "C" {
 	#include "dydt.h"
+	#include "header.h"
 	#include "solver_options.h"
 }
 
