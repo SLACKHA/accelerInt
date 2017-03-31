@@ -30,12 +30,27 @@ void set_same_initial_conditions(int NUM, double** y_host, double** var_host)
     //now set the values
     for (int i = 0; i < NUM; ++i){
         //set mu
-        (*var_host)[i] = 500;
+        (*var_host)[i] = 1000;
         //set y1, y2
         (*y_host)[i] = 2;
         (*y_host)[i + NUM] = 0;
     }
 }
+
+/**
+ * \brief Not needed for van der Pol
+ *
+ *  In pyJac, these are used to transform the input/output vectors to deal with moving the
+ *         last species mass fraction
+ */
+void apply_mask(double* y_host) {}
+/**
+ * \brief Not needed for van der Pol
+ *
+ *  In pyJac, these are used to transform the input/output vectors to deal with moving the
+ *         last species mass fraction
+ */
+void apply_reverse_mask(double* y_host) {}
 
 #ifdef GENERATE_DOCS
 }
