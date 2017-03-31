@@ -33,7 +33,7 @@ A number of stiff integration methods are available in <code>accelerInt</code> o
 <code>accelerInt</code> is a collection of C and CUDA-C code compiled via [SCons](http://scons.org/).
 We again encourage feedback on the compilation process as it has not been widely tested.
 
-\subsection scons Specifying SCons options
+\subsection using_scons Specifying SCons options
 
 SCons is a flexible build system that allows the user to specify many options via the command line controlling the compilation process.  Options may be specified via, e.g:
 

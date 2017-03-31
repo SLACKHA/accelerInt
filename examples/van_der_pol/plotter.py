@@ -8,7 +8,7 @@ files = [os.path.join('log', file) for file in os.listdir('./log/')
          if file.endswith('.bin')]
 files = [file for file in files if os.path.isfile(file)]
 
-linestyles = ['-', '--', '.']
+linestyles = ['-', '--', '-.']
 colorwheel = ['r', 'g', 'b', 'k']
 
 # load data
@@ -19,10 +19,12 @@ for i, file in enumerate(files):
 
     # get the solver name
     label = file.split('-')[0]
+    label = label[label.index('/') + 1:]
 
     # plot y1
-    plt.plot(arr[:, 0], arr[:, 1], linestyles[i % len(linestyles)],
-             label=label, color=colorwheel[i % len(linestyles)])
+    plt.plot(arr[:, 0][::10], arr[:, 1][::10],
+             linestyle=linestyles[i % len(linestyles)],
+             label=label, color=colorwheel[i % len(colorwheel)])
 
 # make legend
 plt.legend(loc=0)
@@ -33,4 +35,4 @@ plt.xlabel('Time(s)')
 plt.ylabel('y_1')
 
 # and save fig
-plt.save('van_der_pol.png')
+plt.savefig('van_der_pol.png', dpi=300, size=(5, 3))

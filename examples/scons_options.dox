@@ -1,7 +1,7 @@
 /*!
 \page scons_opts Configuration options for building accelerInt
 
-\section scons syntax
+\section syntax SCons Syntax
 
 The following options can be passed to SCons to customize the accelerInt
 build process. They should be given in the form:
