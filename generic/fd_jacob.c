@@ -7,6 +7,7 @@
 #include "dydt.h"
 #include <math.h>
 #include <float.h>
+#include <string.h>
 #include "solver_options.h"
 
 //! The finite difference order [Default: 1]
