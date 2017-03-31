@@ -224,7 +224,7 @@ running 'scons build'. The format of this file is:
 """)
 
     for opt in opts.options:
-        print '\n'.join(formatOption(env, opt))
+        print('\n'.join(formatOption(env, opt)))
     sys.exit(0)
 
 valid_arguments = (set(opt[0] for opt in compiler_options) |
