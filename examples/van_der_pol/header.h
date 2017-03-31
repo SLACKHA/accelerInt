@@ -4,8 +4,8 @@
  *        for integration of the van der Pol's equation.
  */
 
-#ifndef HEADER_H
-#define HEADER_H
+#ifndef HEADER_GUARD_H
+#define HEADER_GUARD_H
 
 #include <stdlib.h>
 
@@ -58,14 +58,14 @@ void set_same_initial_conditions(int NUM, double** y_host, double** var_host)
  *  In pyJac, these are used to transform the input/output vectors to deal with moving the
  *         last species mass fraction
  */
-void apply_mask(double* y_host) {}
+void apply_mask(double* y_host);
 /**
  * \brief Not needed for van der Pol
  *
  *  In pyJac, these are used to transform the input/output vectors to deal with moving the
  *         last species mass fraction
  */
-void apply_reverse_mask(double* y_host) {}
+void apply_reverse_mask(double* y_host);
 
 #ifdef GENERATE_DOCS
 }
