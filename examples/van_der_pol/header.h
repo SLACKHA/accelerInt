@@ -16,7 +16,6 @@
  #define omp_get_max_threads() 1
  #define omp_get_num_threads() 1
 #endif
-#endif
 
 #ifdef GENERATE_DOCS
 //put this in the van der Pol namespace for documentation
