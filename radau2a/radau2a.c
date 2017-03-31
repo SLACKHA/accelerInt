@@ -28,6 +28,7 @@ Problems, 2nd Edition, Springer-Verlag, Berlin, 1996. doi:10.1007/978-3-642-
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
 
 #ifdef GENERATE_DOCS
 namespace radau2a {
