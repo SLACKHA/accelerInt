@@ -38,4 +38,4 @@ out_arr = np.concatenate(
         np.reshape(ICs[:, 1], (-1, 1))), axis=1)
 
 # and save to file
-np.save('ign_data.bin', out_arr)
+out_arr.tofile('ign_data.bin')
