@@ -35,20 +35,7 @@ namespace van_der_pol {
  * \param var_host  The vector of \f$mu\f$ parameters for the van der Pol equation
  *
  */
-void set_same_initial_conditions(int NUM, double** y_host, double** var_host)
-{
-    //init vectors
-    (*y_host) = (double*)malloc(NUM * NSP * sizeof(double));
-    (*var_host) = (double*)malloc(NUM * sizeof(double));
-    //now set the values
-    for (int i = 0; i < NUM; ++i){
-        //set mu
-        (*var_host)[i] = 500;
-        //set y1, y2
-        (*y_host)[i] = 2;
-        (*y_host)[i + NUM] = 0;
-    }
-}
+void set_same_initial_conditions(int NUM, double** y_host, double** var_host);
 
 //dummy definitions that are used for pyJac
 
