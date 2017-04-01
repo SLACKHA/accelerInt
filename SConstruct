@@ -273,10 +273,11 @@ if build_cuda:
     try:
         with open(os.path.join(mech_dir, 'regcount'), 'r') as file:
             reg_count = file.readline().strip()
+        NVCCFlags.append(['-maxrregcount {}'.format(reg_count)])
     except:
-        print('Register count not found, skipping cuda integrators')
-        build_cuda = False
-NVCCFlags.append(['-maxrregcount {}'.format(reg_count), '-Xcompiler {}'.format(
+        print('Register count not found. Using default')
+# add openmp
+NVCCFlags.append(['-Xcompiler {}'.format(
     env['openmp_flags'])])
 
 
