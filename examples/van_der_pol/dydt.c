@@ -2,7 +2,7 @@
  * \file
  * \brief An implementation of the van der Pol right hand side (y' = f(y)) function.
  *
- * Implementes the evaluation of the derivative of the state vector with respect to time, \f$\dot{\vec{y}}\f$
+ * Implements the evaluation of the derivative of the state vector with respect to time, \f$\dot{\vec{y}}\f$
  *
  */
 

@@ -23,4 +23,8 @@ namespace van_der_pol {
  */
 void dydt (const double t, const double mu, const double * __restrict__ y, double * __restrict__ dy);
 
+#ifdef GENERATE_DOCS
+}
+#endif
+
 #endif
