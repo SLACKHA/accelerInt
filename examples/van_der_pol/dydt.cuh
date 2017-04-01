@@ -23,6 +23,7 @@ namespace van_der_pol_cu {
  * \param[in]        d_mem     The mechanism_memory struct.  In future versions, this will be used to access the \f$\mu\f$ parameter to have a consistent interface.
  *
  */
+__device__
 void dydt (const double t, const double mu, const double * __restrict__ y, double * __restrict__ dy,
            const mechanism_memory * __restrict__ d_mem);
 

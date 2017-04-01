@@ -6,7 +6,7 @@
  *
  */
 
-#include "header.h"
+#include "header.cuh"
 
 #ifdef GENERATE_DOCS
 //put this in the van der Pol namespace for documentation

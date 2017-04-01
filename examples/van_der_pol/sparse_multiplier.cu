@@ -18,6 +18,7 @@ namespace van_der_pol_cu {
  * \param[in]           Vm          The (NSP x 1) vector to multiply by
  * \param[out]          w           The (NSP x 1) vector to store the result in, \f$w := A * Vm\f$
  */
+__device__
 void sparse_multiplier(const double * A, const double * Vm, double* w) {
   w[INDEX(0)] =  A[INDEX(0)] * Vm[INDEX(0)] +  A[INDEX(NSP)] * Vm[INDEX(1)];
   w[INDEX(1)] =  A[INDEX(1)] * Vm[INDEX(0)] +  A[INDEX(NSP + 1)] * Vm[INDEX(1)];

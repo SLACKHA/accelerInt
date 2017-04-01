@@ -55,7 +55,9 @@ void write_log(int NUM, double t, const double* y_host, FILE* pFile)
             buffer[i] = y_host[NUM * i + j];
             Y_N -= buffer[i];
         }
+        #if NN == NSP + 1 //pyjac
         buffer[NSP] = Y_N;
+        #endif
         apply_reverse_mask(&buffer[1]);
         fwrite(buffer, sizeof(double), NN, pFile);
     }

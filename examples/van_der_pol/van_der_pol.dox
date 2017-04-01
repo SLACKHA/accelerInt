@@ -81,6 +81,13 @@ In order to operate the CUDA solvers, the user must implement some additional fu
 - initialize_gpu_memory() initializes the host and device versions of the mechanism_memory structs, similar to the various initialize_solver() implementations for the GPU solvers
 - free_gpu_memory() cleans up the host and device mechanism_memory structs as with the cleanup_solver() implementation for each GPU solver.
 
+\subsection launch GPU Launch Bounds
+
+The launch_bounds.cuh file contains definitions for a few variables that control CUDA kernel launches:
+- #TARGET_BLOCK_SIZE defines the number of threads per CUDA block
+- #SHARED_SIZE defines the size of shared memory per CUDA block.  This is not currently used by the solvers, but could potentially be used by a used defined RHS / Jacobian implementation.
+- #PREFERL1 tells CUDA to prefer a larger L1 cache over more shared memory.  It is recommended to keep this on.
+
 \subsection ics Initial Conditions
 
 The initial condition reader was designed with @pyJac in mind, it is currently quite cumbersome to use for other data formats.
@@ -136,7 +143,7 @@ While the GPU solvers are called via:
 
 For example, we call:
 
-        ./exprb43-int 1 1
+        ./exprb43-int-gpu 1
         ./cvodes-int 1 1
         ./radau2a-int 1 1
 

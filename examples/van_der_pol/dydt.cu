@@ -6,7 +6,7 @@
  *
  */
 
-#include "header.h"
+#include "header.cuh"
 #include "gpu_macros.cuh"
 
 #ifdef GENERATE_DOCS

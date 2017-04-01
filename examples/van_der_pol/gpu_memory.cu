@@ -3,7 +3,7 @@
  * \brief Initializes and calculates required GPU memory
  */
 
-#include "header.cuh"
+#include "gpu_memory.cuh"
 
 #ifdef GENERATE_DOCS
 //put this in the van der Pol namespace for documentation
@@ -18,11 +18,11 @@ size_t required_mechanism_size() {
   //returns the total required size for the mechanism per thread
   size_t mech_size = 0;
   //state vector y
-  mechanism += NSP;
+  mech_size += NSP;
   //dydt vector
-  mechanism += NSP
+  mech_size += NSP;
   //Jacobian
-  mechanism += NSP * NSP;
+  mech_size += NSP * NSP;
   //and mu parameter
   mech_size += 1;
   return mech_size * sizeof(double);
