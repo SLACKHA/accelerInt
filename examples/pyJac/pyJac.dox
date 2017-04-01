@@ -1,9 +1,9 @@
 /**
-\page pyJac_ex Use with pyJac
+\page pyjac_ex Use with pyJac
 
 Compared to implementation of the \ref vdp van der Pol problem, use of `accelerInt` with @pyJac is quite simple.
 
-\section gen File Geneneration
+\section pyjac_gen File Geneneration
 
 After installing pyJac (via [github](https://github.com/SLACKHA/pyJac) or [pypi](https://pypi.python.org/pypi/pyJac)), the required
 C/CUDA implementation files can be generated e.g. for the included [\f$\ce{H2}\slash\ce{CO}\f$ model](http://onlinelibrary.wiley.com/doi/10.1002/kin.20603/abstract) via:

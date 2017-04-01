@@ -58,7 +58,7 @@ void apply_reverse_mask(double* y_host);
  * \param           jac             The global Jacobian arrays
  *
  * This is also heavily used when using with @pyJac to hold additional arrays
- * for evaluating chemical kinetic reactions.  For an example see \ref pyJac_ex
+ * for evaluating chemical kinetic reactions.
  */
 struct mechanism_memory {
   double * y;
