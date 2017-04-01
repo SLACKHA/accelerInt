@@ -865,6 +865,7 @@ EXAMPLE_RECURSIVE      = NO
 # \image command).
 
 IMAGE_PATH             = $(REPOPATH)/examples/van_der_pol/
+IMAGE_PATH            += $(REPOPATH)/examples/pyJac/
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

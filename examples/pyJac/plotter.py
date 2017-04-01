@@ -14,16 +14,16 @@ colorwheel = ['r', 'g', 'b', 'k']
 # load data
 for i, file in enumerate(files):
     arr = np.fromfile(file)
-    # reshape to a 2001 x 3 matrix (time, y1, y2)
-    arr = np.reshape(arr, (2001, 3))
+    # reshape matrix (nsteps x 15)
+    arr = np.reshape(arr, (-1, 15))
 
     # get the solver name
     label = file.split('-')[0]
     label = label[label.index('/') + 1:]
     label += '-GPU' if 'gpu' in file else ''
 
-    # plot y1
-    plt.plot(arr[:, 0][::10], arr[:, 1][::10],
+    # plot Temperature
+    plt.plot(arr[:, 0], arr[:, 1],
              linestyle=linestyles[i % len(linestyles)],
              label=label, color=colorwheel[i % len(colorwheel)])
 
@@ -31,9 +31,9 @@ for i, file in enumerate(files):
 plt.legend(loc=0)
 
 # title and labels
-plt.title('van der Pol equation')
+plt.title('H2/CO Constant Pressure Ignition')
 plt.xlabel('Time(s)')
-plt.ylabel('$y_1$')
+plt.ylabel('Temerature (K)')
 
 # and save fig
-plt.savefig('van_der_pol.png', dpi=300, size=(5, 3))
+plt.savefig('h2ign.png', dpi=300, size=(5, 3))
