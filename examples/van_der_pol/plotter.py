@@ -20,6 +20,7 @@ for i, file in enumerate(files):
     # get the solver name
     label = file.split('-')[0]
     label = label[label.index('/') + 1:]
+    label += '-GPU' if 'gpu' in file else ''
 
     # plot y1
     plt.plot(arr[:, 0][::10], arr[:, 1][::10],
