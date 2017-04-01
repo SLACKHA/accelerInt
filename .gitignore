@@ -51,3 +51,16 @@ debug/
 
 #this is populated by pyJac, hence we don't want to commit anything
 mechanism/
+
+#ignore SConscripts in examples
+examples/*/Sconscript
+
+#ignore pyJac example output
+examples/pyJac/out/
+
+#ignore solvers
+cvodes-int
+rk78-int
+radau-int*
+exprb43-int*
+exp4-int*
