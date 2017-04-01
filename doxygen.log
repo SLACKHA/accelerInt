@@ -844,5 +844,4 @@ lookup cache used 614/65536 hits=2339 misses=620
 finished...
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
-C:/Users/Nick/Dropbox/accelerInt/examples/van_der_pol/header.cuh:59: warning: unable to resolve reference to `pyJac_ex' for \ref command
 error: Problem running ghostscript gswin32c.exe -q -g786x92 -r537x537x -sDEVICE=ppmraw -sOutputFile=_form0.pnm -dNOPAUSE -dBATCH -- _form0.ps. Check your installation!
