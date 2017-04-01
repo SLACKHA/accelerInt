@@ -1,3 +1,12 @@
+/**
+ * \file
+ * \brief the generic CUDA initial condition reader
+ *
+ * \author Nicholas Curtis
+ * \date 03/10/2015
+ *
+ */
+
 #include "header.cuh"
 #include "gpu_memory.cuh"
 #include "gpu_macros.cuh"
@@ -6,14 +15,28 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
+/**
+ * \brief Reads initial conditions for IVPs from binary file
+ *
+ * \param[in]           filename            the file to read from
+ * \param[in]           NUM                 the number of IVP initial conditions to read
+ * \param[in,out]       y_host              Address of the host state vector pointer.
+                                            This is initialized and populated by this method
+ * \param[in, out]      variable_host       Address of the host pressure/density pointer.
+                                            This is initialized and populated by this method
+ *
+ * Note: the data file is expected to be in the following format:\n
+        time, Temperature, Pressure, mass fractions         (State #1) \n
+        time, Temperature, Pressure, mass fractions         (State #2) ...
+ */
  void read_initial_conditions(const char* filename, int NUM, double** y_host, double** variable_host)
- {    
+ {
     (*y_host) = (double*)malloc(NUM * NN * sizeof(double));
     (*variable_host) = (double*)malloc(NUM * sizeof(double));
     FILE *fp = fopen (filename, "rb");
     if (fp == NULL)
     {
-        fprintf(stderr, "Could not open file: %s\\n", filename);
+        fprintf(stderr, "Could not open file: %s\n", filename);
         exit(1);
     }
     double buffer[NN + 2];

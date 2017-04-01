@@ -1,16 +1,19 @@
-/** 
- * \file krylov.c
+/*!
+ * \file exprb43.c
  *
  * \author Nicholas J. Curtis
  * \date 09/02/2014
  *
- * A krylov subspace integrator using the EXP4 method
- * based on the work of Niesen and Wright (2012)
- * 
+ * \brief A krylov subspace integrator using a 4th order (3rd-order embedded)
+ * 		  exponential Rosenbrock method of Hochbruck et al. (2009)
+ *
+ * See full reference:
+ * M. Hochbruck, A. Ostermann, J. Schweitzer, Exponential Rosenbrock-type methods, SIAM J. Numer. Anal. 47 (1) (2009) 786–803. doi:10.1137/080717717.
+ *
  * NOTE: all matricies stored in column major format!
- * 
+ *
  */
- 
+
 /** Include common code. */
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,14 +29,23 @@
 #include "exponential_linear_algebra.h"
 #include "solver_init.h"
 
+#ifdef GENERATE_DOCS
+namespace exprb43 {
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 
-/** 4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation
- * 
- * 
+/*!
+ * \fn int integrate(const double t_start, const double t_end, const double pr, double* y)
+ * \param t_start The initial integration time
+ * \param t_end The final integration timestep
+ * \param pr User data passed to the RHS function dydt() - commonly used for the Pressure term
+ * \param y The state vector
+ * \brief 4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation
+ * \returns The result of this integration step @see exprb43_ErrCodes
  */
 int integrate (const double t_start, const double t_end, const double pr, double* y) {
-	
+
 	//initial time
 #ifdef CONST_TIME_STEP
 	double h = t_end - t_start;
@@ -44,7 +56,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 
 	double err_old = 1.0;
 	double h_old = h;
-	
+
 	bool reject = false;
 	int failures = 0;
 	int steps = 0;
@@ -66,7 +78,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
       logFile = fopen(out_name, "a");
 
       char out_reject_name[len + 23];
-      sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);	
+      sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);
 	  //file for krylov logging
 	  FILE *rFile;
 	  //open and clear
@@ -114,7 +126,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			eval_jacob (t, pr, y, A);
 			//gy = fy - A * y
 			sparse_multiplier(A, y, gy);
-			
+
 			for (int i = 0; i < NSP; ++i) {
 				gy[i] = fy[i] - gy[i];
 			}
@@ -150,9 +162,9 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		dydt(t, pr, temp, &savedActions[NSP]);
 		sparse_multiplier(A, temp, f_temp);
 
-		
+
 		for (int i = 0; i < NSP; ++i) {
-			temp[i] = savedActions[NSP + i] - f_temp[i] - gy[i]; 
+			temp[i] = savedActions[NSP + i] - f_temp[i] - gy[i];
 		}
 		//temp is now equal to Dn2
 
@@ -185,9 +197,9 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		dydt(t, pr, temp, &savedActions[3 * NSP]);
 		sparse_multiplier(A, temp, f_temp);
 
-		
+
 		for (int i = 0; i < NSP; ++i) {
-			temp[i] = savedActions[3 * NSP + i] - f_temp[i] - gy[i]; 
+			temp[i] = savedActions[3 * NSP + i] - f_temp[i] - gy[i];
 		}
 		//temp is now equal to Dn3
 
@@ -211,23 +223,23 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		matvec_n_by_m_scale_special2(m2, scale_vec, Vm, in, out);
 
 		//construct y1 and error vector
-		
+
 		for (int i = 0; i < NSP; ++i) {
 			//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
 			y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NSP + i] - 48.0 * savedActions[2 * NSP + i] + -2.0 * savedActions[3 * NSP + i] + 12.0 * savedActions[4 * NSP + i];
 			//error vec
 			temp[i] = 48.0 * savedActions[2 * NSP + i] - 12.0 * savedActions[4 * NSP + i];
 		}
-		
+
 
 #ifndef CONST_TIME_STEP
 		//scale and find err
 		scale (y, y1, f_temp);
 		err = fmax(EPS, sc_norm(temp, f_temp));
-		
+
 		// classical step size calculation
-		h_new = pow(err, -1.0 / ORD);	
-		
+		h_new = pow(err, -1.0 / ORD);
+
 		failures = 0;
 		if (err <= 1.0) {
 
@@ -236,25 +248,25 @@ int integrate (const double t_start, const double t_end, const double pr, double
   			#endif
 
 			memcpy(sc, f_temp, NSP * sizeof(double));
-			
+
 			// minimum of classical and Gustafsson step size prediction
 			h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
-			
+
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
-			
+
 			// update y and t
-			
+
 			for (int i = 0; i < NSP; ++i) {
 				y[i] = y1[i];
 			}
-			
+
 			t += h;
-			
+
 			// store time step and error
 			err_old = fmax(1.0e-2, err);
 			h_old = h;
-			
+
 			// check if last step rejected
 			if (reject) {
 				reject = false;
@@ -262,7 +274,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			}
 			h = fmin(h_new, t_end - t);
 			numSteps++;
-						
+
 		} else {
 
 			#ifdef LOG_KRYLOV_AND_STEPSIZES
@@ -272,17 +284,17 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			// limit to 0.2 <= (h_new/8) <= 8.0
 			h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
 			h_new = fmin(h_new, t_end - t);
-			
+
 			reject = true;
 			h = fmin(h, h_new);
 		}
 #else
 		//constant time stepping
-		// update y and t	
+		// update y and t
 		for (int i = 0; i < NSP; ++i) {
 			y[i] = y1[i];
 		}
-		
+
 		t += h;
 #endif
 
@@ -292,6 +304,10 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		fclose(logFile);
 		fclose(rFile);
 	#endif
-	
+
 	return EC_success;
 }
+
+#ifdef GENERATE_DOCS
+}
+#endif

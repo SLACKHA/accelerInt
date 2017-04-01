@@ -2,8 +2,10 @@ import textwrap
 import re
 
 optionWrapper = textwrap.TextWrapper(initial_indent='    ',
-                                   subsequent_indent='    ',
-                                   width=72)
+                                     subsequent_indent='    ',
+                                     width=72)
+
+
 def listify(value):
     """
     Convert an option specified as a string to a list.  Allow both
@@ -19,6 +21,7 @@ def listify(value):
             else:
                 out_list.append(val)
         return out_list
+
 
 def formatOption(env, opt):
     """
@@ -50,7 +53,7 @@ def formatOption(env, opt):
     lines = ['* %s: [ %s ]' % (opt.key, values)]
 
     # Help text, wrapped and idented 4 spaces
-    lines.extend(optionWrapper.wrap(re.sub(r'\s+', ' ',help)))
+    lines.extend(optionWrapper.wrap(re.sub(r'\s+', ' ', help)))
 
     # Default value
     lines.append('    - default: %r' % default)

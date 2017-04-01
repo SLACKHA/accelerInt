@@ -1,6 +1,6 @@
-/*solver_generic.cu
- * the generic integration driver for all GPU solvers
- * \file solver_generic.cu
+/**
+ * \file
+ * \brief The integration driver for the CVODE solver
  *
  * \author Nicholas Curtis
  * \date 03/10/2015
@@ -22,6 +22,20 @@ extern N_Vector *y_locals;
 extern double* y_local_vectors;
 extern void** integrators;
 
+#ifdef GENERATE_DOCS
+namespace cvode {
+#endif
+
+/**
+ * \brief Integration driver for the CPU integrators
+ * \param[in]       NUM         the number of IVPs to solve
+ * \param[in]       t           the current IVP time
+ * \param[in]       t_end       the time to integrate the IVP to
+ * \param[in]       pr_global   the pressure value for the IVPs
+ * \param[in, out]  y_global    the state vectors
+ *
+ * The integration driver for the CVODEs solver
+ */
 void intDriver (const int NUM, const double t, const double t_end,
                 const double *pr_global, double *y_global)
 {
@@ -37,7 +51,7 @@ void intDriver (const int NUM, const double t, const double t_end,
 
         // load local array with initial values from global array
         double* y_local = NV_DATA_S(fill);
-        
+
         for (int i = 0; i < NSP; i++)
         {
             y_local[i] = y_global[tid + i * NUM];
@@ -76,7 +90,6 @@ void intDriver (const int NUM, const double t, const double t_end,
         }
 
         // update global array with integrated values
-        
         for (int i = 0; i < NSP; i++)
         {
             y_global[tid + i * NUM] = y_local[i];
@@ -85,3 +98,7 @@ void intDriver (const int NUM, const double t, const double t_end,
     } // end tid loop
 
 } // end intDriver
+
+#ifdef GENERATE_DOCS
+}
+#endif

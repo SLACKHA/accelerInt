@@ -1,5 +1,6 @@
-/*solver_props.cuh
- *simple convencience file to include the correct solver properties file
+/**
+ * \file
+ * \brief simple convenience file to include the correct solver properties file
  */
 
 #ifndef SOLVER_PROPS_CUH
@@ -15,7 +16,15 @@
  	struct solver_memory {};
 #endif
 
+#ifdef GENERATE_DOCS
+namespace genericcu {
+#endif
+
 __host__
 void check_error(int, int*);
+
+#ifdef GENERATE_DOCS
+namespace }
+#endif
 
 #endif

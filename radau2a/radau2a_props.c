@@ -1,5 +1,15 @@
+/**
+ * \file
+ * \brief Error checking for the CPU Radua-IIa solver
+ */
 #include "radau2a_props.h"
 
+/*! \fn void check_error(int tid, int code)
+	\brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	\param tid The thread (IVP) index
+	\param code The return code of the thread
+	@see ErrorCodes
+ */
 void check_error(int tid, int code)
 {
 	switch(code)

@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Header definitions for LU factorization routines
+ */
+
 #ifndef COMPLEX_INVERSE_H
 #define COMPLEX_INVERSE_H
 

@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Header for Matrix exponential (phi) methods
+ */
+
 #ifndef PHIA_HEAD_HESSENBERG
 #define PHIA_HEAD_HESSENBERG
 

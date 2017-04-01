@@ -1,6 +1,6 @@
-/*read_initial_conditions.h
- * definition of the generic initial condition reader
- * \file read_initial_conditions.h
+/**
+ * \file
+ * \brief definition of the generic initial condition reader
  *
  * \author Nicholas Curtis
  * \date 03/10/2015

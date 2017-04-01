@@ -1,6 +1,6 @@
-/* rb43_init.cu
-*  Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
- * \file rb43_init.cu
+/**
+ * \file exprb43_init.cu
+ * \brief Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
@@ -12,10 +12,14 @@
 #include "solver_props.cuh"
 #include "gpu_macros.cuh"
 
- void initialize_solver() {
-    find_poles_and_residuals();
- }
+#ifdef GENERATE_DOCS
+namespace exprb43cu {
+#endif
 
+/*!
+   \fn char* solver_name()
+   \brief Returns a descriptive solver name
+*/
  const char* solver_name() {
     const char* name = "exprb43-int-gpu";
     return name;
@@ -43,6 +47,13 @@
     FILE* rFile = 0;
 #endif
 
+/*!
+   \fn solver_log()
+   \brief Executes solver specific logging tasks
+
+   Logs errors, step-sizes, and krylov subspace size (if #LOG_OUTPUT is defined)
+   @see solver_options.cuh
+*/
  void solver_log() {
  #ifdef LOG_OUTPUT
  	//first copy back num steps to make sure we're inbounds
@@ -72,6 +83,13 @@
  #endif
  }
 
+ /*!
+   \fn init_solver_log()
+   \brief Initializes solver specific items for logging
+
+   Initializes the Krylov subspace logging files (if #LOG_OUTPUT is defined)
+   @see solver_options.cuh
+*/
  void init_solver_log() {
  #ifdef LOG_OUTPUT
 	//file for krylov logging
@@ -83,13 +101,20 @@
 	logFile = fopen(out_name, "w");
 
 	char out_reject_name[len + 23];
-	sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);    
+	sprintf(out_reject_name, "log/%s-kry-reject.txt", f_name);
 	//file for krylov logging
 	//open and clear
 	rFile = fopen(out_reject_name, "w");
  #endif
  }
 
+/*!
+   \fn size_t required_solver_size()
+   \brief Returns the total size (in bytes) required for memory storage for a single GPU thread
+   Used in calculation of the maximum number of possible GPU threads to launch, this method
+   returns the size of the solver_memory structure (per-GPU thread)
+   @see solver_memory
+*/
  size_t required_solver_size() {
     //return the size (in bytes), needed per cuda thread
     size_t num_bytes = 0;
@@ -113,16 +138,30 @@
     num_bytes += STRIDE * sizeof(cuDoubleComplex);
     //result flag
     num_bytes += 1 * sizeof(int);
-    
+
     return num_bytes;
  }
 
- void createAndZero(void** ptr, size_t size)
+/*!
+ * \fn void createAndZero(void** ptr, size_t size)
+ * \brief Convienvience method to Cuda Malloc and memset a pointer to zero
+ * \param ptr The address of the pointer to malloc
+ * \param size The total size (in bytes) of the pointer to malloc
+ */
+void createAndZero(void** ptr, size_t size)
 {
   cudaErrorCheck(cudaMalloc(ptr, size));
   cudaErrorCheck(cudaMemset(*ptr, 0, size));
 }
 
+/*! \fn void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
+   \brief Initializes the GPU solver
+   \param padded The total (padded) number of GPU threads (IVPs) to solve
+   \param h_mem The host solver_memory structure (to be copied to the GPU)
+   \param d_mem The device solver_memory structure (to be operated on by the GPU)
+
+   Solves for the poles and residuals used for the Rational Approximants in the Krylov subspace methods and initializes solver_memory
+*/
 void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem) {
   find_poles_and_residuals();
   // Allocate storage for the device struct
@@ -146,6 +185,14 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
   cudaErrorCheck( cudaMemcpy(*d_mem, *h_mem, sizeof(solver_memory), cudaMemcpyHostToDevice) );
 }
 
+/*!
+   \fn void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem)
+   \brief Cleans up solver memory
+   @see solver_memory
+   @see solver_options.cuh
+
+   Additionally closes Krylov subspace logfiles (if #LOG_OUTPUT is defined)
+*/
  void cleanup_solver(solver_memory** h_mem, solver_memory** d_mem) {
  #ifdef LOG_OUTPUT
     //close files
@@ -167,3 +214,7 @@ void initialize_solver(int padded, solver_memory** h_mem, solver_memory** d_mem)
     cudaErrorCheck( cudaFree((*h_mem)->result) );
     cudaErrorCheck( cudaFree(*d_mem) );
  }
+
+#ifdef GENERATE_DOCS
+}
+#endif

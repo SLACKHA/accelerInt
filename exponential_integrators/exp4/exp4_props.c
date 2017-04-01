@@ -1,5 +1,25 @@
+/**
+ * \file
+ * \brief Contains error checking for EXP4 return codes
+ *
+ * \author Nicholas J. Curtis
+ * \date 09/02/2014
+ *
+ */
+
 #include "exp4_props.h"
 
+#ifdef GENERATE_DOCS
+namespace exp4 {
+#endif
+
+
+/*! \fn void check_error(int tid, int code)
+	\brief Checks the return code of the given thread (IVP) for an error, and exits if found
+	\param tid The thread (IVP) index
+	\param code The return code of the thread
+	@see exp4_ErrCodes
+ */
 void check_error(int tid, int code)
 {
 	switch(code)
@@ -18,3 +38,7 @@ void check_error(int tid, int code)
 			exit(code);
 	}
 }
+
+#ifdef GENERATE_DOCS
+}
+#endif

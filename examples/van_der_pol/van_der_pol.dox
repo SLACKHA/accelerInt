@@ -1,0 +1,155 @@
+/**
+\page vdp The van der Pol problem
+
+The van der Pol problem is a commonly used stiff test problem for ODE solvers.
+The stiffness is 'tunable' via modification of parameter \f$\mu\f$
+A complete reference can be found in:
+
+        Hairer, Noersett, Wanner: Solving Ordinary Differential Equations II, p 157. Springer-Verlag 1991.
+or for a practical example in Matlab, [see here](http://www.ece.northwestern.edu/local-apps/matlabhelp/techdoc/math_anal/diffeq6.html).
+
+\section defn Problem Definition
+The van der Pol problem can be written as a set of two first-order of non-linear ODE equations:
+
+        \f{align}{
+            & y_1^\prime =&& y_2 \, & y_1(0) =&& y_1^\circ \nonumber \\
+            & y_2^\prime =&& \mu \left(1 - y_1^2y_2\right) - y_1 \, & y_2(0) =&&  y_2^\circ \nonumber
+          \f}
+
+For our purposes, we shall use:
+
+        \f{align}{
+           y_1^\circ &= 2 \nonumber \\
+           y_2^\circ &= 0 \nonumber \\
+           \mu&= 1000 \nonumber
+          \f}
+
+for [comparison purposes](http://www.ece.northwestern.edu/local-apps/matlabhelp/techdoc/math_anal/diffeq6.html#37714)
+
+\section accelerint_indx A Note on Indexing
+
+The format of arrays expected by `accelerInt` is of note.
+
+\attention In all cases, the C-solvers operate on local copies of the state vectors and Jacobian matrix.
+This means that the problem index (i.e. which IVP is being solved) does not enter into vector or matrix indexing.
+The memory layout is still a Column-major format for the Jacobian matrix.
+To see an example of proper Jacobian layout and indexing for C-solvers, see jacob.c
+@see jacob.c
+
+\attention In the CUDA case however, the state vectors and Jacobian matrix remain in global memory by necessity due to limitations
+on the size of local memory per-thread.  Here, the IVP index does factor into indexing concerns, and can be accessed using the built-in CUDA thread indexing parameters (e.g. `threadIdx.x`, etc.).
+Convienience macros are defined in gpu_macros.cuh to aid indexing; for an example of Jacobian layout and indexing for the CUDA-case, see jacob.cu.
+@see #INDEX, gpu_macros.cuh, jacob.cu
+
+\section impl Implementation
+
+This section details the implementation files required for the C and CUDA solvers.
+
+\subsection rhs RHS implementation
+
+First, both languages need a dydt() function implementation.
+Both a header and implementation file are required.
+- For the C-solvers, the implementation is in dydt.c and the header definition in dydt.h
+- For the CUDA-sovlers, the implementation and headers are dydt.cu and dydt.cuh respectively.
+
+\subsection jac Jacobian
+
+If #FINITE_DIFFERENCE is not specified in the \ref scons_opts "SCons Options", an analytical Jacobian implementation must be must be specified.
+Both a header and implementation file are required:
+- See jacob.h and jacob.c for the C-solvers
+- See jacob.cuh and jacob.cu for the C-solvers
+
+\subsection header System Header
+
+The ODE header.h file contains several important macros and definitions.
+- First, the macro #NSP defines the number of variables in the state vector, i.e. 2 for this problem.
+- Second the macro #NN should be defined to be equal to #NSP.
+See \ref ics for more information.
+
+The header.h file also contains header definitions for several functions dealing with initial conditions, set_same_initial_conditions(), apply_mask() and apply_reverse_mask().
+
+The CUDA header.cuh file is similar to the C-version, with a few additional methods regarding \ref GPU_mem GPU Memory initialization.
+It contains the mechanism_memory struct, which defines memory needed for RHS and Jacobian evaluation, as well as the initialize_gpu_memory(), free_gpu_memory(), and required_mechanism_size() methods, which initialize, free
+and calculate the required GPU memory respectively.
+
+\subsection GPU_mem GPU Memory Initialization
+
+In order to operate the CUDA solvers, the user must implement some additional functions designed to properly initialize the required GPU memory.
+`accelerInt` pre-allocates the required memory for the solver and ODE model in the GPU's global memory to get around use of local per-thread (stack) memory allocation which becomes limiting for large ODE systems.
+
+- required_mechanism_size() determines the amount of memory (in bytes) required per each individual CUDA thread.  This is used to determine the maximum number of threads that can be launched per GPU and to split integration into batches if necessary.  This is similar to the various required_solver_size() implementations for the solvers.
+- initialize_gpu_memory() initializes the host and device versions of the mechanism_memory structs, similar to the various initialize_solver() implementations for the GPU solvers
+- free_gpu_memory() cleans up the host and device mechanism_memory structs as with the cleanup_solver() implementation for each GPU solver.
+
+\subsection launch GPU Launch Bounds
+
+The launch_bounds.cuh file contains definitions for a few variables that control CUDA kernel launches:
+- #TARGET_BLOCK_SIZE defines the number of threads per CUDA block
+- #SHARED_SIZE defines the size of shared memory per CUDA block.  This is not currently used by the solvers, but could potentially be used by a used defined RHS / Jacobian implementation.
+- #PREFERL1 tells CUDA to prefer a larger L1 cache over more shared memory.  It is recommended to keep this on.
+
+\subsection ics Initial Conditions
+
+The initial condition reader was designed with @pyJac in mind, it is currently quite cumbersome to use for other data formats.
+
+- Although this will be upgraded in future releases, currently the #NN macro should be defined to be equal to #NSP.
+- Additionally, the initial conditions reader expects the following data format:
+
+        \f{align}{ \nonumber
+           \text{time}, y_1, \text{parameter}, y_2,& y_3, ... y_{NSP} \text{ (State 1)}\\ \nonumber
+           \text{time}, y_1, \text{parameter}, y_2,& y_3, ... y_{NSP} \text{ (State 2)}\\ \nonumber
+           \vdots&
+        \f}
+An example of how to write a file in this format can be found in generate_ics.py
+
+The set_same_initial_conditions(), defined in ics.c and ics.cu defines a simple function to set
+the initial conditions of the state vector if the \ref scons_opts "SCons option" #SAME_IC is used.
+- In this case, we use this method to set the initial conditions described in \ref defn.
+
+Additionally, ics.c / ics.cu defines the dummy methods apply_mask() and apply_reverse_mask(), which are not used for the van der Pol problem.
+
+@see read_initial_conditions.c, read_initial_conditions.cu
+
+\subsection mult Matrix-Vector Multiplier
+
+Finally, the sparse_multiplier.c, sparse_multiplier.cu, sparse_multiplier.h and sparse_multiplier.cuh provide headers and definitions for a "sparse"
+(unrolled) matrix multiplier.
+This is used by the exponential solvers (and may provide speedups if a sparse Jacobian is used).
+
+\section compilation Compiling the van der Pol problem.
+
+We compile the problem with the SCons call:
+
+        scons SAME_IC=True LOG_OUTPUT=True LOG_END_ONLY=False t_end=2000.0 t_step=1.0 mechanism_dir=examples/van_der_pol/ -j 2
+
+This turns on the initial conditions discussed in \ref defn.
+
+- The `j` parameter allows scons to use 2 threads during compilation (vary as necessary)
+- The `mechanism_dir` option tells scons to look in the `van_der_pol` example directory for \ref impl implementation of the required functions described above.
+- We log the output to a file (generated by default in `accelerInt-root/log/solvername.bin`), for plotting.\n
+- The time step #t_step is set to 1 second, while the end time #end_time is set to 2000 seconds.
+- The default error tolerances #ATOL/#RTOL = \f$\num{e-10}\text{ and }\num{e-6}\f$ respectively are used.
+- Additionaly the #PRINT=True option tuns on logging to the screen (if so desired)
+- Alternatively, randomized initial conditions generated by generate_ics.py may be used by copying the resulting `ign_data.bin` file to the root `accelerInt` folder, and compiling without the #SAME_IC option.
+
+\section results Running the Solvers and Plotting Results
+
+The CPU solvers can be called using:
+
+        ./solver_name [num_threads] [num_odes]
+
+While the GPU solvers are called via:
+
+        ./solver_name [num_odes]
+
+For example, we call:
+
+        ./exprb43-int-gpu 1
+        ./cvodes-int 1 1
+        ./radau2a-int 1 1
+
+Next, we load the data and plot (plotter.py), resulting in:
+
+\image html ./van_der_pol.png "Solver output for the van der Pol problem" width=10cm
+
+*/

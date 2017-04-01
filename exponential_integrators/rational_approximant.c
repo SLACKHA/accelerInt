@@ -1,6 +1,6 @@
-/*rational_approximant.cu
-*	The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential
-* \file rational_approximant.cu
+/**
+* \file rational_approximant.c
+* \brief The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential
 *
 * \author Nicholas Curtis
 * \date 03/09/2015
@@ -17,6 +17,9 @@
 double complex poles[N_RA];
 double complex res[N_RA];
 
+/**
+* \brief get poles and residues for rational approximant to matrix exponential
+*/
 void find_poles_and_residuals()
 {
 	// get poles and residues for rational approximant to matrix exponential

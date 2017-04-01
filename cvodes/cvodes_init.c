@@ -1,6 +1,5 @@
-/* rb43_init.cu
-*  Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solver
- * \file rb43_init.cu
+/*! \file cvodes_init.c
+ *  \brief Implementation of the necessary initialization for the CVODE interface
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
@@ -23,10 +22,30 @@
 #include "cvodes/cvodes.h"
 #include "cvodes/cvodes_lapack.h"
 
+#ifdef GENERATE_DOCS
+namespace cvode {
+#endif
+
+/** The state vectors used in CVODE operation */
 N_Vector *y_locals;
+/** The base state vectors used in N_Vector creation */
 double* y_local_vectors;
+/** The stored CVODE integrator objects */
 void** integrators;
 
+/*! \fn void initialize_solver(int num_threads)
+   \brief Initializes the solver
+   \param num_threads The number of OpenMP threads to use
+
+   Various definitions in the generated options, e.g. #FINITE_DIFFERENCE, #CV_MAX_ERRTEST_FAILS,
+   etc. affect the options set for the CVODEs solver. @see solver_options.h
+
+   The RHS function dydt_cvodes() will be used in the solver.
+
+   If #FINITE_DIFFERENCE is not defined, the jacobian function in eval_jacob_cvodes
+   will be used in the CVODE solver.  Else, the CVODE finite difference based on the
+   RHS function will be used.
+*/
  void initialize_solver(int num_threads) {
  	y_locals = (N_Vector*)malloc(num_threads * sizeof(N_Vector));
  	y_local_vectors = (double*)calloc(num_threads * NSP, sizeof(double));
@@ -136,6 +155,13 @@ void** integrators;
 	}
  }
 
+/*!
+   \fn void cleanup_solver(int num_threads)
+   \brief Cleans up the created solvers
+   \param num_threads The number of OpenMP threads used
+
+   Frees and cleans up allocated CVODE memory.
+*/
  void cleanup_solver(int num_threads) {
  	//free the integrators and nvectors
 	for (int i = 0; i < num_threads; i++)
@@ -148,6 +174,10 @@ void** integrators;
 	free(integrators);
  }
 
+/*!
+   \fn char* solver_name()
+   \brief Returns a descriptive solver name
+*/
  const char* solver_name() {
 #ifdef SUNDIALS_ANALYTIC_JACOBIAN
  	const char* name = "cvodes-analytic-int";
@@ -158,8 +188,10 @@ void** integrators;
  }
 
  void init_solver_log() {
- 	
  }
  void solver_log() {
- 	
  }
+
+#ifdef GENERATE_DOCS
+}
+#endif

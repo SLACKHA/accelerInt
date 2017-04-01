@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Header definitions for CUDA LU factorization routines
+ */
+
 #ifndef COMPLEX_INVERSE_CUH
 #define COMPLEX_INVERSE_CUH
 

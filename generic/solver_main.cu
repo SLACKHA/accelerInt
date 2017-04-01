@@ -1,15 +1,15 @@
-/* solver_main.cu
- * the generic main file for all exponential solvers
+/**
  * \file solver_main.cu
+ * \brief the generic main file for all GPU solvers
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
  *
- * Contains main and integration driver functions.
+ * Contains main function, setup, initialization, logging, timing and driver functions
  */
 
 
-/** Include common code. */
+/* Include common code. */
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -20,7 +20,7 @@
 #include <fenv.h>
 #endif
 
-/** Include CUDA libraries. */
+/* Include CUDA libraries. */
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <helper_cuda.h>
@@ -37,9 +37,23 @@
 
 #ifdef DIVERGENCE_TEST
     #include <assert.h>
+    //! If #DIVERGENCE_TEST is defined, this creates a device array for tracking
+    //  internal integrator steps per thread
     __device__ int integrator_steps[DIVERGENCE_TEST] = {0};
 #endif
 
+/**
+ * \brief Writes state vectors to file
+ * \param[in]           NUM                 the number of state vectors to write
+ * \param[in]           t                   the current system time
+ * \param[in]           y_host              the current state vectors
+ * \param[in]           pFile               the opened binary file object
+ *
+ * The resulting file is updated as:
+ * system time\n
+ * temperature, mass fractions (State #1)\n
+ * temperature, mass fractions (State #2)...
+ */
 void write_log(int NUM, double t, const double* y_host, FILE* pFile)
 {
     fwrite(&t, sizeof(double), 1, pFile);
@@ -53,12 +67,30 @@ void write_log(int NUM, double t, const double* y_host, FILE* pFile)
             buffer[i] = y_host[NUM * i + j];
             Y_N -= buffer[i];
         }
+        #if NN == NSP + 1 //pyjac
         buffer[NSP] = Y_N;
+        #endif
         apply_reverse_mask(&buffer[1]);
         fwrite(buffer, sizeof(double), NN, pFile);
     }
 }
 
+/**
+ * \brief A convienience method to copy memory between host pointers of different pitches, widths and heights.
+ *        Enables easier use of CUDA's cudaMemcpy2D functions.
+ *
+ * \param[out]              dst             The destination array
+ * \param[in]               pitch_dst       The width (in bytes) of the destination array.
+                                            This corresponds to the padded number of IVPs to be solved.
+ * \param[in]               src             The source pointer
+ * \param[in]               pitch_src       The width (in bytes)  of the source array.
+                                            This corresponds to the (non-padded) number of IVPs read by read_initial_conditions
+ * \param[in]               offset          The offset within the source array (IVP index) to copy from.
+                                            This is useful in the case (for large models) where the solver and state vector memory will not fit in device memory
+                                            and the integration must be split into multiple kernel calls.
+ * \param[in]               width           The size (in bytes) of memory to copy for each entry in the state vector
+ * \param[in]               height          The number of entries in the state vector
+ */
 inline void memcpy2D_in(double* dst, const int pitch_dst, double const * src, const int pitch_src,
                                      const int offset, const size_t width, const int height) {
     for (int i = 0; i < height; ++i)
@@ -69,6 +101,22 @@ inline void memcpy2D_in(double* dst, const int pitch_dst, double const * src, co
     }
 }
 
+/**
+ * \brief A convienience method to copy memory between host pointers of different pitches, widths and heights.
+ *        Enables easier use of CUDA's cudaMemcpy2D functions.
+ *
+ * \param[out]              dst             The destination array
+ * \param[in]               pitch_dst       The width (in bytes)  of the source array.
+                                            This corresponds to the (non-padded) number of IVPs read by read_initial_conditions
+ * \param[in]               src             The source pointer
+ * \param[in]               pitch_src       The width (in bytes) of the destination array.
+                                            This corresponds to the padded number of IVPs to be solved.
+ * \param[in]               offset          The offset within the destination array (IVP index) to copy to.
+                                            This is useful in the case (for large models) where the solver and state vector memory will not fit in device memory
+                                            and the integration must be split into multiple kernel calls.
+ * \param[in]               width           The size (in bytes) of memory to copy for each entry in the state vector
+ * \param[in]               height          The number of entries in the state vector
+ */
 inline void memcpy2D_out(double* dst, const int pitch_dst, double const * src, const int pitch_src,
                                       const int offset, const size_t width, const int height) {
     for (int i = 0; i < height; ++i)
@@ -83,15 +131,24 @@ inline void memcpy2D_out(double* dst, const int pitch_dst, double const * src, c
 
 /** Main function
  *
- *
- *
  * \param[in]       argc    command line argument count
  * \param[in]       argv    command line argument vector
+ *
+ * This allows running the integrators from the command line.  The syntax is as follows:\n
+ * `./solver-name [num_threads] [num_IVPs]`\n
+ * *  num_threads  [Optional, Default:1]
+ *      *  The number OpenMP threads to utilize
+ *      *  The number of threads cannot be greater than recognized by OpenMP via `omp_get_max_threads()`
+ * *  num_IVPs     [Optional, Default:1]
+ *      *  The number of initial value problems to solve.
+ *      *  This must be less than the number of conditions in the data file if #SAME_IC is not defined.
+ *      *  If #SAME_IC is defined, then the initial conditions in the mechanism files will be used.
+ *
  */
 int main (int argc, char *argv[])
 {
 
-//enable signaling NAN and other bad numerics tracking for easier debugging 
+//enable signaling NAN and other bad numerics tracking for easier debugging
 #ifdef DEBUG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
@@ -180,7 +237,7 @@ int main (int argc, char *argv[])
     // print number of threads and block size
     printf ("# threads: %d \t block size: %d\n", NUM, TARGET_BLOCK_SIZE);
 
-#ifdef SHUFFLE 
+#ifdef SHUFFLE
     const char* filename = "shuffled_data.bin";
 #elif !defined(SAME_IC)
     const char* filename = "ign_data.bin";
@@ -245,9 +302,9 @@ int main (int argc, char *argv[])
         {
             int num_cond = min(NUM - num_solved, padded);
 
-            cudaErrorCheck( cudaMemcpy (host_mech->var, &var_host[num_solved], 
+            cudaErrorCheck( cudaMemcpy (host_mech->var, &var_host[num_solved],
                                         num_cond * sizeof(double), cudaMemcpyHostToDevice));
-            
+
              //copy our memory into y_temp
             memcpy2D_in(y_temp, padded, y_host, NUM,
                             num_solved, num_cond * sizeof(double), NSP);

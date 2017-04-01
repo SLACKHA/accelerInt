@@ -1,11 +1,11 @@
-/* solver_main.cu
- * the generic main file for all exponential solvers
- * \file solver_main.cu
+/**
+ * \file
+ * \brief the generic main file for all CPU solvers
  *
  * \author Nicholas Curtis
  * \date 03/09/2015
  *
- * Contains main and integration driver functions.
+ * Contains main function, setup, initialization, logging, timing and driver functions
  */
 
 
@@ -26,6 +26,22 @@
 #include "timer.h"
 #include "read_initial_conditions.h"
 
+#ifdef GENERATE_DOCS
+namespace generic {
+#endif
+
+/**
+ * \brief Writes state vectors to file
+ * \param[in]           NUM                 the number of state vectors to write
+ * \param[in]           t                   the current system time
+ * \param[in]           y_host              the current state vectors
+ * \param[in]           pFile               the opened binary file object
+ *
+ * The resulting file is updated as:
+ * system time\n
+ * temperature, mass fractions (State #1)\n
+ * temperature, mass fractions (State #2)...
+ */
 void write_log(int NUM, double t, const double* y_host, FILE* pFile)
 {
     fwrite(&t, sizeof(double), 1, pFile);
@@ -39,7 +55,9 @@ void write_log(int NUM, double t, const double* y_host, FILE* pFile)
             buffer[i] = y_host[NUM * i + j];
             Y_N -= buffer[i];
         }
+        #if NN == NSP + 1 //pyjac
         buffer[NSP] = Y_N;
+        #endif
         apply_reverse_mask(&buffer[1]);
         fwrite(buffer, sizeof(double), NN, pFile);
     }
@@ -50,15 +68,24 @@ void write_log(int NUM, double t, const double* y_host, FILE* pFile)
 
 /** Main function
  *
- *
- *
  * \param[in]       argc    command line argument count
  * \param[in]       argv    command line argument vector
+ *
+ * This allows running the integrators from the command line.  The syntax is as follows:\n
+ * `./solver-name [num_threads] [num_IVPs]`\n
+ * *  num_threads  [Optional, Default:1]
+ *      *  The number OpenMP threads to utilize
+ *      *  The number of threads cannot be greater than recognized by OpenMP via `omp_get_max_threads()`
+ * *  num_IVPs     [Optional, Default:1]
+ *      *  The number of initial value problems to solve.
+ *      *  This must be less than the number of conditions in the data file if #SAME_IC is not defined.
+ *      *  If #SAME_IC is defined, then the initial conditions in the mechanism files will be used.
+ *
  */
 int main (int argc, char *argv[])
 {
 
-//enable signaling NAN and other bad numerics tracking for easier debugging 
+//enable signaling NAN and other bad numerics tracking for easier debugging
 #ifdef DEBUG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
@@ -116,7 +143,7 @@ int main (int argc, char *argv[])
     // arrays
     /////////////////////////////////////////////////
 
-#ifdef SHUFFLE 
+#ifdef SHUFFLE
     const char* filename = "shuffled_data.bin";
 #elif !defined(SAME_IC)
     const char* filename = "ign_data.bin";
@@ -228,3 +255,7 @@ int main (int argc, char *argv[])
 
     return 0;
 }
+
+#ifdef GENERATE_DOCS
+}
+#endif

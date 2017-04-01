@@ -1,14 +1,22 @@
-/** 
-* \file radau2a.c
+/**
+* \file
 *
 * \author Nicholas J. Curtis
 * \date 03/16/2015
 *
-* A Radau2A IRK implementation for C
-* 
+* \brief A Radau2A IRK implementation for C
+* Adapted from Hairer and Wanner's [RADAU5 code](http://www.unige.ch/~hairer/prog/stiff/radau5.f)
+* and the [FATODE](http://people.cs.vt.edu/~asandu/Software/FATODE/index.html) ODE integration library
+*
+* For full reference see:\n
+* G. Wanner, E. Hairer, Solving Ordinary Differential Equations II: Stiff and DifferentialAlgebraic
+Problems, 2nd Edition, Springer-Verlag, Berlin, 1996. doi:10.1007/978-3-642-
+05221-7.
+*
 * NOTE: all matricies stored in column major format!
-* 
+*
 */
+
 
 #include "header.h"
 #include "solver_props.h"
@@ -20,39 +28,75 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
 
+#ifdef GENERATE_DOCS
+namespace radau2a {
+#endif
+
+//! Maximum number of allowed internal timesteps before error
 #define Max_no_steps (200000)
+//! Maximum number of allowed Newton iteration steps before error
 #define NewtonMaxit (8)
+//! Use quadratic interpolation from previous step if possible
 #define StartNewton (true)
+//! Use gustafsson time stepping control
 #define Gustafsson
+//! Smallist representable double precision number
 #define Roundoff (EPS)
+//! Controls maximum decrease in timestep size
 #define FacMin (0.2)
+//! Controls maximum increase in timestep size
 #define FacMax (8)
+//! Safety factor for Gustafsson time stepping control
 #define FacSafe (0.9)
+//! Time step factor on rejected step
 #define FacRej (0.1)
+//! Minimum Newton convergence rate
 #define ThetaMin (0.001)
+//! Newton convergence tolerance
 #define NewtonTol (0.03)
+//! Min Timestep ratio to skip LU decomposition
 #define Qmin (1.0)
+//! Max Timestep ratio to skip LU decomposition
 #define Qmax (1.2)
-#define UNROLL (8)
+//#define UNROLL (8)
+//! Error allowed on this many consecutive internal timesteps before exit
+#define Max_consecutive_errs (5)
 //#define SDIRK_ERROR
 
+/**
+ * \brief Computes error weight scaling from initial and current state
+ * \param[in]		y0			the initial state vector to use
+ * \param[in]		y			the current state vector
+ * \param[out]		sc			the populated error weight scalings
+ */
 static inline void scale (const double * __restrict__ y0,
 						  const double* __restrict__ y,
 						  double * __restrict__ sc) {
-	
+
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fmax(fabs(y0[i]), fabs(y[i])) * RTOL);
 	}
 }
 
+/**
+ * \brief Computes error weight scaling from initial state
+ * \param[in]		y0			the initial state vector to use
+ * \param[out]		sc			the populated error weight scalings
+ */
 static inline void scale_init (const double * __restrict__ y0,
 							   double * __restrict__ sc) {
-	
+
 	for (int i = 0; i < NSP; ++i) {
 		sc[i] = 1.0 / (ATOL + fabs(y0[i]) * RTOL);
 	}
 }
+
+/**
+ * \defgroup RK_Params Various parameters for the RadauIIA method
+ * @{
+ */
 
 const static double rkA[3][3] = { {
 	 1.968154772236604258683861429918299e-1,
@@ -82,7 +126,7 @@ const static double rkC[3] = {
 };
 
 #ifdef SDIRK_ERROR
-	// Classical error estimator: 
+	// Classical error estimator:
 	// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
 	const static double rkE[4] = {
 	0.02,
@@ -105,7 +149,7 @@ const static double rkC[3] = {
 	0.2748888295956773677478286035994148
 	};
 #else
-	// Classical error estimator: 
+	// Classical error estimator:
 	// H* Sum (B_j-Bhat_j)*f(Z_j) = H*E(0)*f(0) + Sum E_j*Z_j
 	const static double rkE[4] = {
 	0.05,
@@ -121,11 +165,11 @@ const static double rkC[3] = {
 	};
 #endif
 
-//Local order of error estimator 
+//Local order of error estimator
 /*
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~> Diagonalize the RK matrix:               
-! rkTinv * inv(rkA) * rkT =          
+!~~~> Diagonalize the RK matrix:
+! rkTinv * inv(rkA) * rkT =
 !           |  rkGamma      0           0     |
 !           |      0      rkAlpha   -rkBeta   |
 !           |      0      rkBeta     rkAlpha  |
@@ -148,7 +192,7 @@ const static double rkT[3][3] = {
 0.0e0}
 };
 
-const static double rkTinv[3][3] = 
+const static double rkTinv[3][3] =
 {{4.178718591551904727346462658512057,
 3.27682820761062387082533272429617e-1,
 5.233764454994495480399309159089876e-1},
@@ -186,32 +230,45 @@ const static double rkAinvT[3][3] = {
 
 const static double rkELO = 4;
 
-//dummy size variable
+/**
+ * @}
+ */
+
+//! Lapack - non-transpose
 static char TRANS = 'N';
+//! Lapack - 1 RHS solve
 static int NRHS = 1;
+//! Lapack - Array size
 static int ARRSIZE = NSP;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/*
-* calculate E1 & E2 matricies and their LU Decomposition
+/**
+* \brief Compute E1 & E2 matricies and their LU Decomposition
+* \param[in]			H				The timestep size
+* \param[in,out]		E1				The non-complex matrix system
+* \param[in,out]		E2				The complex matrix system
+* \param[in]			Jac				The Jacobian matrix
+* \param[out]			ipiv1			The pivot indicies for E1
+* \param[out]			ipiv2			The pivot indicies for E2
+* \param[out]			info			An indicator variable determining if an error occured.
 */
 static void RK_Decomp(const double H, double* __restrict__ E1,
 					  double complex* __restrict__ E2, const double* __restrict__ Jac,
 					  int* __restrict__ ipiv1, int* __restrict__ ipiv2, int* __restrict__ info) {
 	double complex temp2 = rkAlpha/H + I * rkBeta/H;
 	double temp1 = rkGamma / H;
-	
+
 	for (int i = 0; i < NSP; i++)
 	{
-		
+
 		for(int j = 0; j < NSP; j++)
 		{
 			E1[i + j * NSP] = -Jac[i + j * NSP];
 			E2[i + j * NSP] = -Jac[i + j * NSP] + 0 * I;
 		}
 		E1[i + i * NSP] += temp1;
-		E2[i + i * NSP] += temp2; 
+		E2[i + i * NSP] += temp2;
 	}
 	dgetrf_(&ARRSIZE, &ARRSIZE, E1, &ARRSIZE, ipiv1, info);
 	if (*info != 0) {
@@ -220,29 +277,35 @@ static void RK_Decomp(const double H, double* __restrict__ E1,
 	zgetrf_(&ARRSIZE, &ARRSIZE, E2, &ARRSIZE, ipiv2, info);
 }
 
+/**
+* \brief Compute Quadaratic interpolate
+*/
 static void RK_Make_Interpolate(const double* __restrict__ Z1, const double* __restrict__ Z2,
 								const double* __restrict__ Z3, double* __restrict__ CONT) {
-	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]); 
-	
+	double den = (rkC[2] - rkC[1]) * (rkC[1] - rkC[0]) * (rkC[0] - rkC[2]);
+
 	for (int i = 0; i < NSP; i++) {
 		CONT[i] = ((-rkC[2] * rkC[2] * rkC[1] * Z1[i] + Z3[i] * rkC[1]* rkC[0] * rkC[0]
-                    + rkC[1] * rkC[1] * rkC[2] * Z1[i] - rkC[1] * rkC[1] * rkC[0] * Z3[i] 
+                    + rkC[1] * rkC[1] * rkC[2] * Z1[i] - rkC[1] * rkC[1] * rkC[0] * Z3[i]
                     + rkC[2] * rkC[2] * rkC[0] * Z2[i] - Z2[i] * rkC[2] * rkC[0] * rkC[0])
                     /den)-Z3[i];
-        CONT[NSP + i] = -( rkC[0] * rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * rkC[1] * (Z1[i] - Z3[i]) 
+        CONT[NSP + i] = -( rkC[0] * rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * rkC[1] * (Z1[i] - Z3[i])
         				 + rkC[2] * rkC[2] * (Z2[i] - Z1[i]) )/den;
-        CONT[NSP + NSP + i] = ( rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * (Z1[i] - Z3[i]) 
+        CONT[NSP + NSP + i] = ( rkC[0] * (Z3[i] - Z2[i]) + rkC[1] * (Z1[i] - Z3[i])
                            + rkC[2] * (Z2[i] - Z1[i]) ) / den;
 	}
 }
 
+/**
+* \brief Apply quadaratic interpolate to get initial values
+*/
 static void RK_Interpolate(const double H, const double Hold, double* __restrict__ Z1,
 						   double* __restrict__ Z2, double* __restrict__ Z3, const double* __restrict__ CONT) {
 	double r = H / Hold;
 	double x1 = 1.0 + rkC[0] * r;
 	double x2 = 1.0 + rkC[1] * r;
 	double x3 = 1.0 + rkC[2] * r;
-	
+
 	for (int i = 0; i < NSP; i++) {
 		Z1[i] = CONT[i] + x1 * (CONT[NSP + i] + x1 * CONT[NSP + NSP + i]);
 		Z2[i] = CONT[i] + x2 * (CONT[NSP + i] + x2 * CONT[NSP + NSP + i]);
@@ -251,19 +314,31 @@ static void RK_Interpolate(const double H, const double Hold, double* __restrict
 }
 
 
+/**
+* \brief Performs \f$Z:= X + Y\f$ with unrolled (or at least bounds known at compile time) loops
+*/
 static inline void WADD(const double* __restrict__ X, const double* __restrict__ Y,
 						double* __restrict__ Z) {
-	
+
 	for (int i = 0; i < NSP; i++)
 	{
 		Z[i] = X[i] + Y[i];
 	}
 }
 
+/**
+* \brief Sepcialization of DAXPY with unrolled (or at least bounds known at compile time) loops
+*
+*
+* Performs:
+*    *  \f$DY1:= DA1 * DX\f$
+*    *  \f$DY2:= DA2 * DX\f$
+*    *  \f$DY3:= DA3 * DX\f$
+*/
 static inline void DAXPY3(const double DA1, const double DA2, const double DA3,
 						  const double* __restrict__ DX, double* __restrict__ DY1,
 						  double* __restrict__ DY2, double* __restrict__ DY3) {
-	
+
 	for (int i = 0; i < NSP; i++) {
 		DY1[i] += DA1 * DX[i];
 		DY2[i] += DA2 * DX[i];
@@ -271,9 +346,9 @@ static inline void DAXPY3(const double DA1, const double DA2, const double DA3,
 	}
 }
 
-/*
-*Prepare the right-hand side for Newton iterations
-*     R = Z - hA * F
+/**
+*	\brief Prepare the right-hand side for Newton iterations:
+*     \f$R = Z - hA * F\f$
 */
 static void RK_PrepareRHS(const double t, const  double pr, const  double H,
 						  const double* __restrict__ Y, const double* __restrict__ Z1,
@@ -281,7 +356,7 @@ static void RK_PrepareRHS(const double t, const  double pr, const  double H,
 						  double* __restrict__ R1, double* __restrict__ R2, double* __restrict__ R3) {
 	double TMP[NSP];
 	double F[NSP];
-	
+
 	for (int i = 0; i < NSP; i++) {
 		R1[i] = Z1[i];
 		R2[i] = Z2[i];
@@ -307,12 +382,15 @@ static void RK_PrepareRHS(const double t, const  double pr, const  double H,
 	DAXPY3(-H * rkA[0][2], -H * rkA[1][2], -H * rkA[2][2], F, R1, R2, R3);
 }
 
+/**
+ * \brief Solves for the RHS values in the Newton iteration
+ */
 static void RK_Solve(const double H, double* __restrict__ E1,
 					 double complex* __restrict__ E2, double* __restrict__ R1,
 					 double* __restrict__ R2, double* __restrict__ R3, int* __restrict__ ipiv1,
 					 int* __restrict__ ipiv2) {
 	// Z = (1/h) T^(-1) A^(-1) * Z
-	
+
 	for(int i = 0; i < NSP; i++)
 	{
 		double x1 = R1[i] / H;
@@ -331,7 +409,7 @@ static void RK_Solve(const double H, double* __restrict__ E1,
 	}
 #endif
 	double complex temp[NSP];
-	
+
 	for (int i = 0; i < NSP; ++i)
 	{
 		temp[i] = R2[i] + I * R3[i];
@@ -343,7 +421,7 @@ static void RK_Solve(const double H, double* __restrict__ E1,
 		exit(-1);
 	}
 #endif
-	
+
 	for (int i = 0; i < NSP; ++i)
 	{
 		R2[i] = creal(temp[i]);
@@ -351,7 +429,7 @@ static void RK_Solve(const double H, double* __restrict__ E1,
 	}
 
 	// Z = T * Z
-	
+
 	for (int i = 0; i < NSP; ++i) {
 		double x1 = R1[i];
 		double x2 = R2[i];
@@ -362,8 +440,11 @@ static void RK_Solve(const double H, double* __restrict__ E1,
 	}
 }
 
+/**
+ * \brief Computes the scaled error norm from the given `scale` and `DY` vectors
+ */
 static inline double RK_ErrorNorm(const double* __restrict__ scale, double* __restrict__ DY) {
-	
+
 	double sum = 0;
 	for (int i = 0; i < NSP; ++i){
 		sum += (scale[i] * scale[i] * DY[i] * DY[i]);
@@ -371,6 +452,9 @@ static inline double RK_ErrorNorm(const double* __restrict__ scale, double* __re
 	return fmax(sqrt(sum / ((double)NSP)), 1e-10);
 }
 
+/**
+ * \brief Computes and returns the error estimate for this step
+ */
 static double RK_ErrorEstimate(const double H, const double t, const double pr,
 							   const double* __restrict__ Y, const double* __restrict__ F0,
 							   const double* __restrict__ Z1, const double* __restrict__ Z2, const double* __restrict__ Z3,
@@ -383,11 +467,11 @@ static double RK_ErrorEstimate(const double H, const double t, const double pr,
     double F1[NSP] = {0};
     double F2[NSP] = {0};
     double TMP[NSP] = {0};
-    
+
     for (int i = 0; i < NSP; ++i) {
     	F2[i] = HrkE1 * Z1[i] + HrkE2 * Z2[i] + HrkE3 * Z3[i];
     }
-    
+
     for (int i = 0; i < NSP; ++i) {
     	TMP[i] = rkE[0] * F0[i] + F2[i];
     }
@@ -402,12 +486,12 @@ static double RK_ErrorEstimate(const double H, const double t, const double pr,
 #endif
     double Err = RK_ErrorNorm(scale, TMP);
     if (Err >= 1.0 && (FirstStep || Reject)) {
-        
+
     	for (int i = 0; i < NSP; i++) {
         	TMP[i] += Y[i];
         }
     	dydt(t, pr, TMP, F1);
-    	
+
     	for (int i = 0; i < NSP; i++) {
         	TMP[i] = F1[i] + F2[i];
         }
@@ -423,9 +507,15 @@ static double RK_ErrorEstimate(const double H, const double t, const double pr,
     return Err;
 }
 
-/** 
- *  5th-order Radau2A implementation
- * 
+/**
+ *  \brief 5th-order Radau2A CPU implementation
+ *
+ *	\param[in]			t_start				The starting time
+ *  \param[in]			t_end				The end integration time
+ *  \param[in]			pr					The system constant variable (pressure/density)
+ *	\param[in,out]		y 					The system state vector at time `t_start`.
+ 											Overwritten with the system state at time `t_end`
+ *  \returns Return code, @see RK_ErrCodes
  */
 int integrate (const double t_start, const double t_end, const double pr, double* y) {
 	double Hmin = 0;
@@ -477,7 +567,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		if (!Reject) {
 			dydt (t, pr, y, F0);
 		}
-		if (!SkipLU) { 
+		if (!SkipLU) {
 			//need to update Jac/LU
 			if (!SkipJac) {
 				eval_jacob (t, pr, y, A);
@@ -485,7 +575,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			RK_Decomp(H, E1, E2, A, ipiv1, ipiv2, &info);
 			if (info != 0) {
 				Nconsecutive += 1;
-				if (Nconsecutive >= 5)
+				if (Nconsecutive >= Max_consecutive_errs)
 				{
 					return EC_consecutive_steps;
 				}
@@ -531,17 +621,17 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			double d3 = RK_ErrorNorm(sc, DZ3);
 			double NewtonIncrement = sqrt((d1 * d1 + d2 * d2 + d3 * d3) / 3.0);
 			Theta = ThetaMin;
-			if (NewtonIter > 0) 
+			if (NewtonIter > 0)
 			{
 				Theta = NewtonIncrement / NewtonIncrementOld;
 				if (Theta < 0.99) {
 					NewtonRate = Theta / (1.0 - Theta);
 				}
-				else { //! Non-convergence of Newton: Theta too large
+				else { // Non-convergence of Newton: Theta too large
 					break;
 				}
 				if (NewtonIter < NewtonMaxit) {
-					//Predict error at the end of Newton process 
+					//Predict error at the end of Newton process
 					double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (1.0 - Theta);
 					if (NewtonPredictedErr >= NewtonTol) {
 						//Non-convergence of Newton: predicted error too large
@@ -554,7 +644,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 
 			NewtonIncrementOld = fmax(NewtonIncrement, Roundoff);
             // Update solution
-            
+
             for (int i = 0; i < NSP; i++)
             {
             	Z1[i] -= DZ1[i];
@@ -578,7 +668,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		}
 
 		double Err = RK_ErrorEstimate(H, t, pr, y, F0, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
-		//!~~~> Computation of new step size Hnew
+		//~~~> Computation of new step size Hnew
 		Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
 		Fac = fmin(FacMax, fmax(FacMin, Fac));
 		Hnew = Fac * H;
@@ -596,7 +686,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 			FirstStep = false;
 			Hold = H;
 			t += H;
-			
+
 			for (int i = 0; i < NSP; i++) {
 				y[i] += Z3[i];
 			}
@@ -636,7 +726,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 		//constant time stepping
 		//update y & t
 		t += H;
-			
+
 		for (int i = 0; i < NSP; i++) {
 			y[i] += Z3[i];
 		}
@@ -644,3 +734,7 @@ int integrate (const double t_start, const double t_end, const double pr, double
 	}
 	return EC_success;
 }
+
+#ifdef GENERATE_DOCS
+}
+#endif

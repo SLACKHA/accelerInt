@@ -1,0 +1,215 @@
+/*!
+\page scons_opts Configuration options for building accelerInt
+
+\section syntax SCons Syntax
+
+The following options can be passed to SCons to customize the accelerInt
+build process. They should be given in the form:
+
+    scons option1=value1 option2=value2
+
+Variables set in this way will be stored in the `accelerInt.conf` file and reused
+automatically on subsequent invocations of scons. Alternatively, the
+configuration options can be entered directly into `accelerInt.conf` before
+running `scons build`. The format of this file is:
+
+    option1 = 'value1'
+    option2 = 'value2'
+
+\section build_type Build Types
+
+To build only the CPU solvers, SCons can be called as:
+
+    scons cpu
+
+Similarly, the GPU solvers can be built with:
+
+    scons gpu
+
+\section build_opts SCons Options
+
+\param toolchain: [ string ]
+
+    The C/C++ compilers to use.
+    - default: 'gnu'
+
+\param blas_lapack_libs: [ string ]
+
+    Comma separated list of blas/lapack libraries to use for the various
+    solvers, set blas_lapack_libs to the the list of libraries that
+    should be passed to the linker, separated by commas, e.g.
+    "lapack,blas" or "lapack,f77blas,cblas,atlas".
+    - default: 'mkl_rt,mkl_intel_lp64,mkl_core,mkl_gnu_thread,dl,mkl_mc,mkl_def'
+
+\param blas_lapack_dir: [ /path/to/blas_lapack_dir ]
+
+    Directory containing the libraries specified by 'blas_lapack_libs'.
+    - default: 'usr/local/lib'
+
+\param NVCCFLAGS: [ string ]
+
+    Compiler flags passed to the CUDA compiler, regardless of
+    optimization level.
+    - default: '-m64 -Xptxas -v'
+
+\param CCFLAGS: [ string ]
+
+    Compiler flags passed to both the C and C++ compiler, regardless of
+    optimization level
+    - default: '-m64'
+
+\param CXXFLAGS: [ string ]
+
+    Compiler flags passed to only the C++ compiler, regardless of
+    optimization level
+    - default: ''
+
+\param CFLAGS: [ string ]
+
+    Compiler flags passed to only the C compiler, regardless of
+    optimization level
+    - default: '-std=c99'
+
+\param thread_flags: [ string ]
+
+    Compiler and linker flags for POSIX multithreading support.
+    - default: '-pthread'
+
+\param openmp_flags: [ string ]
+
+    Compiler and linker flags for OpenMP support.
+    - default: '-fopenmp'
+
+\param compute_level: [ string ]
+
+    The CUDA compute level of your GPUs
+    - default: 'sm_20'
+
+\param sundials_inc_dir: [ string ]
+
+    The directory where the sundials headers are located
+    - default: 'usr/local/include'
+
+\param sundials_lib_dir: [ string ]
+
+    The directory where the sundials libraries are located
+    - default: 'usr/local/lib'
+
+\param boost_inc_dir: [ string ]
+
+    The directory where the boost headers are located
+    - default: 'usr/local/include'
+
+\param fftw3_inc_dir: [ string ]
+
+    The directory where the FFTW3 headers are located
+    - default: 'usr/local/include'
+
+\param fftw3_lib_dir: [ string ]
+
+    The directory where the FFTW3 libraries are located
+    - default: 'usr/local/lib'
+
+\param mechanism_dir: [ string ]
+
+    The directory where mechanism files are located.
+    - default: '/home/nick/Dropbox/accelerInt/mechanism'
+
+\param DEBUG: [ yes | no ]
+
+    Compiles with Debugging flags and information.
+    - default: 'no'
+
+\param ATOL: [ string ]
+
+    Absolute Tolerance for integrators
+    - default: '1e-10'
+
+\param RTOL: [ string ]
+
+    Relative Tolerance for integrators
+    - default: '1e-6'
+
+\param t_step: [ string ]
+
+    Step size for integrator
+    - default: '1e-6'
+
+\param t_end: [ string ]
+
+    End time of the integrator
+    - default: '1e-6'
+
+\param N_RA: [ string ]
+
+    The size of the Rational Approximant for the Exponential
+    Integrators.
+    - default: '10'
+
+\param SAME_IC: [ yes | no ]
+
+    Use the same initial conditions (specified during mechanism
+    creation) during integration.
+    - default: 'no'
+
+\param SHUFFLE: [ yes | no ]
+
+    Shuffle the PaSR initial conditions.
+    - default: 'no'
+
+\param PRECONDITION: [ yes | no ]
+
+    Precondition (via clustering) the PaSR initial conditions.
+    - default: 'no'
+
+\param PRINT: [ yes | no ]
+
+    Log output to screen.
+    - default: 'no'
+
+\param LOG_OUTPUT: [ yes | no ]
+
+    Log output to file.
+    - default: 'no'
+
+\param LOG_END_ONLY: [ yes | no ]
+
+    Log only beginning and end states to file.
+    - default: 'no'
+
+\param IGN: [ yes | no ]
+
+    Log ignition time.
+    - default: 'no'
+
+\param FAST_MATH: [ yes | no ]
+
+    Compile with Fast Math.
+    - default: 'no'
+
+\param FINITE_DIFFERENCE: [ yes | no ]
+
+    Use a finite difference Jacobian (not recommended)
+    - default: 'no'
+
+\param DIVERGENCE_WARPS: [ string ]
+
+    If specified, measure divergence in that many warps
+    - default: '0'
+
+\param CV_HMAX: [ string ]
+
+    If specified, the maximum stepsize for CVode
+    - default: '0'
+
+\param CV_MAX_STEPS: [ string ]
+
+    If specified, the maximum stepsize for CVode
+    - default: '20000'
+
+\param CONST_TIME_STEP: [ for logging purposes ]
+
+    If specified, adaptive timestepping will be turned off
+    - default: 'no'
+
+*/
