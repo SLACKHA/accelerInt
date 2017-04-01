@@ -11,5 +11,6 @@ var searchData=
   ['getinversecomplex',['getInverseComplex',['../linear-algebra_8c.html#a2f33ac7496b7cd6fed5b44188e4aff1e',1,'getInverseComplex(int n, double complex *A):&#160;linear-algebra.c'],['../linear-algebra_8h.html#aaad22cd21b2c37f50d56bc10e562552c',1,'getInverseComplex(int, double complex *):&#160;linear-algebra.c']]],
   ['getlu',['getLU',['../inverse_8cu.html#a25bf32c703aa4b2a43131df214ee0375',1,'getLU(const int n, double *__restrict__ A, int *__restrict__ indPivot, int *__restrict__ info):&#160;inverse.cu'],['../inverse_8cuh.html#a138405fdf6512b1bf16282199a8f60cd',1,'getLU(const int, double *__restrict__, int *__restrict__, int *__restrict__):&#160;inverse.cuh']]],
   ['getmax',['getMax',['../inverse_8cu.html#a7b3d468c8500704ef2452f40b23810bb',1,'inverse.cu']]],
-  ['gettimer',['GetTimer',['../timer_8h.html#ab9a9e5a3142f8bbd781192e032d74c66',1,'timer.h']]]
+  ['gettimer',['GetTimer',['../timer_8h.html#ab9a9e5a3142f8bbd781192e032d74c66',1,'timer.h']]],
+  ['gpuassert',['gpuAssert',['../namespacevan__der__pol__cu.html#a4dc1f096dfd8e6e7f8fdf2367344164c',1,'van_der_pol_cu']]]
 ];

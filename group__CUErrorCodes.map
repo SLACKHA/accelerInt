@@ -1,5 +1,5 @@
 <map id="Return codes of Integrators" name="Return codes of Integrators">
-<area shape="rect" id="node1" href="$group__exp4cu__ErrCodes.html" title="Return codes of GPU\l EXPRB43 integrator" alt="" coords="235,5,383,47"/>
-<area shape="rect" id="node2" href="$group__exprb43cu__ErrCodes.html" title="Return codes of GPU\l EXP4 integrator" alt="" coords="235,71,383,112"/>
-<area shape="rect" id="node4" href="$group__RKCU__ErrCodes.html" title="Return codes of GPU\l Radau&#45;IIa Integrator" alt="" coords="235,136,383,177"/>
+<area shape="rect" id="node1" href="$group__exp4cu__ErrCodes.html" title="Return codes of GPU\l EXPRB43 integrator" alt="" coords="232,5,377,47"/>
+<area shape="rect" id="node2" href="$group__exprb43cu__ErrCodes.html" title="Return codes of GPU\l EXP4 integrator" alt="" coords="232,71,377,112"/>
+<area shape="rect" id="node4" href="$group__RKCU__ErrCodes.html" title="Return codes of GPU\l Radau&#45;IIa Integrator" alt="" coords="232,136,377,177"/>
 </map>

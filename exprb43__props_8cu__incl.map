@@ -1,3 +1,5 @@
-<map id="/home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.cu" name="/home/nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.cu">
-<area shape="rect" id="node2" href="$exprb43__props_8cuh.html" title="Various macros controlling behaviour of RB43 algorithm. " alt="" coords="100,124,232,151"/>
+<map id="C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.cu" name="C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exprb43/exprb43_props.cu">
+<area shape="rect" id="node2" href="$exprb43__props_8cuh.html" title="Various macros controlling behaviour of RB43 algorithm. " alt="" coords="313,124,445,151"/>
+<area shape="rect" id="node3" href="$header_8cuh.html" title="An example header file that defines system size, memory functions and other required methods for inte..." alt="" coords="234,199,321,225"/>
+<area shape="rect" id="node5" href="$gpu__macros_8cuh.html" title="Defines some simple macros to simplify GPU indexing. " alt="" coords="218,273,337,300"/>
 </map>

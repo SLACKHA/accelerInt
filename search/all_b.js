@@ -2,6 +2,8 @@ var searchData=
 [
   ['label',['label',['../namespaceplotter.html#ad86fcffa76050cfefcf5c40741ce3337',1,'plotter']]],
   ['lapack_5fdfns_2eh',['lapack_dfns.h',['../lapack__dfns_8h.html',1,'']]],
+  ['launch_5fbounds_2ecuh',['launch_bounds.cuh',['../launch__bounds_8cuh.html',1,'']]],
+  ['launch_5fbounds_5fcuh',['LAUNCH_BOUNDS_CUH',['../launch__bounds_8cuh.html#a0e5b2d8bb86516f69f85abde5bb8a36c',1,'launch_bounds.cuh']]],
   ['linear_2dalgebra_2ec',['linear-algebra.c',['../linear-algebra_8c.html',1,'']]],
   ['linear_2dalgebra_2eh',['linear-algebra.h',['../linear-algebra_8h.html',1,'']]],
   ['linestyle',['linestyle',['../namespaceplotter.html#a237cb18812bfa1745951f5567bbf8695',1,'plotter']]],

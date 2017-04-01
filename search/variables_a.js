@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['nrhs',['NRHS',['../namespaceradau2a.html#a67ae7402ff0a6a919cfc653405f513e0',1,'radau2a']]],
-  ['num',['num',['../namespacegenerate__ics.html#a14049fe7c70bb10f88153e4105865a47',1,'generate_ics']]]
+  ['label',['label',['../namespaceplotter.html#ad86fcffa76050cfefcf5c40741ce3337',1,'plotter']]],
+  ['linestyle',['linestyle',['../namespaceplotter.html#a237cb18812bfa1745951f5567bbf8695',1,'plotter']]],
+  ['linestyles',['linestyles',['../namespaceplotter.html#a98936b6c9e8b49797b7b50fabaa84b71',1,'plotter']]],
+  ['loc',['loc',['../namespaceplotter.html#a9cb616df2540adf28d965b3aa7329f84',1,'plotter']]]
 ];

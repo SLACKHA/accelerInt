@@ -16,5 +16,7 @@ var searchData=
   ['solver_5fprops_2eh',['solver_props.h',['../solver__props_8h.html',1,'']]],
   ['solver_5frk78_2ecpp',['solver_rk78.cpp',['../solver__rk78_8cpp.html',1,'']]],
   ['sparse_5fmultiplier_2ec',['sparse_multiplier.c',['../sparse__multiplier_8c.html',1,'']]],
+  ['sparse_5fmultiplier_2ecu',['sparse_multiplier.cu',['../sparse__multiplier_8cu.html',1,'']]],
+  ['sparse_5fmultiplier_2ecuh',['sparse_multiplier.cuh',['../sparse__multiplier_8cuh.html',1,'']]],
   ['sparse_5fmultiplier_2eh',['sparse_multiplier.h',['../sparse__multiplier_8h.html',1,'']]]
 ];

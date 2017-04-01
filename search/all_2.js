@@ -19,6 +19,7 @@ var searchData=
   ['controller',['controller',['../namespacerk78.html#aba972d6260988e04e23d64437536c04c',1,'rk78']]],
   ['controllers',['controllers',['../namespacerk78.html#a7f7ff39cbfddcdc41eb68fd64749997f',1,'rk78']]],
   ['createandzero',['createAndZero',['../namespaceexp4cu.html#abcdabb48b002afcaf4520f85bb06c156',1,'exp4cu::createAndZero()'],['../namespaceexprb43cu.html#a411c61dc481c439d2a19e8f17ec5af63',1,'exprb43cu::createAndZero()']]],
+  ['cudaerrorcheck',['cudaErrorCheck',['../gpu__macros_8cuh.html#a30443b62930197b53c467b008efd5a52',1,'gpu_macros.cuh']]],
   ['cv_5fmax_5ferrtest_5ffails',['CV_MAX_ERRTEST_FAILS',['../solver__options_8cuh.html#ac42e0287ba619ab25b7d767a81f48082',1,'CV_MAX_ERRTEST_FAILS():&#160;solver_options.cuh'],['../solver__options_8h.html#ac42e0287ba619ab25b7d767a81f48082',1,'CV_MAX_ERRTEST_FAILS():&#160;solver_options.h']]],
   ['cv_5fmax_5fhnil',['CV_MAX_HNIL',['../solver__options_8cuh.html#af45d9c410d5d7c99d2692080832d506e',1,'CV_MAX_HNIL():&#160;solver_options.cuh'],['../solver__options_8h.html#af45d9c410d5d7c99d2692080832d506e',1,'CV_MAX_HNIL():&#160;solver_options.h']]],
   ['cv_5fmax_5fsteps',['CV_MAX_STEPS',['../solver__options_8cuh.html#a8dd330cbca99d70609ccc451d9099383',1,'CV_MAX_STEPS():&#160;solver_options.cuh'],['../solver__options_8h.html#a8dd330cbca99d70609ccc451d9099383',1,'CV_MAX_STEPS():&#160;solver_options.h']]],

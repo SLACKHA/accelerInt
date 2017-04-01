@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['qmax',['Qmax',['../radau2a_8c.html#afcfd11ffcebe8a32d20dcacebefa7e6f',1,'Qmax():&#160;radau2a.c'],['../radau2a_8cu.html#afcfd11ffcebe8a32d20dcacebefa7e6f',1,'Qmax():&#160;radau2a.cu']]],
-  ['qmin',['Qmin',['../radau2a_8c.html#ac523cd36edc6fc54a93dfdb10a772bc0',1,'Qmin():&#160;radau2a.c'],['../radau2a_8cu.html#ac523cd36edc6fc54a93dfdb10a772bc0',1,'Qmin():&#160;radau2a.cu']]]
+  ['p',['P',['../exp4__props_8cuh.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exp4_props.cuh'],['../exp4__props_8h.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exp4_props.h'],['../exprb43__props_8cuh.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exprb43_props.cuh'],['../exprb43__props_8h.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exprb43_props.h']]],
+  ['phia_5fhead_5fhessenberg_5fcu',['PHIA_HEAD_HESSENBERG_CU',['../phiAHessenberg_8cuh.html#a3cd1f20586504db36f26cc1dbe605dc1',1,'phiAHessenberg.cuh']]],
+  ['preferl1',['PREFERL1',['../launch__bounds_8cuh.html#a878b153e37b2bb9282f21760e71b7103',1,'launch_bounds.cuh']]],
+  ['print',['PRINT',['../solver__options_8cuh.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.cuh'],['../solver__options_8h.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.h']]]
 ];
