@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include "gpu_macros.cuh"
+#include "gou_memory.cuh"
 
 #ifdef GENERATE_DOCS
 //put this in the van der Pol namespace for documentation
@@ -47,25 +48,6 @@ void apply_mask(double* y_host);
  */
 void apply_reverse_mask(double* y_host);
 
-/**
- * \brief This struct is used to store memory for the CUDA RHS and Jacobian evaluation.
- *        Along with the solver_memory struct, this must be initialized and passed to the solvers
- *        the run.  @see solver_memory, initialize_gpu_memory, required_mechanism_size
- *
- * \param           y               The global state vector arrays
- * \param           dy              The global dydt vector arrays
- * \param           var             The global param array [Used for \f$\mu\f$]
- * \param           jac             The global Jacobian arrays
- *
- * This is also heavily used when using with @pyJac to hold additional arrays
- * for evaluating chemical kinetic reactions.
- */
-struct mechanism_memory {
-  double * y;
-  double * dy;
-  double * var;
-  double * jac;
-};
 
 #ifdef GENERATE_DOCS
 }

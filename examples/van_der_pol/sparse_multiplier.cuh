@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef SPARSE_HEAD
-#define SPARSE_HEAD
+#ifndef SPARSE_HEAD_CUH
+#define SPARSE_HEAD_CUH
 
 #include "header.cuh"
 

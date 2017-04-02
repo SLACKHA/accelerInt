@@ -4,6 +4,9 @@
  *
  */
 
+#ifndef JACOB_H
+#define JACOB_H
+
 #ifdef GENERATE_DOCS
 //put this in the van der Pol namespace for documentation
 namespace van_der_pol {
@@ -23,4 +26,6 @@ void eval_jacob (const double t, const double mu, const double * __restrict__ y,
 
 #ifdef GENERATE_DOCS
 }
+#endif
+
 #endif
