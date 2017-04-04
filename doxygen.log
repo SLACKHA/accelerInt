@@ -833,5 +833,4 @@ lookup cache used 650/65536 hits=2455 misses=657
 finished...
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
-C:/Users/Nick/Dropbox/accelerInt/examples/pyJac/pyJac.dox:30: warning: multiple use of section label 'results' while adding section, (first occurrence: C:/Users/Nick/Dropbox/accelerInt/examples/van_der_pol/van_der_pol.dox, line 135)
 C:/Users/Nick/Dropbox/accelerInt/examples/pyJac/pyJac.dox:17: warning: unexpected token TK_EOF as the argument of ref
