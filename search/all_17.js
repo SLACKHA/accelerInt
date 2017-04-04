@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['z1',['Z1',['../structradau2acu_1_1solver__memory.html#a3920a2e20d5145ffe2b1ecdca5c7fa22',1,'radau2acu::solver_memory']]],
-  ['z2',['Z2',['../structradau2acu_1_1solver__memory.html#a01e0b1a2d05bcd51d00cb1418a790d79',1,'radau2acu::solver_memory']]],
-  ['z3',['Z3',['../structradau2acu_1_1solver__memory.html#ac4d01cd67d75acfe199be4d4676c0bf7',1,'radau2acu::solver_memory']]],
-  ['zgetrf_5f',['zgetrf_',['../lapack__dfns_8h.html#a2ebf716defd6efd95412d03c56df2858',1,'lapack_dfns.h']]],
-  ['zgetri_5f',['zgetri_',['../lapack__dfns_8h.html#ac2ad5fa4cc71e72154f005477e0968a2',1,'lapack_dfns.h']]],
-  ['zgetrs_5f',['zgetrs_',['../lapack__dfns_8h.html#a96c5c8afefcf5472aca9e85a647c085c',1,'lapack_dfns.h']]]
+  ['y',['y',['../structvan__der__pol__cu_1_1mechanism__memory.html#a28ba422790cd4c9dfd72b1d5d073be56',1,'van_der_pol_cu::mechanism_memory']]],
+  ['y0',['y0',['../structradau2acu_1_1solver__memory.html#a61b9966a8ea1d5526161988837795e7a',1,'radau2acu::solver_memory']]],
+  ['y_5flocal_5fvectors',['y_local_vectors',['../namespacecvode.html#adae183039534044ead74e1c1a786a36c',1,'cvode::y_local_vectors()'],['../solver__cvodes_8c.html#af6c0090b9c0312d8ea355108bca0fd06',1,'y_local_vectors():&#160;cvodes_init.c']]],
+  ['y_5flocals',['y_locals',['../namespacecvode.html#a84c47b6a9f2bedf2c5c80429079fc8e3',1,'cvode::y_locals()'],['../solver__cvodes_8c.html#a879c5a17d799c66d4f4c57695a1a4a9f',1,'y_locals():&#160;cvodes_init.c']]],
+  ['y_5ftemp',['y_temp',['../namespacegenericcu.html#a9a062af7a496f339320cfccf270a7c0e',1,'genericcu']]]
 ];
