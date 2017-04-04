@@ -18,6 +18,7 @@ var searchData=
   ['gettimer',['GetTimer',['../timer_8h.html#ab9a9e5a3142f8bbd781192e032d74c66',1,'timer.h']]],
   ['gpu_5fmacros_2ecuh',['gpu_macros.cuh',['../gpu__macros_8cuh.html',1,'']]],
   ['gpu_5fmacros_5fcuh',['GPU_MACROS_CUH',['../gpu__macros_8cuh.html#a2067b6353923c3242cdb51077ad72265',1,'gpu_macros.cuh']]],
+  ['gpu_5fmem_5fcuh',['GPU_MEM_CUH',['../gpu__memory_8cuh.html#a5553707778c5daf97d760724cac8693f',1,'gpu_memory.cuh']]],
   ['gpu_5fmemory_2ecu',['gpu_memory.cu',['../gpu__memory_8cu.html',1,'']]],
   ['gpu_5fmemory_2ecuh',['gpu_memory.cuh',['../gpu__memory_8cuh.html',1,'']]],
   ['gpuassert',['gpuAssert',['../namespacevan__der__pol__cu.html#a4dc1f096dfd8e6e7f8fdf2367344164c',1,'van_der_pol_cu']]],

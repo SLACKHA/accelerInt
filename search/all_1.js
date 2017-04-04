@@ -1,5 +1,8 @@
 var searchData=
 [
+  ['accelerint_5fcleanup',['accelerInt_cleanup',['../namespacegeneric.html#ac7566b6b3f44c980a657941f0969f47f',1,'generic::accelerInt_cleanup()'],['../namespacegenericcu.html#af71930f9c3b6bedb6cb18d3c369fd7d2',1,'genericcu::accelerInt_cleanup()']]],
+  ['accelerint_5finitialize',['accelerInt_initialize',['../namespacegeneric.html#a85305f2051f1169945e89a8975adfaa4',1,'generic::accelerInt_initialize()'],['../namespacegenericcu.html#a27a09d3768d4aae8945d3259f97662c9',1,'genericcu::accelerInt_initialize()']]],
+  ['accelerint_5fintegrate',['accelerInt_integrate',['../namespacegeneric.html#a73b0b8e96cc76156fc3cfd2cd57757f7',1,'generic::accelerInt_integrate()'],['../namespacegenericcu.html#a99149c39e6949cb62cf91ac251a36ab8',1,'genericcu::accelerInt_integrate()']]],
   ['all',['ALL',['../radau2a_8cu.html#ada568356af1dada57942e4b6e5d271b0',1,'radau2a.cu']]],
   ['any',['ANY',['../radau2a_8cu.html#a1fb079c51babe820cd76885d3c519446',1,'radau2a.cu']]],
   ['apply_5fmask',['apply_mask',['../namespacevan__der__pol__cu.html#a7faee9f3588766e9cfe7c741dab3ee9b',1,'van_der_pol_cu::apply_mask()'],['../namespacevan__der__pol.html#acc700a326aa10b0c7fdcb2e6841d7a0c',1,'van_der_pol::apply_mask()']]],

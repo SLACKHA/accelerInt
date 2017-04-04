@@ -1,6 +1,8 @@
 <map id="C:/Users/Nick/Dropbox/accelerInt/generic/solver.h" name="C:/Users/Nick/Dropbox/accelerInt/generic/solver.h">
 <area shape="rect" id="node2" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="5,95,168,151"/>
 <area shape="rect" id="node3" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="192,95,357,151"/>
-<area shape="rect" id="node4" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="381,95,547,151"/>
-<area shape="rect" id="node5" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="571,95,725,151"/>
+<area shape="rect" id="node4" href="$solver__interface_8h.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="381,95,547,151"/>
+<area shape="rect" id="node6" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="571,95,736,151"/>
+<area shape="rect" id="node7" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="760,95,915,151"/>
+<area shape="rect" id="node5" href="$solver__interface_8c.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="381,199,547,255"/>
 </map>

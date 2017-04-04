@@ -1,5 +1,5 @@
 <map id="C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.cuh" name="C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.cuh">
 <area shape="rect" id="node2" href="$solver__props_8cuh.html" title="simple convenience file to include the correct solver properties file " alt="" coords="5,109,124,136"/>
 <area shape="rect" id="node3" href="$header_8cuh.html" title="An example header file that defines system size, memory functions and other required methods for inte..." alt="" coords="148,109,235,136"/>
-<area shape="rect" id="node5" href="$gpu__macros_8cuh.html" title="Defines some simple macros to simplify GPU indexing. " alt="" coords="189,184,308,211"/>
+<area shape="rect" id="node5" href="$gpu__macros_8cuh.html" title="Defines some simple macros to simplify GPU indexing. " alt="" coords="132,184,251,211"/>
 </map>

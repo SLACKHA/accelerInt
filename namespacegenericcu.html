@@ -61,7 +61,8 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">genericcu Namespace Reference</div>  </div>
 </div><!--header-->
@@ -92,8 +93,183 @@ Functions</h2></td></tr>
 <tr class="memitem:a21cc3f48896c010b61e283a6f4c82409"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a21cc3f48896c010b61e283a6f4c82409">solver_name</a> ()</td></tr>
 <tr class="memdesc:a21cc3f48896c010b61e283a6f4c82409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a descriptive solver name.  <a href="#a21cc3f48896c010b61e283a6f4c82409">More...</a><br /></td></tr>
 <tr class="separator:a21cc3f48896c010b61e283a6f4c82409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0763334a1f8d1b34235941a58337111a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a0763334a1f8d1b34235941a58337111a">memcpy2D_in</a> (double *dst, const int pitch_dst, double const *src, const int pitch_src, const int offset, const size_t width, const int height)</td></tr>
+<tr class="memdesc:a0763334a1f8d1b34235941a58337111a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A convienience method to copy memory between host pointers of different pitches, widths and heights. Enables easier use of CUDA's cudaMemcpy2D functions.  <a href="#a0763334a1f8d1b34235941a58337111a">More...</a><br /></td></tr>
+<tr class="separator:a0763334a1f8d1b34235941a58337111a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bc15643bd2080817758b42c68ddf28a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a6bc15643bd2080817758b42c68ddf28a">memcpy2D_out</a> (double *dst, const int pitch_dst, double const *src, const int pitch_src, const int offset, const size_t width, const int height)</td></tr>
+<tr class="memdesc:a6bc15643bd2080817758b42c68ddf28a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A convienience method to copy memory between host pointers of different pitches, widths and heights. Enables easier use of CUDA's cudaMemcpy2D functions.  <a href="#a6bc15643bd2080817758b42c68ddf28a">More...</a><br /></td></tr>
+<tr class="separator:a6bc15643bd2080817758b42c68ddf28a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27a09d3768d4aae8945d3259f97662c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a27a09d3768d4aae8945d3259f97662c9">accelerInt_initialize</a> (int NUM, int device)</td></tr>
+<tr class="memdesc:a27a09d3768d4aae8945d3259f97662c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the solver.  <a href="#a27a09d3768d4aae8945d3259f97662c9">More...</a><br /></td></tr>
+<tr class="separator:a27a09d3768d4aae8945d3259f97662c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99149c39e6949cb62cf91ac251a36ab8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a99149c39e6949cb62cf91ac251a36ab8">accelerInt_integrate</a> (const int NUM, const double t, const double t_end, const double <a class="el" href="solver__options_8h.html#aaeb7127cf3bf0b49cec6554fbc101866">t_step</a>, double *__restrict__ y_host, const double *__restrict__ var_host)</td></tr>
+<tr class="memdesc:a99149c39e6949cb62cf91ac251a36ab8"><td class="mdescLeft">&#160;</td><td class="mdescRight">integrate NUM odes from time <code>t</code> to time <code>t_end</code>, using stepsizes of <code>t_step</code>  <a href="#a99149c39e6949cb62cf91ac251a36ab8">More...</a><br /></td></tr>
+<tr class="separator:a99149c39e6949cb62cf91ac251a36ab8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af71930f9c3b6bedb6cb18d3c369fd7d2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#af71930f9c3b6bedb6cb18d3c369fd7d2">accelerInt_cleanup</a> ()</td></tr>
+<tr class="memdesc:af71930f9c3b6bedb6cb18d3c369fd7d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the solver.  <a href="#af71930f9c3b6bedb6cb18d3c369fd7d2">More...</a><br /></td></tr>
+<tr class="separator:af71930f9c3b6bedb6cb18d3c369fd7d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aebd994cd8979f067bd672588910d33b5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#aebd994cd8979f067bd672588910d33b5">padded</a></td></tr>
+<tr class="memdesc:aebd994cd8979f067bd672588910d33b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Padded # of ODEs to solve.  <a href="#aebd994cd8979f067bd672588910d33b5">More...</a><br /></td></tr>
+<tr class="separator:aebd994cd8979f067bd672588910d33b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab055dd890b1213d13abf8c541e4a09eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsolver__memory.html">solver_memory</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#ab055dd890b1213d13abf8c541e4a09eb">host_solver</a></td></tr>
+<tr class="memdesc:ab055dd890b1213d13abf8c541e4a09eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The solver memory structs.  <a href="#ab055dd890b1213d13abf8c541e4a09eb">More...</a><br /></td></tr>
+<tr class="separator:ab055dd890b1213d13abf8c541e4a09eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb75b0bf572d5107ee76511410038a46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsolver__memory.html">solver_memory</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#acb75b0bf572d5107ee76511410038a46">device_solver</a></td></tr>
+<tr class="separator:acb75b0bf572d5107ee76511410038a46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab05c3172a90dd7ba99f0829b5940e52e"><td class="memItemLeft" align="right" valign="top">mechanism_memory *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#ab05c3172a90dd7ba99f0829b5940e52e">host_mech</a></td></tr>
+<tr class="memdesc:ab05c3172a90dd7ba99f0829b5940e52e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mechanism memory structs.  <a href="#ab05c3172a90dd7ba99f0829b5940e52e">More...</a><br /></td></tr>
+<tr class="separator:ab05c3172a90dd7ba99f0829b5940e52e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8afbde3cf8ec319556ccaa155d260d48"><td class="memItemLeft" align="right" valign="top">mechanism_memory *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a8afbde3cf8ec319556ccaa155d260d48">device_mech</a></td></tr>
+<tr class="separator:a8afbde3cf8ec319556ccaa155d260d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bd8f6f5ff530e0031fad8d4771c3324"><td class="memItemLeft" align="right" valign="top">dim3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a3bd8f6f5ff530e0031fad8d4771c3324">dimBlock</a></td></tr>
+<tr class="memdesc:a3bd8f6f5ff530e0031fad8d4771c3324"><td class="mdescLeft">&#160;</td><td class="mdescRight">block and grid sizes  <a href="#a3bd8f6f5ff530e0031fad8d4771c3324">More...</a><br /></td></tr>
+<tr class="separator:a3bd8f6f5ff530e0031fad8d4771c3324"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dd31ddb679f9bc301355945a04698db"><td class="memItemLeft" align="right" valign="top">dim3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a5dd31ddb679f9bc301355945a04698db">dimGrid</a></td></tr>
+<tr class="separator:a5dd31ddb679f9bc301355945a04698db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f7029a718ffe15c6904855ec8344fde"><td class="memItemLeft" align="right" valign="top">int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a5f7029a718ffe15c6904855ec8344fde">result_flag</a></td></tr>
+<tr class="memdesc:a5f7029a718ffe15c6904855ec8344fde"><td class="mdescLeft">&#160;</td><td class="mdescRight">result flag  <a href="#a5f7029a718ffe15c6904855ec8344fde">More...</a><br /></td></tr>
+<tr class="separator:a5f7029a718ffe15c6904855ec8344fde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a062af7a496f339320cfccf270a7c0e"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegenericcu.html#a9a062af7a496f339320cfccf270a7c0e">y_temp</a></td></tr>
+<tr class="memdesc:a9a062af7a496f339320cfccf270a7c0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">temorary storage  <a href="#a9a062af7a496f339320cfccf270a7c0e">More...</a><br /></td></tr>
+<tr class="separator:a9a062af7a496f339320cfccf270a7c0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="af71930f9c3b6bedb6cb18d3c369fd7d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af71930f9c3b6bedb6cb18d3c369fd7d2">&#9670;&nbsp;</a></span>accelerInt_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void genericcu::accelerInt_cleanup </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cleans up the solver. </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00215">215</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="a27a09d3768d4aae8945d3259f97662c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27a09d3768d4aae8945d3259f97662c9">&#9670;&nbsp;</a></span>accelerInt_initialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void genericcu::accelerInt_initialize </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>NUM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>device</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initializes the solver. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">NUM</td><td>The number of ODEs to integrate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">device</td><td>The CUDA device number, if &lt; 0 set to the first available GPU </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00088">88</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="a99149c39e6949cb62cf91ac251a36ab8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99149c39e6949cb62cf91ac251a36ab8">&#9670;&nbsp;</a></span>accelerInt_integrate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void genericcu::accelerInt_integrate </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>NUM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>t</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>t_end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>t_step</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *__restrict__&#160;</td>
+          <td class="paramname"><em>y_host</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double *__restrict__&#160;</td>
+          <td class="paramname"><em>var_host</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>integrate NUM odes from time <code>t</code> to time <code>t_end</code>, using stepsizes of <code>t_step</code> </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">NUM</td><td>The number of ODEs to integrate. This should be the size of the leading dimension of <code>y_host</code> and <code>var_host</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>accelerint_indx </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>The system time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t_end</td><td>The end time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t_step</td><td>The integration step size. If <code>t_step</code> &lt; 0, the step size will be set to <code>t_end - t</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">y_host</td><td>The state vectors to integrate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">var_host</td><td>The parameters to use in <a class="el" href="namespacevan__der__pol.html#a96995d7e4edc13c1ef284c49539a8eb6" title="An implementation of the RHS of the van der Pol equation. ">dydt()</a> and <a class="el" href="fd__jacob_8c.html#acc1470a4068b80fdef18c84671591fb3" title="Computes a finite difference Jacobian of order FD_ORD of the RHS function dydt at the given pressure ...">eval_jacob()</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00161">161</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
 <a id="af403dabfc12de79ff9ab8575983d6f83"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af403dabfc12de79ff9ab8575983d6f83">&#9670;&nbsp;</a></span>check_error()</h2>
 
@@ -337,6 +513,170 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a0763334a1f8d1b34235941a58337111a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0763334a1f8d1b34235941a58337111a">&#9670;&nbsp;</a></span>memcpy2D_in()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void genericcu::memcpy2D_in </td>
+          <td>(</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>pitch_dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double const *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>pitch_src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>height</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A convienience method to copy memory between host pointers of different pitches, widths and heights. Enables easier use of CUDA's cudaMemcpy2D functions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">dst</td><td>The destination array </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pitch_dst</td><td>The width (in bytes) of the destination array. This corresponds to the padded number of IVPs to be solved. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>The source pointer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pitch_src</td><td>The width (in bytes) of the source array. This corresponds to the (non-padded) number of IVPs read by read_initial_conditions </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The offset within the source array (IVP index) to copy from. This is useful in the case (for large models) where the solver and state vector memory will not fit in device memory and the integration must be split into multiple kernel calls. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">width</td><td>The size (in bytes) of memory to copy for each entry in the state vector </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">height</td><td>The number of entries in the state vector </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00046">46</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="a6bc15643bd2080817758b42c68ddf28a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bc15643bd2080817758b42c68ddf28a">&#9670;&nbsp;</a></span>memcpy2D_out()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void genericcu::memcpy2D_out </td>
+          <td>(</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>pitch_dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double const *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>pitch_src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>height</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A convienience method to copy memory between host pointers of different pitches, widths and heights. Enables easier use of CUDA's cudaMemcpy2D functions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">dst</td><td>The destination array </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pitch_dst</td><td>The width (in bytes) of the source array. This corresponds to the (non-padded) number of IVPs read by read_initial_conditions </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>The source pointer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pitch_src</td><td>The width (in bytes) of the destination array. This corresponds to the padded number of IVPs to be solved. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The offset within the destination array (IVP index) to copy to. This is useful in the case (for large models) where the solver and state vector memory will not fit in device memory and the integration must be split into multiple kernel calls. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">width</td><td>The size (in bytes) of memory to copy for each entry in the state vector </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">height</td><td>The number of entries in the state vector </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00072">72</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
 <a id="a95e70ae54ccfc5eb00792846ca80ecde"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a95e70ae54ccfc5eb00792846ca80ecde">&#9670;&nbsp;</a></span>required_solver_size()</h2>
 
@@ -399,6 +739,163 @@ Functions</h2></td></tr>
 <p>Returns a descriptive solver name. </p>
 
 <p class="definition">Definition at line <a class="el" href="cvodes__init_8c_source.html#l00181">181</a> of file <a class="el" href="cvodes__init_8c_source.html">cvodes_init.c</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a8afbde3cf8ec319556ccaa155d260d48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8afbde3cf8ec319556ccaa155d260d48">&#9670;&nbsp;</a></span>device_mech</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">mechanism_memory * genericcu::device_mech</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00022">22</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="acb75b0bf572d5107ee76511410038a46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb75b0bf572d5107ee76511410038a46">&#9670;&nbsp;</a></span>device_solver</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsolver__memory.html">solver_memory</a> * genericcu::device_solver</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00020">20</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="a3bd8f6f5ff530e0031fad8d4771c3324"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bd8f6f5ff530e0031fad8d4771c3324">&#9670;&nbsp;</a></span>dimBlock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">dim3 genericcu::dimBlock</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>block and grid sizes </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00024">24</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="a5dd31ddb679f9bc301355945a04698db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dd31ddb679f9bc301355945a04698db">&#9670;&nbsp;</a></span>dimGrid</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">dim3 genericcu::dimGrid</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00024">24</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="ab05c3172a90dd7ba99f0829b5940e52e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab05c3172a90dd7ba99f0829b5940e52e">&#9670;&nbsp;</a></span>host_mech</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">mechanism_memory* genericcu::host_mech</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The mechanism memory structs. </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00022">22</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="ab055dd890b1213d13abf8c541e4a09eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab055dd890b1213d13abf8c541e4a09eb">&#9670;&nbsp;</a></span>host_solver</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsolver__memory.html">solver_memory</a>* genericcu::host_solver</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The solver memory structs. </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00020">20</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="aebd994cd8979f067bd672588910d33b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebd994cd8979f067bd672588910d33b5">&#9670;&nbsp;</a></span>padded</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int genericcu::padded</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Padded # of ODEs to solve. </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00018">18</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="a5f7029a718ffe15c6904855ec8344fde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f7029a718ffe15c6904855ec8344fde">&#9670;&nbsp;</a></span>result_flag</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int* genericcu::result_flag</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>result flag </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00026">26</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
+
+</div>
+</div>
+<a id="a9a062af7a496f339320cfccf270a7c0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a062af7a496f339320cfccf270a7c0e">&#9670;&nbsp;</a></span>y_temp</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double* genericcu::y_temp</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>temorary storage </p>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8cu_source.html#l00028">28</a> of file <a class="el" href="solver__interface_8cu_source.html">solver_interface.cu</a>.</p>
 
 </div>
 </div>

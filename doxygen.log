@@ -108,6 +108,14 @@ Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.cuh...
 Parsing file C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.cuh...
 Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.h...
 Parsing file C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.h...
+Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.c...
+Parsing file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.c...
+Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cu...
+Parsing file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cu...
+Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cuh...
+Parsing file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cuh...
+Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.h...
+Parsing file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.h...
 Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_main.c...
 Parsing file C:/Users/Nick/Dropbox/accelerInt/generic/solver_main.c...
 Preprocessing C:/Users/Nick/Dropbox/accelerInt/generic/solver_main.cu...
@@ -359,6 +367,10 @@ Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_generic
 Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_generic.cu...
 Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.cuh...
 Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.h...
+Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.c...
+Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cu...
+Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cuh...
+Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.h...
 Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_main.c...
 Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_main.cu...
 Generating code for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_options.cuh...
@@ -460,52 +472,12 @@ Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver.cuh...
 Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver.h...
 Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_generic.c...
 Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_generic.cu...
-Generating docs for file C:/Users/NicThis is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9.6210)
-entering extended mode
-(_formulas.tex
-LaTeX2e <2017/01/01> patch level 1
-Babel <3.9r> and hyphenation patterns for 72 language(s) loaded.
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\article.cls"
-Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\size10.clo"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\epsfig.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\keyval.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphics.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\trig.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics-cfg\graphics.cfg")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics-def\dvips.def"))))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsmath.sty"
-For additional information on amsmath, use the `?' option.
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amstext.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsgen.sty"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsbsy.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsopn.sty"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\siunitx\siunitx.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\expl3.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\expl3-code.tex")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\l3dvips.def"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3packages\xparse\xparse.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\array.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3packages\l3keys2e\l3keys2e.sty"
-) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\translator.st
-y"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\translator-lang
-uage-mappings.tex")))
-No file _formulas.aux.
-
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\dicts\translato
-r-basic-dictionary\translator-basic-dictionary-English.dict")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\siunitx\siunitx-abbreviations.cfg
-") [1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16]
-[17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31]
-[32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] (_formulas.aux) )
-Output written on _formulas.dvi (43 pages, 6672 bytes).
-Transcript written on _formulas.log.
-'gswin32c.exe' is not recognized as an internal or external command,
-operable program or batch file.
-k/Dropbox/accelerInt/generic/solver_init.cuh...
+Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.cuh...
 Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_init.h...
+Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.c...
+Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cu...
+Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.cuh...
+Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_interface.h...
 Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_main.c...
 Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_main.cu...
 Generating docs for file C:/Users/Nick/Dropbox/accelerInt/generic/solver_options.cuh...
@@ -550,7 +522,51 @@ Generating docs for namespace generate_ics
 Generating docs for namespace generic
 Generating docs for namespace genericcu
 Generating docs for namespace plotter
-Generating docs for namespace radau2a
+GeneratiThis is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9.6210)
+entering extended mode
+(_formulas.tex
+LaTeX2e <2017/01/01> patch level 1
+Babel <3.9r> and hyphenation patterns for 72 language(s) loaded.
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\article.cls"
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\size10.clo"))
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\epsfig.sty"
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\keyval.sty")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphics.sty"
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\trig.sty")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics-cfg\graphics.cfg")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics-def\dvips.def"))))
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsmath.sty"
+For additional information on amsmath, use the `?' option.
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amstext.sty"
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsgen.sty"))
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsbsy.sty")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsopn.sty"))
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\siunitx\siunitx.sty"
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\expl3.sty"
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\expl3-code.tex")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\l3dvips.def"))
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3packages\xparse\xparse.sty")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\array.sty")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3packages\l3keys2e\l3keys2e.sty"
+) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\translator.st
+y"
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\translator-lang
+uage-mappings.tex")))
+No file _formulas.aux.
+
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\dicts\translato
+r-basic-dictionary\translator-basic-dictionary-English.dict")
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\siunitx\siunitx-abbreviations.cfg
+") [1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16]
+[17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31]
+[32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] (_formulas.aux) )
+Output written on _formulas.dvi (43 pages, 6672 bytes).
+Transcript written on _formulas.log.
+'gswin32c.exe' is not recognized as an internal or external command,
+operable program or batch file.
+ng docs for namespace radau2a
 Generating docs for namespace radau2acu
 Generating docs for compound radau2acu::solver_memory...
 Generating docs for namespace rk78
@@ -586,261 +602,271 @@ finalizing index lists...
 writing tag file...
 Running dot...
 Generating dot graphs using 9 parallel threads...
-Running dot for graph 1/143
-Running dot for graph 2/143
-Running dot for graph 3/143
-Running dot for graph 4/143
-Running dot for graph 5/143
-Running dot for graph 6/143
-Running dot for graph 7/143
-Running dot for graph 8/143
-Running dot for graph 9/143
-Running dot for graph 10/143
-Running dot for graph 11/143
-Running dot for graph 12/143
-Running dot for graph 13/143
-Running dot for graph 14/143
-Running dot for graph 15/143
-Running dot for graph 16/143
-Running dot for graph 17/143
-Running dot for graph 18/143
-Running dot for graph 19/143
-Running dot for graph 20/143
-Running dot for graph 21/143
-Running dot for graph 22/143
-Running dot for graph 23/143
-Running dot for graph 24/143
-Running dot for graph 25/143
-Running dot for graph 26/143
-Running dot for graph 27/143
-Running dot for graph 28/143
-Running dot for graph 29/143
-Running dot for graph 30/143
-Running dot for graph 31/143
-Running dot for graph 32/143
-Running dot for graph 33/143
-Running dot for graph 34/143
-Running dot for graph 35/143
-Running dot for graph 36/143
-Running dot for graph 37/143
-Running dot for graph 38/143
-Running dot for graph 39/143
-Running dot for graph 40/143
-Running dot for graph 41/143
-Running dot for graph 42/143
-Running dot for graph 43/143
-Running dot for graph 44/143
-Running dot for graph 45/143
-Running dot for graph 46/143
-Running dot for graph 47/143
-Running dot for graph 48/143
-Running dot for graph 49/143
-Running dot for graph 50/143
-Running dot for graph 51/143
-Running dot for graph 52/143
-Running dot for graph 53/143
-Running dot for graph 54/143
-Running dot for graph 55/143
-Running dot for graph 56/143
-Running dot for graph 57/143
-Running dot for graph 58/143
-Running dot for graph 59/143
-Running dot for graph 60/143
-Running dot for graph 61/143
-Running dot for graph 62/143
-Running dot for graph 63/143
-Running dot for graph 64/143
-Running dot for graph 65/143
-Running dot for graph 66/143
-Running dot for graph 67/143
-Running dot for graph 68/143
-Running dot for graph 69/143
-Running dot for graph 70/143
-Running dot for graph 71/143
-Running dot for graph 72/143
-Running dot for graph 73/143
-Running dot for graph 74/143
-Running dot for graph 75/143
-Running dot for graph 76/143
-Running dot for graph 77/143
-Running dot for graph 78/143
-Running dot for graph 79/143
-Running dot for graph 80/143
-Running dot for graph 81/143
-Running dot for graph 82/143
-Running dot for graph 83/143
-Running dot for graph 84/143
-Running dot for graph 85/143
-Running dot for graph 86/143
-Running dot for graph 87/143
-Running dot for graph 88/143
-Running dot for graph 89/143
-Running dot for graph 90/143
-Running dot for graph 91/143
-Running dot for graph 92/143
-Running dot for graph 93/143
-Running dot for graph 94/143
-Running dot for graph 95/143
-Running dot for graph 96/143
-Running dot for graph 97/143
-Running dot for graph 98/143
-Running dot for graph 99/143
-Running dot for graph 100/143
-Running dot for graph 101/143
-Running dot for graph 102/143
-Running dot for graph 103/143
-Running dot for graph 104/143
-Running dot for graph 105/143
-Running dot for graph 106/143
-Running dot for graph 107/143
-Running dot for graph 108/143
-Running dot for graph 109/143
-Running dot for graph 110/143
-Running dot for graph 111/143
-Running dot for graph 112/143
-Running dot for graph 113/143
-Running dot for graph 114/143
-Running dot for graph 115/143
-Running dot for graph 116/143
-Running dot for graph 117/143
-Running dot for graph 118/143
-Running dot for graph 119/143
-Running dot for graph 120/143
-Running dot for graph 121/143
-Running dot for graph 122/143
-Running dot for graph 123/143
-Running dot for graph 124/143
-Running dot for graph 125/143
-Running dot for graph 126/143
-Running dot for graph 127/143
-Running dot for graph 128/143
-Running dot for graph 129/143
-Running dot for graph 130/143
-Running dot for graph 131/143
-Running dot for graph 132/143
-Running dot for graph 133/143
-Running dot for graph 134/143
-Running dot for graph 135/143
-Running dot for graph 136/143
-Running dot for graph 137/143
-Running dot for graph 138/143
-Running dot for graph 139/143
-Running dot for graph 140/143
-Running dot for graph 141/143
-Running dot for graph 142/143
-Running dot for graph 143/143
-Patching output file 1/111
-Patching output file 2/111
-Patching output file 3/111
-Patching output file 4/111
-Patching output file 5/111
-Patching output file 6/111
-Patching output file 7/111
-Patching output file 8/111
-Patching output file 9/111
-Patching output file 10/111
-Patching output file 11/111
-Patching output file 12/111
-Patching output file 13/111
-Patching output file 14/111
-Patching output file 15/111
-Patching output file 16/111
-Patching output file 17/111
-Patching output file 18/111
-Patching output file 19/111
-Patching output file 20/111
-Patching output file 21/111
-Patching output file 22/111
-Patching output file 23/111
-Patching output file 24/111
-Patching output file 25/111
-Patching output file 26/111
-Patching output file 27/111
-Patching output file 28/111
-Patching output file 29/111
-Patching output file 30/111
-Patching output file 31/111
-Patching output file 32/111
-Patching output file 33/111
-Patching output file 34/111
-Patching output file 35/111
-Patching output file 36/111
-Patching output file 37/111
-Patching output file 38/111
-Patching output file 39/111
-Patching output file 40/111
-Patching output file 41/111
-Patching output file 42/111
-Patching output file 43/111
-Patching output file 44/111
-Patching output file 45/111
-Patching output file 46/111
-Patching output file 47/111
-Patching output file 48/111
-Patching output file 49/111
-Patching output file 50/111
-Patching output file 51/111
-Patching output file 52/111
-Patching output file 53/111
-Patching output file 54/111
-Patching output file 55/111
-Patching output file 56/111
-Patching output file 57/111
-Patching output file 58/111
-Patching output file 59/111
-Patching output file 60/111
-Patching output file 61/111
-Patching output file 62/111
-Patching output file 63/111
-Patching output file 64/111
-Patching output file 65/111
-Patching output file 66/111
-Patching output file 67/111
-Patching output file 68/111
-Patching output file 69/111
-Patching output file 70/111
-Patching output file 71/111
-Patching output file 72/111
-Patching output file 73/111
-Patching output file 74/111
-Patching output file 75/111
-Patching output file 76/111
-Patching output file 77/111
-Patching output file 78/111
-Patching output file 79/111
-Patching output file 80/111
-Patching output file 81/111
-Patching output file 82/111
-Patching output file 83/111
-Patching output file 84/111
-Patching output file 85/111
-Patching output file 86/111
-Patching output file 87/111
-Patching output file 88/111
-Patching output file 89/111
-Patching output file 90/111
-Patching output file 91/111
-Patching output file 92/111
-Patching output file 93/111
-Patching output file 94/111
-Patching output file 95/111
-Patching output file 96/111
-Patching output file 97/111
-Patching output file 98/111
-Patching output file 99/111
-Patching output file 100/111
-Patching output file 101/111
-Patching output file 102/111
-Patching output file 103/111
-Patching output file 104/111
-Patching output file 105/111
-Patching output file 106/111
-Patching output file 107/111
-Patching output file 108/111
-Patching output file 109/111
-Patching output file 110/111
-Patching output file 111/111
-lookup cache used 614/65536 hits=2339 misses=620
+Running dot for graph 1/149
+Running dot for graph 2/149
+Running dot for graph 3/149
+Running dot for graph 4/149
+Running dot for graph 5/149
+Running dot for graph 6/149
+Running dot for graph 7/149
+Running dot for graph 8/149
+Running dot for graph 9/149
+Running dot for graph 10/149
+Running dot for graph 11/149
+Running dot for graph 12/149
+Running dot for graph 13/149
+Running dot for graph 14/149
+Running dot for graph 15/149
+Running dot for graph 16/149
+Running dot for graph 17/149
+Running dot for graph 18/149
+Running dot for graph 19/149
+Running dot for graph 20/149
+Running dot for graph 21/149
+Running dot for graph 22/149
+Running dot for graph 23/149
+Running dot for graph 24/149
+Running dot for graph 25/149
+Running dot for graph 26/149
+Running dot for graph 27/149
+Running dot for graph 28/149
+Running dot for graph 29/149
+Running dot for graph 30/149
+Running dot for graph 31/149
+Running dot for graph 32/149
+Running dot for graph 33/149
+Running dot for graph 34/149
+Running dot for graph 35/149
+Running dot for graph 36/149
+Running dot for graph 37/149
+Running dot for graph 38/149
+Running dot for graph 39/149
+Running dot for graph 40/149
+Running dot for graph 41/149
+Running dot for graph 42/149
+Running dot for graph 43/149
+Running dot for graph 44/149
+Running dot for graph 45/149
+Running dot for graph 46/149
+Running dot for graph 47/149
+Running dot for graph 48/149
+Running dot for graph 49/149
+Running dot for graph 50/149
+Running dot for graph 51/149
+Running dot for graph 52/149
+Running dot for graph 53/149
+Running dot for graph 54/149
+Running dot for graph 55/149
+Running dot for graph 56/149
+Running dot for graph 57/149
+Running dot for graph 58/149
+Running dot for graph 59/149
+Running dot for graph 60/149
+Running dot for graph 61/149
+Running dot for graph 62/149
+Running dot for graph 63/149
+Running dot for graph 64/149
+Running dot for graph 65/149
+Running dot for graph 66/149
+Running dot for graph 67/149
+Running dot for graph 68/149
+Running dot for graph 69/149
+Running dot for graph 70/149
+Running dot for graph 71/149
+Running dot for graph 72/149
+Running dot for graph 73/149
+Running dot for graph 74/149
+Running dot for graph 75/149
+Running dot for graph 76/149
+Running dot for graph 77/149
+Running dot for graph 78/149
+Running dot for graph 79/149
+Running dot for graph 80/149
+Running dot for graph 81/149
+Running dot for graph 82/149
+Running dot for graph 83/149
+Running dot for graph 84/149
+Running dot for graph 85/149
+Running dot for graph 86/149
+Running dot for graph 87/149
+Running dot for graph 88/149
+Running dot for graph 89/149
+Running dot for graph 90/149
+Running dot for graph 91/149
+Running dot for graph 92/149
+Running dot for graph 93/149
+Running dot for graph 94/149
+Running dot for graph 95/149
+Running dot for graph 96/149
+Running dot for graph 97/149
+Running dot for graph 98/149
+Running dot for graph 99/149
+Running dot for graph 100/149
+Running dot for graph 101/149
+Running dot for graph 102/149
+Running dot for graph 103/149
+Running dot for graph 104/149
+Running dot for graph 105/149
+Running dot for graph 106/149
+Running dot for graph 107/149
+Running dot for graph 108/149
+Running dot for graph 109/149
+Running dot for graph 110/149
+Running dot for graph 111/149
+Running dot for graph 112/149
+Running dot for graph 113/149
+Running dot for graph 114/149
+Running dot for graph 115/149
+Running dot for graph 116/149
+Running dot for graph 117/149
+Running dot for graph 118/149
+Running dot for graph 119/149
+Running dot for graph 120/149
+Running dot for graph 121/149
+Running dot for graph 122/149
+Running dot for graph 123/149
+Running dot for graph 124/149
+Running dot for graph 125/149
+Running dot for graph 126/149
+Running dot for graph 127/149
+Running dot for graph 128/149
+Running dot for graph 129/149
+Running dot for graph 130/149
+Running dot for graph 131/149
+Running dot for graph 132/149
+Running dot for graph 133/149
+Running dot for graph 134/149
+Running dot for graph 135/149
+Running dot for graph 136/149
+Running dot for graph 137/149
+Running dot for graph 138/149
+Running dot for graph 139/149
+Running dot for graph 140/149
+Running dot for graph 141/149
+Running dot for graph 142/149
+Running dot for graph 143/149
+Running dot for graph 144/149
+Running dot for graph 145/149
+Running dot for graph 146/149
+Running dot for graph 147/149
+Running dot for graph 148/149
+Running dot for graph 149/149
+Patching output file 1/115
+Patching output file 2/115
+Patching output file 3/115
+Patching output file 4/115
+Patching output file 5/115
+Patching output file 6/115
+Patching output file 7/115
+Patching output file 8/115
+Patching output file 9/115
+Patching output file 10/115
+Patching output file 11/115
+Patching output file 12/115
+Patching output file 13/115
+Patching output file 14/115
+Patching output file 15/115
+Patching output file 16/115
+Patching output file 17/115
+Patching output file 18/115
+Patching output file 19/115
+Patching output file 20/115
+Patching output file 21/115
+Patching output file 22/115
+Patching output file 23/115
+Patching output file 24/115
+Patching output file 25/115
+Patching output file 26/115
+Patching output file 27/115
+Patching output file 28/115
+Patching output file 29/115
+Patching output file 30/115
+Patching output file 31/115
+Patching output file 32/115
+Patching output file 33/115
+Patching output file 34/115
+Patching output file 35/115
+Patching output file 36/115
+Patching output file 37/115
+Patching output file 38/115
+Patching output file 39/115
+Patching output file 40/115
+Patching output file 41/115
+Patching output file 42/115
+Patching output file 43/115
+Patching output file 44/115
+Patching output file 45/115
+Patching output file 46/115
+Patching output file 47/115
+Patching output file 48/115
+Patching output file 49/115
+Patching output file 50/115
+Patching output file 51/115
+Patching output file 52/115
+Patching output file 53/115
+Patching output file 54/115
+Patching output file 55/115
+Patching output file 56/115
+Patching output file 57/115
+Patching output file 58/115
+Patching output file 59/115
+Patching output file 60/115
+Patching output file 61/115
+Patching output file 62/115
+Patching output file 63/115
+Patching output file 64/115
+Patching output file 65/115
+Patching output file 66/115
+Patching output file 67/115
+Patching output file 68/115
+Patching output file 69/115
+Patching output file 70/115
+Patching output file 71/115
+Patching output file 72/115
+Patching output file 73/115
+Patching output file 74/115
+Patching output file 75/115
+Patching output file 76/115
+Patching output file 77/115
+Patching output file 78/115
+Patching output file 79/115
+Patching output file 80/115
+Patching output file 81/115
+Patching output file 82/115
+Patching output file 83/115
+Patching output file 84/115
+Patching output file 85/115
+Patching output file 86/115
+Patching output file 87/115
+Patching output file 88/115
+Patching output file 89/115
+Patching output file 90/115
+Patching output file 91/115
+Patching output file 92/115
+Patching output file 93/115
+Patching output file 94/115
+Patching output file 95/115
+Patching output file 96/115
+Patching output file 97/115
+Patching output file 98/115
+Patching output file 99/115
+Patching output file 100/115
+Patching output file 101/115
+Patching output file 102/115
+Patching output file 103/115
+Patching output file 104/115
+Patching output file 105/115
+Patching output file 106/115
+Patching output file 107/115
+Patching output file 108/115
+Patching output file 109/115
+Patching output file 110/115
+Patching output file 111/115
+Patching output file 112/115
+Patching output file 113/115
+Patching output file 114/115
+Patching output file 115/115
+lookup cache used 647/65536 hits=2450 misses=653
 finished...
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?

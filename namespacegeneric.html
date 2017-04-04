@@ -90,6 +90,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a8ea23497102dccb8aaf87ed6d27506fe"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a8ea23497102dccb8aaf87ed6d27506fe">solver_name</a> ()</td></tr>
 <tr class="memdesc:a8ea23497102dccb8aaf87ed6d27506fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a descriptive solver name.  <a href="#a8ea23497102dccb8aaf87ed6d27506fe">More...</a><br /></td></tr>
 <tr class="separator:a8ea23497102dccb8aaf87ed6d27506fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85305f2051f1169945e89a8975adfaa4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a85305f2051f1169945e89a8975adfaa4">accelerInt_initialize</a> (int num_threads)</td></tr>
+<tr class="memdesc:a85305f2051f1169945e89a8975adfaa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the solver.  <a href="#a85305f2051f1169945e89a8975adfaa4">More...</a><br /></td></tr>
+<tr class="separator:a85305f2051f1169945e89a8975adfaa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73b0b8e96cc76156fc3cfd2cd57757f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a73b0b8e96cc76156fc3cfd2cd57757f7">accelerInt_integrate</a> (const int NUM, const double t, const double t_end, const double <a class="el" href="solver__options_8h.html#aaeb7127cf3bf0b49cec6554fbc101866">t_step</a>, double *__restrict__ y_host, const double *__restrict__ var_host)</td></tr>
+<tr class="memdesc:a73b0b8e96cc76156fc3cfd2cd57757f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">integrate NUM odes from time <code>t</code> to time <code>t_end</code>, using stepsizes of <code>t_step</code>  <a href="#a73b0b8e96cc76156fc3cfd2cd57757f7">More...</a><br /></td></tr>
+<tr class="separator:a73b0b8e96cc76156fc3cfd2cd57757f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7566b6b3f44c980a657941f0969f47f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#ac7566b6b3f44c980a657941f0969f47f">accelerInt_cleanup</a> (int num_threads)</td></tr>
+<tr class="memdesc:ac7566b6b3f44c980a657941f0969f47f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans up the solver.  <a href="#ac7566b6b3f44c980a657941f0969f47f">More...</a><br /></td></tr>
+<tr class="separator:ac7566b6b3f44c980a657941f0969f47f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46943f7ebab17c7fb16065c7ed8444ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegeneric.html#a46943f7ebab17c7fb16065c7ed8444ec">write_log</a> (int NUM, double t, const double *y_host, FILE *pFile)</td></tr>
 <tr class="memdesc:a46943f7ebab17c7fb16065c7ed8444ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes state vectors to file.  <a href="#a46943f7ebab17c7fb16065c7ed8444ec">More...</a><br /></td></tr>
 <tr class="separator:a46943f7ebab17c7fb16065c7ed8444ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,6 +111,135 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Include common code. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="ac7566b6b3f44c980a657941f0969f47f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7566b6b3f44c980a657941f0969f47f">&#9670;&nbsp;</a></span>accelerInt_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void generic::accelerInt_cleanup </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_threads</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cleans up the solver. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_threads</td><td>The number of OpenMP threads to use </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8c_source.html#l00060">60</a> of file <a class="el" href="solver__interface_8c_source.html">solver_interface.c</a>.</p>
+
+</div>
+</div>
+<a id="a85305f2051f1169945e89a8975adfaa4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85305f2051f1169945e89a8975adfaa4">&#9670;&nbsp;</a></span>accelerInt_initialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void generic::accelerInt_initialize </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_threads</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initializes the solver. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_threads</td><td>The number of OpenMP threads to use </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8c_source.html#l00022">22</a> of file <a class="el" href="solver__interface_8c_source.html">solver_interface.c</a>.</p>
+
+</div>
+</div>
+<a id="a73b0b8e96cc76156fc3cfd2cd57757f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73b0b8e96cc76156fc3cfd2cd57757f7">&#9670;&nbsp;</a></span>accelerInt_integrate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void generic::accelerInt_integrate </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>NUM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>t</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>t_end</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>t_step</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *__restrict__&#160;</td>
+          <td class="paramname"><em>y_host</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double *__restrict__&#160;</td>
+          <td class="paramname"><em>var_host</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>integrate NUM odes from time <code>t</code> to time <code>t_end</code>, using stepsizes of <code>t_step</code> </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">NUM</td><td>The number of ODEs to integrate. This should be the size of the leading dimension of <code>y_host</code> and <code>var_host</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd>accelerint_indx </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>The system time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t_end</td><td>The end time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t_step</td><td>The integration step size. If <code>t_step</code> &lt; 0, the step size will be set to <code>t_end - t</code> </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">y_host</td><td>The state vectors to integrate. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">var_host</td><td>The parameters to use in <a class="el" href="namespacevan__der__pol.html#a96995d7e4edc13c1ef284c49539a8eb6" title="An implementation of the RHS of the van der Pol equation. ">dydt()</a> and <a class="el" href="fd__jacob_8c.html#acc1470a4068b80fdef18c84671591fb3" title="Computes a finite difference Jacobian of order FD_ORD of the RHS function dydt at the given pressure ...">eval_jacob()</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="solver__interface_8c_source.html#l00038">38</a> of file <a class="el" href="solver__interface_8c_source.html">solver_interface.c</a>.</p>
+
+</div>
+</div>
 <a id="a251b270d1230f00d835580810e4be7bd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a251b270d1230f00d835580810e4be7bd">&#9670;&nbsp;</a></span>check_error()</h2>
 
@@ -296,6 +434,11 @@ Functions</h2></td></tr>
 <p>Integration driver for the CPU integrators. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">NUM</td><td>The (non-padded) number of IVPs to integrate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>The current system time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">t_end</td><td>The IVP integration end time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pr_global</td><td>The system constant variable (pressures / densities) </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">y_global</td><td>The system state vectors at time t. Returns system state vectors at time t_end</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">NUM</td><td>The (non-padded) number of IVPs to integrate </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>The current system time </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">t_end</td><td>The IVP integration end time </td></tr>

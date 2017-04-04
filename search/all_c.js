@@ -16,7 +16,7 @@ var searchData=
   ['max_5fno_5fsteps',['Max_no_steps',['../radau2a_8c.html#a4f5652e996f678da1b1b93c8aa4a7961',1,'Max_no_steps():&#160;radau2a.c'],['../radau2a_8cu.html#a4f5652e996f678da1b1b93c8aa4a7961',1,'Max_no_steps():&#160;radau2a.cu']]],
   ['max_5fsteps',['MAX_STEPS',['../exp4__props_8cuh.html#aa0414caef00a64a51d4c6c0711d9e70a',1,'MAX_STEPS():&#160;exp4_props.cuh'],['../exp4__props_8h.html#aa0414caef00a64a51d4c6c0711d9e70a',1,'MAX_STEPS():&#160;exp4_props.h'],['../exprb43__props_8cuh.html#aa0414caef00a64a51d4c6c0711d9e70a',1,'MAX_STEPS():&#160;exprb43_props.cuh'],['../exprb43__props_8h.html#aa0414caef00a64a51d4c6c0711d9e70a',1,'MAX_STEPS():&#160;exprb43_props.h']]],
   ['mechanism_5fmemory',['mechanism_memory',['../structvan__der__pol__cu_1_1mechanism__memory.html',1,'van_der_pol_cu']]],
-  ['memcpy2d_5fin',['memcpy2D_in',['../solver__main_8cu.html#a8baeaa804b9d16c49da2b8c74fbd6680',1,'solver_main.cu']]],
-  ['memcpy2d_5fout',['memcpy2D_out',['../solver__main_8cu.html#acfaf06165e3e00cb81ebbcd80ee9c23f',1,'solver_main.cu']]],
+  ['memcpy2d_5fin',['memcpy2D_in',['../namespacegenericcu.html#a0763334a1f8d1b34235941a58337111a',1,'genericcu::memcpy2D_in()'],['../solver__main_8cu.html#a8baeaa804b9d16c49da2b8c74fbd6680',1,'memcpy2D_in():&#160;solver_main.cu']]],
+  ['memcpy2d_5fout',['memcpy2D_out',['../namespacegenericcu.html#a6bc15643bd2080817758b42c68ddf28a',1,'genericcu::memcpy2D_out()'],['../solver__main_8cu.html#acfaf06165e3e00cb81ebbcd80ee9c23f',1,'memcpy2D_out():&#160;solver_main.cu']]],
   ['multiplycomplexuppermv',['multiplyComplexUpperMV',['../complexInverse_8c.html#afab60c79bd7e7da7e6fd1d96ce74f42a',1,'multiplyComplexUpperMV(const int n, double complex *x, const int lda, const double complex *A):&#160;complexInverse.c'],['../complexInverse_8cu.html#ad83e7dc7b03a7837b20592aabcfe107c',1,'multiplyComplexUpperMV(const int n, cuDoubleComplex *x, const int lda, const cuDoubleComplex *A):&#160;complexInverse.cu']]]
 ];
