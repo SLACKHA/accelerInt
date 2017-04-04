@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -99,7 +105,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the van der Pol right hand side (y' = f(y)) function. </p>
-<p>Implements the evaluation of the derivative of the state vector with respect to time, <img class="formulaInl" alt="$\dot{\vec{y}}$" src="form_28.png"/> </p>
+<p>Implements the evaluation of the derivative of the state vector with respect to time, \(\dot{\vec{y}}\) </p>
 
 <p class="definition">Definition in file <a class="el" href="dydt_8c_source.html">dydt.c</a>.</p>
 </div></div><!-- contents -->

@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -86,13 +92,13 @@ Functions</h2></td></tr>
 <tr class="memdesc:a5941fdd8c66eada16d6a0acaec4e1f78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply quadaratic interpolate to get initial values.  <a href="#a5941fdd8c66eada16d6a0acaec4e1f78">More...</a><br /></td></tr>
 <tr class="separator:a5941fdd8c66eada16d6a0acaec4e1f78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbf6ff499a4ff97db4b27df63b6fbffd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceradau2a.html#afbf6ff499a4ff97db4b27df63b6fbffd">WADD</a> (const double *__restrict__ X, const double *__restrict__ Y, double *__restrict__ Z)</td></tr>
-<tr class="memdesc:afbf6ff499a4ff97db4b27df63b6fbffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs <img class="formulaInl" alt="$Z:= X + Y$" src="form_20.png"/> with unrolled (or at least bounds known at compile time) loops.  <a href="#afbf6ff499a4ff97db4b27df63b6fbffd">More...</a><br /></td></tr>
+<tr class="memdesc:afbf6ff499a4ff97db4b27df63b6fbffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \(Z:= X + Y\) with unrolled (or at least bounds known at compile time) loops.  <a href="#afbf6ff499a4ff97db4b27df63b6fbffd">More...</a><br /></td></tr>
 <tr class="separator:afbf6ff499a4ff97db4b27df63b6fbffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accc366d693bc987d4e9f3e5fcc5721b1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceradau2a.html#accc366d693bc987d4e9f3e5fcc5721b1">DAXPY3</a> (const double DA1, const double DA2, const double DA3, const double *__restrict__ DX, double *__restrict__ DY1, double *__restrict__ DY2, double *__restrict__ DY3)</td></tr>
 <tr class="memdesc:accc366d693bc987d4e9f3e5fcc5721b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sepcialization of DAXPY with unrolled (or at least bounds known at compile time) loops.  <a href="#accc366d693bc987d4e9f3e5fcc5721b1">More...</a><br /></td></tr>
 <tr class="separator:accc366d693bc987d4e9f3e5fcc5721b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5bc219a47482e040d93186def505f01"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceradau2a.html#af5bc219a47482e040d93186def505f01">RK_PrepareRHS</a> (const double t, const double pr, const double H, const double *__restrict__ Y, const double *__restrict__ Z1, const double *__restrict__ Z2, const double *__restrict__ Z3, double *__restrict__ R1, double *__restrict__ R2, double *__restrict__ R3)</td></tr>
-<tr class="memdesc:af5bc219a47482e040d93186def505f01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the right-hand side for Newton iterations: <img class="formulaInl" alt="$R = Z - hA * F$" src="form_24.png"/>.  <a href="#af5bc219a47482e040d93186def505f01">More...</a><br /></td></tr>
+<tr class="memdesc:af5bc219a47482e040d93186def505f01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the right-hand side for Newton iterations: \(R = Z - hA * F\).  <a href="#af5bc219a47482e040d93186def505f01">More...</a><br /></td></tr>
 <tr class="separator:af5bc219a47482e040d93186def505f01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9dfab43bd32440af1158bad0d91ade3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceradau2a.html#ab9dfab43bd32440af1158bad0d91ade3">RK_Solve</a> (const double H, double *__restrict__ E1, double complex *__restrict__ E2, double *__restrict__ R1, double *__restrict__ R2, double *__restrict__ R3, int *__restrict__ ipiv1, int *__restrict__ ipiv2)</td></tr>
 <tr class="memdesc:ab9dfab43bd32440af1158bad0d91ade3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves for the RHS values in the Newton iteration.  <a href="#ab9dfab43bd32440af1158bad0d91ade3">More...</a><br /></td></tr>
@@ -242,9 +248,9 @@ Variables</h2></td></tr>
 
 <p>Sepcialization of DAXPY with unrolled (or at least bounds known at compile time) loops. </p>
 <p>Performs:</p><ul>
-<li><img class="formulaInl" alt="$DY1:= DA1 * DX$" src="form_21.png"/></li>
-<li><img class="formulaInl" alt="$DY2:= DA2 * DX$" src="form_22.png"/></li>
-<li><img class="formulaInl" alt="$DY3:= DA3 * DX$" src="form_23.png"/> </li>
+<li>\(DY1:= DA1 * DX\)</li>
+<li>\(DY2:= DA2 * DX\)</li>
+<li>\(DY3:= DA3 * DX\) </li>
 </ul>
 
 <p class="definition">Definition at line <a class="el" href="radau2a_8c_source.html#l00338">338</a> of file <a class="el" href="radau2a_8c_source.html">radau2a.c</a>.</p>
@@ -771,7 +777,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Prepare the right-hand side for Newton iterations: <img class="formulaInl" alt="$R = Z - hA * F$" src="form_24.png"/>. </p>
+<p>Prepare the right-hand side for Newton iterations: \(R = Z - hA * F\). </p>
 
 <p class="definition">Definition at line <a class="el" href="radau2a_8c_source.html#l00353">353</a> of file <a class="el" href="radau2a_8c_source.html">radau2a.c</a>.</p>
 
@@ -1034,7 +1040,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Performs <img class="formulaInl" alt="$Z:= X + Y$" src="form_20.png"/> with unrolled (or at least bounds known at compile time) loops. </p>
+<p>Performs \(Z:= X + Y\) with unrolled (or at least bounds known at compile time) loops. </p>
 
 <p class="definition">Definition at line <a class="el" href="radau2a_8c_source.html#l00320">320</a> of file <a class="el" href="radau2a_8c_source.html">radau2a.c</a>.</p>
 

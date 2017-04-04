@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -72,7 +78,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the van der Pol jacobian <img class="formulaInl" alt="$\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}$" src="form_33.png"/>.  
+<p>An implementation of the van der Pol jacobian \(\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}\).  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="header_8h_source.html">header.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -98,7 +104,7 @@ Functions</h2></td></tr>
 <tr class="separator:a591a205f3018bef87815bb37655028e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the van der Pol jacobian <img class="formulaInl" alt="$\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}$" src="form_33.png"/>. </p>
+<div class="textblock"><p>An implementation of the van der Pol jacobian \(\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}\). </p>
 <p>Implementes the evaluation of van der Pol Jacobian </p>
 
 <p class="definition">Definition in file <a class="el" href="jacob_8c_source.html">jacob.c</a>.</p>

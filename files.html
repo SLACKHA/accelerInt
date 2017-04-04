@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -87,8 +93,8 @@ $(function() {
 <tr id="row_1_0_9_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="header_8h_source.html"><span class="icondoc"></span></a><a class="el" href="header_8h.html" target="_self">header.h</a></td><td class="desc">An example header file that defines system size and other required methods for integration of the van der Pol's equation </td></tr>
 <tr id="row_1_0_10_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="ics_8c_source.html"><span class="icondoc"></span></a><a class="el" href="ics_8c.html" target="_self">ics.c</a></td><td class="desc">Sets same Initial Conditions (ICs) for all problems </td></tr>
 <tr id="row_1_0_11_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="ics_8cu_source.html"><span class="icondoc"></span></a><a class="el" href="ics_8cu.html" target="_self">ics.cu</a></td><td class="desc">Sets same Initial Conditions (ICs) for all problems </td></tr>
-<tr id="row_1_0_12_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="jacob_8c_source.html"><span class="icondoc"></span></a><a class="el" href="jacob_8c.html" target="_self">jacob.c</a></td><td class="desc">An implementation of the van der Pol jacobian <img class="formulaInl" alt="$\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}$" src="form_33.png"/> </td></tr>
-<tr id="row_1_0_13_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="jacob_8cu_source.html"><span class="icondoc"></span></a><a class="el" href="jacob_8cu.html" target="_self">jacob.cu</a></td><td class="desc">A CUDA implementation of the van der Pol jacobian <img class="formulaInl" alt="$\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}$" src="form_33.png"/> </td></tr>
+<tr id="row_1_0_12_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="jacob_8c_source.html"><span class="icondoc"></span></a><a class="el" href="jacob_8c.html" target="_self">jacob.c</a></td><td class="desc">An implementation of the van der Pol jacobian \(\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}\) </td></tr>
+<tr id="row_1_0_13_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="jacob_8cu_source.html"><span class="icondoc"></span></a><a class="el" href="jacob_8cu.html" target="_self">jacob.cu</a></td><td class="desc">A CUDA implementation of the van der Pol jacobian \(\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}\) </td></tr>
 <tr id="row_1_0_14_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="jacob_8cuh_source.html"><span class="icondoc"></span></a><a class="el" href="jacob_8cuh.html" target="_self">jacob.cuh</a></td><td class="desc">Contains a header definition for the CUDA van der Pol Jacobian evaluation </td></tr>
 <tr id="row_1_0_15_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="jacob_8h_source.html"><span class="icondoc"></span></a><a class="el" href="jacob_8h.html" target="_self">jacob.h</a></td><td class="desc">Contains a header definition for the van der Pol Jacobian evaluation </td></tr>
 <tr id="row_1_0_16_" style="display:none;"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><a href="launch__bounds_8cuh_source.html"><span class="icondoc"></span></a><a class="el" href="launch__bounds_8cuh.html" target="_self">launch_bounds.cuh</a></td><td class="desc">A number of definitions that control CUDA kernel launches </td></tr>

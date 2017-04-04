@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -98,13 +104,13 @@ Functions</h2></td></tr>
 <tr class="memdesc:aedd1b59cd1eff341e90ba6c6aaada0fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">scaleComplex scales a vector (with increment equal to one) by a constant val.  <a href="#aedd1b59cd1eff341e90ba6c6aaada0fd">More...</a><br /></td></tr>
 <tr class="separator:aedd1b59cd1eff341e90ba6c6aaada0fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a5ccfb63190cc88035612f5c4cbbe5f"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="complexInverse_8cu.html#a4a5ccfb63190cc88035612f5c4cbbe5f">complexGERU</a> (const int n, const cuDoubleComplex alpha, const cuDoubleComplex *arrX, const cuDoubleComplex *arrY, const int incY, cuDoubleComplex *A, const int lda)</td></tr>
-<tr class="memdesc:a4a5ccfb63190cc88035612f5c4cbbe5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">complexGERU performs the rank 1 operation <img class="formulaInl" alt="$A := alpha * arrX * arrY **T + A$" src="form_19.png"/> where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix  <a href="#a4a5ccfb63190cc88035612f5c4cbbe5f">More...</a><br /></td></tr>
+<tr class="memdesc:a4a5ccfb63190cc88035612f5c4cbbe5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">complexGERU performs the rank 1 operation \(A := alpha * arrX * arrY **T + A\) where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix  <a href="#a4a5ccfb63190cc88035612f5c4cbbe5f">More...</a><br /></td></tr>
 <tr class="separator:a4a5ccfb63190cc88035612f5c4cbbe5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad83e7dc7b03a7837b20592aabcfe107c"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="complexInverse_8cu.html#ad83e7dc7b03a7837b20592aabcfe107c">multiplyComplexUpperMV</a> (const int n, cuDoubleComplex *x, const int lda, const cuDoubleComplex *A)</td></tr>
-<tr class="memdesc:ad83e7dc7b03a7837b20592aabcfe107c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the matrix-vector operation <img class="formulaInl" alt="$x_v:= A*x_v$" src="form_16.png"/>.  <a href="#ad83e7dc7b03a7837b20592aabcfe107c">More...</a><br /></td></tr>
+<tr class="memdesc:ad83e7dc7b03a7837b20592aabcfe107c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the matrix-vector operation \(x_v:= A*x_v\).  <a href="#ad83e7dc7b03a7837b20592aabcfe107c">More...</a><br /></td></tr>
 <tr class="separator:ad83e7dc7b03a7837b20592aabcfe107c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3e9e304c4d35955cf6f79d7a5a53369"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="complexInverse_8cu.html#ab3e9e304c4d35955cf6f79d7a5a53369">complexGEMV</a> (const int m, const int n, const int lda, const cuDoubleComplex alpha, const cuDoubleComplex *A, const cuDoubleComplex *arrX, cuDoubleComplex *arrY)</td></tr>
-<tr class="memdesc:ab3e9e304c4d35955cf6f79d7a5a53369"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the matrix-vector operation <img class="formulaInl" alt="$alpha*A*x + y$" src="form_18.png"/> where alpha is a scalar, x and y are vectors and A is an m by n matrix.  <a href="#ab3e9e304c4d35955cf6f79d7a5a53369">More...</a><br /></td></tr>
+<tr class="memdesc:ab3e9e304c4d35955cf6f79d7a5a53369"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the matrix-vector operation \(alpha*A*x + y\) where alpha is a scalar, x and y are vectors and A is an m by n matrix.  <a href="#ab3e9e304c4d35955cf6f79d7a5a53369">More...</a><br /></td></tr>
 <tr class="separator:ab3e9e304c4d35955cf6f79d7a5a53369"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a241fad7ccf21bf3c76f0e8f2235f9897"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="complexInverse_8cu.html#a241fad7ccf21bf3c76f0e8f2235f9897">getComplexLU</a> (const int n, cuDoubleComplex *__restrict__ A, int *__restrict__ indPivot, int *__restrict__ info)</td></tr>
 <tr class="memdesc:a241fad7ccf21bf3c76f0e8f2235f9897"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the LU factorization of a (n x n) matrix using partial pivoting with row interchanges.  <a href="#a241fad7ccf21bf3c76f0e8f2235f9897">More...</a><br /></td></tr>
@@ -184,7 +190,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes the matrix-vector operation <img class="formulaInl" alt="$alpha*A*x + y$" src="form_18.png"/> where alpha is a scalar, x and y are vectors and A is an m by n matrix. </p>
+<p>Computes the matrix-vector operation \(alpha*A*x + y\) where alpha is a scalar, x and y are vectors and A is an m by n matrix. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>On entry, M specifies the number of rows of the matrix A. Must be &gt;= 0 </td></tr>
@@ -265,7 +271,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>complexGERU performs the rank 1 operation <img class="formulaInl" alt="$A := alpha * arrX * arrY **T + A$" src="form_19.png"/> where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix </p>
+<p>complexGERU performs the rank 1 operation \(A := alpha * arrX * arrY **T + A\) where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>The matrix/vector size </td></tr>
@@ -530,7 +536,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>The factorization has the form: <img class="formulaInl" alt="$A = P * L * U$" src="form_15.png"/> where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). </p>
+<p>The factorization has the form: \(A = P * L * U\) where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). </p>
 
 <p class="definition">Definition at line <a class="el" href="complexInverse_8cu_source.html#l00216">216</a> of file <a class="el" href="complexInverse_8cu_source.html">complexInverse.cu</a>.</p>
 
@@ -630,7 +636,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>The factorization has the form: <img class="formulaInl" alt="$A = P * L * U$" src="form_15.png"/> where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). For full reference see: G. W. Stewart, Matrix Algorithms: Volume 1: Basic Decompositions, SIAM, Philadelphia, 1998. doi:10.1137/1.9781611971408. </p>
+<p>The factorization has the form: \(A = P * L * U\) where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). For full reference see: G. W. Stewart, Matrix Algorithms: Volume 1: Basic Decompositions, SIAM, Philadelphia, 1998. doi:10.1137/1.9781611971408. </p>
 
 <p class="definition">Definition at line <a class="el" href="complexInverse_8cu_source.html#l00367">367</a> of file <a class="el" href="complexInverse_8cu_source.html">complexInverse.cu</a>.</p>
 
@@ -674,11 +680,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Performs the matrix-vector operation <img class="formulaInl" alt="$x_v:= A*x_v$" src="form_16.png"/>. </p>
+<p>Performs the matrix-vector operation \(x_v:= A*x_v\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>On entry, n specifies the order of the matrix A. n must be at least zero. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">x</td><td>x is an array of dimension at least (n). Before entry, the incremented array X must contain the n element vector <img class="formulaInl" alt="$x_v$" src="form_17.png"/>. On exit, X is overwritten with the transformed vector <img class="formulaInl" alt="$x_v$" src="form_17.png"/>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">x</td><td>x is an array of dimension at least (n). Before entry, the incremented array X must contain the n element vector \(x_v\). On exit, X is overwritten with the transformed vector \(x_v\). </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">lda</td><td>The stride of the matrix </td></tr>
   </table>
   </dd>

@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -204,7 +210,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mu</td><td>The van der Pol parameter </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The state vector </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">dy</td><td>The output RHS (dydt) vector </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the <img class="formulaInl" alt="$\mu$" src="form_31.png"/> parameter to have a consistent interface.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the \(\mu\) parameter to have a consistent interface.</td></tr>
   </table>
   </dd>
 </dl>
@@ -215,7 +221,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mu</td><td>The van der Pol parameter </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The state vector </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">dy</td><td>The output RHS (dydt) vector </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the <img class="formulaInl" alt="$\mu$" src="form_31.png"/> parameter to have a consistent interface. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the \(\mu\) parameter to have a consistent interface. </td></tr>
   </table>
   </dd>
 </dl>
@@ -275,7 +281,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mu</td><td>The van der Pol parameter </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The state vector at time t </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">jac</td><td>The jacobian to populate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the <img class="formulaInl" alt="$\mu$" src="form_31.png"/> parameter to have a consistent interface.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the \(\mu\) parameter to have a consistent interface.</td></tr>
   </table>
   </dd>
 </dl>
@@ -286,14 +292,14 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mu</td><td>The van der Pol parameter </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The state vector at time t </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">jac</td><td>The jacobian to populate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the <img class="formulaInl" alt="$\mu$" src="form_31.png"/> parameter to have a consistent interface. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">d_mem</td><td>The <a class="el" href="structvan__der__pol__cu_1_1mechanism__memory.html" title="This struct is used to store memory for the CUDA RHS and Jacobian evaluation. Along with the solver_m...">mechanism_memory</a> struct. In future versions, this will be used to access the \(\mu\) parameter to have a consistent interface. </td></tr>
   </table>
   </dd>
 </dl>
-<p>jac[0, 0] = <img class="formulaInl" alt="$\frac{\partial \dot{y_1}}{\partial y_1}$" src="form_34.png"/></p>
-<p>jac[0, 1] = <img class="formulaInl" alt="$\frac{\partial \dot{y_2}}{\partial y_1}$" src="form_35.png"/></p>
-<p>jac[1, 0] = <img class="formulaInl" alt="$\frac{\partial \dot{y_1}}{\partial y_2}$" src="form_36.png"/></p>
-<p>jac[1, 1] = <img class="formulaInl" alt="$\frac{\partial \dot{y_2}}{\partial y_2}$" src="form_37.png"/> </p>
+<p>jac[0, 0] = \(\frac{\partial \dot{y_1}}{\partial y_1}\)</p>
+<p>jac[0, 1] = \(\frac{\partial \dot{y_2}}{\partial y_1}\)</p>
+<p>jac[1, 0] = \(\frac{\partial \dot{y_1}}{\partial y_2}\)</p>
+<p>jac[1, 1] = \(\frac{\partial \dot{y_2}}{\partial y_2}\) </p>
 
 <p class="definition">Definition at line <a class="el" href="jacob_8cu_source.html#l00031">31</a> of file <a class="el" href="jacob_8cu_source.html">jacob.cu</a>.</p>
 
@@ -492,10 +498,10 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">NUM</td><td>The number of initial value problems </td></tr>
     <tr><td class="paramname">y_host</td><td>The state vectors to initialize </td></tr>
-    <tr><td class="paramname">var_host</td><td>The vector of <img class="formulaInl" alt="$mu$" src="form_32.png"/> parameters for the van der Pol equation</td></tr>
+    <tr><td class="paramname">var_host</td><td>The vector of \(mu\) parameters for the van der Pol equation</td></tr>
     <tr><td class="paramname">NUM</td><td>The number of initial value problems </td></tr>
     <tr><td class="paramname">y_host</td><td>The state vectors to initialize </td></tr>
-    <tr><td class="paramname">var_host</td><td>The vector of <img class="formulaInl" alt="$\mu$" src="form_31.png"/> parameters for the van der Pol equation </td></tr>
+    <tr><td class="paramname">var_host</td><td>The vector of \(\mu\) parameters for the van der Pol equation </td></tr>
   </table>
   </dd>
 </dl>
@@ -541,7 +547,7 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">A</td><td>The (NSP x NSP) Jacobian matrix, see <a class="el" href="namespacevan__der__pol__cu.html#a316e3f1146620ef6e300525aa3d73258" title="An implementation of the van der Pol jacobian. ">eval_jacob()</a> for details on layout </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">Vm</td><td>The (NSP x 1) vector to multiply by </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>The (NSP x 1) vector to store the result in, <img class="formulaInl" alt="$w := A * Vm$" src="form_38.png"/> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>The (NSP x 1) vector to store the result in, \(w := A * Vm\) </td></tr>
   </table>
   </dd>
 </dl>

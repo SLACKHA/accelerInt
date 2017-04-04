@@ -522,51 +522,7 @@ Generating docs for namespace generate_ics
 Generating docs for namespace generic
 Generating docs for namespace genericcu
 Generating docs for namespace plotter
-GeneratiThis is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9.6210)
-entering extended mode
-(_formulas.tex
-LaTeX2e <2017/01/01> patch level 1
-Babel <3.9r> and hyphenation patterns for 72 language(s) loaded.
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\article.cls"
-Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\size10.clo"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\epsfig.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\keyval.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphics.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\trig.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics-cfg\graphics.cfg")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics-def\dvips.def"))))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsmath.sty"
-For additional information on amsmath, use the `?' option.
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amstext.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsgen.sty"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsbsy.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsmath\amsopn.sty"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\siunitx\siunitx.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\expl3.sty"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\expl3-code.tex")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3kernel\l3dvips.def"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3packages\xparse\xparse.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tools\array.sty")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\l3packages\l3keys2e\l3keys2e.sty"
-) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\translator.st
-y"
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\translator-lang
-uage-mappings.tex")))
-No file _formulas.aux.
-
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\beamer\translator\dicts\translato
-r-basic-dictionary\translator-basic-dictionary-English.dict")
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\siunitx\siunitx-abbreviations.cfg
-") [1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16]
-[17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31]
-[32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] (_formulas.aux) )
-Output written on _formulas.dvi (43 pages, 6672 bytes).
-Transcript written on _formulas.log.
-'gswin32c.exe' is not recognized as an internal or external command,
-operable program or batch file.
-ng docs for namespace radau2a
+Generating docs for namespace radau2a
 Generating docs for namespace radau2acu
 Generating docs for compound radau2acu::solver_memory...
 Generating docs for namespace rk78
@@ -583,8 +539,6 @@ Generating dependency graph for directory C:/Users/Nick/Dropbox/accelerInt/expon
 Generating dependency graph for directory C:/Users/Nick/Dropbox/accelerInt/generic
 Generating dependency graph for directory C:/Users/Nick/Dropbox/accelerInt/radau2a
 Generating dependency graph for directory C:/Users/Nick/Dropbox/accelerInt/rk78
-Generating bitmaps for formulas in HTML...
-Generating image form_0.png for formula
 Generating index page...
 Generating page index...
 Generating module index...
@@ -870,4 +824,3 @@ lookup cache used 647/65536 hits=2450 misses=653
 finished...
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
 C:/Users/Nick/Dropbox/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
-error: Problem running ghostscript gswin32c.exe -q -g786x92 -r537x537x -sDEVICE=ppmraw -sOutputFile=_form0.pnm -dNOPAUSE -dBATCH -- _form0.ps. Check your installation!

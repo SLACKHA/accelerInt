@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -189,7 +195,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Performs the dot product of the w (NSP x 1) vector with the given subspace vector (NSP x 1) </p>
-<p>returns <img class="formulaInl" alt="$Vm \dot w$" src="form_9.png"/></p>
+<p>returns \(Vm \dot w\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>the vector with with to dot </td></tr>
@@ -452,7 +458,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor and added to another vector. </p>
-<p>Computes <img class="formulaInl" alt="$A * V * scale + add$" src="form_3.png"/></p>
+<p>Computes \(A * V * scale + add\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>size of the matrix </td></tr>
@@ -534,7 +540,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor and adds and subtracts the specified vectors note, the addition is twice the specified vector. </p>
-<p>Computes <img class="formulaInl" alt="$scale * A * V + 2 * add - sub$" src="form_4.png"/></p>
+<p>Computes \(scale * A * V + 2 * add - sub\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>size of the matrix </td></tr>
@@ -605,7 +611,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor. </p>
-<p>Computes the following: <img class="formulaInl" alt="$Av1 = A * V1 * scale[0]$" src="form_0.png"/>, <img class="formulaInl" alt="$Av2 = A * V2 * scale[1]$" src="form_1.png"/>, and <img class="formulaInl" alt="$Av3 = A * V3 * scale[2] + V4 + V5$" src="form_2.png"/></p>
+<p>Computes the following: \(Av1 = A * V1 * scale[0]\), \(Av2 = A * V2 * scale[1]\), and \(Av3 = A * V3 * scale[2] + V4 + V5\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>size of the matrix </td></tr>
@@ -674,7 +680,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Matrix-vector multiplication of a matrix sized NSPxM and a vector of size Mx1 scaled by a specified factor. </p>
-<p>Computes the following: <img class="formulaInl" alt="$Av1 = A * V1 * scale[0]$" src="form_0.png"/> and: <img class="formulaInl" alt="$Av2 = A * V2 * scale[1]$" src="form_1.png"/></p>
+<p>Computes the following: \(Av1 = A * V1 * scale[0]\) and: \(Av2 = A * V2 * scale[1]\)</p>
 <p>Performs inline matrix-vector multiplication (with unrolled loops)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -726,7 +732,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Normalize the input vector using a 2-norm. </p>
-<p><img class="formulaInl" alt="$v_{out} = \frac{v}{\left| v \right|}_2$" src="form_8.png"/></p>
+<p>\(v_{out} = \frac{v}{\left| v \right|}_2\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>vector to be normalized </td></tr>
@@ -774,7 +780,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Perform weighted norm. </p>
-<p>Computes <img class="formulaInl" alt="$\left| nums * sc\right|_2$" src="form_6.png"/></p>
+<p>Computes \(\left| nums * sc\right|_2\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">nums</td><td>values to be normed </td></tr>
@@ -829,7 +835,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get scaling for weighted norm. </p>
-<p>Computes <img class="formulaInl" alt="$\frac{1.0}{ATOL + \max\left(\left|y0\right|, \left|y1\right|) * RTOL\right)}$" src="form_5.png"/></p>
+<p>Computes \(\frac{1.0}{ATOL + \max\left(\left|y0\right|, \left|y1\right|) * RTOL\right)}\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">y0</td><td>values at current timestep </td></tr>
@@ -931,7 +937,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Sets Vm to s * w. </p>
-<p><img class="formulaInl" alt="$Vm = s * w$" src="form_11.png"/></p>
+<p>\(Vm = s * w\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>the scale multiplier to use </td></tr>
@@ -986,7 +992,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Subtracts Vm scaled by s from w. </p>
-<p><img class="formulaInl" alt="$ w -= Vm * s$" src="form_10.png"/></p>
+<p>\( w -= Vm * s\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>the scale multiplier to use </td></tr>
@@ -1025,7 +1031,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Computes and returns the two norm of a vector. </p>
-<p>Computes <img class="formulaInl" alt="$\sqrt{\sum{v^2}}$" src="form_7.png"/></p>
+<p>Computes \(\sqrt{\sum{v^2}}\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>the vector </td></tr>

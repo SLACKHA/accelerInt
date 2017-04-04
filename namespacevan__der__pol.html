@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -183,7 +189,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>The <code>y</code> and <code>dy</code> vectors supplied here are local versions of the global state vectors. They have been transformed from the global Column major (Fortan) ordering to a local 1-D vector Hence the vector accesses can be done in a simple manner below, i.e. y[0] -&gt; <img class="formulaInl" alt="$y_1$" src="form_29.png"/>, y[1] -&gt; <img class="formulaInl" alt="$y_2$" src="form_30.png"/>, etc. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__generic_8c.html" title="the generic integration driver for the CPU solvers ">solver_generic.c</a></dd></dl>
+<p>The <code>y</code> and <code>dy</code> vectors supplied here are local versions of the global state vectors. They have been transformed from the global Column major (Fortan) ordering to a local 1-D vector Hence the vector accesses can be done in a simple manner below, i.e. y[0] -&gt; \(y_1\), y[1] -&gt; \(y_2\), etc. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="solver__generic_8c.html" title="the generic integration driver for the CPU solvers ">solver_generic.c</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">t</td><td>The current system time </td></tr>
@@ -256,10 +262,10 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>jac[0, 0] = <img class="formulaInl" alt="$\frac{\partial \dot{y_1}}{\partial y_1}$" src="form_34.png"/></p>
-<p>jac[0, 1] = <img class="formulaInl" alt="$\frac{\partial \dot{y_2}}{\partial y_1}$" src="form_35.png"/></p>
-<p>jac[1, 0] = <img class="formulaInl" alt="$\frac{\partial \dot{y_1}}{\partial y_2}$" src="form_36.png"/></p>
-<p>jac[1, 1] = <img class="formulaInl" alt="$\frac{\partial \dot{y_2}}{\partial y_2}$" src="form_37.png"/> </p>
+<p>jac[0, 0] = \(\frac{\partial \dot{y_1}}{\partial y_1}\)</p>
+<p>jac[0, 1] = \(\frac{\partial \dot{y_2}}{\partial y_1}\)</p>
+<p>jac[1, 0] = \(\frac{\partial \dot{y_1}}{\partial y_2}\)</p>
+<p>jac[1, 1] = \(\frac{\partial \dot{y_2}}{\partial y_2}\) </p>
 
 <p class="definition">Definition at line <a class="el" href="jacob_8c_source.html#l00029">29</a> of file <a class="el" href="jacob_8c_source.html">jacob.c</a>.</p>
 
@@ -302,10 +308,10 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">NUM</td><td>The number of initial value problems </td></tr>
     <tr><td class="paramname">y_host</td><td>The state vectors to initialize </td></tr>
-    <tr><td class="paramname">var_host</td><td>The vector of <img class="formulaInl" alt="$mu$" src="form_32.png"/> parameters for the van der Pol equation</td></tr>
+    <tr><td class="paramname">var_host</td><td>The vector of \(mu\) parameters for the van der Pol equation</td></tr>
     <tr><td class="paramname">NUM</td><td>The number of initial value problems </td></tr>
     <tr><td class="paramname">y_host</td><td>The state vectors to initialize </td></tr>
-    <tr><td class="paramname">var_host</td><td>The vector of <img class="formulaInl" alt="$\mu$" src="form_31.png"/> parameters for the van der Pol equation </td></tr>
+    <tr><td class="paramname">var_host</td><td>The vector of \(\mu\) parameters for the van der Pol equation </td></tr>
   </table>
   </dd>
 </dl>
@@ -351,7 +357,7 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">A</td><td>The (NSP x NSP) Jacobian matrix, see <a class="el" href="namespacevan__der__pol.html#a591a205f3018bef87815bb37655028e8" title="An implementation of the van der Pol jacobian. ">eval_jacob()</a> for details on layout </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">Vm</td><td>The (NSP x 1) vector to multiply by </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>The (NSP x 1) vector to store the result in, <img class="formulaInl" alt="$w := A * Vm$" src="form_38.png"/> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>The (NSP x 1) vector to store the result in, \(w := A * Vm\) </td></tr>
   </table>
   </dd>
 </dl>

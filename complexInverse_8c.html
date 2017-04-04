@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -102,10 +108,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:abf5391e42443aa516eecd888b8837ced"><td class="mdescLeft">&#160;</td><td class="mdescRight">scaleComplex scales a vector (with increment equal to one) by a constant val.  <a href="#abf5391e42443aa516eecd888b8837ced">More...</a><br /></td></tr>
 <tr class="separator:abf5391e42443aa516eecd888b8837ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afab60c79bd7e7da7e6fd1d96ce74f42a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="complexInverse_8c.html#afab60c79bd7e7da7e6fd1d96ce74f42a">multiplyComplexUpperMV</a> (const int n, double complex *x, const int lda, const double complex *A)</td></tr>
-<tr class="memdesc:afab60c79bd7e7da7e6fd1d96ce74f42a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the matrix-vector operation <img class="formulaInl" alt="$x_v:= A*x_v$" src="form_16.png"/>.  <a href="#afab60c79bd7e7da7e6fd1d96ce74f42a">More...</a><br /></td></tr>
+<tr class="memdesc:afab60c79bd7e7da7e6fd1d96ce74f42a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the matrix-vector operation \(x_v:= A*x_v\).  <a href="#afab60c79bd7e7da7e6fd1d96ce74f42a">More...</a><br /></td></tr>
 <tr class="separator:afab60c79bd7e7da7e6fd1d96ce74f42a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30c78bcd7e780b95ac502f72fd1b432d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="complexInverse_8c.html#a30c78bcd7e780b95ac502f72fd1b432d">complexGEMV</a> (const int m, const int n, const int lda, const double alpha, const double complex *__restrict__ A, const double complex *arrX, double complex *arrY)</td></tr>
-<tr class="memdesc:a30c78bcd7e780b95ac502f72fd1b432d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the matrix-vector operation <img class="formulaInl" alt="$alpha*A*x + y$" src="form_18.png"/> where alpha is a scalar, x and y are vectors and A is an m by n matrix.  <a href="#a30c78bcd7e780b95ac502f72fd1b432d">More...</a><br /></td></tr>
+<tr class="memdesc:a30c78bcd7e780b95ac502f72fd1b432d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the matrix-vector operation \(alpha*A*x + y\) where alpha is a scalar, x and y are vectors and A is an m by n matrix.  <a href="#a30c78bcd7e780b95ac502f72fd1b432d">More...</a><br /></td></tr>
 <tr class="separator:a30c78bcd7e780b95ac502f72fd1b432d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab75b38ab553b5bd395319fb895d78202"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="complexInverse_8c.html#ab75b38ab553b5bd395319fb895d78202">getComplexInverseHessenbergLU</a> (const int n, double complex *__restrict__ A, const int *__restrict__ indPivot)</td></tr>
 <tr class="memdesc:ab75b38ab553b5bd395319fb895d78202"><td class="mdescLeft">&#160;</td><td class="mdescRight">getComplexInverseHessenbergLU computes the inverse of a matrix using the LU factorization computed by getHessenbergLU.  <a href="#ab75b38ab553b5bd395319fb895d78202">More...</a><br /></td></tr>
@@ -176,7 +182,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes the matrix-vector operation <img class="formulaInl" alt="$alpha*A*x + y$" src="form_18.png"/> where alpha is a scalar, x and y are vectors and A is an m by n matrix. </p>
+<p>Computes the matrix-vector operation \(alpha*A*x + y\) where alpha is a scalar, x and y are vectors and A is an m by n matrix. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>On entry, M specifies the number of rows of the matrix A. Must be &gt;= 0 </td></tr>
@@ -369,7 +375,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>The factorization has the form: <img class="formulaInl" alt="$A = P * L * U$" src="form_15.png"/> where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). For full reference see: G. W. Stewart, Matrix Algorithms: Volume 1: Basic Decompositions, SIAM, Philadelphia, 1998. doi:10.1137/1.9781611971408. </p>
+<p>The factorization has the form: \(A = P * L * U\) where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). For full reference see: G. W. Stewart, Matrix Algorithms: Volume 1: Basic Decompositions, SIAM, Philadelphia, 1998. doi:10.1137/1.9781611971408. </p>
 
 <p class="definition">Definition at line <a class="el" href="complexInverse_8c_source.html#l00035">35</a> of file <a class="el" href="complexInverse_8c_source.html">complexInverse.c</a>.</p>
 
@@ -413,11 +419,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Performs the matrix-vector operation <img class="formulaInl" alt="$x_v:= A*x_v$" src="form_16.png"/>. </p>
+<p>Performs the matrix-vector operation \(x_v:= A*x_v\). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>On entry, n specifies the order of the matrix A. n must be at least zero. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">x</td><td>x is an array of dimension at least (n). Before entry, the incremented array X must contain the n element vector <img class="formulaInl" alt="$x_v$" src="form_17.png"/>. On exit, X is overwritten with the transformed vector <img class="formulaInl" alt="$x_v$" src="form_17.png"/>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">x</td><td>x is an array of dimension at least (n). Before entry, the incremented array X must contain the n element vector \(x_v\). On exit, X is overwritten with the transformed vector \(x_v\). </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">lda</td><td>The stride of the matrix </td></tr>
   </table>
   </dd>

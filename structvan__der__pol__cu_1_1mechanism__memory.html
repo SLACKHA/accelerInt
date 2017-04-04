@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -93,7 +99,7 @@ Public Attributes</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">y</td><td>The global state vector arrays </td></tr>
     <tr><td class="paramname">dy</td><td>The global dydt vector arrays </td></tr>
-    <tr><td class="paramname">var</td><td>The global param array [Used for <img class="formulaInl" alt="$\mu$" src="form_31.png"/>] </td></tr>
+    <tr><td class="paramname">var</td><td>The global param array [Used for \(\mu\)] </td></tr>
     <tr><td class="paramname">jac</td><td>The global Jacobian arrays</td></tr>
   </table>
   </dd>

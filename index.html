@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -125,9 +131,9 @@ Dependencies</h2>
 <h1><a class="anchor" id="main_mem"></a>
 Memory Format</h1>
 <p><code>accelerInt</code> uses a Column-major (Fortran) data formatting scheme, future versions will include optional use of the Row-major (C) data ordering.</p>
-<p>For a state vector entry <img class="formulaInl" alt="$\vec{y} = \{ y_1, y_1, \ldots y_N \}$" src="form_25.png"/> and IVPs <img class="formulaInl" alt="$1, 2, \ldots N_{\text{state}}$" src="form_26.png"/>, this equates to storing the state vectors in memory as:</p>
+<p>For a state vector entry \(\vec{y} = \{ y_1, y_1, \ldots y_N \}\) and IVPs \(1, 2, \ldots N_{\text{state}}\), this equates to storing the state vectors in memory as:</p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{align} \nonumber y_{1,1}, y_{1,2},&amp; \ldots y_{1,N_{\text{state}}} \\ \nonumber y_{2,1}, y_{2,2},&amp; \ldots y_{2,N_{\text{state}}} \\ \nonumber \vdots&amp; \\ \nonumber y_{N,1}, y_{N,2},&amp; \ldots y_{N,N_{\text{state}}} \\ \nonumber \end{align}" src="form_27.png"/>
+\begin{align} \nonumber y_{1,1}, y_{1,2},&amp; \ldots y_{1,N_{\text{state}}} \\ \nonumber y_{2,1}, y_{2,2},&amp; \ldots y_{2,N_{\text{state}}} \\ \nonumber \vdots&amp; \\ \nonumber y_{N,1}, y_{N,2},&amp; \ldots y_{N,N_{\text{state}}} \\ \nonumber \end{align}
 </p>
 <p> For a pratical example see the <a class="el" href="vdp.html#accelerint_indx">van der Pol equation example</a> </p>
 </div></div><!-- contents -->

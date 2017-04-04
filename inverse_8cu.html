@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -104,7 +110,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:adac70ba85b61598b9fcee8a381eed708"><td class="mdescLeft">&#160;</td><td class="mdescRight">interchanges two vectors arrX and arrY.  <a href="#adac70ba85b61598b9fcee8a381eed708">More...</a><br /></td></tr>
 <tr class="separator:adac70ba85b61598b9fcee8a381eed708"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dbfcd45123f24c8d64e2049ae2782fe"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inverse_8cu.html#a8dbfcd45123f24c8d64e2049ae2782fe">GERU</a> (const int n, const double alpha, const double *__restrict__ arrX, const double *__restrict__ arrY, const int incY, double *__restrict__ A, const int lda)</td></tr>
-<tr class="memdesc:a8dbfcd45123f24c8d64e2049ae2782fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">GERU performs the rank 1 operation <img class="formulaInl" alt="$A := alpha * arrX * arrY **T + A$" src="form_19.png"/> where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix.  <a href="#a8dbfcd45123f24c8d64e2049ae2782fe">More...</a><br /></td></tr>
+<tr class="memdesc:a8dbfcd45123f24c8d64e2049ae2782fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">GERU performs the rank 1 operation \(A := alpha * arrX * arrY **T + A\) where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix.  <a href="#a8dbfcd45123f24c8d64e2049ae2782fe">More...</a><br /></td></tr>
 <tr class="separator:a8dbfcd45123f24c8d64e2049ae2782fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25bf32c703aa4b2a43131df214ee0375"><td class="memItemLeft" align="right" valign="top">__device__ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="inverse_8cu.html#a25bf32c703aa4b2a43131df214ee0375">getLU</a> (const int n, double *__restrict__ A, int *__restrict__ indPivot, int *__restrict__ info)</td></tr>
 <tr class="memdesc:a25bf32c703aa4b2a43131df214ee0375"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the LU factorization of a (n x n) matrix using partial pivoting with row interchanges.  <a href="#a25bf32c703aa4b2a43131df214ee0375">More...</a><br /></td></tr>
@@ -171,7 +177,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>GERU performs the rank 1 operation <img class="formulaInl" alt="$A := alpha * arrX * arrY **T + A$" src="form_19.png"/> where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix. </p>
+<p>GERU performs the rank 1 operation \(A := alpha * arrX * arrY **T + A\) where alpha is a scalar, arrX and arrY are n element vectors, and A is a (lda x n) matrix. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>The matrix/vector size </td></tr>
@@ -244,7 +250,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>The factorization has the form: <img class="formulaInl" alt="$A = P * L * U$" src="form_15.png"/> where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). </p>
+<p>The factorization has the form: \(A = P * L * U\) where P is a permutation matrix, L is lower triangular with unit diagonal elements (lower trapezoidal if m &gt; n), and U is upper triangular (upper trapezoidal if m &lt; n). </p>
 
 <p class="definition">Definition at line <a class="el" href="inverse_8cu_source.html#l00145">145</a> of file <a class="el" href="inverse_8cu_source.html">inverse.cu</a>.</p>
 

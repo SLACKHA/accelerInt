@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -151,7 +157,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Compute the zeroth order Phi (exponential) matrix function. This is the regular matrix exponential. </p>
-<p>Computes <img class="formulaInl" alt="$\phi_0(c*A)$" src="form_14.png"/></p>
+<p>Computes \(\phi_0(c*A)\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>The Hessenberg matrix size (mxm) </td></tr>
@@ -205,7 +211,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Compute the 2nd order Phi (exponential) matrix function. </p>
-<p>Computes <img class="formulaInl" alt="$\phi_2(c*A)$" src="form_12.png"/></p>
+<p>Computes \(\phi_2(c*A)\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>The Hessenberg matrix size (mxm) </td></tr>
@@ -259,7 +265,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Compute the first order Phi (exponential) matrix function. </p>
-<p>Computes <img class="formulaInl" alt="$\phi_1(c*A)$" src="form_13.png"/></p>
+<p>Computes \(\phi_1(c*A)\)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">m</td><td>The Hessenberg matrix size (mxm) </td></tr>

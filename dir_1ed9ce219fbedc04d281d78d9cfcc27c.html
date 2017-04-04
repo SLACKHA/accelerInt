@@ -12,6 +12,12 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"],
+});
+</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -108,10 +114,10 @@ Files</h2></td></tr>
 <tr class="memdesc:ics_8cu"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets same Initial Conditions (ICs) for all problems. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:jacob_8c"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jacob_8c.html">jacob.c</a> <a href="jacob_8c_source.html">[code]</a></td></tr>
-<tr class="memdesc:jacob_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">An implementation of the van der Pol jacobian <img class="formulaInl" alt="$\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}$" src="form_33.png"/>. <br /></td></tr>
+<tr class="memdesc:jacob_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">An implementation of the van der Pol jacobian \(\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}\). <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:jacob_8cu"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jacob_8cu.html">jacob.cu</a> <a href="jacob_8cu_source.html">[code]</a></td></tr>
-<tr class="memdesc:jacob_8cu"><td class="mdescLeft">&#160;</td><td class="mdescRight">A CUDA implementation of the van der Pol jacobian <img class="formulaInl" alt="$\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}$" src="form_33.png"/>. <br /></td></tr>
+<tr class="memdesc:jacob_8cu"><td class="mdescLeft">&#160;</td><td class="mdescRight">A CUDA implementation of the van der Pol jacobian \(\frac{\partial \dot{\vec{y}}}{\partial \vec{y}}\). <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:jacob_8cuh"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jacob_8cuh.html">jacob.cuh</a> <a href="jacob_8cuh_source.html">[code]</a></td></tr>
 <tr class="memdesc:jacob_8cuh"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains a header definition for the CUDA van der Pol Jacobian evaluation. <br /></td></tr>
