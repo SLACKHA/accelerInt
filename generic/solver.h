@@ -19,6 +19,16 @@
  namespace generic {
 #endif
 
+/**
+ * \brief Integration driver for the CPU integrators
+ * \param[in]       NUM             The (non-padded) number of IVPs to integrate
+ * \param[in]       t               The current system time
+ * \param[in]       t_end           The IVP integration end time
+ * \param[in]       pr_global       The system constant variable (pressures / densities)
+ * \param[in,out]   y_global        The system state vectors at time t.
+                                    Returns system state vectors at time t_end
+ *
+ */
  void intDriver (const int NUM, const double t, const double t_end,
                 const double* pr_global, double* y_global);
 
