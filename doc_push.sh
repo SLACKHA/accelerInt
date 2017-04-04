@@ -27,6 +27,8 @@ cd code_docs
 git clone -b gh-pages $GH_REPO_REF
 cd $GH_REPO_NAME
 
+git checkout documentation
+
 ##### Configure git.
 # Set the push default to simple i.e. push only the current branch.
 git config --global push.default simple
