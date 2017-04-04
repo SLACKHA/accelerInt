@@ -26,9 +26,7 @@ void eval_jacob (const double t, const double mu, const double * __restrict__ y,
 
 #ifdef GENERATE_DOCS
 }
-<<<<<<< HEAD
-=======
+
 #endif
 
->>>>>>> master
 #endif
