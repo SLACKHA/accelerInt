@@ -1,4 +1,5 @@
-SUNDIALS_ROOT=$(SLASHOPT)/sundials/
+SUNDIALS_ROOT=$(HOME)/kaust/sundials/2.5.0
+TCHEM_ROOT=$(HOME)/kaust/tchem/TChem_v1.0
 #SUNDIALS_ROOT=$(HOME)/sundials/
 
 #CLINCPATH= $(AMDAPPSDKROOT)/include
@@ -16,7 +17,6 @@ endif
 endif
 
 CV= 0
-#ifeq ($(shell [[ "$(cv)x" -eq "x" ]] && ( ! [[ $(cv) == 0 ]] && echo true) ), true)
 ifneq ($(cv),)
 ifneq ($(cv),0)
    CV= 1
@@ -24,7 +24,6 @@ endif
 endif
 
 CL= 0
-#ifeq ($(shell [[ "$(cv)x" -eq "x" ]] && ( ! [[ $(cv) == 0 ]] && echo true) ), true)
 ifneq ($(cl),)
 ifneq ($(cl),0)
    CL= 1
@@ -97,8 +96,8 @@ ifneq ($(CV),0)
    LDFLAGS+= -lsundials_cvodes -lsundials_nvecserial -L${SUNDIALS_ROOT}/lib
 endif
 ifneq ($(USE_TCHEM),0)
-   CFLAGS += -I$(SLASHOPT)/tchem/TChem_v0.2/include -D__ENABLE_TCHEM=1
-   LDFLAGS += -ltchem -L$(SLASHOPT)/tchem/TChem_v0.2/lib
+   CFLAGS += -I$(TCHEM_ROOT)/include -D__ENABLE_TCHEM=1
+   LDFLAGS += -ltchem -L$(TCHEM_ROOT)/lib
 endif
 
 #LDFLAGS+= -llapack
@@ -141,7 +140,7 @@ endif
 AR	= ar rv
 
 EXEC	= test_ck.exe
-OBJS	= cklib.o clock.o rk.o ros.o
+OBJS	= cklib.o clock.o rk.o ros.o sdirk.o
 ifneq ($(CL),0)
    OBJS	+= cl_driver.o
 endif

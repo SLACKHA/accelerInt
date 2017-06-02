@@ -23,6 +23,7 @@
 #include <cklib.h>
 #include <rk.h>
 #include <ros.h>
+#include <sdirk.h>
 
 #if defined(__ENABLE_OPENCL) && (__ENABLE_OPENCL != 0)
    extern "C" {
@@ -551,7 +552,9 @@ int cv_driver (int neq, ValueType u_in[], const _T& t_stop, Solver &solver, Func
       if (i == nsteps-1) t_next = t_stop;
       double _t0 = WallClock();
 
-      solver.solve(t, t_next, u, func);
+      //const int itask = CV_NORMAL;
+      const int itask = CV_ONE_STEP;
+      solver.solve(t, t_next, u, func, itask);
 
       if (nsteps > 1)
       {
@@ -596,7 +599,7 @@ int main (int argc, char* argv[])
 
    std::string ckname("ck.bin");
 
-   typedef enum { None, RK, ROS, CV } solverTag_t;
+   typedef enum { None, RK, ROS, SDIRK, CV } solverTag_t;
 
    int num_problems = 1;
    //int use_rk  = 0;
@@ -682,20 +685,18 @@ int main (int argc, char* argv[])
          }
          else if (strcmp(argv[index], "-ros") == 0)
          {
-            //index++;
-            //use_ros = 1;
             solver_tag = ROS;
          }
          else if (strcmp(argv[index], "-rk") == 0)
          {
-            //index++;
-            //use_rk = 1;
             solver_tag = RK;
+         }
+         else if (strcmp(argv[index], "-sdirk") == 0)
+         {
+            solver_tag = SDIRK;
          }
          else if (strcmp(argv[index], "-cv") == 0)
          {
-            //index++;
-            //use_cv = 1;
             solver_tag = CV;
          }
       }
@@ -1135,6 +1136,40 @@ int main (int argc, char* argv[])
             ros_destroy(&ros_);
             //free(ros_rwk);
             //free(ros_iwk);
+
+            int write_stride = std::max(1,num_problems / 16);
+            if (problem_id % write_stride == 0)
+               printf("%d: %d %d %f\n", problem_id, counters_.nst, counters_.niters, u[neq-1]);
+         }
+         else if (solver_tag == SDIRK)
+         {
+            sdirk_t sdirk_obj;
+            sdirk_counters_t counters_;
+            double t_ = 0, h_ = 0;
+            sdirk_create (&sdirk_obj, neq, S4a);
+
+            int _lrwk = sdirk_lenrwk (&sdirk_obj);
+            int _liwk = sdirk_leniwk (&sdirk_obj);
+            if (_rwk.size() != _lrwk) _rwk.resize(_lrwk);
+            if (_iwk.size() != _liwk) _iwk.resize(_liwk);
+
+            sdirk_init (&sdirk_obj, t_, t_stop);
+
+#if defined(__ENABLE_TCHEM)
+            if (TChem::enableJacobian_)
+            {
+               sdirk_solve (&sdirk_obj, &t_, &h_, &counters_, &u[0], &_iwk[0], &_rwk[0], TChem::rhs, TChem::jac, NULL);
+            }
+            else
+#endif
+            {
+               sdirk_solve (&sdirk_obj, &t_, &h_, &counters_, &u[0], &_iwk[0], &_rwk[0], NULL, NULL, &cklib_func);
+            }
+
+            nst_ += counters_.nst;
+            nit_ += counters_.niters;
+
+            sdirk_destroy(&sdirk_obj);
 
             int write_stride = std::max(1,num_problems / 16);
             if (problem_id % write_stride == 0)
