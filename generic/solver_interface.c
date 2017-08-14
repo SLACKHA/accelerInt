@@ -9,6 +9,7 @@
  */
 
 #include "solver_interface.h"
+#include <math.h>
 
 #ifdef GENERATE_DOCS
 namespace generic {
@@ -28,26 +29,28 @@ void accelerInt_initialize(int num_threads) {
  * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
  *
  * \param[in]           NUM             The number of ODEs to integrate.  This should be the size of the leading dimension of `y_host` and `var_host`.  @see accelerint_indx
- * \param[in]           t               The system time
+ * \param[in]           t_start         The system time
  * \param[in]           t_end           The end time
- * \param[in]           t_step          The integration step size.  If `t_step` < 0, the step size will be set to `t_end - t`
+ * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
  * \param[in,out]       y_host          The state vectors to integrate.
  * \param[in]           var_host        The parameters to use in dydt() and eval_jacob()
  *
  */
-void accelerInt_integrate(const int NUM, const double t, const double t_end, const double t_step,
+void accelerInt_integrate(const int NUM, const double t_start, const double t_end, const double stepsize,
                           double * __restrict__ y_host, const double * __restrict__ var_host)
 {
-    t_step = t_step < 0 ? t_end - t : t_step;
+    double t = t_start;
+    double step = stepsize < 0 ? t_end - t : stepsize;
+    double t_next = fmin(end_time, t + step);
     int numSteps = 0;
 
     // time integration loop
     while (t + EPS < t_end)
     {
         numSteps++;
-        intDriver(NUM, t, t_next, var_host, y_host);
+        intDriver(NUM, t, t_end, var_host, y_host);
         t = t_next;
-        t_next = fmin(t_end, (numSteps + 1) * t_step);
+        t_next = fmin(t_end, (numSteps + 1) * step);
     }
 }
 
