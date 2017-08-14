@@ -1,35 +1,35 @@
-<map id="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/header.h" name="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/header.h">
-<area shape="rect" id="node2" href="$cvodes__dydt_8h.html" title="Header file for CVODEs interface to RHS of ODEs. " alt="" coords="72,117,233,173"/>
-<area shape="rect" id="node4" href="$cvodes__init_8c.html" title="Implementation of the necessary initialization for the CVODE interface. " alt="" coords="191,228,352,284"/>
-<area shape="rect" id="node5" href="$cvodes__jac_8h.html" title="A simple wrapper, allowing for use of the analytical jacobian w/ CVODES. " alt="" coords="309,117,471,173"/>
-<area shape="rect" id="node7" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="495,117,656,173"/>
-<area shape="rect" id="node8" href="$arnoldi_8h.html" title="Implementation of the arnoldi iteration methods. " alt="" coords="1340,228,1525,284"/>
-<area shape="rect" id="node9" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="1089,332,1275,388"/>
-<area shape="rect" id="node10" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1569,332,1771,388"/>
-<area shape="rect" id="node11" href="$phiAHessenberg_8h.html" title="Header for Matrix exponential (phi) methods. " alt="" coords="1193,117,1395,173"/>
-<area shape="rect" id="node12" href="$exponential__linear__algebra_8h.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="1469,109,1668,180"/>
-<area shape="rect" id="node13" href="$phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="2007,117,2208,173"/>
-<area shape="rect" id="node14" href="$rational__approximant_8c.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="2232,117,2457,173"/>
-<area shape="rect" id="node15" href="$fd__jacob_8c.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="2481,117,2643,173"/>
-<area shape="rect" id="node16" href="$read__initial__conditions_8c.html" title="the generic initial condition reader " alt="" coords="2667,117,2833,173"/>
-<area shape="rect" id="node17" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="2857,117,3019,173"/>
-<area shape="rect" id="node18" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="3043,117,3204,173"/>
-<area shape="rect" id="node19" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="3229,117,3394,173"/>
-<area shape="rect" id="node20" href="$radau2a__props_8h.html" title="Various macros controlling behaviour of RADAU2A algorithm. " alt="" coords="3418,117,3583,173"/>
-<area shape="rect" id="node22" href="$rk78__typedefs_8hpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="3607,117,3765,173"/>
-<area shape="rect" id="node25" href="$exp4__props_8h.html" title="Various macros controlling behaviour of EXP4 algorithm. " alt="" coords="680,117,884,173"/>
-<area shape="rect" id="node27" href="$exprb43__props_8h.html" title="Various macros controlling behaviour of EXPRB43 algorithm. " alt="" coords="1742,117,1982,173"/>
-<area shape="rect" id="node29" href="$dydt_8c.html" title="An implementation of the van der Pol right hand side (y&#39; = f(y)) function. " alt="" coords="3789,117,3964,173"/>
-<area shape="rect" id="node30" href="$ics_8c.html" title="Sets same Initial Conditions (ICs) for all problems. " alt="" coords="3988,117,4163,173"/>
-<area shape="rect" id="node31" href="$ics_8cu.html" title="Sets same Initial Conditions (ICs) for all problems. " alt="" coords="4187,117,4361,173"/>
-<area shape="rect" id="node32" href="$jacob_8c.html" title="An implementation of the van der Pol jacobian . " alt="" coords="4385,117,4560,173"/>
-<area shape="rect" id="node33" href="$sparse__multiplier_8h.html" title="Header definition for Jacobian vector multiplier, used in exponential integrators. " alt="" coords="908,117,1117,173"/>
-<area shape="rect" id="node3" href="$cvodes__dydt_8c.html" title="CVODEs Wrapper for the RHS function. " alt="" coords="5,228,167,284"/>
-<area shape="rect" id="node6" href="$cvodes__jac_8c.html" title="A simple wrapper, allowing for use of the analytical jacobian w/ CVODES. " alt="" coords="376,228,537,284"/>
-<area shape="rect" id="node21" href="$radau2a__props_8c.html" title="Error checking for the CPU Radua&#45;IIa solver. " alt="" coords="3418,228,3583,284"/>
-<area shape="rect" id="node23" href="$rk78__init_8cpp.html" title="Implementation of the necessary initialization for Boost&#39;s RK78&#45;Felhberg solver. " alt="" coords="3607,228,3765,284"/>
-<area shape="rect" id="node24" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="3789,228,3946,284"/>
-<area shape="rect" id="node26" href="$exp4__props_8c.html" title="Contains error checking for EXP4 return codes. " alt="" coords="655,228,859,284"/>
-<area shape="rect" id="node28" href="$exprb43__props_8c.html" title="Contains error checking for EXPRB43 return codes. " alt="" coords="1742,228,1982,284"/>
-<area shape="rect" id="node34" href="$sparse__multiplier_8c.html" title="Implementation for Jacobian vector multiplication, used in exponential integrators. " alt="" coords="935,228,1144,284"/>
+<map id="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/header.h" name="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/header.h">
+<area shape="rect" id="node2" href="$cvodes__dydt_8h.html" title="Header file for CVODEs interface to RHS of ODEs. " alt="" coords="79,117,252,173"/>
+<area shape="rect" id="node4" href="$cvodes__init_8c.html" title="Implementation of the necessary initialization for the CVODE interface. " alt="" coords="203,228,376,284"/>
+<area shape="rect" id="node5" href="$cvodes__jac_8h.html" title="A simple wrapper, allowing for use of the analytical jacobian w/ CVODES. " alt="" coords="327,117,500,173"/>
+<area shape="rect" id="node7" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="524,117,697,173"/>
+<area shape="rect" id="node8" href="$arnoldi_8h.html" title="Implementation of the arnoldi iteration methods. " alt="" coords="1374,228,1565,284"/>
+<area shape="rect" id="node9" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="1126,332,1317,388"/>
+<area shape="rect" id="node10" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1609,332,1810,388"/>
+<area shape="rect" id="node11" href="$phiAHessenberg_8h.html" title="Header for Matrix exponential (phi) methods. " alt="" coords="1232,117,1432,173"/>
+<area shape="rect" id="node12" href="$exponential__linear__algebra_8h.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="1507,109,1706,180"/>
+<area shape="rect" id="node13" href="$phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="2045,117,2245,173"/>
+<area shape="rect" id="node14" href="$rational__approximant_8c.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="2270,117,2495,173"/>
+<area shape="rect" id="node15" href="$fd__jacob_8c.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="2520,117,2693,173"/>
+<area shape="rect" id="node16" href="$read__initial__conditions_8c.html" title="the generic initial condition reader " alt="" coords="2717,117,2891,173"/>
+<area shape="rect" id="node17" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="2915,117,3088,173"/>
+<area shape="rect" id="node18" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="3112,117,3285,173"/>
+<area shape="rect" id="node19" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="3309,117,3483,173"/>
+<area shape="rect" id="node20" href="$radau2a__props_8h.html" title="Various macros controlling behaviour of RADAU2A algorithm. " alt="" coords="3507,117,3680,173"/>
+<area shape="rect" id="node22" href="$rk78__typedefs_8hpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="3704,117,3877,173"/>
+<area shape="rect" id="node25" href="$exp4__props_8h.html" title="Various macros controlling behaviour of EXP4 algorithm. " alt="" coords="722,117,926,173"/>
+<area shape="rect" id="node27" href="$exprb43__props_8h.html" title="Various macros controlling behaviour of EXPRB43 algorithm. " alt="" coords="1781,117,2021,173"/>
+<area shape="rect" id="node29" href="$dydt_8c.html" title="An implementation of the van der Pol right hand side (y&#39; = f(y)) function. " alt="" coords="3901,117,4083,173"/>
+<area shape="rect" id="node30" href="$ics_8c.html" title="Sets same Initial Conditions (ICs) for all problems. " alt="" coords="4107,117,4288,173"/>
+<area shape="rect" id="node31" href="$ics_8cu.html" title="Sets same Initial Conditions (ICs) for all problems. " alt="" coords="4312,117,4493,173"/>
+<area shape="rect" id="node32" href="$jacob_8c.html" title="An implementation of the van der Pol jacobian . " alt="" coords="4517,117,4699,173"/>
+<area shape="rect" id="node33" href="$sparse__multiplier_8h.html" title="Header definition for Jacobian vector multiplier, used in exponential integrators. " alt="" coords="950,117,1157,173"/>
+<area shape="rect" id="node3" href="$cvodes__dydt_8c.html" title="CVODEs Wrapper for the RHS function. " alt="" coords="5,228,179,284"/>
+<area shape="rect" id="node6" href="$cvodes__jac_8c.html" title="A simple wrapper, allowing for use of the analytical jacobian w/ CVODES. " alt="" coords="400,228,573,284"/>
+<area shape="rect" id="node21" href="$radau2a__props_8c.html" title="Error checking for the CPU Radua&#45;IIa solver. " alt="" coords="3507,228,3680,284"/>
+<area shape="rect" id="node23" href="$rk78__init_8cpp.html" title="Implementation of the necessary initialization for Boost&#39;s RK78&#45;Felhberg solver. " alt="" coords="3704,228,3877,284"/>
+<area shape="rect" id="node24" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="3901,228,4075,284"/>
+<area shape="rect" id="node26" href="$exp4__props_8c.html" title="Contains error checking for EXP4 return codes. " alt="" coords="697,228,901,284"/>
+<area shape="rect" id="node28" href="$exprb43__props_8c.html" title="Contains error checking for EXPRB43 return codes. " alt="" coords="1781,228,2021,284"/>
+<area shape="rect" id="node34" href="$sparse__multiplier_8c.html" title="Implementation for Jacobian vector multiplication, used in exponential integrators. " alt="" coords="977,228,1183,284"/>
 </map>

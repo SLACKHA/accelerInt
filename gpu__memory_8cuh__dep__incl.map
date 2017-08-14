@@ -1,7 +1,7 @@
-<map id="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/gpu_memory.cuh" name="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/gpu_memory.cuh">
-<area shape="rect" id="node2" href="$read__initial__conditions_8cu.html" title="the generic CUDA initial condition reader " alt="" coords="5,109,177,165"/>
-<area shape="rect" id="node3" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="201,109,363,165"/>
-<area shape="rect" id="node5" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="387,109,548,165"/>
-<area shape="rect" id="node6" href="$gpu__memory_8cu.html" title="Initializes and calculates required GPU memory. " alt="" coords="572,109,765,165"/>
-<area shape="rect" id="node4" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="201,213,363,269"/>
+<map id="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/gpu_memory.cuh" name="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/gpu_memory.cuh">
+<area shape="rect" id="node2" href="$read__initial__conditions_8cu.html" title="the generic CUDA initial condition reader " alt="" coords="5,109,179,165"/>
+<area shape="rect" id="node3" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="203,109,376,165"/>
+<area shape="rect" id="node5" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="400,109,573,165"/>
+<area shape="rect" id="node6" href="$gpu__memory_8cu.html" title="Initializes and calculates required GPU memory. " alt="" coords="598,109,789,165"/>
+<area shape="rect" id="node4" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="203,213,376,269"/>
 </map>

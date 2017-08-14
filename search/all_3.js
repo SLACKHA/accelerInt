@@ -1,14 +1,12 @@
 var searchData=
 [
   ['daxpy3',['DAXPY3',['../namespaceradau2a.html#accc366d693bc987d4e9f3e5fcc5721b1',1,'radau2a']]],
-  ['debug',['DEBUG',['../solver__options_8cuh.html#ad72dbcf6d0153db1b8d8a58001feed83',1,'DEBUG():&#160;solver_options.cuh'],['../solver__options_8h.html#ad72dbcf6d0153db1b8d8a58001feed83',1,'DEBUG():&#160;solver_options.h']]],
   ['device_5fmech',['device_mech',['../namespacegenericcu.html#a8afbde3cf8ec319556ccaa155d260d48',1,'genericcu']]],
   ['device_5fsolver',['device_solver',['../namespacegenericcu.html#acb75b0bf572d5107ee76511410038a46',1,'genericcu']]],
   ['dgetrf_5f',['dgetrf_',['../lapack__dfns_8h.html#a8b6e4afdfc82e0d8024928738768f9c4',1,'lapack_dfns.h']]],
   ['dgetrs_5f',['dgetrs_',['../lapack__dfns_8h.html#aa840d70b8a5a78c39c7c447e36c949b2',1,'lapack_dfns.h']]],
   ['dimblock',['dimBlock',['../namespacegenericcu.html#a3bd8f6f5ff530e0031fad8d4771c3324',1,'genericcu']]],
   ['dimgrid',['dimGrid',['../namespacegenericcu.html#a5dd31ddb679f9bc301355945a04698db',1,'genericcu']]],
-  ['divergence_5ftest',['DIVERGENCE_TEST',['../solver__options_8cuh.html#afd8c973bc66908100d15f47ae514ed41',1,'solver_options.cuh']]],
   ['dotproduct',['dotproduct',['../exponential__linear__algebra_8cu.html#a43b8d535f44e58015de9b6ea37561bd7',1,'dotproduct(const double *__restrict__ w, const double *__restrict__ Vm):&#160;exponential_linear_algebra.cu'],['../exponential__linear__algebra_8cuh.html#a43b8d535f44e58015de9b6ea37561bd7',1,'dotproduct(const double *__restrict__ w, const double *__restrict__ Vm):&#160;exponential_linear_algebra.cu'],['../exponential__linear__algebra_8h.html#afe704435bfc4dde0c5115869dea30907',1,'dotproduct(const double *__restrict__ w, const double *__restrict__ Vm):&#160;exponential_linear_algebra.h']]],
   ['dpi',['dpi',['../namespaceplotter.html#af98b6cfc9367ea3c7b70eb67c6b101d7',1,'plotter']]],
   ['dy',['dy',['../structvan__der__pol__cu_1_1mechanism__memory.html#ad1599d0622cb9407b3ad70570e96ae97',1,'van_der_pol_cu::mechanism_memory']]],

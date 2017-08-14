@@ -1,35 +1,35 @@
-<map id="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/header.cuh" name="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/header.cuh">
-<area shape="rect" id="node2" href="$arnoldi_8cuh.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="353,235,539,291"/>
-<area shape="rect" id="node3" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="152,347,337,403"/>
-<area shape="rect" id="node4" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1302,347,1510,403"/>
+<map id="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/header.cuh" name="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/header.cuh">
+<area shape="rect" id="node2" href="$arnoldi_8cuh.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="355,235,545,291"/>
+<area shape="rect" id="node3" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="151,347,341,403"/>
+<area shape="rect" id="node4" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1330,347,1538,403"/>
 <area shape="rect" id="node5" href="$phiAHessenberg_8cuh.html" title="Header for Matrix exponential (phi) methods. " alt="" coords="252,117,467,173"/>
 <area shape="rect" id="node6" href="$exponential__linear__algebra_8cuh.html" title="Definitions of various linear algebra functions needed in the exponential integrators. " alt="" coords="29,109,228,180"/>
-<area shape="rect" id="node8" href="$phiAHessenberg_8cu.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="729,117,937,173"/>
-<area shape="rect" id="node9" href="$rational__approximant_8cu.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="961,117,1193,173"/>
-<area shape="rect" id="node10" href="$complexInverse_8cu.html" title="Implementation of LU factorization of complex (variable&#45;sized) matricies for CUDA. " alt="" coords="1217,117,1379,173"/>
-<area shape="rect" id="node11" href="$fd__jacob_8cuh.html" title="Header definition of CUDA Finite Difference Jacobian. " alt="" coords="543,117,704,173"/>
-<area shape="rect" id="node13" href="$inverse_8cu.html" title="CUDA LU decomposition implementation. " alt="" coords="1455,117,1616,173"/>
-<area shape="rect" id="node14" href="$read__initial__conditions_8cu.html" title="the generic CUDA initial condition reader " alt="" coords="2712,235,2884,291"/>
-<area shape="rect" id="node15" href="$solver__init_8cuh.html" title="Header definitions for solver initialization routins. " alt="" coords="1640,117,1801,173"/>
-<area shape="rect" id="node17" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="2283,347,2444,403"/>
-<area shape="rect" id="node18" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1941,347,2103,403"/>
-<area shape="rect" id="node20" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="3111,347,3272,403"/>
-<area shape="rect" id="node22" href="$radau2a_8cu.html" title="A Radau2A IRK implementation for CUDA Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE..." alt="" coords="2523,117,2689,173"/>
-<area shape="rect" id="node23" href="$radau2a__props_8cuh.html" title="Various macros controlling behaviour of RADAU2A algorithm. " alt="" coords="2091,117,2257,173"/>
-<area shape="rect" id="node25" href="$exp4__props_8cuh.html" title="Various macros controlling behaviour of EXP4 algorithm. " alt="" coords="2281,117,2499,173"/>
-<area shape="rect" id="node27" href="$exprb43__props_8cuh.html" title="Various macros controlling behaviour of RB43 algorithm. " alt="" coords="1825,109,2016,180"/>
-<area shape="rect" id="node29" href="$dydt_8cu.html" title="A CUDA implementation of the van der Pol right hand side (y&#39; = f(y)) function. " alt="" coords="3039,117,3213,173"/>
-<area shape="rect" id="node30" href="$gpu__memory_8cuh.html" title="Headers for GPU memory initialization. " alt="" coords="2814,117,3014,173"/>
-<area shape="rect" id="node32" href="$jacob_8cu.html" title="A CUDA implementation of the van der Pol jacobian . " alt="" coords="3289,117,3464,173"/>
-<area shape="rect" id="node33" href="$sparse__multiplier_8cuh.html" title="Header definition for CUDA Jacobian vector multiplier, used in exponential integrators. " alt="" coords="3488,117,3711,173"/>
+<area shape="rect" id="node8" href="$phiAHessenberg_8cu.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="740,117,947,173"/>
+<area shape="rect" id="node9" href="$rational__approximant_8cu.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="971,117,1203,173"/>
+<area shape="rect" id="node10" href="$complexInverse_8cu.html" title="Implementation of LU factorization of complex (variable&#45;sized) matricies for CUDA. " alt="" coords="1227,117,1401,173"/>
+<area shape="rect" id="node11" href="$fd__jacob_8cuh.html" title="Header definition of CUDA Finite Difference Jacobian. " alt="" coords="542,117,715,173"/>
+<area shape="rect" id="node13" href="$inverse_8cu.html" title="CUDA LU decomposition implementation. " alt="" coords="1475,117,1649,173"/>
+<area shape="rect" id="node14" href="$read__initial__conditions_8cu.html" title="the generic CUDA initial condition reader " alt="" coords="2767,235,2941,291"/>
+<area shape="rect" id="node15" href="$solver__init_8cuh.html" title="Header definitions for solver initialization routins. " alt="" coords="1673,117,1846,173"/>
+<area shape="rect" id="node17" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="2331,347,2505,403"/>
+<area shape="rect" id="node18" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1977,347,2150,403"/>
+<area shape="rect" id="node20" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="3158,347,3331,403"/>
+<area shape="rect" id="node22" href="$radau2a_8cu.html" title="A Radau2A IRK implementation for CUDA Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE..." alt="" coords="2577,117,2750,173"/>
+<area shape="rect" id="node23" href="$radau2a__props_8cuh.html" title="Various macros controlling behaviour of RADAU2A algorithm. " alt="" coords="2137,117,2310,173"/>
+<area shape="rect" id="node25" href="$exp4__props_8cuh.html" title="Various macros controlling behaviour of EXP4 algorithm. " alt="" coords="2334,117,2553,173"/>
+<area shape="rect" id="node27" href="$exprb43__props_8cuh.html" title="Various macros controlling behaviour of RB43 algorithm. " alt="" coords="1871,109,2061,180"/>
+<area shape="rect" id="node29" href="$dydt_8cu.html" title="A CUDA implementation of the van der Pol right hand side (y&#39; = f(y)) function. " alt="" coords="3099,117,3281,173"/>
+<area shape="rect" id="node30" href="$gpu__memory_8cuh.html" title="Headers for GPU memory initialization. " alt="" coords="2876,117,3075,173"/>
+<area shape="rect" id="node32" href="$jacob_8cu.html" title="A CUDA implementation of the van der Pol jacobian . " alt="" coords="3355,117,3537,173"/>
+<area shape="rect" id="node33" href="$sparse__multiplier_8cuh.html" title="Header definition for CUDA Jacobian vector multiplier, used in exponential integrators. " alt="" coords="3561,117,3782,173"/>
 <area shape="rect" id="node7" href="$exponential__linear__algebra_8cu.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="80,228,279,299"/>
-<area shape="rect" id="node12" href="$fd__jacob_8cu.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="563,235,724,291"/>
-<area shape="rect" id="node16" href="$solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="1785,235,1947,291"/>
-<area shape="rect" id="node21" href="$radau2a__init_8cu.html" title="Implementation of the necessary initialization for the Radau&#45;IIA solver. " alt="" coords="1443,235,1609,291"/>
-<area shape="rect" id="node19" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1941,451,2103,507"/>
-<area shape="rect" id="node24" href="$radau2a__props_8cu.html" title="Error checking for the CPU Radua&#45;IIa solver. " alt="" coords="2237,235,2402,291"/>
-<area shape="rect" id="node26" href="$exp4__props_8cu.html" title="Error checking for the EXP4 algorithm. " alt="" coords="2426,235,2637,291"/>
-<area shape="rect" id="node28" href="$exprb43__props_8cu.html" title="Error checking for the EXPRB43 algorithm. " alt="" coords="1971,228,2161,299"/>
-<area shape="rect" id="node31" href="$gpu__memory_8cu.html" title="Initializes and calculates required GPU memory. " alt="" coords="2960,235,3153,291"/>
-<area shape="rect" id="node34" href="$sparse__multiplier_8cu.html" title="Implementation for CUDA Jacobian vector multiplication, used in exponential integrators. " alt="" coords="3491,235,3707,291"/>
+<area shape="rect" id="node12" href="$fd__jacob_8cu.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="570,235,743,291"/>
+<area shape="rect" id="node16" href="$solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="1821,235,1994,291"/>
+<area shape="rect" id="node21" href="$radau2a__init_8cu.html" title="Implementation of the necessary initialization for the Radau&#45;IIA solver. " alt="" coords="1471,235,1645,291"/>
+<area shape="rect" id="node19" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1977,451,2150,507"/>
+<area shape="rect" id="node24" href="$radau2a__props_8cu.html" title="Error checking for the CPU Radua&#45;IIa solver. " alt="" coords="2285,235,2458,291"/>
+<area shape="rect" id="node26" href="$exp4__props_8cu.html" title="Error checking for the EXP4 algorithm. " alt="" coords="2482,235,2693,291"/>
+<area shape="rect" id="node28" href="$exprb43__props_8cu.html" title="Error checking for the EXPRB43 algorithm. " alt="" coords="2019,228,2209,299"/>
+<area shape="rect" id="node31" href="$gpu__memory_8cu.html" title="Initializes and calculates required GPU memory. " alt="" coords="3016,235,3207,291"/>
+<area shape="rect" id="node34" href="$sparse__multiplier_8cu.html" title="Implementation for CUDA Jacobian vector multiplication, used in exponential integrators. " alt="" coords="3564,235,3779,291"/>
 </map>

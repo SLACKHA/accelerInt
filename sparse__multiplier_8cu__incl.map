@@ -1,4 +1,4 @@
-<map id="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/sparse_multiplier.cu" name="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/sparse_multiplier.cu">
+<map id="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/sparse_multiplier.cu" name="C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/sparse_multiplier.cu">
 <area shape="rect" id="node2" href="$sparse__multiplier_8cuh.html" title="Header definition for CUDA Jacobian vector multiplier, used in exponential integrators. " alt="" coords="105,109,250,136"/>
 <area shape="rect" id="node3" href="$header_8cuh.html" title="An example header file that defines system size, memory functions and other required methods for inte..." alt="" coords="134,184,221,211"/>
 <area shape="rect" id="node5" href="$gpu__macros_8cuh.html" title="Defines some simple macros to simplify GPU indexing. " alt="" coords="118,259,237,285"/>

@@ -34,8 +34,7 @@ var searchData=
   ['res',['res',['../phiAHessenberg_8c.html#a2df94bdd03b8eb32a977adec203dadef',1,'res():&#160;rational_approximant.c'],['../phiAHessenberg_8cu.html#af309432c3d053cc809c36518fb7d7f00',1,'res():&#160;rational_approximant.c'],['../rational__approximant_8c.html#a2df94bdd03b8eb32a977adec203dadef',1,'res():&#160;rational_approximant.c'],['../rational__approximant_8cu.html#af309432c3d053cc809c36518fb7d7f00',1,'res():&#160;rational_approximant.cu']]],
   ['result',['result',['../structradau2acu_1_1solver__memory.html#a4c4c20676cc0589db565d85401f08c22',1,'radau2acu::solver_memory::result()'],['../structexp4cu_1_1solver__memory.html#aa0f66d6db2a4db2d779ff4dc407821b5',1,'exp4cu::solver_memory::result()'],['../structexprb43cu_1_1solver__memory.html#a69d7ae536d679306d284b461a8bdb2c3',1,'exprb43cu::solver_memory::result()']]],
   ['result_5fflag',['result_flag',['../namespacegenericcu.html#a5f7029a718ffe15c6904855ec8344fde',1,'genericcu']]],
-  ['rhs_5feval',['rhs_eval',['../classrk78_1_1rhs__eval.html',1,'rk78']]],
-  ['rhs_5feval',['rhs_eval',['../classrk78_1_1rhs__eval.html#a267629cf61ce2410c11073dbee0e7810',1,'rk78::rhs_eval']]],
+  ['rhs_5feval',['rhs_eval',['../classrk78_1_1rhs__eval.html',1,'rk78::rhs_eval'],['../classrk78_1_1rhs__eval.html#a267629cf61ce2410c11073dbee0e7810',1,'rk78::rhs_eval::rhs_eval()']]],
   ['rk78',['rk78',['../namespacerk78.html',1,'']]],
   ['rk78_5finit_2ecpp',['rk78_init.cpp',['../rk78__init_8cpp.html',1,'']]],
   ['rk78_5ftypedefs_2ehpp',['rk78_typedefs.hpp',['../rk78__typedefs_8hpp.html',1,'']]],
@@ -62,6 +61,5 @@ var searchData=
   ['rktinv',['rkTinv',['../group__RK__Params.html#ga967c2bc749d9b8cda1585bf4ee50b1c1',1,'radau2a']]],
   ['rktinvainv',['rkTinvAinv',['../group__RK__Params.html#ga048232e984719eb1fed3f8ba7fb4c25b',1,'radau2a']]],
   ['roots',['roots',['../linear-algebra_8c.html#ab95d3c92732d7711d9446fb25e0c6369',1,'roots(int n, double *v, double complex *rt):&#160;linear-algebra.c'],['../linear-algebra_8h.html#aa90f025f46d234d3a36724d2d6208bea',1,'roots(int, double *, double complex *):&#160;linear-algebra.c']]],
-  ['roundoff',['Roundoff',['../radau2a_8c.html#a0628e9521e9961c49b173765f9d815d3',1,'Roundoff():&#160;radau2a.c'],['../radau2a_8cu.html#a0628e9521e9961c49b173765f9d815d3',1,'Roundoff():&#160;radau2a.cu']]],
-  ['rtol',['RTOL',['../solver__options_8cuh.html#af50ac611d9fae906f9419504fd2caa5d',1,'RTOL():&#160;solver_options.cuh'],['../solver__options_8h.html#af50ac611d9fae906f9419504fd2caa5d',1,'RTOL():&#160;solver_options.h']]]
+  ['roundoff',['Roundoff',['../radau2a_8c.html#a0628e9521e9961c49b173765f9d815d3',1,'Roundoff():&#160;radau2a.c'],['../radau2a_8cu.html#a0628e9521e9961c49b173765f9d815d3',1,'Roundoff():&#160;radau2a.cu']]]
 ];

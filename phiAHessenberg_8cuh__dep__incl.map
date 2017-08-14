@@ -1,5 +1,5 @@
-<map id="/home/nick/Documents/accelerInt&#45;docs/exponential_integrators/phiAHessenberg.cuh" name="/home/nick/Documents/accelerInt&#45;docs/exponential_integrators/phiAHessenberg.cuh">
-<area shape="rect" id="node2" href="$arnoldi_8cuh.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="116,109,301,165"/>
-<area shape="rect" id="node3" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="5,213,191,269"/>
-<area shape="rect" id="node4" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="215,213,423,269"/>
+<map id="C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/phiAHessenberg.cuh" name="C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/phiAHessenberg.cuh">
+<area shape="rect" id="node2" href="$arnoldi_8cuh.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="117,109,308,165"/>
+<area shape="rect" id="node3" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="5,213,196,269"/>
+<area shape="rect" id="node4" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="221,213,429,269"/>
 </map>

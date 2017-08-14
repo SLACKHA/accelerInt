@@ -12,10 +12,8 @@ var searchData=
   ['phiahessenberg_2eh',['phiAHessenberg.h',['../phiAHessenberg_8h.html',1,'']]],
   ['phihm',['phiHm',['../structexp4cu_1_1solver__memory.html#a3278cfbb9029ad325ca304b995097c64',1,'exp4cu::solver_memory::phiHm()'],['../structexprb43cu_1_1solver__memory.html#aebb83d142ab8d04edad3538544c67ec4',1,'exprb43cu::solver_memory::phiHm()']]],
   ['plotter',['plotter',['../namespaceplotter.html',1,'']]],
-  ['plotter_2epy',['plotter.py',['../pyJac_2plotter_8py.html',1,'']]],
-  ['plotter_2epy',['plotter.py',['../van__der__pol_2plotter_8py.html',1,'']]],
+  ['plotter_2epy',['plotter.py',['../van__der__pol_2plotter_8py.html',1,'(Global Namespace)'],['../pyJac_2plotter_8py.html',1,'(Global Namespace)']]],
   ['poles',['poles',['../phiAHessenberg_8c.html#a48b61efd6d33096c7c1b014f817d1baf',1,'poles():&#160;rational_approximant.c'],['../phiAHessenberg_8cu.html#a4a123ce887b4a39c29859b77db90e7e2',1,'poles():&#160;rational_approximant.c'],['../rational__approximant_8c.html#a48b61efd6d33096c7c1b014f817d1baf',1,'poles():&#160;rational_approximant.c'],['../rational__approximant_8cu.html#a4a123ce887b4a39c29859b77db90e7e2',1,'poles():&#160;rational_approximant.cu']]],
   ['preferl1',['PREFERL1',['../launch__bounds_8cuh.html#a878b153e37b2bb9282f21760e71b7103',1,'launch_bounds.cuh']]],
-  ['print',['PRINT',['../solver__options_8cuh.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.cuh'],['../solver__options_8h.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.h']]],
   ['pyjac_2edox',['pyJac.dox',['../pyJac_8dox.html',1,'']]]
 ];
