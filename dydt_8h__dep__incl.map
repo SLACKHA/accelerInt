@@ -3,8 +3,9 @@
 <area shape="rect" id="node3" href="$fd__jacob_8c.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="203,109,376,165"/>
 <area shape="rect" id="node4" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="400,109,573,165"/>
 <area shape="rect" id="node5" href="$rk78__typedefs_8hpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="597,109,771,165"/>
-<area shape="rect" id="node8" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="795,109,986,165"/>
-<area shape="rect" id="node9" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1010,109,1211,165"/>
+<area shape="rect" id="node8" href="$rkc_8c.html" title="Defines interface for Runge&#45;Kutta&#45;Chebyshev (RKC) solver. " alt="" coords="795,117,971,158"/>
+<area shape="rect" id="node9" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="995,109,1186,165"/>
+<area shape="rect" id="node10" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1210,109,1411,165"/>
 <area shape="rect" id="node6" href="$rk78__init_8cpp.html" title="Implementation of the necessary initialization for Boost&#39;s RK78&#45;Felhberg solver. " alt="" coords="499,213,672,269"/>
 <area shape="rect" id="node7" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="696,213,869,269"/>
 </map>

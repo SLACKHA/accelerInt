@@ -17,5 +17,15 @@ var searchData=
   ['read_5finitial_5fconditions_2ecuh',['read_initial_conditions.cuh',['../read__initial__conditions_8cuh.html',1,'']]],
   ['read_5finitial_5fconditions_2eh',['read_initial_conditions.h',['../read__initial__conditions_8h.html',1,'']]],
   ['rk78_5finit_2ecpp',['rk78_init.cpp',['../rk78__init_8cpp.html',1,'']]],
-  ['rk78_5ftypedefs_2ehpp',['rk78_typedefs.hpp',['../rk78__typedefs_8hpp.html',1,'']]]
+  ['rk78_5ftypedefs_2ehpp',['rk78_typedefs.hpp',['../rk78__typedefs_8hpp.html',1,'']]],
+  ['rkc_2ec',['rkc.c',['../rkc_8c.html',1,'']]],
+  ['rkc_2ecu',['rkc.cu',['../rkc_8cu.html',1,'']]],
+  ['rkc_2ecuh',['rkc.cuh',['../rkc_8cuh.html',1,'']]],
+  ['rkc_2eh',['rkc.h',['../rkc_8h.html',1,'']]],
+  ['rkc_5finit_2ec',['rkc_init.c',['../rkc__init_8c.html',1,'']]],
+  ['rkc_5finit_2ecu',['rkc_init.cu',['../rkc__init_8cu.html',1,'']]],
+  ['rkc_5fprops_2ec',['rkc_props.c',['../rkc__props_8c.html',1,'']]],
+  ['rkc_5fprops_2ecu',['rkc_props.cu',['../rkc__props_8cu.html',1,'']]],
+  ['rkc_5fprops_2ecuh',['rkc_props.cuh',['../rkc__props_8cuh.html',1,'']]],
+  ['rkc_5fprops_2eh',['rkc_props.h',['../rkc__props_8h.html',1,'']]]
 ];

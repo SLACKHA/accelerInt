@@ -1,6 +1,10 @@
 var searchData=
 [
   ['p',['P',['../exp4__props_8cuh.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exp4_props.cuh'],['../exp4__props_8h.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exp4_props.h'],['../exprb43__props_8cuh.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exprb43_props.cuh'],['../exprb43__props_8h.html#a2748566f4c443ee77aa831e63dbb5ebe',1,'P():&#160;exprb43_props.h']]],
+  ['p01',['P01',['../rkc__props_8cuh.html#a4bf72b9e10032d0e1ac2a371bcec73d5',1,'P01():&#160;rkc_props.cuh'],['../rkc__props_8h.html#a4bf72b9e10032d0e1ac2a371bcec73d5',1,'P01():&#160;rkc_props.h']]],
+  ['p1',['P1',['../rkc__props_8cuh.html#a6c2a9f7efd46f0160f3037869924d6ce',1,'P1():&#160;rkc_props.cuh'],['../rkc__props_8h.html#a6c2a9f7efd46f0160f3037869924d6ce',1,'P1():&#160;rkc_props.h']]],
+  ['p4',['P4',['../rkc__props_8cuh.html#acbc14a33d017f5f2dabce1cb0d85718e',1,'P4():&#160;rkc_props.cuh'],['../rkc__props_8h.html#acbc14a33d017f5f2dabce1cb0d85718e',1,'P4():&#160;rkc_props.h']]],
+  ['p8',['P8',['../rkc__props_8cuh.html#ae04365e5a91d08e332a28f00efe389fe',1,'P8():&#160;rkc_props.cuh'],['../rkc__props_8h.html#ae04365e5a91d08e332a28f00efe389fe',1,'P8():&#160;rkc_props.h']]],
   ['padded',['padded',['../namespacegenericcu.html#aebd994cd8979f067bd672588910d33b5',1,'genericcu']]],
   ['params',['params',['../namespacegenerate__ics.html#a14a1aec494f04870890b451733441bab',1,'generate_ics']]],
   ['phi2ac_5fvariable',['phi2Ac_variable',['../phiAHessenberg_8c.html#a325b6ad1fdc0c8b7034850650476d2a8',1,'phi2Ac_variable(const int m, const double *A, const double c, double *phiA):&#160;phiAHessenberg.c'],['../phiAHessenberg_8cu.html#ae7972d89009078777211b58162f2dd76',1,'phi2Ac_variable(const int m, const double *__restrict__ A, const double c, double *__restrict__ phiA, const solver_memory *__restrict__ solver, cuDoubleComplex *__restrict__ work):&#160;phiAHessenberg.cu'],['../phiAHessenberg_8cuh.html#a6daaee3ff7b872cd3bf32bdfda84b68a',1,'phi2Ac_variable(const int, const double *__restrict__, const double, double *__restrict__, const solver_memory *__restrict__, cuDoubleComplex *__restrict__):&#160;phiAHessenberg.cuh'],['../phiAHessenberg_8h.html#a1515b373392005fc1adcacbc6201d6aa',1,'phi2Ac_variable(const int, const double *, const double, double *):&#160;phiAHessenberg.c']]],
@@ -15,5 +19,6 @@ var searchData=
   ['plotter_2epy',['plotter.py',['../van__der__pol_2plotter_8py.html',1,'(Global Namespace)'],['../pyJac_2plotter_8py.html',1,'(Global Namespace)']]],
   ['poles',['poles',['../phiAHessenberg_8c.html#a48b61efd6d33096c7c1b014f817d1baf',1,'poles():&#160;rational_approximant.c'],['../phiAHessenberg_8cu.html#a4a123ce887b4a39c29859b77db90e7e2',1,'poles():&#160;rational_approximant.c'],['../rational__approximant_8c.html#a48b61efd6d33096c7c1b014f817d1baf',1,'poles():&#160;rational_approximant.c'],['../rational__approximant_8cu.html#a4a123ce887b4a39c29859b77db90e7e2',1,'poles():&#160;rational_approximant.cu']]],
   ['preferl1',['PREFERL1',['../launch__bounds_8cuh.html#a878b153e37b2bb9282f21760e71b7103',1,'launch_bounds.cuh']]],
+  ['print',['PRINT',['../solver__options_8cuh.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.cuh'],['../solver__options_8h.html#a8b43bafee90b30676faae508c21cb8d7',1,'PRINT():&#160;solver_options.h']]],
   ['pyjac_2edox',['pyJac.dox',['../pyJac_8dox.html',1,'']]]
 ];

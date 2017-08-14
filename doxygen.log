@@ -16,6 +16,7 @@ Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/gener
 Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/mechanism
 Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/radau2a
 Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/rk78
+Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/rkc
 Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4
 Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exprb43
 Searching for files in directory C:/Users/Nick/Documents/github/accelerInt/examples
@@ -121,6 +122,10 @@ Preprocessing C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.c...
 Parsing file C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.c...
 Preprocessing C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.cu...
 Parsing file C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.cu...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.cuh...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.cuh...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.h...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.h...
 Preprocessing C:/Users/Nick/Documents/github/accelerInt/generic/solver_props.cuh...
 Parsing file C:/Users/Nick/Documents/github/accelerInt/generic/solver_props.cuh...
 Preprocessing C:/Users/Nick/Documents/github/accelerInt/generic/solver_props.h...
@@ -149,6 +154,26 @@ Preprocessing C:/Users/Nick/Documents/github/accelerInt/rk78/rk78_typedefs.hpp..
 Parsing file C:/Users/Nick/Documents/github/accelerInt/rk78/rk78_typedefs.hpp...
 Preprocessing C:/Users/Nick/Documents/github/accelerInt/rk78/solver_rk78.cpp...
 Parsing file C:/Users/Nick/Documents/github/accelerInt/rk78/solver_rk78.cpp...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.c...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.c...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cu...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cu...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cuh...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cuh...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.h...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.h...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.c...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.c...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.cu...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.cu...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.c...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.c...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cu...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cu...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cuh...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cuh...
+Preprocessing C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.h...
+Parsing file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.h...
 Preprocessing C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4.c...
 Parsing file C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4.c...
 Preprocessing C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4.cu...
@@ -375,6 +400,8 @@ Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solve
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_interface.h...
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.c...
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.cu...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.cuh...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.h...
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_props.cuh...
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_props.h...
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/generic/timer.h...
@@ -389,6 +416,16 @@ Generating code for file C:/Users/Nick/Documents/github/accelerInt/radau2a/radau
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/rk78/rk78_init.cpp...
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/rk78/rk78_typedefs.hpp...
 Generating code for file C:/Users/Nick/Documents/github/accelerInt/rk78/solver_rk78.cpp...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.c...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cu...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cuh...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.h...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.c...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.cu...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.c...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cu...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cuh...
+Generating code for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.h...
 Generating file documentation...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/cvodes/cvodes_dydt.c...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/cvodes/cvodes_dydt.h...
@@ -466,34 +503,7 @@ Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/fd_ja
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/inverse.cu...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/inverse.cuh...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/lapack_dfns.h...
-Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/read_initial_C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
-C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.cu:146: warning: explicit link request to 'SAME_IC' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.cu:147: warning: explicit link request to 'SAME_IC' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:58: warning: explicit link request to 'FINITE_DIFFERENCE' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:111: warning: explicit link request to 'SAME_IC' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:139: warning: explicit link request to 't_step' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:139: warning: explicit link request to 'end_time' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:140: warning: explicit link request to 'ATOL' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:140: warning: explicit link request to 'RTOL' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:141: warning: explicit link request to 'PRINT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/van_der_pol/van_der_pol.dox:142: warning: explicit link request to 'SAME_IC' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:17: warning: unexpected token TK_EOF as the argument of ref
-C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:32: warning: explicit link request to 't_step' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:32: warning: explicit link request to 'end_time' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:33: warning: explicit link request to 'ATOL' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:33: warning: explicit link request to 'RTOL' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:34: warning: explicit link request to 'PRINT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:35: warning: explicit link request to 'SAME_IC' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/cvodes/cvodes_init.c:39: warning: explicit link request to 'FINITE_DIFFERENCE' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/cvodes/cvodes_init.c:39: warning: explicit link request to 'CV_MAX_ERRTEST_FAILS' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/cvodes/cvodes_init.c:44: warning: explicit link request to 'FINITE_DIFFERENCE' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:197: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:137: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:101: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:101: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exprb43/exprb43_init.cu:193: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exprb43/exprb43conditions.c...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/read_initial_conditions.c...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/read_initial_conditions.cu...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/read_initial_conditions.cuh...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/read_initial_conditions.h...
@@ -509,6 +519,8 @@ Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solve
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_interface.h...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.c...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.cu...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.cuh...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.h...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_props.cuh...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/solver_props.h...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/generic/timer.h...
@@ -523,6 +535,16 @@ Generating docs for file C:/Users/Nick/Documents/github/accelerInt/radau2a/radau
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rk78/rk78_init.cpp...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rk78/rk78_typedefs.hpp...
 Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rk78/solver_rk78.cpp...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.c...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cu...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cuh...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.h...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.c...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_init.cu...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.c...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cu...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cuh...
+Generating docs for file C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.h...
 Generating page documentation...
 Generating docs for page scons_opts...
 Generating docs for page vdp...
@@ -530,12 +552,15 @@ Generating docs for page pyjac_ex...
 Generating group documentation...
 Generating dependency graph for group RKCU_ErrCodes
 Generating dependency graph for group RK_ErrCodes
+Generating dependency graph for group RKCCU_ErrCodes
+Generating dependency graph for group RKC_ErrCodes
 Generating dependency graph for group exp4cu_ErrCodes
 Generating dependency graph for group exp4_ErrCodes
 Generating dependency graph for group exprb43cu_ErrCodes
 Generating dependency graph for group exprb43_ErrCodes
 Generating dependency graph for group CUErrorCodes
 Generating dependency graph for group ErrorCodes
+Generating dependency graph for group RKCErrorCodes
 Generating class documentation...
 Generating docs for compound solver_memory...
 Generating namespace index...
@@ -555,6 +580,9 @@ Generating docs for namespace radau2acu
 Generating docs for compound radau2acu::solver_memory...
 Generating docs for namespace rk78
 Generating docs for compound rk78::rhs_eval...
+Generating docs for namespace rkc
+Generating docs for namespace rkc_cu
+Generating docs for compound rkc_cu::solver_memory...
 Generating docs for namespace van_der_pol
 Generating docs for namespace van_der_pol_cu
 Generating docs for compound van_der_pol_cu::mechanism_memory...
@@ -567,6 +595,7 @@ Generating dependency graph for directory C:/Users/Nick/Documents/github/acceler
 Generating dependency graph for directory C:/Users/Nick/Documents/github/accelerInt/generic
 Generating dependency graph for directory C:/Users/Nick/Documents/github/accelerInt/radau2a
 Generating dependency graph for directory C:/Users/Nick/Documents/github/accelerInt/rk78
+Generating dependency graph for directory C:/Users/Nick/Documents/github/accelerInt/rkc
 Generating index page...
 Generating page index...
 Generating module index...
@@ -584,275 +613,312 @@ finalizing index lists...
 writing tag file...
 Running dot...
 Generating dot graphs using 9 parallel threads...
-Running dot for graph 1/145
-Running dot for graph 2/145
-Running dot for graph 3/145
-Running dot for graph 4/145
-Running dot for graph 5/145
-Running dot for graph 6/145
-Running dot for graph 7/145
-Running dot for graph 8/145
-Running dot for graph 9/145
-Running dot for graph 10/145
-Running dot for graph 11/145
-Running dot for graph 12/145
-Running dot for graph 13/145
-Running dot for graph 14/145
-Running dot for graph 15/145
-Running dot for graph 16/145
-Running dot for graph 17/145
-Running dot for graph 18/145
-Running dot for graph 19/145
-Running dot for graph 20/145
-Running dot for graph 21/145
-Running dot for graph 22/145
-Running dot for graph 23/145
-Running dot for graph 24/145
-Running dot for graph 25/145
-Running dot for graph 26/145
-Running dot for graph 27/145
-Running dot for graph 28/145
-Running dot for graph 29/145
-Running dot for graph 30/145
-Running dot for graph 31/145
-Running dot for graph 32/145
-Running dot for graph 33/145
-Running dot for graph 34/145
-Running dot for graph 35/145
-Running dot for graph 36/145
-Running dot for graph 37/145
-Running dot for graph 38/145
-Running dot for graph 39/145
-Running dot for graph 40/145
-Running dot for graph 41/145
-Running dot for graph 42/145
-Running dot for graph 43/145
-Running dot for graph 44/145
-Running dot for graph 45/145
-Running dot for graph 46/145
-Running dot for graph 47/145
-Running dot for graph 48/145
-Running dot for graph 49/145
-Running dot for graph 50/145
-Running dot for graph 51/145
-Running dot for graph 52/145
-Running dot for graph 53/145
-Running dot for graph 54/145
-Running dot for graph 55/145
-Running dot for graph 56/145
-Running dot for graph 57/145
-Running dot for graph 58/145
-Running dot for graph 59/145
-Running dot for graph 60/145
-Running dot for graph 61/145
-Running dot for graph 62/145
-Running dot for graph 63/145
-Running dot for graph 64/145
-Running dot for graph 65/145
-Running dot for graph 66/145
-Running dot for graph 67/145
-Running dot for graph 68/145
-Running dot for graph 69/145
-Running dot for graph 70/145
-Running dot for graph 71/145
-Running dot for graph 72/145
-Running dot for graph 73/145
-Running dot for graph 74/145
-Running dot for graph 75/145
-Running dot for graph 76/145
-Running dot for graph 77/145
-Running dot for graph 78/145
-Running dot for graph 79/145
-Running dot for graph 80/145
-Running dot for graph 81/145
-Running dot for graph 82/145
-Running dot for graph 83/145
-Running dot for graph 84/145
-Running dot for graph 85/145
-Running dot for graph 86/145
-Running dot for graph 87/145
-Running dot for graph 88/145
-Running dot for graph 89/145
-Running dot for graph 90/145
-Running dot for graph 91/145
-Running dot for graph 92/145
-Running dot for graph 93/145
-Running dot for graph 94/145
-Running dot for graph 95/145
-Running dot for graph 96/145
-Running dot for graph 97/145
-Running dot for graph 98/145
-Running dot for graph 99/145
-Running dot for graph 100/145
-Running dot for graph 101/145
-Running dot for graph 102/145
-Running dot for graph 103/145
-Running dot for graph 104/145
-Running dot for graph 105/145
-Running dot for graph 106/145
-Running dot for graph 107/145
-Running dot for graph 108/145
-Running dot for graph 109/145
-Running dot for graph 110/145
-Running dot for graph 111/145
-Running dot for graph 112/145
-Running dot for graph 113/145
-Running dot for graph 114/145
-Running dot for graph 115/145
-Running dot for graph 116/145
-Running dot for graph 117/145
-Running dot for graph 118/145
-Running dot for graph 119/145
-Running dot for graph 120/145
-Running dot for graph 121/145
-Running dot for graph 122/145
-Running dot for graph 123/145
-Running dot for graph 124/145
-Running dot for graph 125/145
-Running dot for graph 126/145
-Running dot for graph 127/145
-Running dot for graph 128/145
-Running dot for graph 129/145
-Running dot for graph 130/145
-Running dot for graph 131/145
-Running dot for graph 132/145
-Running dot for graph 133/145
-Running dot for graph 134/145
-Running dot for graph 135/145
-Running dot for graph 136/145
-Running dot for graph 137/145
-Running dot for graph 138/145
-Running dot for graph 139/145
-Running dot for graph 140/145
-Running dot for graph 141/145
-Running dot for graph 142/145
-Running dot for graph 143/145
-Running dot for graph 144/145
-Running dot for graph 145/145
-Patching output file 1/113
-Patching output file 2/113
-Patching output file 3/113
-Patching output file 4/113
-Patching output file 5/113
-Patching output file 6/113
-Patching output file 7/113
-Patching output file 8/113
-Patching output file 9/113
-Patching output file 10/113
-Patching output file 11/113
-Patching output file 12/113
-Patching output file 13/113
-Patching output file 14/113
-Patching output file 15/113
-Patching output file 16/113
-Patching output file 17/113
-Patching output file 18/113
-Patching output file 19/113
-Patching output file 20/113
-Patching output file 21/113
-Patching output file 22/113
-Patching output file 23/113
-Patching output file 24/113
-Patching output file 25/113
-Patching output file 26/113
-Patching output file 27/113
-Patching output file 28/113
-Patching output file 29/113
-Patching output file 30/113
-Patching output file 31/113
-Patching output file 32/113
-Patching output file 33/113
-Patching output file 34/113
-Patching output file 35/113
-Patching output file 36/113
-Patching output file 37/113
-Patching output file 38/113
-Patching output file 39/113
-Patching output file 40/113
-Patching output file 41/113
-Patching output file 42/113
-Patching output file 43/113
-Patching output file 44/113
-Patching output file 45/113
-Patching output file 46/113
-Patching output file 47/113
-Patching output file 48/113
-Patching output file 49/113
-Patching output file 50/113
-Patching output file 51/113
-Patching output file 52/113
-Patching output file 53/113
-Patching output file 54/113
-Patching output file 55/113
-Patching output file 56/113
-Patching output file 57/113
-Patching output file 58/113
-Patching output file 59/113
-Patching output file 60/113
-Patching output file 61/113
-Patching output file 62/113
-Patching output file 63/113
-Patching output file 64/113
-Patching output file 65/113
-Patching output file 66/113
-Patching output file 67/113
-Patching output file 68/113
-Patching output file 69/113
-Patching output file 70/113
-Patching output file 71/113
-Patching output file 72/113
-Patching output file 73/113
-Patching output file 74/113
-Patching output file 75/113
-Patching output file 76/113
-Patching output file 77/113
-Patching output file 78/113
-Patching output file 79/113
-Patching output file 80/113
-Patching output file 81/113
-Patching output file 82/113
-Patching output file 83/113
-Patching output file 84/113
-Patching output file 85/113
-Patching output file 86/113
-Patching output file 87/113
-Patching output file 88/113
-Patching output file 89/113
-Patching output file 90/113
-Patching output file 91/113
-Patching output file 92/113
-Patching output file 93/113
-Patching output file 94/113
-Patching output file 95/113
-Patching output file 96/113
-Patching output file 97/113
-Patching output file 98/113
-Patching output file 99/113
-Patching output file 100/113
-Patching output file 101/113
-Patching output file 102/113
-Patching output file 103/113
-Patching output file 104/113
-Patching output file 105/113
-Patching output file 106/113
-Patching output file 107/113
-Patching output file 108/113
-Patching output file 109/113
-Patching output file 110/113
-Patching output file 111/113
-Patching output file 112/113
-Patching output file 113/113
-lookup cache used 615/65536 hits=2331 misses=622
+Running dot for graph 1/166
+Running dot for graph 2/166
+Running dot for graph 3/166
+Running dot for graph 4/166
+Running dot for graph 5/166
+Running dot for graph 6/166
+Running dot for graph 7/166
+Running dot for graph 8/166
+Running dot for graph 9/166
+Running dot for graph 10/166
+Running dot for graph 11/166
+Running dot for graph 12/166
+Running dot for graph 13/166
+Running dot for graph 14/166
+Running dot for graph 15/166
+Running dot for graph 16/166
+Running dot for graph 17/166
+Running dot for graph 18/166
+Running dot for graph 19/166
+Running dot for graph 20/166
+Running dot for graph 21/166
+Running dot for graph 22/166
+Running dot for graph 23/166
+Running dot for graph 24/166
+Running dot for graph 25/166
+Running dot for graph 26/166
+Running dot for graph 27/166
+Running dot for graph 28/166
+Running dot for graph 29/166
+Running dot for graph 30/166
+Running dot for graph 31/166
+Running dot for graph 32/166
+Running dot for graph 33/166
+Running dot for graph 34/166
+Running dot for graph 35/166
+Running dot for graph 36/166
+Running dot for graph 37/166
+Running dot for graph 38/166
+Running dot for graph 39/166
+Running dot for graph 40/166
+Running dot for graph 41/166
+Running dot for graph 42/166
+Running dot for graph 43/166
+Running dot for graph 44/166
+Running dot for graph 45/166
+Running dot for graph 46/166
+Running dot for graph 47/166
+Running dot for graph 48/166
+Running dot for graph 49/166
+Running dot for graph 50/166
+Running dot for graph 51/166
+Running dot for graph 52/166
+Running dot for graph 53/166
+Running dot for graph 54/166
+Running dot for graph 55/166
+Running dot for graph 56/166
+Running dot for graph 57/166
+Running dot for graph 58/166
+Running dot for graph 59/166
+Running dot for graph 60/166
+Running dot for graph 61/166
+Running dot for graph 62/166
+Running dot for graph 63/166
+Running dot for graph 64/166
+Running dot for graph 65/166
+Running dot for graph 66/166
+Running dot for graph 67/166
+Running dot for graph 68/166
+Running dot for graph 69/166
+Running dot for graph 70/166
+Running dot for graph 71/166
+Running dot for graph 72/166
+Running dot for graph 73/166
+Running dot for graph 74/166
+Running dot for graph 75/166
+Running dot for graph 76/166
+Running dot for graph 77/166
+Running dot for graph 78/166
+Running dot for graph 79/166
+Running dot for graph 80/166
+Running dot for graph 81/166
+Running dot for graph 82/166
+Running dot for graph 83/166
+Running dot for graph 84/166
+Running dot for graph 85/166
+Running dot for graph 86/166
+Running dot for graph 87/166
+Running dot for graph 88/166
+Running dot for graph 89/166
+Running dot for graph 90/166
+Running dot for graph 91/166
+Running dot for graph 92/166
+Running dot for graph 93/166
+Running dot for graph 94/166
+Running dot for graph 95/166
+Running dot for graph 96/166
+Running dot for graph 97/166
+Running dot for graph 98/166
+Running dot for graph 99/166
+Running dot for graph 100/166
+Running dot for graph 101/166
+Running dot for graph 102/166
+Running dot for graph 103/166
+Running dot for graph 104/166
+Running dot for graph 105/166
+Running dot for graph 106/166
+Running dot for graph 107/166
+Running dot for graph 108/166
+Running dot for graph 109/166
+Running dot for graph 110/166
+Running dot for graph 111/166
+Running dot for graph 112/166
+Running dot for graph 113/166
+Running dot for graph 114/166
+Running dot for graph 115/166
+Running dot for graph 116/166
+Running dot for graph 117/166
+Running dot for graph 118/166
+Running dot for graph 119/166
+Running dot for graph 120/166
+Running dot for graph 121/166
+Running dot for graph 122/166
+Running dot for graph 123/166
+Running dot for graph 124/166
+Running dot for graph 125/166
+Running dot for graph 126/166
+Running dot for graph 127/166
+Running dot for graph 128/166
+Running dot for graph 129/166
+Running dot for graph 130/166
+Running dot for graph 131/166
+Running dot for graph 132/166
+Running dot for graph 133/166
+Running dot for graph 134/166
+Running dot for graph 135/166
+Running dot for graph 136/166
+Running dot for graph 137/166
+Running dot for graph 138/166
+Running dot for graph 139/166
+Running dot for graph 140/166
+Running dot for graph 141/166
+Running dot for graph 142/166
+Running dot for graph 143/166
+Running dot for graph 144/166
+Running dot for graph 145/166
+Running dot for graph 146/166
+Running dot for graph 147/166
+Running dot for graph 148/166
+Running dot for graph 149/166
+Running dot for graph 150/166
+Running dot for graph 151/166
+Running dot for graph 152/166
+Running dot for graph 153/166
+Running dot for graph 154/166
+Running dot for graph 155/166
+Running dot for graph 156/166
+Running dot for graph 157/166
+Running dot for graph 158/166
+Running dot for graph 159/166
+Running dot for graph 160/166
+Running dot for graph 161/166
+Running dot for graph 162/166
+Running dot for graph 163/166
+Running dot for graph 164/166
+Running dot for graph 165/166
+Running dot for graph 166/166
+Patching output file 1/128
+Patching output file 2/128
+Patching output file 3/128
+Patching output file 4/128
+Patching output file 5/128
+Patching output file 6/128
+Patching output file 7/128
+Patching output file 8/128
+Patching output file 9/128
+Patching output file 10/128
+Patching output file 11/128
+Patching output file 12/128
+Patching output file 13/128
+Patching output file 14/128
+Patching output file 15/128
+Patching output file 16/128
+Patching output file 17/128
+Patching output file 18/128
+Patching output file 19/128
+Patching output file 20/128
+Patching output file 21/128
+Patching output file 22/128
+Patching output file 23/128
+Patching output file 24/128
+Patching output file 25/128
+Patching output file 26/128
+Patching output file 27/128
+Patching output file 28/128
+Patching output file 29/128
+Patching output file 30/128
+Patching output file 31/128
+Patching output file 32/128
+Patching output file 33/128
+Patching output file 34/128
+Patching output file 35/128
+Patching output file 36/128
+Patching output file 37/128
+Patching output file 38/128
+Patching output file 39/128
+Patching output file 40/128
+Patching output file 41/128
+Patching output file 42/128
+Patching output file 43/128
+Patching output file 44/128
+Patching output file 45/128
+Patching output file 46/128
+Patching output file 47/128
+Patching output file 48/128
+Patching output file 49/128
+Patching output file 50/128
+Patching output file 51/128
+Patching output file 52/128
+Patching output file 53/128
+Patching output file 54/128
+Patching output file 55/128
+Patching output file 56/128
+Patching output file 57/128
+Patching output file 58/128
+Patching output file 59/128
+Patching output file 60/128
+Patching output file 61/128
+Patching output file 62/128
+Patching output file 63/128
+Patching output file 64/128
+Patching output file 65/128
+Patching output file 66/128
+Patching output file 67/128
+Patching output file 68/128
+Patching output file 69/128
+Patching output file 70/128
+Patching output file 71/128
+Patching output file 72/128
+Patching output file 73/128
+Patching output file 74/128
+Patching output file 75/128
+Patching output file 76/128
+Patching output file 77/128
+Patching output file 78/128
+Patching output file 79/128
+Patching output file 80/128
+Patching output file 81/128
+Patching output file 82/128
+Patching output file 83/128
+Patching output file 84/128
+Patching output file 85/128
+Patching output file 86/128
+Patching output file 87/128
+Patching output file 88/128
+Patching output file 89/128
+Patching output file 90/128
+Patching output file 91/128
+Patching output file 92/128
+Patching output file 93/128
+Patching output file 94/128
+Patching output file 95/128
+Patching output file 96/128
+Patching output file 97/128
+Patching output file 98/128
+Patching output file 99/128
+Patching output file 100/128
+Patching output file 101/128
+Patching output file 102/128
+Patching output file 103/128
+Patching output file 104/128
+Patching output file 105/128
+Patching output file 106/128
+Patching output file 107/128
+Patching output file 108/128
+Patching output file 109/128
+Patching output file 110/128
+Patching output file 111/128
+Patching output file 112/128
+Patching output file 113/128
+Patching output file 114/128
+Patching output file 115/128
+Patching output file 116/128
+Patching output file 117/128
+Patching output file 118/128
+Patching output file 119/128
+Patching output file 120/128
+Patching output file 121/128
+Patching output file 122/128
+Patching output file 123/128
+Patching output file 124/128
+Patching output file 125/128
+Patching output file 126/128
+Patching output file 127/128
+Patching output file 128/128
+lookup cache used 737/65536 hits=3366 misses=746
 finished...
-_init.cu:88: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exprb43/exprb43_init.cu:52: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
+C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_props.h:16: warning: include file header.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
+C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_props.h:17: warning: include file stdio.h not found, perhaps you forgot to add its directory to INCLUDE_PATH?
+C:/Users/Nick/Documents/github/accelerInt/examples/pyJac/pyJac.dox:17: warning: unexpected token TK_EOF as the argument of ref
 C:/Users/Nick/Documents/github/accelerInt/generic/solver_interface.h:33: warning: argument 't' of command @param is not found in the argument list of generic::accelerInt_integrate(const int NUM, const double t_start, const double t_end, const double stepsize, double *__restrict__ y_host, const double *__restrict__ var_host)
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:143: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exprb43/exprb43_init.c:47: warning: explicit link request to 'FINITE_DIFFERENCE' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exprb43/exprb43_init.c:47: warning: explicit link request to 'CV_MAX_ERRTEST_FAILS' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exprb43/exprb43_init.c:52: warning: explicit link request to 'FINITE_DIFFERENCE' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.c:83: warning: explicit link request to 'SAME_IC' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/generic/solver_main.c:84: warning: explicit link request to 'SAME_IC' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:101: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:143: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
-C:/Users/Nick/Documents/github/accelerInt/exponential_integrators/exp4/exp4_init.cu:101: warning: explicit link request to 'LOG_OUTPUT' could not be resolved
+<integrate>:1: warning: argument 't' of command @param is not found in the argument list of rkc_cu::integrate(const Real tstart, const Real tEnd, const Real pr, Real *y, mechanism_memory const *const __restrict__ mech, solver_memory const *const __restrict__ solver)
+C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cu:192: warning: The following parameters of rkc_cu::integrate(const Real tstart, const Real tEnd, const Real pr, Real *y, mechanism_memory const *const __restrict__ mech, solver_memory const *const __restrict__ solver) are not documented:
+  parameter 'tstart'
+C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cu:13: warning: The following parameters of rkc_cu::rkc_spec_rad(const Real t, const Real pr, const Real hmax, const Real *y, const Real *F, Real *v, Real *Fv, mechanism_memory const *const __restrict__ mech) are not documented:
+  parameter 'mech'
+C:/Users/Nick/Documents/github/accelerInt/rkc/rkc.cu:104: warning: The following parameters of rkc_cu::rkc_step(const Real t, const Real pr, const Real h, const Real *y_0, const Real *F_0, const int s, Real *y_j, Real *y_jm1, Real *y_jm2, mechanism_memory const *const __restrict__ mech) are not documented:
+  parameter 'y_jm1'
+  parameter 'y_jm2'
+  parameter 'mech'

@@ -1,6 +1,10 @@
 var searchData=
 [
+  ['same_5fic',['SAME_IC',['../solver__options_8cuh.html#aa98acf0dc83a3dce3ba168d75a74cb1b',1,'SAME_IC():&#160;solver_options.cuh'],['../solver__options_8h.html#aa98acf0dc83a3dce3ba168d75a74cb1b',1,'SAME_IC():&#160;solver_options.h']]],
   ['shared_5fsize',['SHARED_SIZE',['../launch__bounds_8cuh.html#a232fb4f165a3ecb4a9e5f2a7f1f45a19',1,'launch_bounds.cuh']]],
+  ['shuffle',['SHUFFLE',['../solver__options_8cuh.html#a0b43a0be2f674fea3218e7fb5221db1f',1,'SHUFFLE():&#160;solver_options.cuh'],['../solver__options_8h.html#a0b43a0be2f674fea3218e7fb5221db1f',1,'SHUFFLE():&#160;solver_options.h']]],
+  ['small',['SMALL',['../solver__options_8cuh.html#a09c78d2f8feb311dd9fc969a0bf84979',1,'SMALL():&#160;solver_options.cuh'],['../solver__options_8h.html#a09c78d2f8feb311dd9fc969a0bf84979',1,'SMALL():&#160;solver_options.h']]],
+  ['solv_5fopt_5fhead',['SOLV_OPT_HEAD',['../solver__options_8cuh.html#a0cdb20d794f10fb22eebe8854ae6aa45',1,'solver_options.cuh']]],
   ['solver_5fcuh',['SOLVER_CUH',['../solver_8cuh.html#aeb5114b5c03776476cc8e7689face990',1,'solver.cuh']]],
   ['solver_5finit_5fcuh',['SOLVER_INIT_CUH',['../solver__init_8cuh.html#a6476a3e2130c9d369a9f7f65aaf5721e',1,'solver_init.cuh']]],
   ['solver_5finterface_5fcuh',['SOLVER_INTERFACE_CUH',['../solver__interface_8cuh.html#a5e32e3109db9f7952f87b316e17faa3c',1,'solver_interface.cuh']]],

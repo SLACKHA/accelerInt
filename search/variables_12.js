@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['work',['work',['../structrkc__cu_1_1solver__memory.html#a580ddea5715e3bd31942e75c9d2a199d',1,'rkc_cu::solver_memory']]],
   ['work1',['work1',['../structradau2acu_1_1solver__memory.html#a2512e6fe1af56ee636bd449272292281',1,'radau2acu::solver_memory::work1()'],['../structexp4cu_1_1solver__memory.html#aecfb53728ed87d6857212dd1e19345a8',1,'exp4cu::solver_memory::work1()'],['../structexprb43cu_1_1solver__memory.html#a97191dca9ff8d04d16d37b26fbea4906',1,'exprb43cu::solver_memory::work1()']]],
   ['work2',['work2',['../structradau2acu_1_1solver__memory.html#a835223221d3f704f6cac19ef71888700',1,'radau2acu::solver_memory::work2()'],['../structexp4cu_1_1solver__memory.html#a571d5da694382eb078504242f69c4b78',1,'exp4cu::solver_memory::work2()'],['../structexprb43cu_1_1solver__memory.html#a9339316b1097345efa3b55832b3d0d1c',1,'exprb43cu::solver_memory::work2()']]],
   ['work3',['work3',['../structradau2acu_1_1solver__memory.html#addc4decdb12feacf160e9559fc146870',1,'radau2acu::solver_memory::work3()'],['../structexp4cu_1_1solver__memory.html#a1798b2513a1d21e9beaa998f1dc1df89',1,'exp4cu::solver_memory::work3()'],['../structexprb43cu_1_1solver__memory.html#ae3a2fe062018c4b7f97f039feceeb003',1,'exprb43cu::solver_memory::work3()']]],

@@ -1,7 +1,7 @@
 var searchData=
 [
   ['res',['res',['../phiAHessenberg_8c.html#a2df94bdd03b8eb32a977adec203dadef',1,'res():&#160;rational_approximant.c'],['../phiAHessenberg_8cu.html#af309432c3d053cc809c36518fb7d7f00',1,'res():&#160;rational_approximant.c'],['../rational__approximant_8c.html#a2df94bdd03b8eb32a977adec203dadef',1,'res():&#160;rational_approximant.c'],['../rational__approximant_8cu.html#af309432c3d053cc809c36518fb7d7f00',1,'res():&#160;rational_approximant.cu']]],
-  ['result',['result',['../structradau2acu_1_1solver__memory.html#a4c4c20676cc0589db565d85401f08c22',1,'radau2acu::solver_memory::result()'],['../structexp4cu_1_1solver__memory.html#aa0f66d6db2a4db2d779ff4dc407821b5',1,'exp4cu::solver_memory::result()'],['../structexprb43cu_1_1solver__memory.html#a69d7ae536d679306d284b461a8bdb2c3',1,'exprb43cu::solver_memory::result()']]],
+  ['result',['result',['../structradau2acu_1_1solver__memory.html#a4c4c20676cc0589db565d85401f08c22',1,'radau2acu::solver_memory::result()'],['../structrkc__cu_1_1solver__memory.html#a91c0bdadb7cba7482dbe829eaaa588e4',1,'rkc_cu::solver_memory::result()'],['../structexp4cu_1_1solver__memory.html#aa0f66d6db2a4db2d779ff4dc407821b5',1,'exp4cu::solver_memory::result()'],['../structexprb43cu_1_1solver__memory.html#a69d7ae536d679306d284b461a8bdb2c3',1,'exprb43cu::solver_memory::result()']]],
   ['result_5fflag',['result_flag',['../namespacegenericcu.html#a5f7029a718ffe15c6904855ec8344fde',1,'genericcu']]],
   ['rka',['rkA',['../group__RK__Params.html#ga37314d1d93d3f053f469c40c5d42a43e',1,'radau2a']]],
   ['rkainvt',['rkAinvT',['../group__RK__Params.html#gaf7c73eb3be684541be92d125fef651bc',1,'radau2a']]],
