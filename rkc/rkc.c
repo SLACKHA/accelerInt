@@ -48,7 +48,7 @@ Real rkc_spec_rad (const Real t, const Real pr, const Real hmax, const Real* y,
 
     Real nrm1 = ZERO;
     Real nrm2 = ZERO;
-    for (int i = 0; i < NN; ++i) {
+    for (int i = 0; i < NSP; ++i) {
         nrm1 += (y[i] * y[i]);
         nrm2 += (v[i] * v[i]);
     }
@@ -58,22 +58,22 @@ Real rkc_spec_rad (const Real t, const Real pr, const Real hmax, const Real* y,
     Real dynrm;
     if ((nrm1 != ZERO) && (nrm2 != ZERO)) {
         dynrm = nrm1 * sqrt(UROUND);
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             v[i] = y[i] + v[i] * (dynrm / nrm2);
         }
     } else if (nrm1 != ZERO) {
         dynrm = nrm1 * sqrt(UROUND);
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             v[i] = y[i] * (ONE + sqrt(UROUND));
         }
     } else if (nrm2 != ZERO) {
         dynrm = UROUND;
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             v[i] *= (dynrm / nrm2);
         }
     } else {
         dynrm = UROUND;
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             v[i] = UROUND;
         }
     }
@@ -85,25 +85,25 @@ Real rkc_spec_rad (const Real t, const Real pr, const Real hmax, const Real* y,
         dydt (t, pr, v, Fv);
 
         nrm1 = ZERO;
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             nrm1 += ((Fv[i] - F[i]) * (Fv[i] - F[i]));
         }
         nrm1 = sqrt(nrm1);
         nrm2 = sigma;
         sigma = nrm1 / dynrm;
         if ((iter >= 2) && (fabs(sigma - nrm2) <= (fmax(sigma, small) * P01))) {
-            for (int i = 0; i < NN; ++i) {
+            for (int i = 0; i < NSP; ++i) {
                 v[i] = v[i] - y[i];
             }
             return (ONEP2 * sigma);
         }
 
         if (nrm1 != ZERO) {
-            for (int i = 0; i < NN; ++i) {
+            for (int i = 0; i < NSP; ++i) {
                 v[i] = y[i] + ((Fv[i] - F[i]) * (dynrm / nrm1));
             }
         } else {
-            int ind = (iter % NN);
+            int ind = (iter % NSP);
             v[ind] = y[ind] - (v[ind] - y[ind]);
         }
 
@@ -136,12 +136,12 @@ void rkc_step (const Real t, const Real pr, const Real h, const Real* y_0, const
     Real b_jm1 = ONE / (FOUR * (w0 * w0));
     Real b_jm2 = b_jm1;
 
-    Real y_jm1[NN];
-    Real y_jm2[NN];
+    Real y_jm1[NSP];
+    Real y_jm2[NSP];
 
       // calculate y_1
     Real mu_t = w1 * b_jm1;
-    for (int i = 0; i < NN; ++i) {
+    for (int i = 0; i < NSP; ++i) {
         y_jm2[i] = y_0[i];
         y_jm1[i] = y_0[i] + (mu_t * h * F_0[i]);
     }
@@ -170,14 +170,14 @@ void rkc_step (const Real t, const Real pr, const Real h, const Real* y_0, const
           // calculate derivative, use y array for temporary storage
         dydt (t + (h * c_jm1), pr, y_jm1, y_j);
 
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             y_j[i] = (ONE - mu - nu) * y_0[i] + (mu * y_jm1[i]) + (nu * y_jm2[i])
                  + h * mu_t * (y_j[i] - (gamma_t * F_0[i]));
         }
         Real c_j = (mu * c_jm1) + (nu * c_jm2) + mu_t * (ONE - gamma_t);
 
         if (j < s) {
-            for (int i = 0; i < NN; ++i) {
+            for (int i = 0; i < NSP; ++i) {
                 y_jm2[i] = y_jm1[i];
                 y_jm1[i] = y_j[i];
             }
@@ -205,13 +205,13 @@ void rkc_step (const Real t, const Real pr, const Real h, const Real* y_0, const
  * \param[in,out] t     The time (starting, then ending).
  * \param[in] tEnd      The desired end time.
  * \param[in] pr        A parameter used for pressure or density to pass to the derivative function.
- * \param[in] task      0 to take a single integration step, 1 to integrate to tEnd.
- * \param[in,out] work  Real work array, size 3.
+// * \param[in] task      0 to take a single integration step, 1 to integrate to tEnd.
  * \param[in,out] y     Dependent variable array, integrated values replace initial conditions.
  */
-void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, Real* y) {
+int integrate (Real t, const Real tEnd, const Real pr, Real* y) {
 
     int nstep = 0;
+    Real work[4 + NSP] = {0};
 
     int m_max = (int)(round(sqrt(RTOL / (10.0 * UROUND))));
 
@@ -219,18 +219,18 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
         m_max = 2;
     }
 
-    Real y_n[NN];
-    for (int i = 0; i < NN; ++i) {
+    Real y_n[NSP];
+    for (int i = 0; i < NSP; ++i) {
         y_n[i] = y[i];
     }
 
     // calculate F_n for initial y
-    Real F_n[NN];
+    Real F_n[NSP];
     dydt (t, pr, y_n, F_n);
 
     // load initial estimate for eigenvector
     if (work[2] < UROUND) {
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             work[4 + i] = F_n[i];
         }
     }
@@ -241,8 +241,8 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
     while (t < tEnd) {
         // use time step stored in work[2]
 
-        Real temp_arr[NN];
-        Real temp_arr2[NN];
+        Real temp_arr[NSP];
+        Real temp_arr2[NSP];
         Real err;
 
         // estimate Jacobian spectral radius
@@ -259,17 +259,17 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
             }
             work[2] = fmax(work[2], hmin);
 
-            for (int i = 0; i < NN; ++i) {
+            for (int i = 0; i < NSP; ++i) {
                 temp_arr[i] = y_n[i] + (work[2] * F_n[i]);
             }
             dydt (t + work[2], pr, temp_arr, temp_arr2);
 
             err = ZERO;
-            for (int i = 0; i < NN; ++i) {
+            for (int i = 0; i < NSP; ++i) {
                 Real est = (temp_arr2[i] - F_n[i]) / (ATOL + RTOL * fabs(y_n[i]));
                 err += est * est;
             }
-            err = work[2] * sqrt(err / NN);
+            err = work[2] * sqrt(err / NSP);
 
             if ((P1 * work[2]) < (hmax * sqrt(err))) {
                 work[2] = fmax(P1 * work[2] / sqrt(err), hmin);
@@ -301,12 +301,12 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
 
         // estimate error
         err = ZERO;
-        for (int i = 0; i < NN; ++i) {
+        for (int i = 0; i < NSP; ++i) {
             Real est = P8 * (y_n[i] - y[i]) + P4 * work[2] * (F_n[i] + temp_arr[i]);
             est /= (ATOL + RTOL * fmax(fabs(y[i]), fabs(y_n[i])));
             err += est * est;
         }
-        err = sqrt(err / ((Real)NN));
+        err = sqrt(err / ((Real)NSP));
 
         if (err > ONE) {
             // error too large, step is rejected
@@ -341,7 +341,7 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
             work[0] = err;
             work[1] = work[2];
 
-            for (int i = 0; i < NN; ++i) {
+            for (int i = 0; i < NSP; ++i) {
                 y_n[i] = y[i];
                 F_n[i] = temp_arr[i];
             }
@@ -350,12 +350,15 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
             work[2] *= fmax(P1, fac);
             work[2] = fmax(hmin, fmin(hmax, work[2]));
 
+            /* currently not supported
             if (task == 0) {
                 // only perform one step
                 return;
-            }
+            }*/
         }
 
     }
+
+    return EC_success;
 
 } // rkc_driver
