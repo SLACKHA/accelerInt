@@ -19,7 +19,6 @@
  *
  */
 
-#include "header.h"
 #include "rkc.h"
 #include "dydt.h"
 
@@ -27,20 +26,8 @@
 namespace rkc {
 #endif
 
-#define TEN 10.0
-#define ONEP1 1.1
-#define ONEP2 1.2
-#define ONEP54 1.54
-#define P8 0.8
-#define P4 0.4
-#define P1 0.1
-#define P01 0.01
-#define ONE3RD (1.0 / 3.0)
-#define TWO3RD (2.0 / 3.0)
-#define UROUND (2.22e-16)
-
-const Real rel_tol = 1.0e-6;
-const Real abs_tol = 1.0e-10;
+const Real RTOL = 1.0e-6;
+const Real ATOL = 1.0e-10;
 
 /**
  * \brief Function to estimate spectral radius.
@@ -226,7 +213,7 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
 
     int nstep = 0;
 
-    int m_max = (int)(round(sqrt(rel_tol / (10.0 * UROUND))));
+    int m_max = (int)(round(sqrt(RTOL / (10.0 * UROUND))));
 
     if (m_max < 2) {
         m_max = 2;
@@ -279,7 +266,7 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
 
             err = ZERO;
             for (int i = 0; i < NN; ++i) {
-                Real est = (temp_arr2[i] - F_n[i]) / (abs_tol + rel_tol * fabs(y_n[i]));
+                Real est = (temp_arr2[i] - F_n[i]) / (ATOL + RTOL * fabs(y_n[i]));
                 err += est * est;
             }
             err = work[2] * sqrt(err / NN);
@@ -316,7 +303,7 @@ void rkc_driver (Real t, const Real tEnd, const Real pr, int task, Real* work, R
         err = ZERO;
         for (int i = 0; i < NN; ++i) {
             Real est = P8 * (y_n[i] - y[i]) + P4 * work[2] * (F_n[i] + temp_arr[i]);
-            est /= (abs_tol + rel_tol * fmax(fabs(y[i]), fabs(y_n[i])));
+            est /= (ATOL + RTOL * fmax(fabs(y[i]), fabs(y_n[i])));
             err += est * est;
         }
         err = sqrt(err / ((Real)NN));

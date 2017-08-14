@@ -1,7 +1,9 @@
 #ifndef RKC_HEAD
 #define RKC_HEAD
 
-#include "header.h"
+#include "header.cuh"
+#include "rkc_props.cuh"
+#include "solver_options.cuh"
 
 //__device__ Real rkc_spec_rad (const Real, const Real, const Real*, const Real*, Real*, Real*);
 __device__ Real rkc_spec_rad (const Real, const Real, const Real, const Real*, const Real*, Real*, Real*);

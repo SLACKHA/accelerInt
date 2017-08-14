@@ -12,6 +12,8 @@
  	#include "exp4_props.h"
 #elif RADAU2A
  	#include "radau2a_props.h"
+#elif RKC
+    #include "rkc_props.h"
 #endif
 
 #ifdef GENERATE_DOCS

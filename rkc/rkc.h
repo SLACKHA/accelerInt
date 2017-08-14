@@ -2,6 +2,7 @@
 #define RKC_HEAD
 
 #include "header.h"
+#include "rkc_props.h"
 
 //Real rkc_spec_rad (const Real, const Real, const Real*, const Real*, Real*, Real*);
 Real rkc_spec_rad (const Real, const Real, const Real, const Real*, const Real*, Real*, Real*);

@@ -1,13 +1,14 @@
-#ifndef HEADER
-#define HEADER
+#ifndef RKC_PROPS_H
+#define RKC_PROPS_H
 
-#include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
-#include <stdbool.h>
 
 /** Set double precision */
 #define DOUBLE
+
+#ifdef GENERATE_DOCS
+namespace radau2a {
+#endif
 
 #ifdef DOUBLE
 	#define Real double
@@ -51,12 +52,27 @@
 	#define UROUND (2.22e-16)
 #endif
 
-// OpenMP
-#ifdef _OPENMP
-	#include <omp.h>
-#else
-	#define omp_get_max_threads() 1
- 	#define omp_get_num_threads() 1
+/**
+ * \addtogroup ErrorCodes Return codes of Integrators
+ * @{
+ */
+/**
+ * \defgroup RKC_ErrCodes Return codes of RKC integrator
+ * @{
+ */
+
+//! Successful time step
+#define EC_success (0)
+
+/**
+ * @}
+ */
+/**
+ * @}
+ */
+
+#ifdef GENERATE_DOCS
+}
 #endif
 
 #endif
