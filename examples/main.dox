@@ -22,7 +22,7 @@ A number of stiff integration methods are available in <code>accelerInt</code> o
 | Radau-IIa<sup>2</sup>   | Implicit RK               | 5th                   |  X  |  X  |
 | EXP4<sup>3</sup>        | Semi-implicit Exponential | Nominally 4th         |  X  |  X  |
 | EXPRB43<sup>4</sup>     | Semi-implicit Exponential | 4th                   |  X  |  X  |
-| RKC<sup<5></sup>        | Explicit Runge Kutta      | Stabilized 2nd        |  X  |  X  |
+| RKC<sup>5</sup>         | Explicit Runge Kutta      | Stabilized 2nd        |  X  |  X  |
 
 Note: The RKC integrator is in prelimary support, and has not been fully validated in this work.
 
