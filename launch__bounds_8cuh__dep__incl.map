@@ -1,5 +1,5 @@
-<map id="C:/Users/Nick/Dropbox/accelerInt/examples/van_der_pol/launch_bounds.cuh" name="C:/Users/Nick/Dropbox/accelerInt/examples/van_der_pol/launch_bounds.cuh">
-<area shape="rect" id="node2" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="5,109,171,165"/>
-<area shape="rect" id="node4" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="195,109,360,165"/>
-<area shape="rect" id="node3" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="5,213,171,269"/>
+<map id="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/launch_bounds.cuh" name="/home/nick/Documents/accelerInt&#45;docs/examples/van_der_pol/launch_bounds.cuh">
+<area shape="rect" id="node2" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="5,109,167,165"/>
+<area shape="rect" id="node4" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="191,109,352,165"/>
+<area shape="rect" id="node3" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="5,213,167,269"/>
 </map>
