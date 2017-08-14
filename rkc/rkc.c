@@ -21,13 +21,11 @@
 
 #include "rkc.h"
 #include "dydt.h"
+#include "solver_options.h"
 
 #ifdef GENERATE_DOCS
 namespace rkc {
 #endif
-
-const Real RTOL = 1.0e-6;
-const Real ATOL = 1.0e-10;
 
 /**
  * \brief Function to estimate spectral radius.
