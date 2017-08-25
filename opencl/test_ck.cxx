@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <fstream>
+#include <sstream>
 #include <iostream>
 
 #ifdef DEBUG
@@ -611,6 +613,7 @@ int main (int argc, char* argv[])
    int cl_iters = 1;
    int write_data = 0;
    int read_data = 0;
+   int read_csv = 0;
    char *read_file = NULL;
    int omp_chunk_size = 1;
    bool nohost = false;
@@ -914,48 +917,122 @@ int main (int argc, char* argv[])
    // Load problem data from a file.
    if (read_data)
    {
-      FILE *data_in = fopen(read_file,"r");
-      if (data_in == NULL)
-      {
-         fprintf(stderr,"error opening data input file %s\n", read_file);
-         return 2;
-      }
-
-      int np;
-      fread(&np, sizeof(int), 1, data_in);
-
-      double dt;
-      fread(&dt, sizeof(double), 1, data_in);
-
-      //if (np < num_problems)
-      //   num_problems = np;
-
-      printf("num_problems (in) = %d %d\n", num_problems, np);
-      printf("dt = %e\n", dt);
-      //t_stop = dt;
-      printf("t_stop = %e\n", t_stop);
-
+      printf("read_csv= %d\n", read_csv);
       const int neq = ck.n_species + 1;
+      int np = -1;
 
-      //for (int i = 0; i < num_problems; ++i)
-      for (int i = 0; i < std::min(np, num_problems); ++i)
+      // ASCII CSV path.
+      if (read_csv)
       {
-         double x_, v_, T_, p_;
-         VectorType<double> yk_(ck.n_species);
-         fread(&x_, sizeof(double), 1, data_in);
-         fread(&v_, sizeof(double), 1, data_in);
-         fread(&T_, sizeof(double), 1, data_in);
-         fread(&p_, sizeof(double), 1, data_in);
-         fread(yk_.getPointer(), sizeof(double), ck.n_species, data_in);
+         // First, load all of the file into a list of strings for each line.
+         std::vector <std::vector <std::string> > file_data;
+         std::ifstream infile( read_file );
 
-         memcpy( &u_in[i*neq], yk_.getPointer(), sizeof(double)*ck.n_species);
-         u_in[i*neq+ck.n_species] = T_;
-         //printf("%d %f\n", i, T_);
+         while (infile)
+         {
+            std::string s;
+            if (!std::getline( infile, s )) break;
+
+            //std::cout << "line: " << s << std::endl;
+
+            std::istringstream ss( s );
+            std::vector <std::string> record;
+
+            while (ss)
+            {
+               std::string s;
+               if (!std::getline( ss, s, ',' )) break;
+               record.push_back( s );
+               //std::cout << s<< std::endl;
+               //size_t pos = 0;
+               //while (s[pos] == ' ') pos++;
+               //record.push_back( std::string(s, pos, std::string::npos) );
+            }
+
+            file_data.push_back( record );
+         }
+         if (!infile.eof())
+         {
+            std::cerr << "Fooey!\n";
+            return -1;
+         }
+
+         np = atoi( file_data[0][0].c_str() );
+         int nsp = atoi( file_data[0][1].c_str() );
+         if (nsp != ck.n_species)
+         {
+            fprintf(stderr,"Input profile file error: # species not correct %d %d\n", nsp, ck.n_species);
+            return -1;
+         }
+
+         printf("num_problems (in) = %d %d\n", num_problems, np);
+
+         //if (np < num_problems)
+         //   num_problems = np;
+
+         //t_stop = dt;
+
+         for (int i = 0; i < std::min(np, num_problems); ++i)
+         {
+            double x_, v_ = 0, T_, p_;
+            VectorType<double> yk_(ck.n_species);
+
+            x_ = strtod( file_data[i+1][0].c_str(), NULL );
+            T_ = strtod( file_data[i+1][1].c_str(), NULL );
+            p_ = strtod( file_data[i+1][2].c_str(), NULL );
+
+            for (int k = 0; k < ck.n_species; ++k)
+               yk_[k] = strtod( file_data[i+1][k+3].c_str(), NULL );
+
+            memcpy( &u_in[i*neq], yk_.getPointer(), sizeof(double)*ck.n_species);
+            u_in[i*neq+ck.n_species] = T_;
+            //printf("%d %f\n", i, T_);
+         }
+      }
+      // Binary path.
+      else
+      {
+         FILE *data_in = fopen(read_file,"r");
+         if (data_in == NULL)
+         {
+            fprintf(stderr,"error opening data input file %s\n", read_file);
+            return 2;
+         }
+
+         fread(&np, sizeof(int), 1, data_in);
+
+         printf("num_problems (in) = %d %d\n", num_problems, np);
+
+         //if (np < num_problems)
+         //   num_problems = np;
+
+         double dt;
+         fread(&dt, sizeof(double), 1, data_in);
+         printf("dt = %e\n", dt);
+
+         //for (int i = 0; i < num_problems; ++i)
+         for (int i = 0; i < std::min(np, num_problems); ++i)
+         {
+            double x_, v_, T_, p_;
+            VectorType<double> yk_(ck.n_species);
+
+            fread(&x_, sizeof(double), 1, data_in);
+            fread(&v_, sizeof(double), 1, data_in);
+            fread(&T_, sizeof(double), 1, data_in);
+            fread(&p_, sizeof(double), 1, data_in);
+            fread(yk_.getPointer(), sizeof(double), ck.n_species, data_in);
+
+            memcpy( &u_in[i*neq], yk_.getPointer(), sizeof(double)*ck.n_species);
+            u_in[i*neq+ck.n_species] = T_;
+            //printf("%d %f\n", i, T_);
+         }
+
+         fclose(data_in);
       }
 
-      fclose(data_in);
-
-      printf("np (after) = %d\n", np);
+      printf("t_stop = %e\n", t_stop);
+      //printf("np (after) = %d\n", np);
+      //return 0;
 
       /* Now, fill in the rest of the slots */
       if (np < num_problems)
@@ -1044,6 +1121,8 @@ int main (int argc, char* argv[])
          for (int k = 0; k < neq; ++k)
             u[k] = u_in[problem_id * neq + k];
 
+         double To = u[neq-1];
+
          //u[neq-1] = T0;
 
          user_data.pres   = p;
@@ -1058,7 +1137,7 @@ int main (int argc, char* argv[])
 
             int write_stride = std::max(1,num_problems / 16);
             if (problem_id % write_stride == 0)
-               printf("%d: %d %d %f\n", problem_id, cv_cklib_obj.nst, cv_cklib_obj.nfe, u[neq-1]);
+               printf("%d: %d %d %f %f\n", problem_id, cv_cklib_obj.nst, cv_cklib_obj.nfe, u[neq-1], To);
 #else
              std::cerr << "recompile with -DUSE_SUNDIALS" << std::endl;
 #endif
@@ -1139,7 +1218,7 @@ int main (int argc, char* argv[])
 
             int write_stride = std::max(1,num_problems / 16);
             if (problem_id % write_stride == 0)
-               printf("%d: %d %d %f\n", problem_id, counters_.nst, counters_.niters, u[neq-1]);
+               printf("%d: %d %d %f %f\n", problem_id, counters_.nst, counters_.niters, u[neq-1], To);
          }
          else if (solver_tag == SDIRK)
          {
@@ -1173,7 +1252,7 @@ int main (int argc, char* argv[])
 
             int write_stride = std::max(1,num_problems / 16);
             if (problem_id % write_stride == 0)
-               printf("%d: %d %d %f\n", problem_id, counters_.nst, counters_.niters, u[neq-1]);
+               printf("%d: %d %d %f %f\n", problem_id, counters_.nst, counters_.niters, u[neq-1], To);
          }
 
          ysum += u[neq-1];

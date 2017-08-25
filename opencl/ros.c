@@ -978,8 +978,8 @@ int ros_solve (__global const ros_t *ros, double *tcur, double *hcur, __private 
       fact = fmax(fact, 1.0 / ros->adaption_limit);
       fact = fmin(fact,       ros->adaption_limit);
 
-      //if (iter % 1 == 0)
-      //   printf("iter = %d: passed=%d ... t = %e, fact = %f %f %e\n", iter, (accept ? (h <= ros->h_min ? -1 : 1) : 0), t, fact, y[__getIndex(neq-1)], h);
+      if (iter % 10 == 0 && 0)
+         printf("iter = %d: passed=%d ... t = %e, fact = %f %f %e\n", iter, (accept ? (h <= ros->h_min ? -1 : 1) : 0), t, fact, y[__getIndex(neq-1)], h);
 
       // Apply grow/shrink factor for next step.
       h = h * fact;
