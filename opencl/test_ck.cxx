@@ -613,7 +613,7 @@ int main (int argc, char* argv[])
    int cl_iters = 1;
    int write_data = 0;
    int read_data = 0;
-   int read_csv = 0;
+   int read_csv = 1;
    char *read_file = NULL;
    int omp_chunk_size = 1;
    bool nohost = false;
@@ -681,6 +681,10 @@ int main (int argc, char* argv[])
             assert (index < argc);
             read_file = argv[index];
             read_data = 1;
+         }
+         else if (strcmp(argv[index], "-csv") == 0)
+         {
+            read_csv = 1;
          }
          else if (strcmp(argv[index], "-nohost") == 0)
          {
