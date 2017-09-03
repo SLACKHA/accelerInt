@@ -39,6 +39,12 @@ endif
 
 CFLAGS  = -I. #-std=c99
 
+ifneq ($(verbose),)
+ ifneq ($(verbose),0)
+   CFLAGS += -DVERBOSE=10
+ endif
+endif
+
 ifeq ($(intel),1)
    CC	= icc -std=c99
    CXX	= icpc
@@ -86,6 +92,13 @@ LDFLAGS = -lstdc++
 #LDFLAGS+= -mkl=sequential
 #endif
 
+ifneq ($(pyjac),)
+ ifneq ($(pyjac),0)
+   CFLAGS += -D__ENABLE_PYJAC
+   LDFLAGS += -L$(PYJACPATH) -lc_pyjac
+ endif
+endif
+
 ifneq ($(CL),0)
    CFLAGS += -I$(CLINCPATH) -D__ENABLE_OPENCL
    LDFLAGS += -L$(CLLIBPATH) -lOpenCL
@@ -116,10 +129,6 @@ else
 endif
 
 ifeq ($(intel),1)
-   ifneq ($(verbose),)
-      CFLAGS += -vec-report=$(verbose)
-   endif
-
    MIC_ = 0
    OFFLOAD_ = 0
 

@@ -27,6 +27,16 @@
 #include <ros.h>
 #include <sdirk.h>
 
+static bool usePyJac = false;
+
+#ifdef __ENABLE_PYJAC
+# warning 'Enabled PyJac RHS'
+namespace pyjac
+{
+   extern "C" void dydt (const double, const double, const double *, double *);
+} // namespace-pyjac
+#endif
+
 #if defined(__ENABLE_OPENCL) && (__ENABLE_OPENCL != 0)
    extern "C" {
       //void cl_driver (double p, double T, double *u, ckdata_t*, double *udot, int numProblems, rk_t *rk);
@@ -423,9 +433,35 @@ struct cklib_functor
       const int kk = neq-1;
       assert(ck_->n_species == kk);
 
-#if 1
+#ifdef __ENABLE_PYJAC
+      if (usePyJac)
+      {
+         lenrwk_ = ck_lenrwk(ck_);
+         assert( lenrwk_ >= 2*neq );
+         this->rwk_[0] = y[neq-1];
+         for (int k = 0; k < kk; ++k)
+            this->rwk_[k+1] = y[k];
+
+         pyjac::dydt( time, 0.1*this->pres_, this->rwk_, this->rwk_ + neq );
+
+         ydot[neq-1] = this->rwk_[neq+0];
+         for (int k = 0; k < kk; ++k)
+            ydot[k] = this->rwk_[neq+1+k];
+
+         //for (int k = 0; k < neq; ++k)
+         //   printf("pyJac: ydot[%d] = %e\n", k, ydot[k]);
+
+         return;
+      }
+#endif
+
       ckrhs (this->pres_, y[neq-1], y, ydot, this->ck_, rwk_);
-#else
+
+      //for (int k = 0; k < neq; ++k)
+      //   printf("cklib: ydot[%d] = %e\n", k, ydot[k]);
+      //exit(-1);
+
+#if 0
       for (int k = 0; k < neq; ++k)
          ydot[k] = 0.0;
 
@@ -554,8 +590,7 @@ int cv_driver (int neq, ValueType u_in[], const _T& t_stop, Solver &solver, Func
       if (i == nsteps-1) t_next = t_stop;
       double _t0 = WallClock();
 
-      //const int itask = CV_NORMAL;
-      const int itask = CV_ONE_STEP;
+      const int itask = CV_NORMAL;
       solver.solve(t, t_next, u, func, itask);
 
       if (nsteps > 1)
@@ -686,6 +721,14 @@ int main (int argc, char* argv[])
          {
             read_csv = 1;
          }
+         else if (strcmp(argv[index], "-pyjac") == 0)
+         {
+            usePyJac = true;
+#ifndef __ENABLE_PYJAC
+            fprintf(stderr,"PyJac enabled at run-time but not compiled.\n");
+            return -1;
+#endif
+         }
          else if (strcmp(argv[index], "-nohost") == 0)
          {
             nohost = true;
@@ -790,7 +833,7 @@ int main (int argc, char* argv[])
 
    printf("iH2=%d, iO2=%d, iN2=%d\n", iH2, iO2, iN2);
 
-   x[iH2] = 2.0; x[iO2] = 1.0; x[iN2] = 4.0;
+   x[iH2] = 2.0; x[iO2] = 1.0; x[iN2] = 0.0;
 
    double x_sum(0);
    for (int k = 0; k < ck.n_species; ++k)
@@ -903,6 +946,13 @@ int main (int argc, char* argv[])
       printf("adjusting num_problems to be multiple of max_threads %d %d %d\n", max_threads, num_problems, round_up);
       num_problems += round_up;
    }
+#endif
+
+   if (usePyJac)
+      std::cout << "Using PyJac RHS instead of internal functions." << std::endl;
+#ifdef __ENABLE_PYJAC
+   else
+      std::cout << "PyJac disabled at run-time." << std::endl;
 #endif
 
    std::cout << "num_problems = " << num_problems << " delta = " << delta << std::endl;

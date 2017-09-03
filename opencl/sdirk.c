@@ -957,8 +957,10 @@ int sdirk_solve (__global const sdirk_t *sdirk, double *tcur, double *hcur, __pr
       HScalingFactor = fmax( HScalingFactor, 1.0 / sdirk->adaption_limit);
       HScalingFactor = fmin( HScalingFactor,       sdirk->adaption_limit);
 
-      if (iter % 10 == 0 && 0)
+#ifdef VERBOSE
+      if (iter % (VERBOSE) == 0)
          printf("iter = %d: passed=%d ... t = %e, HScalingFactor = %f %f %e\n", iter, (Accepted ? (h <= sdirk->h_min ? -1 : 1) : 0), t, HScalingFactor, y[__getIndex(neq-1)], h);
+#endif
 
       // Apply grow/shrink factor for next step.
       h *= HScalingFactor;
@@ -992,7 +994,9 @@ int sdirk_solve (__global const sdirk_t *sdirk, double *tcur, double *hcur, __pr
       }
    }
 
-   //printf("nst=%d nit=%d nfe=%d nje=%d nlu=%d nni=%d (%4.1f, %3.1f)\n", nst, iter, nfe, nje, nlu, nni, (double)(nfe-nje*(neq+1)) / nst, (double)nni / (nst*sdirk->numStages));
+#ifdef VERBOSE
+   printf("nst=%d nit=%d nfe=%d nje=%d nlu=%d nni=%d (%4.1f, %3.1f)\n", nst, iter, nfe, nje, nlu, nni, (double)(nfe-nje*(neq+1)) / nst, (double)nni / (nst*sdirk->numStages));
+#endif
 
    return ierr;
 
