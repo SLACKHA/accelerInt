@@ -178,7 +178,7 @@ int main (int argc, char *argv[])
     if (stat("./log/", &info) != 0)
     {
         printf("Expecting 'log' subdirectory in current working directory. Please run"
-               "mkdir log (or the equivalent) and run again.\n");
+               " mkdir log (or the equivalent) and run again.\n");
         exit(-1);
     }
     sprintf(out_name, "log/%s-log.bin", f_name);
