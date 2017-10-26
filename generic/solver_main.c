@@ -16,9 +16,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <complex.h>
-#ifdef LOG_OUTPUT
+#include <sys/types.h>
 #include <sys/stat.h>
-#endif
 #ifdef DEBUG
 #include <fenv.h>
 #endif
@@ -175,11 +174,11 @@ int main (int argc, char *argv[])
     const char* f_name = solver_name();
     int len = strlen(f_name);
     char out_name[len + 13];
-    struct stat st;
-    if (stat("./log/",&st) == 0)
+    struct stat info;
+    if (stat("./log/", &info) != 0)
     {
         printf("Expecting 'log' subdirectory in current working directory. Please run"
-               "mkdir log (or the equivalent) and run again.");
+               "mkdir log (or the equivalent) and run again.\n");
         exit(-1);
     }
     sprintf(out_name, "log/%s-log.bin", f_name);
