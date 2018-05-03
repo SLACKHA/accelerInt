@@ -73,7 +73,7 @@ Disabling solvers based on available libaries is a feature that may be added to 
 
 \section main_mem Memory Format
 
-<code>accelerInt</code> uses a Column-major (Fortran) data formatting scheme, future versions will include optional use of the Row-major (C) data ordering.
+The state vector expected by <code>accelerInt</code> should be formatted in Column-major (Fortan) order, future versions will include optional use of the Row-major (C) data ordering.
 
 For a state vector entry \f$\vec{y} = \{ y_1, y_1, \ldots y_N \}\f$
 and IVPs \f$1, 2, \ldots N_{\text{state}}\f$, this equates to storing the state vectors in memory as:
@@ -84,5 +84,8 @@ and IVPs \f$1, 2, \ldots N_{\text{state}}\f$, this equates to storing the state 
            \vdots& \\ \nonumber
            y_{N,1}, y_{N,2},& \ldots y_{N,N_{\text{state}}} \\ \nonumber
         \f}
-For a pratical example see the \ref accelerint_indx "van der Pol equation example"
+
+\section examples Examples
+For a fully working integration problem, see the \ref accelerint_indx "van der Pol equation example"
+Another recently added example (thanks to Andrew Alferman) implements \ref accelerint_indx "the Oregonator problem".
 */
