@@ -1,1 +1,1 @@
-OUTPUT_DIRECTORY=docs/ REPOPATH=. doxygen Doxyfile
+OUTPUT_DIR=docs/ REPOPATH=. doxygen Doxyfile
