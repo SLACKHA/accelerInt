@@ -11,7 +11,10 @@ import SCons
 import platform
 from buildutils import *
 import shutil
-from pyjac import utils
+
+# mirrored from pyjac
+header_ext = dict(c='.h', cuda='.cuh')
+"""dict: header extensions based on language"""
 
 valid_commands = ('build', 'test', 'cpu', 'gpu', 'help')
 
@@ -287,7 +290,7 @@ NVCCFlags.append(['-Xcompiler {}'.format(
 
 def check_extras(lang, subdir, check_str, check_file, list_file):
     if check_file is None:
-        check_file = os.path.join(mech_dir, subdir + utils.header_ext[lang])
+        check_file = os.path.join(mech_dir, subdir + header_ext[lang])
     else:
         check_file = os.path.join(mech_dir, check_file)
     have_extras = False
@@ -350,7 +353,7 @@ def write_options(lang, dir):
     # write the solver_options file
     # scons will automagically decide what needs recompilation based on this
     # hooray!
-    with open(os.path.join(dir, 'solver_options{}'.format(utils.header_ext[lang])), 'w') as file:
+    with open(os.path.join(dir, 'solver_options{}'.format(header_ext[lang])), 'w') as file:
         file.write("""
         /*! \file
 
