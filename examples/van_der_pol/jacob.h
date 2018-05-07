@@ -21,9 +21,6 @@ namespace van_der_pol {
  * \param[in]           y               The state vector at time t
  * \param[out]          jac             The jacobian to populate
  *
- *  As with dydt(), this function operates on local
- *  copies of the global state vector and jacobian.  Hence simple linear indexing can be used here.
- *  @see solver_generic.c
  */
 void eval_jacob (const double t, const double mu, const double * __restrict__ y, double * __restrict__ jac);
 

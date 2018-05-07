@@ -16,11 +16,6 @@ namespace van_der_pol {
 
 /*!
  *
- * \brief Set same ICs for all problems
- * \param NUM       The number of initial value problems
- * \param y_host    The state vectors to initialize
- * \param var_host  The vector of \f$\mu\f$ parameters for the van der Pol equation
- *
  */
 void set_same_initial_conditions(int NUM, double** y_host, double** var_host)
 {
