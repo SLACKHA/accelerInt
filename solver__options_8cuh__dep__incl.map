@@ -1,21 +1,21 @@
-<map id="C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.cuh" name="C:/Users/Nick/Documents/github/accelerInt/generic/solver_options.cuh">
-<area shape="rect" id="node2" href="$exponential__linear__algebra_8cuh.html" title="Definitions of various linear algebra functions needed in the exponential integrators. " alt="" coords="302,109,501,180"/>
-<area shape="rect" id="node4" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="173,347,364,403"/>
-<area shape="rect" id="node5" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="431,347,639,403"/>
-<area shape="rect" id="node7" href="$phiAHessenberg_8cu.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="624,117,830,173"/>
-<area shape="rect" id="node8" href="$rational__approximant_8cu.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="855,117,1087,173"/>
-<area shape="rect" id="node9" href="$fd__jacob_8cuh.html" title="Header definition of CUDA Finite Difference Jacobian. " alt="" coords="1111,117,1284,173"/>
-<area shape="rect" id="node11" href="$solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="1308,117,1482,173"/>
-<area shape="rect" id="node16" href="$radau2a_8cu.html" title="A Radau2A IRK implementation for CUDA Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE..." alt="" coords="1506,117,1679,173"/>
-<area shape="rect" id="node17" href="$rkc_8cuh.html" title="C:/Users/Nick/Documents\l/github/accelerInt/rkc\l/rkc.cuh" alt="" coords="1703,117,1876,173"/>
-<area shape="rect" id="node19" href="$exp4__init_8cu.html" title="Implementation of the necessary initialization for the EXP4 method. " alt="" coords="1901,117,2097,173"/>
-<area shape="rect" id="node20" href="$exprb43__init_8cu.html" title="Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solv..." alt="" coords="2122,117,2354,173"/>
-<area shape="rect" id="node3" href="$arnoldi_8cuh.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="306,235,497,291"/>
-<area shape="rect" id="node6" href="$exponential__linear__algebra_8cu.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="32,228,230,299"/>
-<area shape="rect" id="node10" href="$fd__jacob_8cu.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="914,235,1087,291"/>
-<area shape="rect" id="node12" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="1308,235,1482,291"/>
-<area shape="rect" id="node13" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1506,235,1679,291"/>
-<area shape="rect" id="node15" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="1111,235,1284,291"/>
-<area shape="rect" id="node14" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1506,347,1679,403"/>
-<area shape="rect" id="node18" href="$rkc_8cu.html" title="C:/Users/Nick/Documents\l/github/accelerInt/rkc\l/rkc.cu" alt="" coords="1703,235,1876,291"/>
+<map id="/home/nick/Documents/software_repos/accelerInt/generic/solver_options.cuh" name="/home/nick/Documents/software_repos/accelerInt/generic/solver_options.cuh">
+<area shape="rect" id="node2" href="$exponential__linear__algebra_8cuh.html" title="Definitions of various linear algebra functions needed in the exponential integrators. " alt="" coords="289,109,493,180"/>
+<area shape="rect" id="node4" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="177,347,353,417"/>
+<area shape="rect" id="node5" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="428,347,604,417"/>
+<area shape="rect" id="node7" href="$phiAHessenberg_8cu.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="604,109,780,180"/>
+<area shape="rect" id="node8" href="$rational__approximant_8cu.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="804,109,980,180"/>
+<area shape="rect" id="node9" href="$fd__jacob_8cuh.html" title="Header definition of CUDA Finite Difference Jacobian. " alt="" coords="1004,117,1180,173"/>
+<area shape="rect" id="node11" href="$solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="1204,117,1380,173"/>
+<area shape="rect" id="node16" href="$radau2a_8cu.html" title="A Radau2A IRK implementation for CUDA Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE..." alt="" coords="1404,117,1580,173"/>
+<area shape="rect" id="node17" href="$rkc_8cuh.html" title="/home/nick/Documents\l/software_repos/accelerInt\l/rkc/rkc.cuh" alt="" coords="1604,117,1780,173"/>
+<area shape="rect" id="node19" href="$exp4__init_8cu.html" title="Implementation of the necessary initialization for the EXP4 method. " alt="" coords="1804,109,1980,180"/>
+<area shape="rect" id="node20" href="$exprb43__init_8cu.html" title="Implementation of the necessary initialization for the 4th order (3rd order embedded) Rosenbrock Solv..." alt="" coords="2004,109,2180,180"/>
+<area shape="rect" id="node3" href="$arnoldi_8cuh.html" title="Implementation of the GPU arnoldi iteration methods. " alt="" coords="303,228,479,299"/>
+<area shape="rect" id="node6" href="$exponential__linear__algebra_8cu.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="31,228,228,299"/>
+<area shape="rect" id="node10" href="$fd__jacob_8cu.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="804,235,980,291"/>
+<area shape="rect" id="node12" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="1204,235,1380,291"/>
+<area shape="rect" id="node13" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1404,235,1593,291"/>
+<area shape="rect" id="node15" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="1004,235,1180,291"/>
+<area shape="rect" id="node14" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="1407,354,1590,410"/>
+<area shape="rect" id="node18" href="$rkc_8cu.html" title="/home/nick/Documents\l/software_repos/accelerInt\l/rkc/rkc.cu" alt="" coords="1617,235,1793,291"/>
 </map>

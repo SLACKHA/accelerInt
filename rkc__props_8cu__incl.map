@@ -1,4 +1,4 @@
-<map id="C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cu" name="C:/Users/Nick/Documents/github/accelerInt/rkc/rkc_props.cu">
+<map id="/home/nick/Documents/software_repos/accelerInt/rkc/rkc_props.cu" name="/home/nick/Documents/software_repos/accelerInt/rkc/rkc_props.cu">
 <area shape="rect" id="node2" href="$rkc__props_8cuh.html" title="Various macros controlling behaviour of RKC algorithm. " alt="" coords="284,109,388,136"/>
 <area shape="rect" id="node3" href="$header_8cuh.html" title="An example header file that defines system size, memory functions and other required methods for inte..." alt="" coords="171,184,258,211"/>
 <area shape="rect" id="node5" href="$gpu__macros_8cuh.html" title="Defines some simple macros to simplify GPU indexing. " alt="" coords="94,259,213,285"/>
