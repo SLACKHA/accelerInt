@@ -37,7 +37,7 @@ ifneq ($(omp),0)
 endif
 endif
 
-CFLAGS  = -I. #-std=c99
+CFLAGS  = -I. -g #-std=c99
 
 ifneq ($(verbose),)
  ifneq ($(verbose),0)
@@ -94,7 +94,7 @@ LDFLAGS = -lstdc++
 
 ifneq ($(pyjac),)
  ifneq ($(pyjac),0)
-   CFLAGS += -D__ENABLE_PYJAC
+   CFLAGS += -D__ENABLE_PYJAC -I$(PYJACPATH)
    LDFLAGS += -L$(PYJACPATH) -lc_pyjac
  endif
 endif

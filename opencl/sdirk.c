@@ -390,8 +390,10 @@ int sdirk_hin (__global const sdirk_t *sdirk, const double t, double *h0, __glob
    // compute ydot at t=t0
    if (need_ydot)
    {
-      //func(neq, 0.0, y, ydot, user_data);
-      cklib_callback(neq, 0.0, y, ydot, user_data);
+      if (func)
+         func(neq, 0.0, y, ydot, user_data);
+      else
+         cklib_callback(neq, 0.0, y, ydot, user_data);
       //sdirk->nfe++;
       need_ydot = 0;
    }
@@ -408,8 +410,10 @@ int sdirk_hin (__global const sdirk_t *sdirk, const double t, double *h0, __glob
          y1[__getIndex(k)] = y[__getIndex(k)] + hg * ydot[__getIndex(k)];
 
       // compute y' at t1
-      //func (neq, 0.0, y1, ydot1, user_data);
-      cklib_callback (neq, 0.0, y1, ydot1, user_data);
+      if (func)
+         func (neq, 0.0, y1, ydot1, user_data);
+      else
+         cklib_callback (neq, 0.0, y1, ydot1, user_data);
       //sdirk->nfe++;
 
       // Compute WRMS norm of y''
@@ -692,8 +696,10 @@ void sdirk_fdjac (__global const sdirk_t *sdirk, const double tcur, const double
 
       __global double *jcol = &Jy[__getIndex(j*neq)];
 
-      //func (neq, tcur, y, jcol, user_data);
-      cklib_callback (neq, tcur, y, jcol, user_data);
+      if (func)
+         func (neq, tcur, y, jcol, user_data);
+      else
+         cklib_callback (neq, tcur, y, jcol, user_data);
 
       const double delyi = 1. / dely;
       for (int i = 0; i < neq; ++i)
@@ -716,7 +722,8 @@ int sdirk_solve (__global const sdirk_t *sdirk, double *tcur, double *hcur, __pr
    #define h (*hcur)
    #define t (*tcur)
    #define neq (sdirk->neq)
-   #define InterpolateNewton	(0)	// Start at zero (0) or interpolate a starting guess (1)
+   //#define InterpolateNewton	(0)	// Start at zero (0) or interpolate a starting guess (1)
+   #define InterpolateNewton	(1)	// Start at zero (0) or interpolate a starting guess (1)
    #define MaxNewtonIterations	(8)	// Max number of newton iterations
    #define NewtonThetaMin	(0.005)	// Minimum convergence rate for the Newton Iteration (0.001)
    #define NewtonThetaMax	(0.999)	// Maximum residual drop acceptable
@@ -766,20 +773,20 @@ int sdirk_solve (__global const sdirk_t *sdirk, double *tcur, double *hcur, __pr
          // Compute the Jacobian matrix or recycle an old one.
          if (ComputeJ)
          {
-            //if (jac == NULL)
+            if (jac)
+               jac (neq, t, y, Jy, user_data);
+            else
             {
                // Compute the RHS ... the fd algorithm expects it.
-               //func (neq, t, y, fy, user_data);
-               cklib_callback (neq, t, y, fy, user_data);
+               if (func)
+                  func (neq, t, y, fy, user_data);
+               else
+                  cklib_callback (neq, t, y, fy, user_data);
                nfe++;
 
                sdirk_fdjac (sdirk, t, h, y, fy, Jy, func, user_data);
                nfe += neq;
             }
-            //else
-            //{
-            //   jac (neq, t, y, Jy, user_data);
-            //}
 
             nje++;
          }
@@ -839,8 +846,10 @@ int sdirk_solve (__global const sdirk_t *sdirk, double *tcur, double *hcur, __pr
                for (int k = 0; k < neq; ++k)
                   del[__getIndex(k)] = y[__getIndex(k)] + z_s[__getIndex(k)];
 
-               //func (neq, t, ynew, fy, user_data);
-               cklib_callback (neq, t, del, fy, user_data);
+               if (func)
+                  func (neq, t, del, fy, user_data);
+               else
+                  cklib_callback (neq, t, del, fy, user_data);
                nfe++;
 
                const double hgamma = h*sdirk->gamma;

@@ -376,8 +376,10 @@ int ros_hin (__global const ros_t *ros, const double t, double *h0, __global dou
    // compute ydot at t=t0
    if (need_ydot)
    {
-      //func(neq, 0.0, y, ydot, user_data);
-      cklib_callback(neq, 0.0, y, ydot, user_data);
+      if (func)
+         func(neq, 0.0, y, ydot, user_data);
+      else
+         cklib_callback(neq, 0.0, y, ydot, user_data);
       //ros->nfe++;
       need_ydot = 0;
    }
@@ -394,8 +396,10 @@ int ros_hin (__global const ros_t *ros, const double t, double *h0, __global dou
          y1[__getIndex(k)] = y[__getIndex(k)] + hg * ydot[__getIndex(k)];
 
       // compute y' at t1
-      //func (neq, 0.0, y1, ydot1, user_data);
-      cklib_callback (neq, 0.0, y1, ydot1, user_data);
+      if (func)
+         func (neq, 0.0, y1, ydot1, user_data);
+      else
+         cklib_callback (neq, 0.0, y1, ydot1, user_data);
       //ros->nfe++;
 
       // Compute WRMS norm of y''
@@ -791,8 +795,10 @@ void ros_fdjac (__global const ros_t *ros, const double tcur, const double hcur,
 
       __global double *jcol = &Jy[__getIndex(j*neq)];
 
-      //func (neq, tcur, y, jcol, user_data);
-      cklib_callback (neq, tcur, y, jcol, user_data);
+      if (func)
+         func (neq, tcur, y, jcol, user_data);
+      else
+         cklib_callback (neq, tcur, y, jcol, user_data);
 
       const double delyi = 1. / dely;
       for (int i = 0; i < neq; ++i)
@@ -848,19 +854,19 @@ int ros_solve (__global const ros_t *ros, double *tcur, double *hcur, __private 
       //ros_setewt (ros, y, ewt);
 
       // Compute the RHS and Jacobian matrix.
-      //func (neq, t, y, fy, user_data);
-      cklib_callback (neq, t, y, fy, user_data);
+      if (func)
+         func (neq, t, y, fy, user_data);
+      else
+         cklib_callback (neq, t, y, fy, user_data);
       nfe++;
 
-      //if (jac == NULL)
+      if (jac)
+         jac (neq, t, y, Jy, user_data);
+      else
       {
          ros_fdjac (ros, t, h, y, fy, Jy, func, user_data);
          nfe += neq;
       }
-      //else
-      //{
-      //   jac (neq, t, y, Jy, user_data);
-      //}
 
       nje++;
 
@@ -902,8 +908,10 @@ int ros_solve (__global const ros_t *ros, double *tcur, double *hcur, __private 
                ros_daxpy (neq, Asj, k_j, ynew);
             }
 
-            //func (neq, t, ynew, fy, user_data);
-            cklib_callback (neq, t, ynew, fy, user_data);
+            if (func)
+               func (neq, t, ynew, fy, user_data);
+            else
+               cklib_callback (neq, t, ynew, fy, user_data);
             nfe++;
 
             //printf("newF=%d\n", s);
