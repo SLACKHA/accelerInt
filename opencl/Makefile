@@ -59,7 +59,7 @@ else
    OMP	= -fopenmp
 endif
 
-   CFLAGS += -O3
+   CFLAGS += -O2
 #  CFLAGS += -no-vec
 ifeq ($(opt),3)
    CFLAGS += -DFAST_MATH
@@ -81,7 +81,8 @@ ifneq ($(USE_OMP),0)
    CFLAGS += $(OMP)
 endif
 
-CXXFLAGS= ${CFLAGS} -std=c++0x -Wno-enum-compare
+#CXXFLAGS= ${CFLAGS} -std=c++0x -Wno-enum-compare
+CXXFLAGS= ${CFLAGS} -std=c++11 -Wno-enum-compare
 
 FC	= ifort
 FFLAGS	= -O2 -r8
@@ -169,6 +170,10 @@ all: exec
 
 $(EXEC) : test_ck.cxx ${OBJS}
 #%.exe : test_ck.cxx ${OBJS}
+	@echo "Building executable $@"
+	${CXX} ${CXXFLAGS} -o $@ $< ${OBJS} ${LDFLAGS}
+
+driver : driver.cxx ${OBJS}
 	@echo "Building executable $@"
 	${CXX} ${CXXFLAGS} -o $@ $< ${OBJS} ${LDFLAGS}
 

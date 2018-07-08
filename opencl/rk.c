@@ -27,6 +27,15 @@
 //     fourth-order runge-kutta integration
 //        x  = x + a1*f1 + a3*f3 + a4*f4 + a5*f5
 
+#define _func(neq,t,y,f,vdat) { \
+   if (func) { \
+      func((neq),(t),(y),(f),(vdat)); \
+   } \
+   else { \
+      cklib_callback((neq), (t), (y), (f), (vdat)); \
+   } \
+}
+
 // Single-step function
 __inline
 int rkf45 (const int neq, const double h, __global double *restrict y, __global double *restrict y_out, __global double *rwk, RHS_Function_t func, __private void *user_data)
@@ -102,7 +111,7 @@ int rkf45 (const int neq, const double h, __global double *restrict y, __global 
    __global double *restrict ytmp = rwk + __getIndex(6*neq) ;
 
    // 1)
-   cklib_callback(neq, 0.0, y, f1, user_data);
+   _func(neq, 0.0, y, f1, user_data);
 
    for (int k = 0; k < neq; k++)
    {
@@ -112,7 +121,7 @@ int rkf45 (const int neq, const double h, __global double *restrict y, __global 
    }
 
    // 2)
-   cklib_callback(neq, 0.0, ytmp, f2, user_data);
+   _func(neq, 0.0, ytmp, f2, user_data);
 
    for (int k = 0; k < neq; k++)
    {
@@ -122,7 +131,7 @@ int rkf45 (const int neq, const double h, __global double *restrict y, __global 
    }
 
    // 3)
-   cklib_callback(neq, 0.0, ytmp, f3, user_data);
+   _func(neq, 0.0, ytmp, f3, user_data);
 
    for (int k = 0; k < neq; k++) {
       //f3[k] = h * ydot[k];
@@ -131,7 +140,7 @@ int rkf45 (const int neq, const double h, __global double *restrict y, __global 
    }
 
    // 4)
-   cklib_callback(neq, 0.0, ytmp, f4, user_data);
+   _func(neq, 0.0, ytmp, f4, user_data);
 
    for (int k = 0; k < neq; k++) {
       //f4[k] = h * ydot[k];
@@ -140,7 +149,7 @@ int rkf45 (const int neq, const double h, __global double *restrict y, __global 
    }
 
    // 5)
-   cklib_callback(neq, 0.0, ytmp, f5, user_data);
+   _func(neq, 0.0, ytmp, f5, user_data);
 
    for (int k = 0; k < neq; k++) {
       //f5[k] = h * ydot[k];
@@ -149,7 +158,7 @@ int rkf45 (const int neq, const double h, __global double *restrict y, __global 
    }
 
    // 6)
-   cklib_callback(neq, 0.0, ytmp, f6, user_data);
+   _func(neq, 0.0, ytmp, f6, user_data);
 
    for (int k = 0; k < neq; k++)
    {
@@ -278,7 +287,7 @@ int rk_hin (__global const rk_t *restrict rk, const double t, double *h0, __glob
    // compute ydot at t=t0
    if (need_ydot)
    {
-      cklib_callback(neq, 0.0, y, ydot, user_data);
+      _func(neq, 0.0, y, ydot, user_data);
       //++rk->nfe;
       need_ydot = 0;
    }
@@ -295,7 +304,7 @@ int rk_hin (__global const rk_t *restrict rk, const double t, double *h0, __glob
          y1[__getIndex(k)] = y[__getIndex(k)] + hg * ydot[__getIndex(k)];
 
       // compute y' at t1
-      cklib_callback (neq, 0.0, y1, ydot1, user_data);
+      _func (neq, 0.0, y1, ydot1, user_data);
       //++rk->nfe;
 
       // Compute WRMS norm of y''

@@ -42,8 +42,11 @@ typedef struct //_rk_counters_s
 }
 rk_counters_t;
 
-//typedef int (*RHS_Function_t)(int neq, double tcur, double *y, double *ydot, void *user_data);
+#if defined(__OPENCL_VERSION__)
 typedef void* RHS_Function_t;
+#else
+typedef int (*RHS_Function_t)(int neq, double tcur, double *y, double *ydot, void *user_data);
+#endif
 
 
 int rk_create (__global rk_t *rk, const int neq);
