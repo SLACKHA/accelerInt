@@ -36,17 +36,17 @@ void accelerInt_initialize(int NUM, int device);
 
 
 /**
- * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
+ * \brief integrate NUM odes from time `t_start` to time `t_end`, using stepsizes of `t_step`
  *
  * \param[in]           NUM             The number of ODEs to integrate.  This should be the size of the leading dimension of `y_host` and `var_host`.  @see accelerint_indx
- * \param[in]           t               The system time
+ * \param[in]           t_start         The system time
  * \param[in]           t_end           The end time
- * \param[in]           t_step          The integration step size.  If `t_step` < 0, the step size will be set to `t_end - t`
+ * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
  * \param[in,out]       y_host          The state vectors to integrate.
  * \param[in]           var_host        The parameters to use in dydt() and eval_jacob()
  *
  */
-void accelerInt_integrate(const int NUM, const double t, const double t_end, const double t_step,
+void accelerInt_integrate(const int NUM, const double t_start, const double t_end, const double stepsize,
                           double * __restrict__ y_host, const double * __restrict__ var_host);
 
 /**

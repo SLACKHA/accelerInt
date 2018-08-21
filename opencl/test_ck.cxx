@@ -897,6 +897,10 @@ int main (int argc, char* argv[])
             read_file = argv[index];
             read_data = 1;
          }
+         else if (strcmp(argv[index], "-binary") == 0)
+         {
+            read_csv = 0;
+         }
          else if (strcmp(argv[index], "-csv") == 0)
          {
             read_csv = 1;

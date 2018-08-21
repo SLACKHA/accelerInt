@@ -11,7 +11,10 @@ import SCons
 import platform
 from buildutils import *
 import shutil
-from pyjac import utils
+
+# mirrored from pyjac
+header_ext = dict(c='.h', cuda='.cuh')
+"""dict: header extensions based on language"""
 
 valid_commands = ('build', 'test', 'cpu', 'gpu', 'help')
 
@@ -170,6 +173,9 @@ config_options = [
     ('mechanism_dir',
      'The directory where mechanism files are located.',
      defaults.mechanism_dir),
+    EnumVariable('buildtype',
+     'The type of build to run (exe or lib)', 'exe',
+     allowed_values=('exe', 'lib')),
     BoolVariable(
         'DEBUG', 'Compiles with Debugging flags and information.', False),
     ('ATOL', 'Absolute Tolerance for integrators', '1e-10'),
@@ -265,6 +271,7 @@ exp4_int_dir = os.path.join(home, 'exponential_integrators', 'exp4')
 exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
 cvodes_dir = os.path.join(home, 'cvodes')
 rk78_dir = os.path.join(home, 'rk78')
+rkc_dir = os.path.join(home, 'rkc')
 
 common_dir_list = [generic_dir, mech_dir]
 
@@ -283,7 +290,7 @@ NVCCFlags.append(['-Xcompiler {}'.format(
 
 def check_extras(lang, subdir, check_str, check_file, list_file):
     if check_file is None:
-        check_file = os.path.join(mech_dir, subdir + utils.header_ext[lang])
+        check_file = os.path.join(mech_dir, subdir + header_ext[lang])
     else:
         check_file = os.path.join(mech_dir, check_file)
     have_extras = False
@@ -346,7 +353,7 @@ def write_options(lang, dir):
     # write the solver_options file
     # scons will automagically decide what needs recompilation based on this
     # hooray!
-    with open(os.path.join(dir, 'solver_options{}'.format(utils.header_ext[lang])), 'w') as file:
+    with open(os.path.join(dir, 'solver_options{}'.format(header_ext[lang])), 'w') as file:
         file.write("""
         /*! \file
 
@@ -508,6 +515,8 @@ if 'NVCC_INC_PATH' not in env:
 if build_cuda:
     env['NVCC_INC_PATH'] += common_dir_list
 
+build_lib = env['buildtype'] == 'lib'
+
 target_list = {}
 
 # copy a good SConscript into the mechanism dir
@@ -555,16 +564,20 @@ def builder(env_save, cmech, cumech, newdict, mydir, variant,
                                        src_dir=thedir)
             cint += ctemp
             cuint += cutemp
+
+    ffilter = ['main'] if build_lib else ['interface']
     if filter_out is not None:
         if not isinstance(filter_out, list):
             filter_out = [filter_out]
-        cint = [x for x in cint if not any(y in str(x) for y in filter_out)]
-        cmech = [x for x in cmech if not any(y in str(x) for y in filter_out)]
-        cgen = [x for x in cgen if not any(y in str(x) for y in filter_out)]
+        ffilter += filter_out
+    if ffilter:
+        cint = [x for x in cint if not any(y in str(x) for y in ffilter)]
+        cmech = [x for x in cmech if not any(y in str(x) for y in ffilter)]
+        cgen = [x for x in cgen if not any(y in str(x) for y in ffilter)]
         if cumech is not None:
-            cuint = [x for x in cuint if not any(y in str(x) for y in filter_out)]
-            cumech = [x for x in cmech if not any(y in str(x) for y in filter_out)]
-            cugen = [x for x in cgen if not any(y in str(x) for y in filter_out)]
+            cuint = [x for x in cuint if not any(y in str(x[0]) for y in ffilter)]
+            cumech = [x for x in cumech if not any(y in str(x[0]) for y in ffilter)]
+            cugen = [x for x in cugen if not any(y in str(x[0]) for y in ffilter)]
 
     target_list[target_base] = []
     target_list[target_base].append(
@@ -635,10 +648,23 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCC_INC_PATH'] = [exp_int_dir, exprb43_int_dir]
 new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
-rb43c, rb43cu = builder(env_save, mech_c, mech_cuda,
+rb43c, rb43cu = builder(env_save, mech_c,
+                        mech_cuda if build_cuda else None,
                         new_defines, exprb43_int_dir,
                         variant, 'exprb43-int', target_list,
                         [exp_int_dir])
+
+# rkc
+new_defines = {}
+new_defines['CPPPATH'] = [rkc_dir]
+new_defines['NVCC_INC_PATH'] = [rkc_dir]
+new_defines['CPPDEFINES'] = ['RKC']
+new_defines['NVCCDEFINES'] = ['RKC']
+rkc, rkccu = builder(env_save, mech_c,
+                     mech_cuda if build_cuda else None,
+                     new_defines, rkc_dir,
+                     variant, 'rkc-int', target_list,
+                     filter_out=['nverse'])
 
 # cvodes
 new_defines = {}
@@ -646,7 +672,7 @@ new_defines['CPPDEFINES'] = ['CVODES']
 new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
-cvodesc, dummy = builder(env_save, mech_c, None, new_defines,
+cvodesc, _ = builder(env_save, mech_c, None, new_defines,
                          cvodes_dir, variant, 'cvodes-int',
                          target_list, None,
                          filter_out=['solver_generic', 'nverse'])

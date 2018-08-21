@@ -23,7 +23,7 @@ namespace rk78 {
 
 extern std::vector<state_type*> state_vectors;
 extern std::vector<rhs_eval*> evaluators;
-extern std::vector<controller*> controllers;
+extern std::vector<controller> controllers;
 
 extern "C" void intDriver(const int, const double, const double, const double*, double*);
 
@@ -82,7 +82,7 @@ void intDriver (const int NUM, const double t, const double t_end,
         }
 
 #ifndef STIFFNESS_MEASURE
-        integrate_adaptive(*controllers[index],
+        integrate_adaptive(controllers[index],
             *evaluators[index], vec, t, t_end, t_end - t);
 #else
         double tol = 1e-15;
