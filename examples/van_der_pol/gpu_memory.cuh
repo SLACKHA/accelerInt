@@ -3,12 +3,9 @@
  * \brief Headers for GPU memory initialization
  */
 
-<<<<<<< HEAD
-=======
 #ifndef GPU_MEM_CUH
 #define GPU_MEM_CUH
 
->>>>>>> master
 #include "header.cuh"
 
 #ifdef GENERATE_DOCS
@@ -59,8 +56,5 @@ void free_gpu_memory(mechanism_memory** h_mem, mechanism_memory** d_mem);
 #ifdef GENERATE_DOCS
 }
 #endif
-<<<<<<< HEAD
-=======
 
 #endif
->>>>>>> master
