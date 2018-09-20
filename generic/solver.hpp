@@ -12,6 +12,7 @@
  #define SOLVER_H
 
 #include <float.h>
+#include <cstddef>
 #include "error_codes.hpp"
 
 namespace c_solvers {
@@ -50,7 +51,7 @@ namespace c_solvers {
             virtual ~Integrator();
 
             virtual void initSolverLog() = 0;
-            virtual void log() = 0;
+            virtual void solverLog() = 0;
 
             virtual void reinitialize(int numThreads) = 0;
             virtual void clean() = 0;
@@ -58,7 +59,7 @@ namespace c_solvers {
             virtual const char* solverName() const = 0;
             virtual void checkError(int, ErrorCode) const = 0;
 
-            virtual size_t requiredSolverMemorySize() const = 0;
+            virtual std::size_t requiredSolverMemorySize() const = 0;
 
             /**
             * \brief A header definition of the integrate method, that must be implemented by various solvers
@@ -68,10 +69,8 @@ namespace c_solvers {
             * \param[in,out]      y                   The IVP state vector at time t_start.
                                                       At end of this function call, the system state at time t_end is stored here
             */
-            ErrorCode integrate(const double t_start, const double t_end,
-                                const double pr, double* y) const;
-
-            Solver solver_type;
+            virtual ErrorCode integrate(const double t_start, const double t_end,
+                                        const double pr, double* y) const = 0;
 
         protected:
             int numThreads;

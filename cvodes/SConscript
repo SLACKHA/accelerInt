@@ -5,6 +5,6 @@ cuObj = []
 for src in c_src:
 	if env['FINITE_DIFFERENCE'] and 'cvodes_jac' in str(src):
 		continue
-	cObj.append(env.Object(src, variant_dir=env['variant']))
+	cObj.append(env.SharedObject(src, variant_dir=env['variant']))
 
 Return ('cObj', 'cuObj')

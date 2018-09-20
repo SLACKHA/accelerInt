@@ -5,15 +5,13 @@
  * \date 09/19/2019
  */
 
-#ifndef RADAU2A_PROPS_H
-#define RADAU2A_PROPS_H
+#ifndef RADAU2A_SOLVER_H
+#define RADAU2A_SOLVER_H
 
 #include "header.h"
 #include <stdio.h>
 #include "solver.hpp"
 namespace c_solvers
-{
-namespace radau
 {
     //! Maximum number of allowed internal timesteps before error
     #define Max_no_steps (200000)
@@ -200,66 +198,86 @@ namespace radau
 
     class RadauIntegrator : public Integrator
     {
+        public:
 
-        RadauIntegrator(int numThreads) : Integrator(numThreads)
-        {
-        }
-
-
-        /*! checkError
-            \brief Checks the return code of the given thread (IVP) for an error, and exits if found
-            \param tid The thread (IVP) index
-            \param code The return code of the thread
-            @see ErrorCodes
-        */
-        void checkError(int tid, ErrorCode code)
-        {
-            switch(code)
+            RadauIntegrator(int numThreads) : Integrator(numThreads)
             {
-                case ErrorCode::MAX_CONSECUTIVE_ERRORS_EXCEEDED:
-                    printf("During integration of ODE# %d, an error occured on too many consecutive integration steps,"
-                            "exiting...\n", tid);
-                    exit(code);
-                case ErrorCode::MAX_STEPS_EXCEEDED:
-                    printf("During integration of ODE# %d, the allowed number of integration steps was exceeded,"
-                            "exiting...\n", tid);
-                    exit(code);
-                case ErrorCode::H_PLUS_T_EQUALS_H:
-                    printf("During integration of ODE# %d, the stepsize 'h' was decreased such that h = t + h,"
-                            "exiting...\n", tid);
-                    exit(code);
-                case ErrorCode::MAX_NEWTON_ITER_EXCEEDED:
-                    printf("During integration of ODE# %d, the allowed number of newton iteration steps was exceeded,"
-                            "exiting...\n", tid);
-                    exit(code);
             }
-        }
 
-        /*!
-           \fn char* solverName()
-           \brief Returns a descriptive solver name
-        */
-        const char* solverName() {
-            const char* name = "radau2a-int";
-            return name;
-        }
 
-        void clean() {
-            // pass
-        }
-        void reinitialize(int numThreads) {
-            // pass
-        }
+            /*! checkError
+                \brief Checks the return code of the given thread (IVP) for an error, and exits if found
+                \param tid The thread (IVP) index
+                \param code The return code of the thread
+                @see ErrorCodes
+            */
+            void checkError(int tid, ErrorCode code) const
+            {
+                switch(code)
+                {
+                    case ErrorCode::MAX_CONSECUTIVE_ERRORS_EXCEEDED:
+                        printf("During integration of ODE# %d, an error occured on too many consecutive integration steps,"
+                                "exiting...\n", tid);
+                        exit(code);
+                    case ErrorCode::MAX_STEPS_EXCEEDED:
+                        printf("During integration of ODE# %d, the allowed number of integration steps was exceeded,"
+                                "exiting...\n", tid);
+                        exit(code);
+                    case ErrorCode::H_PLUS_T_EQUALS_H:
+                        printf("During integration of ODE# %d, the stepsize 'h' was decreased such that h = t + h,"
+                                "exiting...\n", tid);
+                        exit(code);
+                    case ErrorCode::MAX_NEWTON_ITER_EXCEEDED:
+                        printf("During integration of ODE# %d, the allowed number of newton iteration steps was exceeded,"
+                                "exiting...\n", tid);
+                        exit(code);
+                }
+            }
 
-        void initSolverLog() {
-            // pass
-        }
+            /*!
+               \fn char* solverName()
+               \brief Returns a descriptive solver name
+            */
+            const char* solverName() const {
+                const char* name = "radau2a-int";
+                return name;
+            }
 
-        void solverLog() {
-            // pass
-        }
-    };
-}
+            void clean() {
+                // pass
+            }
+            void reinitialize(int numThreads) {
+                // pass
+            }
+
+            void initSolverLog() {
+                // pass
+            }
+
+            void solverLog() {
+                // pass
+            }
+
+            std::size_t requiredSolverMemorySize() const
+            {
+                // C-solvers don't require pre-allocation
+                return 0;
+            }
+
+            /**
+             *  \brief 5th-order Radau2A CPU implementation
+             *
+             *  \param[in]          t_start             The starting time
+             *  \param[in]          t_end               The end integration time
+             *  \param[in]          pr                  The system constant variable (pressure/density)
+             *  \param[in,out]      y                   The system state vector at time `t_start`.
+                                                        Overwritten with the system state at time `t_end`
+             *  \returns Return code, @see RK_ErrCodes
+             */
+            ErrorCode integrate (
+                const double t_start, const double t_end, const double pr, double* y) const;
+
+        };
 }
 
 #endif

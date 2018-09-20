@@ -8,7 +8,7 @@ FD = env['FINITE_DIFFERENCE']
 for src in c_src:
     if FD and 'jacob' in str(src):
         continue
-    cObj.append(env.Object(src, variant_dir=env['variant']))
+    cObj.append(env.SharedObject(src, variant_dir=env['variant']))
 
 
 cudaObj = []

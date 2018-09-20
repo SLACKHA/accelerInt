@@ -171,8 +171,8 @@ config_options = [
      'The directory where mechanism files are located.',
      defaults.mechanism_dir),
     EnumVariable('buildtype',
-     'The type of build to run (exe or lib)', 'exe',
-     allowed_values=('exe', 'lib')),
+                 'The type of build to run (exe or lib)', 'exe',
+                 allowed_values=('exe', 'lib')),
     BoolVariable(
         'DEBUG', 'Compiles with Debugging flags and information.', False),
     ('ATOL', 'Absolute Tolerance for integrators', '1e-10'),
@@ -266,6 +266,7 @@ LinkFlags.append(env['openmp_flags'])
 
 # directories
 mech_dir = os.path.join(home, env['mechanism_dir'])
+interface_dir = os.path.join(home, 'interface')
 linalg_dir = os.path.join(home, 'linear_algebra')
 generic_dir = os.path.join(home, 'generic')
 radau2a_dir = os.path.join(home, 'radau2a')
@@ -496,12 +497,17 @@ def build_lib(save, defines, src, variant, target_base, filter=None):
         env[key].extend(listify(value))
 
     # build generic for this lib
-    mygendir = os.path.join(generic_dir,
-                            os.path.basename(os.path.normpath(src)))
     cgen, cugen = env.SConscript(os.path.join(generic_dir, 'SConscript'),
-                                 variant_dir=os.path.join(mygendir, variant),
+                                 variant_dir=os.path.join(generic_dir, variant),
                                  src_dir=generic_dir,
                                  exports=['env'])
+
+    # add interface
+    cinterface, cuinterface = env.SConscript(
+        os.path.join(interface_dir, 'SConscript'),
+        variant_dir=os.path.join(interface_dir, variant),
+        src_dir=interface_dir,
+        exports=['env'])
 
     # build integrator for this lib
     cint, cuint = env.SConscript(os.path.join(src, 'SConscript'),
@@ -509,8 +515,10 @@ def build_lib(save, defines, src, variant, target_base, filter=None):
                                  src_dir=src,
                                  exports=['env'])
 
-    clib = env.Library(cint + cgen)
-    culib = env.Library(cuint + cugen)
+    clib = env.SharedLibrary(cint + cgen + cinterface)
+    culib = []
+    if build_cuda:
+        culib = env.SharedLibrary(cuint + cugen + cuinterface)
 
     return clib, culib
 
@@ -607,10 +615,10 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCC_INC_PATH'] = [exp_int_dir, exp4_int_dir]
 new_defines['CPPDEFINES'] = ['EXP4']
 new_defines['NVCCDEFINES'] = ['EXP4']
-exp4_c, exp4_cuda = builder(env_save, mech_c, mech_cuda,
-                            new_defines, exp4_int_dir,
-                            variant, 'exp4-int', target_list,
-                            [exp_int_dir])
+# exp4_c, exp4_cuda = builder(env_save, mech_c, mech_cuda,
+#                             new_defines, exp4_int_dir,
+#                             variant, 'exp4-int', target_list,
+#                             [exp_int_dir])
 
 # exprb43
 new_defines = {}
@@ -620,11 +628,11 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCC_INC_PATH'] = [exp_int_dir, exprb43_int_dir]
 new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
-rb43c, rb43cu = builder(env_save, mech_c,
-                        mech_cuda if build_cuda else None,
-                        new_defines, exprb43_int_dir,
-                        variant, 'exprb43-int', target_list,
-                        [exp_int_dir])
+# rb43c, rb43cu = builder(env_save, mech_c,
+#                         mech_cuda if build_cuda else None,
+#                         new_defines, exprb43_int_dir,
+#                         variant, 'exprb43-int', target_list,
+#                         [exp_int_dir])
 
 # rkc
 new_defines = {}
@@ -632,11 +640,11 @@ new_defines['CPPPATH'] = [rkc_dir]
 new_defines['NVCC_INC_PATH'] = [rkc_dir]
 new_defines['CPPDEFINES'] = ['RKC']
 new_defines['NVCCDEFINES'] = ['RKC']
-rkc, rkccu = builder(env_save, mech_c,
-                     mech_cuda if build_cuda else None,
-                     new_defines, rkc_dir,
-                     variant, 'rkc-int', target_list,
-                     filter_out=['nverse'])
+# rkc, rkccu = builder(env_save, mech_c,
+#                      mech_cuda if build_cuda else None,
+#                      new_defines, rkc_dir,
+#                      variant, 'rkc-int', target_list,
+#                      filter_out=['nverse'])
 
 # cvodes
 new_defines = {}
@@ -644,10 +652,10 @@ new_defines['CPPDEFINES'] = ['CVODES']
 new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
-cvodesc, _ = builder(env_save, mech_c, None, new_defines,
-                         cvodes_dir, variant, 'cvodes-int',
-                         target_list, None,
-                         filter_out=['solver_generic', 'nverse'])
+# cvodesc, _ = builder(env_save, mech_c, None, new_defines,
+#                          cvodes_dir, variant, 'cvodes-int',
+#                          target_list, None,
+#                          filter_out=['solver_generic', 'nverse'])
 
 # rk78
 new_defines = {}
@@ -655,9 +663,9 @@ env_cpp = env_save.Clone()
 env_cpp['CCFLAGS'] = []
 new_defines['CPPDEFINES'] = ['RK78']
 new_defines['CPPPATH'] = [rk78_dir, env['boost_inc_dir']]
-builder(env_save, mech_c, None, new_defines,
-        rk78_dir, variant, 'rk78-int', target_list,
-        filter_out=['solver_generic', 'nverse'])
+# builder(env_save, mech_c, None, new_defines,
+#         rk78_dir, variant, 'rk78-int', target_list,
+#         filter_out=['solver_generic', 'nverse'])
 
 flat_values = []
 cpu_vals = []

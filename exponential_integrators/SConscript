@@ -7,7 +7,7 @@ for src in c_src:
 	name = str(src)
 	stub = name[:name.index('.c')]
 	targ = stub + '_' + name_mod + '.o'
-	cObj.append(env.Object(target=targ, source=src, variant_dir=env['variant']))
+	cObj.append(env.SharedObject(target=targ, source=src, variant_dir=env['variant']))
 
 cudaObj = []
 cuda_src = Glob('*.cu')
@@ -20,7 +20,7 @@ if env['build_cuda']:
 
 	def add_c_obj(src, cudaObj, env):
 		obj = 'cu_' + src.replace('.c', '_{}.o'.format(name_mod))
-		cudaObj.append(env.Object(
+		cudaObj.append(env.SharedObject(
 						target=obj,
 						source=src,
 						variant_dir=env['variant']))

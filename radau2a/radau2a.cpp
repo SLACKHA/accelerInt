@@ -31,8 +31,6 @@ Problems, 2nd Edition, Springer-Verlag, Berlin, 1996. doi:10.1007/978-3-642-
 
 namespace c_solvers
 {
-namespace radau
-{
 
 
 	/**
@@ -339,7 +337,7 @@ namespace radau
 	 											Overwritten with the system state at time `t_end`
 	 *  \returns Return code, @see RK_ErrCodes
 	 */
-	ErrorCode integrate (const double t_start, const double t_end, const double pr, double* y) {
+	ErrorCode RadauIntegrator::integrate (const double t_start, const double t_end, const double pr, double* y) const {
 		double Hmin = 0;
 		double Hold = 0;
 	#ifdef Gustafsson
@@ -557,5 +555,4 @@ namespace radau
 		return ErrorCode::SUCCESS;
 	}
 
-}
 }
