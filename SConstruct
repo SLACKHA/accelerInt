@@ -9,7 +9,7 @@ import platform
 from buildutils import listify, formatOption
 import shutil
 
-valid_commands = ('radau2a-cpu', 'rk78-cpu', 'cpu', 'gpu', 'help')
+valid_commands = ('radau2a-cpu', 'rk78-cpu', 'rkc-cpu', 'cpu', 'gpu', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -660,13 +660,11 @@ new_defines['NVCCDEFINES'] = ['RB43']
 new_defines = {}
 new_defines['CPPPATH'] = [rkc_dir]
 new_defines['NVCC_INC_PATH'] = [rkc_dir]
-new_defines['CPPDEFINES'] = ['RKC']
-new_defines['NVCCDEFINES'] = ['RKC']
-# rkc, rkccu = builder(env_save, mech_c,
-#                      mech_cuda if build_cuda else None,
-#                      new_defines, rkc_dir,
-#                      variant, 'rkc-int', target_list,
-#                      filter_out=['nverse'])
+rkc_c, rkc_cuda = build_lib(env_save, core, new_defines, rkc_dir,
+                            variant, 'rkc')
+rkc_c = env.Alias('rkc-cpu', rkc_c)
+rkc_cuda = env.Alias('rkc-gpu', rkc_cuda)
+
 
 # cvodes
 new_defines = {}
