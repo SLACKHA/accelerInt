@@ -21,7 +21,7 @@ std::vector<rhs_eval*> evaluators;
 //! Addaptive timesteppers
 std::vector<stepper*> steppers;
 //! ODE controllers
-std::vector<controller*> controllers;
+std::vector<controller> controllers;
 #ifdef STIFFNESS_MEASURE
 std::vector<double> max_stepsize;
 #include <stdio.h>
@@ -45,7 +45,7 @@ void initialize_solver(int num_threads) {
 		state_vectors.push_back(new state_type(NSP, 0.0));
 		evaluators.push_back(new rhs_eval());
 		steppers.push_back(new stepper());
-		controllers.push_back(new controller(ATOL, RTOL, *steppers[i]));
+		controllers.push_back(make_controlled<stepper>(ATOL, RTOL, *steppers[i]));
 	}
 }
 
@@ -61,7 +61,7 @@ void cleanup_solver(int num_threads) {
 		delete state_vectors[i];
 		delete evaluators[i];
 		delete steppers[i];
-		delete controllers[i];
+		controllers.pop_back();
 	}
 #ifdef STIFFNESS_MEASURE
 	fclose(stepsizes);
