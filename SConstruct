@@ -9,7 +9,7 @@ import platform
 from buildutils import listify, formatOption
 import shutil
 
-valid_commands = ('radau2a-cpu', 'cpu', 'gpu', 'help')
+valid_commands = ('radau2a-cpu', 'rk78-cpu', 'cpu', 'gpu', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -487,7 +487,7 @@ except IOError as e:
         pass
 
 
-def build_lib(save, defines, src, variant, target_base, filter=None):
+def get_env(save, defines):
     env = save.Clone()
 
     # update defines
@@ -495,6 +495,12 @@ def build_lib(save, defines, src, variant, target_base, filter=None):
         if key not in env:
             env[key] = []
         env[key].extend(listify(value))
+
+    return env
+
+
+def build_core(save, defines, variant):
+    env = get_env(save, defines)
 
     # build generic for this lib
     cgen, cugen = env.SConscript(os.path.join(generic_dir, 'SConscript'),
@@ -509,16 +515,28 @@ def build_lib(save, defines, src, variant, target_base, filter=None):
         src_dir=interface_dir,
         exports=['env'])
 
+    ccore = env.SharedLibrary(cgen + cinterface)
+    cucore = None
+    if build_cuda:
+        cucore = env.SharedLibrary(cugen + cuinterface)
+    return ccore, cucore
+
+
+def build_lib(save, core, defines, src, variant, target_base, filter=None):
+    env = get_env(save, defines)
+
+    ccore, cucore = core
+
     # build integrator for this lib
     cint, cuint = env.SConscript(os.path.join(src, 'SConscript'),
                                  variant_dir=os.path.join(src, variant),
                                  src_dir=src,
                                  exports=['env'])
 
-    clib = env.SharedLibrary(cint + cgen + cinterface)
+    clib = env.SharedLibrary(cint + ccore)
     culib = []
     if build_cuda:
-        culib = env.SharedLibrary(cuint + cugen + cuinterface)
+        culib = env.SharedLibrary(cuint + cucore)
 
     return clib, culib
 
@@ -596,14 +614,18 @@ env_save = env.Clone()
 mech_c, mech_cuda = env.SConscript(os.path.join(mech_dir, 'SConscript'),
                                    variant_dir=os.path.join(mech_dir, variant),
                                    exports=['env'])
+
+new_defines = {}
+new_defines['CPPPATH'] = [radau2a_dir, rk78_dir]
+new_defines['NVCC_INC_PATH'] = [radau2a_dir, rk78_dir]
+core = build_core(env_save, new_defines, variant)
+
 # radua
 new_defines = {}
-new_defines['CPPDEFINES'] = ['RADAU2A']
 new_defines['CPPPATH'] = [radau2a_dir]
-new_defines['NVCCDEFINES'] = ['RADAU2A']
 new_defines['NVCC_INC_PATH'] = [radau2a_dir]
-radau_c, radau_cuda = build_lib(env_save, new_defines, radau2a_dir, variant,
-                                'radau2a')
+radau_c, radau_cuda = build_lib(env_save, core, new_defines, radau2a_dir,
+                                variant, 'radau2a')
 radau_c = env.Alias('radau2a-cpu', radau_c)
 radau_cuda = env.Alias('radau2a-gpu', radau_cuda)
 
@@ -660,12 +682,10 @@ new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
 # rk78
 new_defines = {}
 env_cpp = env_save.Clone()
-env_cpp['CCFLAGS'] = []
-new_defines['CPPDEFINES'] = ['RK78']
 new_defines['CPPPATH'] = [rk78_dir, env['boost_inc_dir']]
-# builder(env_save, mech_c, None, new_defines,
-#         rk78_dir, variant, 'rk78-int', target_list,
-#         filter_out=['solver_generic', 'nverse'])
+rk78_c, _ = build_lib(env_save, core, new_defines, rk78_dir, variant,
+                      'rk78')
+rk78_c = env.Alias('rk78-cpu', rk78_c)
 
 flat_values = []
 cpu_vals = []

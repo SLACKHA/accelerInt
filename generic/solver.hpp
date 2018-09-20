@@ -13,6 +13,7 @@
 
 #include <float.h>
 #include <cstddef>
+#include <stdio.h>
 #include "error_codes.hpp"
 
 namespace c_solvers {
@@ -57,8 +58,35 @@ namespace c_solvers {
             virtual void clean() = 0;
 
             virtual const char* solverName() const = 0;
-            virtual void checkError(int, ErrorCode) const = 0;
 
+            /*! checkError
+                \brief Checks the return code of the given thread (IVP) for an error, and exits if found
+                \param tid The thread (IVP) index
+                \param code The return code of the thread
+                @see ErrorCodes
+            */
+            void checkError(int tid, ErrorCode code) const
+            {
+                switch(code)
+                {
+                    case ErrorCode::MAX_CONSECUTIVE_ERRORS_EXCEEDED:
+                        printf("During integration of ODE# %d, an error occured on too many consecutive integration steps,"
+                                "exiting...\n", tid);
+                        exit(code);
+                    case ErrorCode::MAX_STEPS_EXCEEDED:
+                        printf("During integration of ODE# %d, the allowed number of integration steps was exceeded,"
+                                "exiting...\n", tid);
+                        exit(code);
+                    case ErrorCode::H_PLUS_T_EQUALS_H:
+                        printf("During integration of ODE# %d, the stepsize 'h' was decreased such that h = t + h,"
+                                "exiting...\n", tid);
+                        exit(code);
+                    case ErrorCode::MAX_NEWTON_ITER_EXCEEDED:
+                        printf("During integration of ODE# %d, the allowed number of newton iteration steps was exceeded,"
+                                "exiting...\n", tid);
+                        exit(code);
+                }
+            }
             virtual std::size_t requiredSolverMemorySize() const = 0;
 
             /**
