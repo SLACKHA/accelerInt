@@ -8,11 +8,9 @@
  */
 
 #include "header.h"
-#include "solver.h"
+#include "solver.hpp"
 
-#ifdef GENERATE_DOCS
- namespace generic {
-#endif
+namespace c_solvers {
 
 /**
  * \brief Integration driver for the CPU integrators
@@ -25,8 +23,8 @@
  *
  * This is generic driver for CPU integrators
  */
-void intDriver (const int NUM, const double t, const double t_end,
-                const double *pr_global, double *y_global)
+void intDriver (const Integrator& integrator, const int NUM, const double t,
+                const double t_end, const double *pr_global, double *y_global)
 {
     int tid;
     #pragma omp parallel for shared(y_global, pr_global) private(tid)
@@ -44,7 +42,8 @@ void intDriver (const int NUM, const double t, const double t_end,
         }
 
         // call integrator for one time step
-        check_error(tid, integrate (t, t_end, pr_local, y_local));
+        ErrorCode err = integrator.integrate(t, t_end, pr_local, y_local);
+        integrator.checkError(tid, err);
 
         // update global array with integrated values
 
@@ -57,6 +56,4 @@ void intDriver (const int NUM, const double t, const double t_end,
 
 } // end intDriver
 
-#ifdef GENERATE_DOCS
- }
-#endif
+}

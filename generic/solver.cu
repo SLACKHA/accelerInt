@@ -11,9 +11,7 @@
 #include "header.cuh"
 #include "gpu_macros.cuh"
 
-#ifdef GENERATE_DOCS
- namespace genericcu {
-#endif
+namespace cuda_solvers {
 
 /**
  * \brief Generic driver for the GPU integrators
@@ -41,6 +39,4 @@ void intDriver (const int NUM,
     }
 } // end intDriver
 
-#ifdef GENERATE_DOCS
- }
-#endif
+}

@@ -156,9 +156,12 @@ def generate(env):
         # default flags for the NVCC compiler
         env['NVCCFLAGS'] = ''
         # default NVCC commands
-        env['NVCC_OBJ_CMD'] = '$NVCC $NVCC_INC_PATH $NVCCPATH $NVCCFLAGS $NVCCDEFINES -dc -o $TARGET $SOURCES'
-        env['NVCC_DLINK_CMD'] = '$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS $NVCCLINKFLAGS -dlink -o dlink.o'
-        env['NVCC_PROG_CMD'] = '$NLINK $NVCCLINKFLAGS $SOURCES dlink.o $NVCCLIBPATH $NVCCLIBS -o $TARGET'
+        env['NVCC_OBJ_CMD'] = ('$NVCC $NVCC_INC_PATH $NVCCPATH $NVCCFLAGS '
+                               '$NVCCDEFINES -dc -o $TARGET $SOURCES')
+        env['NVCC_DLINK_CMD'] = ('$NVCC $SOURCES $NVCCLIBPATH $NVCCLIBS '
+                                 '$NVCCLINKFLAGS -dlink -o dlink.o')
+        env['NVCC_PROG_CMD'] = ('$NLINK $NVCCLINKFLAGS $SOURCES dlink.o '
+                                '$NVCCLIBPATH $NVCCLIBS -o $TARGET')
 
         # helpers
         home = os.environ.get('HOME', '')
@@ -202,7 +205,9 @@ def generate(env):
                                 cudaToolkitPath = path
                                 break
                 if not pathFound:
-                    raise Exception("Cannot find the CUDA Toolkit path. Please modify your SConscript or add the path in cudaenv.py")
+                    raise Exception("Cannot find the CUDA Toolkit path. Please "
+                                    "modify your SConscript or add the path in "
+                                    "cudaenv.py")
         env['CUDA_TOOLKIT_PATH'] = cudaToolkitPath
 
         # find CUDA SDK path and set CUDA_SDK_PATH
