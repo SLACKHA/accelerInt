@@ -82,7 +82,7 @@ namespace c_solvers
             numSteps++;
             intDriver(integrator, NUM, t, t_end, var_host, y_host);
             t = t_next;
-            t_next = fmin(t_end, (numSteps + 1) * step);
+            t_next = fmin(t_end, (numSteps + 1) * stepsize);
         }
         auto t2 = std::chrono::high_resolution_clock::now();
 

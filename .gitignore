@@ -64,3 +64,6 @@ rk78-int
 radau-int*
 exprb43-int*
 exp4-int*
+
+# ignore command compile for linting
+compile_commands.json

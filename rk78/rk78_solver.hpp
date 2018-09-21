@@ -8,7 +8,6 @@
 #ifndef RK78_SOLVER_H
 #define RK78_SOLVER_H
 
-#include "header.h"
 #include "dydt.h"
 #include "solver.hpp"
 
@@ -60,8 +59,8 @@ namespace c_solvers
 
         public:
 
-            RK78Integrator(int neq, int numThreads) :
-                Integrator(neq, numThreads)
+            RK78Integrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-6) :
+                Integrator(neq, numThreads, atol, rtol)
             {
                 this->reinitialize(numThreads);
             }

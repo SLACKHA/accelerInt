@@ -8,7 +8,7 @@
 #ifndef RKC_SOLVER_H
 #define RKC_SOLVER_H
 
-#include "header.h"
+#include "dydt.h"
 #include "solver.hpp"
 namespace c_solvers
 {
