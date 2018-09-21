@@ -15,7 +15,6 @@
 
 #include "solver.hpp"
 #include "solver_types.hpp"
-#include "radau2a_solver.hpp"
 
 namespace c_solvers
 {
@@ -41,12 +40,13 @@ std::unique_ptr<Integrator> init(IntegratorType type, int num_threads);
  * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
  * \param[in,out]       phi_host        The state vectors to integrate.
  * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
+ * \returns             timing          The wall-clock duration spent in integration in milliseconds
  *
  */
-void integrate(const Integrator* const integrator,
-               const int NUM, const double t, const double t_end,
-               const double stepsize, double * __restrict__ phi_host,
-               const double * __restrict__ param_host);
+double integrate(Integrator& integrator,
+                 const int NUM, const double t, const double t_end,
+                 const double stepsize, double * __restrict__ phi_host,
+                 const double * __restrict__ param_host);
 
 }
 

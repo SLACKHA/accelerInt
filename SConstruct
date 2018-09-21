@@ -9,7 +9,8 @@ import platform
 from buildutils import listify, formatOption
 import shutil
 
-valid_commands = ('radau2a-cpu', 'rk78-cpu', 'rkc-cpu', 'cpu', 'gpu', 'help')
+valid_commands = ('exp4-cpu', 'radau2a-cpu', 'rk78-cpu', 'rkc-cpu', 'cpu', 'gpu',
+                  'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -616,8 +617,8 @@ mech_c, mech_cuda = env.SConscript(os.path.join(mech_dir, 'SConscript'),
                                    exports=['env'])
 
 new_defines = {}
-new_defines['CPPPATH'] = [radau2a_dir, rk78_dir]
-new_defines['NVCC_INC_PATH'] = [radau2a_dir, rk78_dir]
+new_defines['CPPPATH'] = [radau2a_dir, rk78_dir, rkc_dir]
+new_defines['NVCC_INC_PATH'] = [radau2a_dir, rk78_dir, rkc_dir]
 core = build_core(env_save, new_defines, variant)
 
 # radua
@@ -635,12 +636,10 @@ new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
 new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
 new_defines['LIBS'] = ['fftw3']
 new_defines['NVCC_INC_PATH'] = [exp_int_dir, exp4_int_dir]
-new_defines['CPPDEFINES'] = ['EXP4']
-new_defines['NVCCDEFINES'] = ['EXP4']
-# exp4_c, exp4_cuda = builder(env_save, mech_c, mech_cuda,
-#                             new_defines, exp4_int_dir,
-#                             variant, 'exp4-int', target_list,
-#                             [exp_int_dir])
+exp4_c, exp4_cuda = build_lib(env_save, core, new_defines, exp4_int_dir,
+                              variant, 'exp4')
+exp4_c = env.Alias('exp4-cpu', exp4_c)
+exp4_cuda = env.Alias('exp4-gpu', exp4_cuda)
 
 # exprb43
 new_defines = {}
@@ -685,16 +684,10 @@ rk78_c, _ = build_lib(env_save, core, new_defines, rk78_dir, variant,
                       'rk78')
 rk78_c = env.Alias('rk78-cpu', rk78_c)
 
-flat_values = []
-cpu_vals = []
+cpu_vals = [rkc_c, rk78_c, radau_c]
 gpu_vals = []
-for key, value in target_list.items():
-    flat_values.extend(value)
-    if 'gpu' not in key:
-        cpu_vals.extend(value)
-    else:
-        gpu_vals.extend(value)
-Alias('build', flat_values)
+all_vals = []
+Alias('build', all_vals)
 Alias('cpu', cpu_vals)
 Alias('gpu', gpu_vals)
-Default(flat_values)
+Default(all_vals)

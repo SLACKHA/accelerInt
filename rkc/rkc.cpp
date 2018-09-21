@@ -38,15 +38,16 @@ namespace c_solvers
      * \param[in,out] v Array for eigenvectors
      * \param[out] Fv   Array for derivative evaluations
      */
-    double rkc_spec_rad (const double t, const double pr, const double hmax, const double* y,
-                         const double* F, double* v, double* Fv) {
+    double RKCIntegrator::rkc_spec_rad (const double t, const double pr, const double hmax,
+                                        const double* __restrict__ y, const double* __restrict__ F,
+                                        double* __restrict__ v, double* __restrict__ Fv) {
 
         const int itmax = 50;
         double small = ONE / hmax;
 
         double nrm1 = ZERO;
         double nrm2 = ZERO;
-        for (int i = 0; i < NSP; ++i) {
+        for (int i = 0; i < _neq; ++i) {
             nrm1 += (y[i] * y[i]);
             nrm2 += (v[i] * v[i]);
         }
@@ -56,22 +57,22 @@ namespace c_solvers
         double dynrm;
         if ((nrm1 != ZERO) && (nrm2 != ZERO)) {
             dynrm = nrm1 * sqrt(UROUND);
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 v[i] = y[i] + v[i] * (dynrm / nrm2);
             }
         } else if (nrm1 != ZERO) {
             dynrm = nrm1 * sqrt(UROUND);
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 v[i] = y[i] * (ONE + sqrt(UROUND));
             }
         } else if (nrm2 != ZERO) {
             dynrm = UROUND;
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 v[i] *= (dynrm / nrm2);
             }
         } else {
             dynrm = UROUND;
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 v[i] = UROUND;
             }
         }
@@ -83,25 +84,25 @@ namespace c_solvers
             dydt (t, pr, v, Fv);
 
             nrm1 = ZERO;
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 nrm1 += ((Fv[i] - F[i]) * (Fv[i] - F[i]));
             }
             nrm1 = sqrt(nrm1);
             nrm2 = sigma;
             sigma = nrm1 / dynrm;
             if ((iter >= 2) && (fabs(sigma - nrm2) <= (fmax(sigma, small) * P01))) {
-                for (int i = 0; i < NSP; ++i) {
+                for (int i = 0; i < _neq; ++i) {
                     v[i] = v[i] - y[i];
                 }
                 return (ONEP2 * sigma);
             }
 
             if (nrm1 != ZERO) {
-                for (int i = 0; i < NSP; ++i) {
+                for (int i = 0; i < _neq; ++i) {
                     v[i] = y[i] + ((Fv[i] - F[i]) * (dynrm / nrm1));
                 }
             } else {
-                int ind = (iter % NSP);
+                int ind = (iter % _neq);
                 v[ind] = y[ind] - (v[ind] - y[ind]);
             }
 
@@ -122,8 +123,10 @@ namespace c_solvers
      * \param[in] s    number of steps.
      * \param[out] y_j  Integrated variables.
      */
-    void rkc_step (const double t, const double pr, const double h, const double* y_0, const double* F_0,
-                   const int s, double* y_j) {
+    void RKCIntegrator::rkc_step (const double t, const double pr, const double h,
+                                  const double* y_0, const double* F_0, const int s,
+                                  double* __restrict__ y_j, double* __restrict__ y_jm1,
+                                  double* __restrict__ y_jm2) {
 
         const double w0 = ONE + TWO / (13.0 * (double)(s * s));
         double temp1 = (w0 * w0) - ONE;
@@ -134,12 +137,12 @@ namespace c_solvers
         double b_jm1 = ONE / (FOUR * (w0 * w0));
         double b_jm2 = b_jm1;
 
-        double y_jm1[NSP];
-        double y_jm2[NSP];
+        double y_jm1[_neq];
+        double y_jm2[_neq];
 
           // calculate y_1
         double mu_t = w1 * b_jm1;
-        for (int i = 0; i < NSP; ++i) {
+        for (int i = 0; i < _neq; ++i) {
             y_jm2[i] = y_0[i];
             y_jm1[i] = y_0[i] + (mu_t * h * F_0[i]);
         }
@@ -168,14 +171,14 @@ namespace c_solvers
               // calculate derivative, use y array for temporary storage
             dydt (t + (h * c_jm1), pr, y_jm1, y_j);
 
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 y_j[i] = (ONE - mu - nu) * y_0[i] + (mu * y_jm1[i]) + (nu * y_jm2[i])
                      + h * mu_t * (y_j[i] - (gamma_t * F_0[i]));
             }
             double c_j = (mu * c_jm1) + (nu * c_jm2) + mu_t * (ONE - gamma_t);
 
             if (j < s) {
-                for (int i = 0; i < NSP; ++i) {
+                for (int i = 0; i < _neq; ++i) {
                     y_jm2[i] = y_jm1[i];
                     y_jm1[i] = y_j[i];
                 }
@@ -208,7 +211,10 @@ namespace c_solvers
     ErrorCode RKCIntegrator::integrate (double t, const double tEnd, const double pr, double* y) {
 
         int nstep = 0;
-        double work[4 + NSP] = {0};
+        int tid = omp_get_thread_num();
+
+        double* work = _unique<double>(tid, _work);
+        std::memset(work, 0, (4 + _neq) * sizeof(double));
 
         int m_max = (int)(round(sqrt(RTOL / (10.0 * UROUND))));
 
@@ -216,18 +222,18 @@ namespace c_solvers
             m_max = 2;
         }
 
-        double y_n[NSP];
-        for (int i = 0; i < NSP; ++i) {
+        double* y_n = _unique<double>(tid, _y_n);
+        for (int i = 0; i < _neq; ++i) {
             y_n[i] = y[i];
         }
 
         // calculate F_n for initial y
-        double F_n[NSP];
+        double* y_n = _unique<double>(tid, _F_n);
         dydt (t, pr, y_n, F_n);
 
         // load initial estimate for eigenvector
         if (work[2] < UROUND) {
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 work[4 + i] = F_n[i];
             }
         }
@@ -235,11 +241,11 @@ namespace c_solvers
         const double hmax = fabs(tEnd - t);
         double hmin = TEN * UROUND * fmax(fabs(t), hmax);
 
+        double* temp_arr = _unique<double>(tid, _temp_arr);
+        double* temp_arr2 = _unique<double>(tid, _temp_arr2);
+
         while (t < tEnd) {
             // use time step stored in work[2]
-
-            double temp_arr[NSP];
-            double temp_arr2[NSP];
             double err;
 
             // estimate Jacobian spectral radius
@@ -256,17 +262,17 @@ namespace c_solvers
                 }
                 work[2] = fmax(work[2], hmin);
 
-                for (int i = 0; i < NSP; ++i) {
+                for (int i = 0; i < _neq; ++i) {
                     temp_arr[i] = y_n[i] + (work[2] * F_n[i]);
                 }
                 dydt (t + work[2], pr, temp_arr, temp_arr2);
 
                 err = ZERO;
-                for (int i = 0; i < NSP; ++i) {
+                for (int i = 0; i < _neq; ++i) {
                     double est = (temp_arr2[i] - F_n[i]) / (ATOL + RTOL * fabs(y_n[i]));
                     err += est * est;
                 }
-                err = work[2] * sqrt(err / NSP);
+                err = work[2] * sqrt(err / _neq);
 
                 if ((P1 * work[2]) < (hmax * sqrt(err))) {
                     work[2] = fmax(P1 * work[2] / sqrt(err), hmin);
@@ -291,19 +297,19 @@ namespace c_solvers
             hmin = TEN * UROUND * fmax(fabs(t), fabs(t + work[2]));
 
             // perform tentative time step
-            rkc_step (t, pr, work[2], y_n, F_n, m, y);
+            rkc_step (t, pr, work[2], y_n, F_n, m, y, y_jm1, y_jm2);
 
             // calculate F_np1 with tenative y_np1
             dydt (t + work[2], pr, y, temp_arr);
 
             // estimate error
             err = ZERO;
-            for (int i = 0; i < NSP; ++i) {
+            for (int i = 0; i < _neq; ++i) {
                 double est = P8 * (y_n[i] - y[i]) + P4 * work[2] * (F_n[i] + temp_arr[i]);
                 est /= (ATOL + RTOL * fmax(fabs(y[i]), fabs(y_n[i])));
                 err += est * est;
             }
-            err = sqrt(err / ((double)NSP));
+            err = sqrt(err / ((double)_neq));
 
             if (err > ONE) {
                 // error too large, step is rejected
@@ -338,7 +344,7 @@ namespace c_solvers
                 work[0] = err;
                 work[1] = work[2];
 
-                for (int i = 0; i < NSP; ++i) {
+                for (int i = 0; i < _neq; ++i) {
                     y_n[i] = y[i];
                     F_n[i] = temp_arr[i];
                 }

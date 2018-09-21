@@ -28,7 +28,7 @@ namespace c_solvers {
      *  \returns Return code, @see RK_ErrCodes
      */
     ErrorCode RK78Integrator::integrate (
-        const double t_start, const double t_end, const double pr, double* y) const
+        const double t_start, const double t_end, const double pr, double* y)
     {
         int index = omp_get_thread_num();
 

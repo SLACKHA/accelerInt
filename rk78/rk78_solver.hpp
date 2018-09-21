@@ -60,7 +60,8 @@ namespace c_solvers
 
         public:
 
-            RK78Integrator(int numThreads) : Integrator(numThreads)
+            RK78Integrator(int neq, int numThreads) :
+                Integrator(neq, numThreads)
             {
                 this->reinitialize(numThreads);
             }
@@ -74,7 +75,7 @@ namespace c_solvers
                \fn char* solver_name()
                \brief Returns a descriptive solver name
             */
-            const char* solver_name() {
+            const char* solverName() const {
                 const char* name = "rk78-int";
                 return name;
             }
@@ -90,7 +91,7 @@ namespace c_solvers
                     // initialize boost interface
                     evaluators.push_back(std::unique_ptr<RK78>(new RK78()));
                     steppers.push_back(std::unique_ptr<stepper>(new stepper()));
-                    controllers.push_back(make_controlled<stepper>(ATOL, RTOL, *steppers[i]));
+                    controllers.push_back(make_controlled<stepper>(atol(), rtol(), *steppers[i]));
                 }
             }
 
@@ -102,7 +103,7 @@ namespace c_solvers
                 // pass
             }
 
-            std::size_t requiredSolverMemorySize() const
+            std::size_t requiredSolverMemorySize()
             {
                 // C-solvers don't require pre-allocation
                 return 0;
@@ -119,7 +120,7 @@ namespace c_solvers
              *  \returns Return code, @see RK_ErrCodes
              */
             ErrorCode integrate (
-                const double t_start, const double t_end, const double pr, double* y) const;
+                const double t_start, const double t_end, const double pr, double* y);
 
         };
 }

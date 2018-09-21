@@ -7,7 +7,6 @@
  *
  */
 
-#include "header.h"
 #include "solver.hpp"
 
 namespace c_solvers {
@@ -23,37 +22,50 @@ namespace c_solvers {
  *
  * This is generic driver for CPU integrators
  */
-void intDriver (const Integrator& integrator, const int NUM, const double t,
+void intDriver (Integrator& integrator, const int NUM, const double t,
                 const double t_end, const double *pr_global, double *y_global)
 {
-    int tid;
-    #pragma omp parallel for shared(y_global, pr_global) private(tid)
-    for (tid = 0; tid < NUM; ++tid) {
+    int ivp_index;
+
+    #pragma omp parallel for shared(integrator, y_global, pr_global) private(ivp_index)
+    for (ivp_index = 0; ivp_index < NUM; ++ivp_index) {
 
         // local array with initial values
-        double y_local[NSP];
-        double pr_local = pr_global[tid];
+        double* phi = integrator.phi(omp_get_thread_num());
+        double pr_local = pr_global[ivp_index];
 
         // load local array with initial values from global array
 
-        for (int i = 0; i < NSP; i++)
+        for (int i = 0; i < integrator.neq(); i++)
         {
-            y_local[i] = y_global[tid + i * NUM];
+            phi[i] = y_global[ivp_index + i * NUM];
         }
 
         // call integrator for one time step
-        ErrorCode err = integrator.integrate(t, t_end, pr_local, y_local);
-        integrator.checkError(tid, err);
+        ErrorCode err = integrator.integrate(t, t_end, pr_local, phi);
+        integrator.checkError(ivp_index, err);
 
         // update global array with integrated values
 
-        for (int i = 0; i < NSP; i++)
+        for (int i = 0; i < integrator.neq(); i++)
         {
-            y_global[tid + i * NUM] = y_local[i];
+            y_global[ivp_index + i * NUM] = phi[i];
         }
 
-    } //end tid loop
+    } //end ivp_index loop
 
 } // end intDriver
+
+// template specializations
+template double* Integrator::_unique(int tid, std::size_t offset);
+template int* Integrator::_unique(int tid, std::size_t offset);
+template std::complex<double>* Integrator::_unique(int tid, std::size_t offset);
+
+//! return reference to the beginning of the working memory
+//! for this thread `tid`
+double* Integrator::phi(int tid)
+{
+    return _unique<double>(tid, std::size_t(0));
+}
 
 }

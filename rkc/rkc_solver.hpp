@@ -5,8 +5,8 @@
  * \date 09/19/2019
  */
 
-#ifndef RADAU2A_SOLVER_H
-#define RADAU2A_SOLVER_H
+#ifndef RKC_SOLVER_H
+#define RKC_SOLVER_H
 
 #include "header.h"
 #include "solver.hpp"
@@ -33,53 +33,118 @@ namespace c_solvers
 
     class RKCIntegrator : public Integrator
     {
-        public:
+    protected:
+        //! offsets
 
-            RKCIntegrator(int numThreads) : Integrator(numThreads)
-            {
-            }
+        std::size_t _work;
+        std::size_t _y_n;
+        std::size_t _F_n;
+        std::size_t _temp_arr;
+        std::size_t _temp_arr2;
+        std::size_t _y_jm1;
+        std::size_t _y_jm2;
 
-            /*!
-               \fn char* solverName()
-               \brief Returns a descriptive solver name
-            */
-            const char* solverName() const {
-                const char* name = "rkc-int";
-                return name;
-            }
+        /**
+         * \brief Function to estimate spectral radius.
+         *
+         * \param[in] t     the time.
+         * \param[in] pr    A parameter used for pressure or density to pass to the derivative function.
+         * \param[in] hmax  Max time step size.
+         * \param[in] y     Array of dependent variable.
+         * \param[in] F     Derivative evaluated at current state
+         * \param[in,out] v Array for eigenvectors
+         * \param[out] Fv   Array for derivative evaluations
+         */
+        double rkc_spec_rad (const double t, const double pr, const double hmax,
+                             const double* __restrict__ y, const double* __restrict__ F,
+                             double* __restrict__ v, double* __restrict__ Fv);
 
-            void clean() {
-                // pass
-            }
-            void reinitialize(int numThreads) {
-                // pass
-            }
+        /**
+         * \brief Function to take a single RKC integration step
+         *
+         * \param[in] t    the starting time.
+         * \param[in] pr   A parameter used for pressure or density to pass to the derivative function.
+         * \param[in] h    Time-step size.
+         * \param[in] y_0  Initial conditions.
+         * \param[in] F_0  Derivative function at initial conditions.
+         * \param[in] s    number of steps.
+         * \param[out] y_j  Integrated variables.
+         */
+        void rkc_step (const double t, const double pr, const double h,
+                       const double* y_0, const double* F_0, const int s,
+                       double* __restrict__ y_j, double* __restrict__ y_jm1,
+                       double* __restrict__ y_jm2);
 
-            void initSolverLog() {
-                // pass
-            }
+    public:
 
-            void solverLog() {
-                // pass
-            }
+        RKCIntegrator(int neq, int numThreads) : Integrator(neq, numThreads)
+        {
+        }
 
-            std::size_t requiredSolverMemorySize() const
-            {
-                // C-solvers don't require pre-allocation
-                return 0;
-            }
+        /*!
+           \fn char* solverName()
+           \brief Returns a descriptive solver name
+        */
+        const char* solverName() const {
+            const char* name = "rkc-int";
+            return name;
+        }
 
-            /**
-             * \brief Driver function for RKC integrator.
-             *
-             * \param[in,out] t     The time (starting, then ending).
-             * \param[in] tEnd      The desired end time.
-             * \param[in] pr        A parameter used for pressure or density to pass to the derivative function.
-             * \param[in,out] y     Dependent variable array, integrated values replace initial conditions.
-             */
-            ErrorCode integrate (
-                const double t_start, const double t_end, const double pr, double* y) const;
+        void clean() {
+            // pass
+        }
+        void reinitialize(int numThreads) {
+            // pass
+        }
 
-        };
+        void initSolverLog() {
+            // pass
+        }
 
+        void solverLog() {
+            // pass
+        }
+
+        std::size_t requiredSolverMemorySize()
+        {
+            std::size_t working = Integrator::requiredSolverMemorySize();
+            // work
+            _work = working;
+            working += (4 + _neq) * sizeof(double);
+            // yn
+            _y_n = working;
+            working += _neq * sizeof(double);
+            // fn
+            _F_n = working;
+            working += _neq * sizeof(double);
+            // temp1
+            _temp_arr = working;
+            working += _neq * sizeof(double);
+            // temp2
+            _temp_arr2 = working;
+            working += _neq * sizeof(double);
+            // y_jm1
+            _y_jm1 = working;
+            working += _neq * sizeof(double);
+            // y_jm2
+            _y_jm2 = working;
+            working += _neq * sizeof(double);
+
+            return working;
+        }
+
+        /**
+         * \brief Driver function for RKC integrator.
+         *
+         * \param[in,out] t     The time (starting, then ending).
+         * \param[in] tEnd      The desired end time.
+         * \param[in] pr        A parameter used for pressure or density to pass to the derivative function.
+         * \param[in,out] y     Dependent variable array, integrated values replace initial conditions.
+         */
+        ErrorCode integrate (
+            const double t_start, const double t_end, const double pr, double* y);
+
+    };
 }
+
+#endif
