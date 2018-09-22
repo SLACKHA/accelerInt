@@ -185,7 +185,8 @@ namespace c_solvers {
     *
     */
     void intDriver (Integrator& integrator, const int NUM, const double t,
-                    const double t_end, const double* pr_global, double* y_global);
+                    const double t_end, const double* __restrict__ pr_global,
+                    double* __restrict__ y_global);
 
 
 }

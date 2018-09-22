@@ -23,7 +23,8 @@ namespace c_solvers {
  * This is generic driver for CPU integrators
  */
 void intDriver (Integrator& integrator, const int NUM, const double t,
-                const double t_end, const double *pr_global, double *y_global)
+                const double t_end, const double * __restrict__ pr_global,
+                double * __restrict__ y_global)
 {
     int ivp_index;
 
@@ -31,7 +32,7 @@ void intDriver (Integrator& integrator, const int NUM, const double t,
     for (ivp_index = 0; ivp_index < NUM; ++ivp_index) {
 
         // local array with initial values
-        double* phi = integrator.phi(omp_get_thread_num());
+        double* __restrict__ phi = integrator.phi(omp_get_thread_num());
         double pr_local = pr_global[ivp_index];
 
         // load local array with initial values from global array

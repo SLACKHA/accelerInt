@@ -77,7 +77,8 @@ namespace c_solvers
 
     public:
 
-        RKCIntegrator(int neq, int numThreads) : Integrator(neq, numThreads)
+        RKCIntegrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-6) :
+            Integrator(neq, numThreads, atol, rtol)
         {
         }
 
