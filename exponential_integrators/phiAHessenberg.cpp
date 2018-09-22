@@ -3,17 +3,11 @@
  * \brief Computes various matrix exponential functions on the Krylov Hessenberg matricies
  */
 
-#include <stdlib.h>
-#include <complex.h>
+#include <cstdlib>
+#include <complex>
 
-#include "header.h"
 #include "lapack_dfns.h"
 #include "complexInverse.h"
-#include "solver_options.h"
-#include "solver_props.h"
-
-extern double complex poles[N_RA];
-extern double complex res[N_RA];
 
 /** \brief Compute the 2nd order Phi (exponential) matrix function
  *
@@ -24,11 +18,12 @@ extern double complex res[N_RA];
  *  \param[in]		c		The scaling factor
  *  \param[out]		phiA	The resulting exponential matrix
  */
-int phi2Ac_variable(const int m, const double* A, const double c, double* phiA) {
+int ExponentialIntegrator::phi2Ac_variable(const int m, const double* A, const double c, double* phiA) {
 
 	//allocate arrays
-	int ipiv[STRIDE] = {0};
-	double complex invA[STRIDE * STRIDE];
+	int tid = omp_get_thread_num();
+	int* ipiv = _unique<int>(tid, _ipiv);
+	std::complex<double>* invA = _unique<std::complex<double>>(tid, _invA);
 	int info = 0;
 
 	for (int i = 0; i < m; ++i) {
@@ -63,7 +58,7 @@ int phi2Ac_variable(const int m, const double* A, const double c, double* phiA) 
 		for (int i = 0; i < m; ++i) {
 
 			for (int j = 0; j < m; ++j) {
-				phiA[i + j*STRIDE] += 2.0 * creal((res[q] / (poles[q] * poles[q])) * invA[i + j * STRIDE]);
+				phiA[i + j*STRIDE] += 2.0 * std::real((res[q] / (poles[q] * poles[q])) * invA[i + j * STRIDE]);
 			}
 		}
 	}
@@ -80,11 +75,12 @@ int phi2Ac_variable(const int m, const double* A, const double c, double* phiA) 
  *  \param[in]		c		The scaling factor
  *  \param[out]		phiA	The resulting exponential matrix
  */
-int phiAc_variable(const int m, const double* A, const double c, double* phiA) {
+int ExponentialIntegrator::phiAc_variable(const int m, const double* A, const double c, double* phiA) {
 
 	//allocate arrays
-	int ipiv[STRIDE] = {0};
-	double complex invA[STRIDE * STRIDE];
+	int tid = omp_get_thread_num();
+	int* ipiv = _unique<int>(tid, _ipiv);
+	std::complex<double>* invA = _unique<std::complex<double>>(tid, _invA);
 	int info = 0;
 
 	for (int i = 0; i < m; ++i) {
@@ -119,7 +115,7 @@ int phiAc_variable(const int m, const double* A, const double c, double* phiA) {
 		for (int i = 0; i < m; ++i) {
 
 			for (int j = 0; j < m; ++j) {
-				phiA[i + j*STRIDE] += 2.0 * creal((res[q] / poles[q]) * invA[i + j * STRIDE]);
+				phiA[i + j*STRIDE] += 2.0 * std::real((res[q] / poles[q]) * invA[i + j * STRIDE]);
 			}
 		}
 	}
@@ -137,11 +133,12 @@ int phiAc_variable(const int m, const double* A, const double c, double* phiA) {
  *  \param[in]		c		The scaling factor
  *  \param[out]		phiA	The resulting exponential matrix
  */
-int expAc_variable(const int m, const double* A, const double c, double* phiA) {
+int ExponentialIntegrator::expAc_variable(const int m, const double* A, const double c, double* phiA) {
 
 	//allocate arrays
-	int ipiv[STRIDE] = {0};
-	double complex invA[STRIDE * STRIDE];
+	int tid = omp_get_thread_num();
+	int* ipiv = _unique<int>(tid, _ipiv);
+	std::complex<double>* invA = _unique<std::complex<double>>(tid, _invA);
 	int info = 0;
 
 	for (int i = 0; i < m; ++i) {
@@ -176,7 +173,7 @@ int expAc_variable(const int m, const double* A, const double c, double* phiA) {
 		for (int i = 0; i < m; ++i) {
 
 			for (int j = 0; j < m; ++j) {
-				phiA[i + j*STRIDE] += 2.0 * creal(res[q] * invA[i + j*STRIDE]);
+				phiA[i + j*STRIDE] += 2.0 * std::real(res[q] * invA[i + j*STRIDE]);
 			}
 		}
 	}

@@ -5,20 +5,16 @@
  * \author Nicholas Curtis
  * \date 03/09/2015
  *
- * Note: turn on EXACT_KRYLOV krylov definition to use the use the "happy breakdown" criteria in determining end of krylov iteration
+ * Note: turn on EXACT_KRYLOV krylov definition to use the use the "happy breakdown"
+  		 criteria in determining end of krylov iteration
  */
 
 #ifndef ARNOLDI_H
 #define ARNOLDI_H
 
-#include <string.h>
-
-#include "header.h"
-#include "phiAHessenberg.h"
-#include "exponential_linear_algebra.h"
-#include "sparse_multiplier.h"
-#include "solver_options.h"
-#include "solver_props.h"
+#include <cstring>
+// include exp solver for sparse multiplier defn
+#include "exp_solver.hpp"
 
 //#define EXACT_KRYLOV
 
@@ -42,30 +38,30 @@ static int index_list[23] = {1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 21, 27, 34, 42,
  * \param[out]			Hm 		the constructed Hessenberg matrix, used in actual exponentials
  * \param[out] 			phiHm   the exponential matrix computed from h * scale * Hm
  */
-static inline
-int arnoldi(const double scale, const int p, const double h, const double* A, const double* v, const double* sc, double* beta, double* Vm, double* Hm, double* phiHm)
+inline
+int ExponentialIntegrator::arnoldi(const double scale, const int p, const double h, const double* A, const double* v, const double* sc, double* beta, double* Vm, double* Hm, double* phiHm)
 {
 	//the temporary work array
-	double w[NSP];
+	double* __restrict__ w = _unique<double>(omp_get_thread_num(), _w);
 
 	//first place A*fy in the Vm matrix
 	*beta = normalize(v, Vm);
 
-	double store = 0;
-	int index = 0;
-	int j = 0;
-	double err = 2.0;
+    int index = 0;
+    int j = 0;
+    double err = 2.0;
 
-	while(err > 1.0)
-	{
+    while(err > 1.0)
+    {
 
+	    double store = 0;
 		for (; j < index_list[index] && j + p < STRIDE; j++)
 		{
-			sparse_multiplier(A, &Vm[j * NSP], w);
+			sparse_multiplier(A, &Vm[j * _neq], w);
 			for (int i = 0; i <= j; i++)
 			{
-				Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * NSP]);
-				scale_subtract(Hm[j * STRIDE + i], &Vm[i * NSP], w);
+				Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * _neq]);
+				scale_subtract(Hm[j * STRIDE + i], &Vm[i * _neq], w);
 			}
 			Hm[j * STRIDE + j + 1] = two_norm(w);
 			if (fabs(Hm[j * STRIDE + j + 1]) < ATOL)
@@ -74,7 +70,7 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 				j++;
 				break;
 			}
-			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * NSP]);
+			scale_mult(1.0 / Hm[j * STRIDE + j + 1], w, &Vm[(j + 1) * _neq]);
 		}
 #ifndef CONST_TIME_STEP
 		if (j + p >= STRIDE)
@@ -89,7 +85,7 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 		Hm[(j - 1) * STRIDE + j] = 0.0;
 
 		//0. fill potentially non-empty memory first
-		memset(&Hm[j * STRIDE], 0, (j + 2) * sizeof(double));
+		std::memset(&Hm[j * STRIDE], 0, (j + 2) * sizeof(double));
 
 		//get error
 		//1. Construct augmented Hm (fill in identity matrix)
@@ -115,7 +111,7 @@ int arnoldi(const double scale, const int p, const double h, const double* A, co
 		}
 
 		//3. Get error
-		err = h * (*beta) * fabs(store * phiHm[(j) * STRIDE + (j) - 1]) * sc_norm(&Vm[(j) * NSP], sc);
+		err = h * (*beta) * fabs(store * phiHm[(j) * STRIDE + (j) - 1]) * sc_norm(&Vm[(j) * _neq], sc);
 
 		//restore Hm(m, m + 1)
 		Hm[(j - 1) * STRIDE + j] = store;

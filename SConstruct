@@ -636,6 +636,8 @@ new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir, exp4_int_dir]
 new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
 new_defines['LIBS'] = ['fftw3']
 new_defines['NVCC_INC_PATH'] = [exp_int_dir, exp4_int_dir]
+new_defines['CPPDEFINES'] = ['EXP4']
+new_defines['NVCCDEFINES'] = ['EXP4']
 exp4_c, exp4_cuda = build_lib(env_save, core, new_defines, exp4_int_dir,
                               variant, 'exp4')
 exp4_c = env.Alias('exp4-cpu', exp4_c)
@@ -684,7 +686,7 @@ rk78_c, _ = build_lib(env_save, core, new_defines, rk78_dir, variant,
                       'rk78')
 rk78_c = env.Alias('rk78-cpu', rk78_c)
 
-cpu_vals = [rkc_c, rk78_c, radau_c]
+cpu_vals = [rkc_c, rk78_c, radau_c, exp4_c]
 gpu_vals = []
 all_vals = []
 Alias('build', all_vals)

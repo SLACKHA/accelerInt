@@ -9,18 +9,15 @@
 */
 
 //cf
-#include "header.h"
-#include "cf.h"
-#include "solver_options.h"
-#include <complex.h>
-
-double complex poles[N_RA];
-double complex res[N_RA];
+extern "C" {
+    #include "cf.h"
+}
+#include "rational_approximant.hpp"
 
 /**
 * \brief get poles and residues for rational approximant to matrix exponential
 */
-void find_poles_and_residuals()
+void find_poles_and_residuals(std::vector<std::complex<double>>& poles, std::vector<std::complex<double>>& res)
 {
 	// get poles and residues for rational approximant to matrix exponential
     double *poles_r = (double *) calloc (N_RA, sizeof(double));
@@ -32,8 +29,8 @@ void find_poles_and_residuals()
 
     for (int i = 0; i < N_RA; ++i)
     {
-        poles[i] = poles_r[i] + poles_i[i] * _Complex_I;
-        res[i] = res_r[i] + res_i[i] * _Complex_I;
+        poles[i].emplace_back(std::complex<double>(poles_r[i], poles_i[i]));
+        res[i].emplace_back(std::complex<double>(res_r[i], res_i[i]));
     }
 
     // free memory
