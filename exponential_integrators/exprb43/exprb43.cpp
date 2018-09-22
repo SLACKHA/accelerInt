@@ -36,7 +36,7 @@ namespace c_solvers {
 	 * \brief 4th-order exponential integrator function w/ adaptive Kyrlov subspace approximation
 	 * \returns The result of this integration step @see exprb43_ErrCodes
 	 */
-	ErrorCode integrate (const double t_start, const double t_end, const double pr, double* __restrict__ y) {
+	ErrorCode EXPRB43Integrator::integrate (const double t_start, const double t_end, const double pr, double* __restrict__ y) {
 
 		//initial time
 	#ifdef CONST_TIME_STEP
@@ -103,7 +103,7 @@ namespace c_solvers {
 				//gy = fy - A * y
 				sparse_multiplier(A, y, gy);
 
-				for (int i = 0; i < NSP; ++i) {
+				for (int i = 0; i < _neq; ++i) {
 					gy[i] = fy[i] - gy[i];
 				}
 			}
@@ -135,12 +135,12 @@ namespace c_solvers {
 			//next compute Dn2
 			//Dn2 = (F(Un2) - Jn * Un2) - gy
 
-			dydt(t, pr, temp, &savedActions[NSP]);
+			dydt(t, pr, temp, &savedActions[_neq]);
 			sparse_multiplier(A, temp, f_temp);
 
 
-			for (int i = 0; i < NSP; ++i) {
-				temp[i] = savedActions[NSP + i] - f_temp[i] - gy[i];
+			for (int i = 0; i < _neq; ++i) {
+				temp[i] = savedActions[_neq + i] - f_temp[i] - gy[i];
 			}
 			//temp is now equal to Dn2
 
@@ -160,22 +160,22 @@ namespace c_solvers {
 			}
 
 			//save Phi3(h * A) * Dn2 to savedActions[0]
-			//save Phi4(h * A) * Dn2 to savedActions[NSP]
+			//save Phi4(h * A) * Dn2 to savedActions[_neq]
 			//add the action of phi_1 on Dn2 to y and hn * phi_1(hA) * fy to get Un3
 			const double* in[5] = {&phiHm[(m1 + 2) * STRIDE], &phiHm[(m1 + 3) * STRIDE], &phiHm[m1 * STRIDE], savedActions, y};
-			double* out[3] = {&savedActions[NSP], &savedActions[2 * NSP], temp};
+			double* out[3] = {&savedActions[_neq], &savedActions[2 * _neq], temp};
 			double scale_vec[3] = {beta / (h * h), beta / (h * h * h), beta};
 			matvec_n_by_m_scale_special(m1, scale_vec, Vm, in, out);
 			//Un3 is now in temp
 
 			//next compute Dn3
 			//Dn3 = F(Un3) - A * Un3 - gy
-			dydt(t, pr, temp, &savedActions[3 * NSP]);
+			dydt(t, pr, temp, &savedActions[3 * _neq]);
 			sparse_multiplier(A, temp, f_temp);
 
 
-			for (int i = 0; i < NSP; ++i) {
-				temp[i] = savedActions[3 * NSP + i] - f_temp[i] - gy[i];
+			for (int i = 0; i < _neq; ++i) {
+				temp[i] = savedActions[3 * _neq + i] - f_temp[i] - gy[i];
 			}
 			//temp is now equal to Dn3
 
@@ -190,8 +190,8 @@ namespace c_solvers {
 				continue;
 			}
 
-			out[0] = &savedActions[3 * NSP];
-			out[1] = &savedActions[4 * NSP];
+			out[0] = &savedActions[3 * _neq];
+			out[1] = &savedActions[4 * _neq];
 			in[0] = &phiHm[(m2 + 2) * STRIDE];
 			in[1] = &phiHm[(m2 + 3) * STRIDE];
 			scale_vec[0] = beta / (h * h);
@@ -200,11 +200,11 @@ namespace c_solvers {
 
 			//construct y1 and error vector
 
-			for (int i = 0; i < NSP; ++i) {
+			for (int i = 0; i < _neq; ++i) {
 				//y1 = y + h * phi1(h * A) * fy + h * sum(bi * Dni)
-				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[NSP + i] - 48.0 * savedActions[2 * NSP + i] + -2.0 * savedActions[3 * NSP + i] + 12.0 * savedActions[4 * NSP + i];
+				y1[i] = y[i] + savedActions[i] + 16.0 * savedActions[_neq + i] - 48.0 * savedActions[2 * _neq + i] + -2.0 * savedActions[3 * _neq + i] + 12.0 * savedActions[4 * _neq + i];
 				//error vec
-				temp[i] = 48.0 * savedActions[2 * NSP + i] - 12.0 * savedActions[4 * NSP + i];
+				temp[i] = 48.0 * savedActions[2 * _neq + i] - 12.0 * savedActions[4 * _neq + i];
 			}
 
 
@@ -223,7 +223,7 @@ namespace c_solvers {
 					fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
 	  			#endif
 
-				memcpy(sc, f_temp, NSP * sizeof(double));
+				memcpy(sc, f_temp, _neq * sizeof(double));
 
 				// minimum of classical and Gustafsson step size prediction
 				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
@@ -233,7 +233,7 @@ namespace c_solvers {
 
 				// update y and t
 
-				for (int i = 0; i < NSP; ++i) {
+				for (int i = 0; i < _neq; ++i) {
 					y[i] = y1[i];
 				}
 
@@ -267,7 +267,7 @@ namespace c_solvers {
 	#else
 			//constant time stepping
 			// update y and t
-			for (int i = 0; i < NSP; ++i) {
+			for (int i = 0; i < _neq; ++i) {
 				y[i] = y1[i];
 			}
 
