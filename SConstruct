@@ -9,8 +9,8 @@ import platform
 from buildutils import listify, formatOption
 import shutil
 
-valid_commands = ('exp4-cpu', 'radau2a-cpu', 'rk78-cpu', 'rkc-cpu', 'cpu', 'gpu',
-                  'help')
+valid_commands = ('cvodes-cpu', 'exp4-cpu', 'exprb43-cpu', 'radau2a-cpu', 'rkc-cpu',
+                  'rk78-cpu', 'cpu', 'gpu', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -534,10 +534,10 @@ def build_lib(save, core, defines, src, variant, target_base, filter=None):
                                  src_dir=src,
                                  exports=['env'])
 
-    clib = env.SharedLibrary(cint + ccore)
+    clib = env.SharedLibrary(cint, LIBS=[ccore])
     culib = []
     if build_cuda:
-        culib = env.SharedLibrary(cuint + cucore)
+        culib = env.SharedLibrary(cuint, LIBS=[cucore])
 
     return clib, culib
 
@@ -651,11 +651,10 @@ new_defines['LIBS'] = ['fftw3']
 new_defines['NVCC_INC_PATH'] = [exp_int_dir, exprb43_int_dir]
 new_defines['CPPDEFINES'] = ['RB43']
 new_defines['NVCCDEFINES'] = ['RB43']
-# rb43c, rb43cu = builder(env_save, mech_c,
-#                         mech_cuda if build_cuda else None,
-#                         new_defines, exprb43_int_dir,
-#                         variant, 'exprb43-int', target_list,
-#                         [exp_int_dir])
+exprb43_c, exprb43_cuda = build_lib(env_save, core, new_defines, exprb43_int_dir,
+                                    variant, 'exprb43')
+exprb43_c = env.Alias('exprb43-cpu', exprb43_c)
+exprb43_cuda = env.Alias('exprb43-gpu', exprb43_cuda)
 
 # rkc
 new_defines = {}
@@ -669,14 +668,12 @@ rkc_cuda = env.Alias('rkc-gpu', rkc_cuda)
 
 # cvodes
 new_defines = {}
-new_defines['CPPDEFINES'] = ['CVODES']
 new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
 new_defines['LIBPATH'] = [env['sundials_lib_dir']]
 new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
-# cvodesc, _ = builder(env_save, mech_c, None, new_defines,
-#                          cvodes_dir, variant, 'cvodes-int',
-#                          target_list, None,
-#                          filter_out=['solver_generic', 'nverse'])
+cvodes_c, _ = build_lib(env_save, core, new_defines, cvodes_dir,
+                        variant, 'cvodes')
+cvodes_c = env.Alias('cvodes-cpu', cvodes_c)
 
 # rk78
 new_defines = {}
@@ -686,7 +683,7 @@ rk78_c, _ = build_lib(env_save, core, new_defines, rk78_dir, variant,
                       'rk78')
 rk78_c = env.Alias('rk78-cpu', rk78_c)
 
-cpu_vals = [rkc_c, rk78_c, radau_c, exp4_c]
+cpu_vals = [rkc_c, rk78_c, radau_c, exp4_c, exprb43_c, cvodes_c]
 gpu_vals = []
 all_vals = []
 Alias('build', all_vals)

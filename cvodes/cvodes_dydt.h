@@ -6,7 +6,6 @@
 #ifndef DYDT_HEAD_CVODES
 #define DYDT_HEAD_CVODES
 
-#include "header.h"
 #include "sundials/sundials_nvector.h"
 #include "nvector/nvector_serial.h"
 

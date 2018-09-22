@@ -1,5 +1,5 @@
 Import('env')
-c_src = Glob('*.c')
+c_src = Glob('*.c') + Glob('*.cpp')
 cObj = []
 cuObj = []
 for src in c_src:
