@@ -12,6 +12,9 @@
 #include "radau2a_solver.hpp"
 #include "rk78_solver.hpp"
 #include "rkc_solver.hpp"
+#include "cvodes_solver.hpp"
+#include "exp4_solver.hpp"
+#include "exprb43_solver.hpp"
 
 #include <cmath>
 #include <sstream>
@@ -38,6 +41,12 @@ namespace c_solvers
                 return std::unique_ptr<RK78Integrator>(new RK78Integrator(neq, numThreads));
             case IntegratorType::RKC:
                 return std::unique_ptr<RKCIntegrator>(new RKCIntegrator(neq, numThreads));
+            case IntegratorType::EXP4:
+                return std::unique_ptr<EXP4Integrator>(new EXP4Integrator(neq, numThreads));
+            case IntegratorType::EXPRB43:
+                return std::unique_ptr<EXPRB43Integrator>(new EXPRB43Integrator(neq, numThreads));
+            case IntegratorType::CVODES:
+                return std::unique_ptr<CVODEIntegrator>(new CVODEIntegrator(neq, numThreads));
             default:
                 std::ostringstream ss;
                 ss << "Integrator type: " << type << " not implemented for C!" << std::endl;

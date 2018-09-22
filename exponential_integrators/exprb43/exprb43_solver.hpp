@@ -15,18 +15,6 @@
 namespace c_solvers
 {
 
-    //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
-    //#define USE_SMOOTHED_ERROR
-     //! max order of the phi functions (for error estimation)
-    #define P 4
-    //! order of embedded methods
-    #define ORD 3.0
-    //! Maximum allowed internal timesteps per integration step
-    #define MAX_STEPS (100000)
-    //! Number of consecutive errors on internal integration steps allowed before exit
-    #define MAX_CONSECUTIVE_ERRORS (5)
-
-
     class EXPRB43Integrator : public ExponentialIntegrator
     {
     protected:
@@ -53,6 +41,17 @@ namespace c_solvers
         std::size_t _savedActions;
 
     public:
+
+        //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
+        //#define USE_SMOOTHED_ERROR
+        //! max order of the phi functions (for error estimation)
+        static constexpr int P = 4;
+        //! order of embedded methods
+        static constexpr double ORD = 3.0;
+        //! Maximum allowed internal timesteps per integration step
+        static constexpr int MAX_STEPS = 100000;
+        //! Number of consecutive errors on internal integration steps allowed before exit
+        static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
 
         EXPRB43Integrator(int neq, int numThreads,
                           double atol=1e-10, double rtol=1e-6,

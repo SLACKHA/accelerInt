@@ -13,16 +13,6 @@
 namespace c_solvers
 {
 
-    //! max order of the phi functions (for error estimation)
-    #define P 1
-    //! order of embedded methods
-    #define ORD 3.0
-    //! Maximum allowed internal timesteps per integration step
-    #define MAX_STEPS (100000)
-    //! Number of consecutive errors on internal integration steps allowed before exit
-    #define MAX_CONSECUTIVE_ERRORS (5)
-
-
     class EXP4Integrator : public ExponentialIntegrator
     {
     protected:
@@ -55,6 +45,16 @@ namespace c_solvers
         std::size_t _k7;
 
     public:
+
+        //! max order of the phi functions (for error estimation)
+        static constexpr int P = 1;
+        //! order of embedded methods
+        static constexpr double ORD = 3.0;
+        //! Maximum allowed internal timesteps per integration step
+        static constexpr int MAX_STEPS = 100000;
+        //! Number of consecutive errors on internal integration steps allowed before exit
+        static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
+
 
         EXP4Integrator(int neq, int numThreads,
                        double atol=1e-10, double rtol=1e-6,
