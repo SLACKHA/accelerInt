@@ -96,6 +96,8 @@ namespace c_solvers {
                     "the allowed number of newton iteration steps was exceeded,"
                     "exiting..." << std::endl;
                     exit(code);
+                default:
+                    return;
             }
         }
 
@@ -118,10 +120,6 @@ namespace c_solvers {
         */
         virtual ErrorCode integrate(const double t_start, const double t_end,
                                     const double pr, double* y) = 0;
-
-        //! return reference to the beginning of the working memory
-        //! for this thread `tid`
-        virtual double* phi(int tid) final;
 
         //! return the absolute tolerance
         inline const double atol() const
@@ -147,9 +145,24 @@ namespace c_solvers {
             return _numThreads;
         }
 
+       /**
+        * \brief Integration driver for the CPU integrators
+        * \param[in]       NUM             The (non-padded) number of IVPs to integrate
+        * \param[in]       t               The current system time
+        * \param[in]       t_end           The IVP integration end time
+        * \param[in]       pr_global       The system constant variable (pressures / densities)
+        * \param[in,out]   y_global        The system state vectors at time t.
+                                          Returns system state vectors at time t_end
+        *
+        */
+        void intDriver (const int NUM, const double t,
+                        const double t_end, const double* __restrict__ pr_global,
+                        double* __restrict__ y_global);
+
     protected:
-        //! the required memory size (in bytes) for this solver
-        std::size_t _memSize;
+        //! return reference to the beginning of the working memory
+        //! for this thread `tid`
+        virtual double* phi(int tid) final;
 
         //! the number of OpenMP threads to use
         const int _numThreads;
@@ -162,6 +175,8 @@ namespace c_solvers {
 
         //! the relative tolerance for this integrator
         const double _rtol;
+        //! the required memory size (in bytes) for this solver
+        std::size_t _memSize;
 
         //! working memory for this integrator
         std::unique_ptr<char> working_buffer;
@@ -171,23 +186,8 @@ namespace c_solvers {
         {
             return (T*)(&working_buffer.get()[tid * _memSize + offset]);
         }
+
     };
-
-    /**
-    * \brief Integration driver for the CPU integrators
-    * \param[in]       int             An instance of an integrator class to use
-    * \param[in]       NUM             The (non-padded) number of IVPs to integrate
-    * \param[in]       t               The current system time
-    * \param[in]       t_end           The IVP integration end time
-    * \param[in]       pr_global       The system constant variable (pressures / densities)
-    * \param[in,out]   y_global        The system state vectors at time t.
-                                      Returns system state vectors at time t_end
-    *
-    */
-    void intDriver (Integrator& integrator, const int NUM, const double t,
-                    const double t_end, const double* __restrict__ pr_global,
-                    double* __restrict__ y_global);
-
 
 }
 

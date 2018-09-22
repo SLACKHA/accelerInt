@@ -89,7 +89,7 @@ namespace c_solvers
         while (t + EPS < t_end)
         {
             numSteps++;
-            intDriver(integrator, NUM, t, t_end, var_host, y_host);
+            integrator.intDriver(NUM, t, t_end, var_host, y_host);
             t = t_next;
             t_next = fmin(t_end, (numSteps + 1) * stepsize);
         }
