@@ -22,7 +22,8 @@
  */
 
 #include "dydt.h"
-#include "error_codes.hpp"
+#include "rkc_solver.hpp"
+#include <cstring>
 
 namespace c_solvers
 {
@@ -137,9 +138,6 @@ namespace c_solvers
         double b_jm1 = ONE / (FOUR * (w0 * w0));
         double b_jm2 = b_jm1;
 
-        double y_jm1[_neq];
-        double y_jm2[_neq];
-
           // calculate y_1
         double mu_t = w1 * b_jm1;
         for (int i = 0; i < _neq; ++i) {
@@ -213,22 +211,22 @@ namespace c_solvers
         int nstep = 0;
         int tid = omp_get_thread_num();
 
-        double* work = _unique<double>(tid, _work);
+        double* __restrict__ work = _unique<double>(tid, _work);
         std::memset(work, 0, (4 + _neq) * sizeof(double));
 
-        int m_max = (int)(round(sqrt(RTOL / (10.0 * UROUND))));
+        int m_max = (int)(round(sqrt(_rtol / (10.0 * UROUND))));
 
         if (m_max < 2) {
             m_max = 2;
         }
 
-        double* y_n = _unique<double>(tid, _y_n);
+        double* __restrict__ y_n = _unique<double>(tid, _y_n);
         for (int i = 0; i < _neq; ++i) {
             y_n[i] = y[i];
         }
 
         // calculate F_n for initial y
-        double* y_n = _unique<double>(tid, _F_n);
+        double* __restrict__ F_n = _unique<double>(tid, _F_n);
         dydt (t, pr, y_n, F_n);
 
         // load initial estimate for eigenvector
@@ -241,8 +239,11 @@ namespace c_solvers
         const double hmax = fabs(tEnd - t);
         double hmin = TEN * UROUND * fmax(fabs(t), hmax);
 
-        double* temp_arr = _unique<double>(tid, _temp_arr);
-        double* temp_arr2 = _unique<double>(tid, _temp_arr2);
+        double* __restrict__ temp_arr = _unique<double>(tid, _temp_arr);
+        double* __restrict__ temp_arr2 = _unique<double>(tid, _temp_arr2);
+
+        double* __restrict__ y_jm1 = _unique<double>(tid, _y_jm1);
+        double* __restrict__ y_jm2 = _unique<double>(tid, _y_jm2);
 
         while (t < tEnd) {
             // use time step stored in work[2]
@@ -269,7 +270,7 @@ namespace c_solvers
 
                 err = ZERO;
                 for (int i = 0; i < _neq; ++i) {
-                    double est = (temp_arr2[i] - F_n[i]) / (ATOL + RTOL * fabs(y_n[i]));
+                    double est = (temp_arr2[i] - F_n[i]) / (_atol + _rtol * fabs(y_n[i]));
                     err += est * est;
                 }
                 err = work[2] * sqrt(err / _neq);
@@ -306,7 +307,7 @@ namespace c_solvers
             err = ZERO;
             for (int i = 0; i < _neq; ++i) {
                 double est = P8 * (y_n[i] - y[i]) + P4 * work[2] * (F_n[i] + temp_arr[i]);
-                est /= (ATOL + RTOL * fmax(fabs(y[i]), fabs(y_n[i])));
+                est /= (_atol + _rtol * fmax(fabs(y[i]), fabs(y_n[i])));
                 err += est * est;
             }
             err = sqrt(err / ((double)_neq));
@@ -325,16 +326,15 @@ namespace c_solvers
                 nstep++;
 
                 double fac = TEN;
-                double temp1, temp2;
 
                 if (work[1] < UROUND) {
-                    temp2 = pow(err, ONE3RD);
+                    double temp2 = pow(err, ONE3RD);
                     if (P8 < (fac * temp2)) {
                         fac = P8 / temp2;
                     }
                 } else {
-                    temp1 = P8 * work[2] * pow(work[0], ONE3RD);
-                    temp2 = work[1] * pow(err, TWO3RD);
+                    double temp1 = P8 * work[2] * pow(work[0], ONE3RD);
+                    double temp2 = work[1] * pow(err, TWO3RD);
                     if (temp1 < (fac * temp2)) {
                         fac = temp1 / temp2;
                     }
