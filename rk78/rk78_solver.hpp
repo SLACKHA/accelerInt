@@ -17,8 +17,11 @@
 #include <boost/numeric/odeint.hpp>
 using namespace boost::numeric::odeint;
 
+//! boost state vector type
+typedef std::vector<double> state_type;
+
 //! boost stepper type
-typedef runge_kutta_fehlberg78<double* , double> stepper;
+typedef runge_kutta_fehlberg78<state_type> stepper;
 
 //! boost step size controller
 typedef controlled_runge_kutta<stepper> controller;
@@ -43,7 +46,7 @@ namespace c_solvers
         }
 
         //wrapper for the pyJac RHS fn
-        void operator() (const double* y , double* fy , const double t) const
+        void operator() (const state_type& y , state_type& fy , const double t) const
         {
             dydt(t, this->m_statevar, &y[0], &fy[0]);
         }
@@ -54,6 +57,7 @@ namespace c_solvers
         protected:
             RK78 wrapper;
             std::vector<std::unique_ptr<RK78>> evaluators;
+            std::vector<state_type> state_vectors;
             std::vector<std::unique_ptr<stepper>> steppers;
             std::vector<controller> controllers;
 
@@ -82,6 +86,7 @@ namespace c_solvers
             void clean() {
                 evaluators.clear();
                 steppers.clear();
+                state_vectors.clear();
                 controllers.clear();
             }
             void reinitialize(int numThreads) {
@@ -90,6 +95,7 @@ namespace c_solvers
                     // initialize boost interface
                     evaluators.push_back(std::unique_ptr<RK78>(new RK78()));
                     steppers.push_back(std::unique_ptr<stepper>(new stepper()));
+                    state_vectors.push_back(state_type(_neq, 0.0));
                     controllers.push_back(make_controlled<stepper>(atol(), rtol(), *steppers[i]));
                 }
             }

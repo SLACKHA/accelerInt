@@ -28,15 +28,18 @@ namespace c_solvers {
      *  \returns Return code, @see RK_ErrCodes
      */
     ErrorCode RK78Integrator::integrate (
-        const double t_start, const double t_end, const double pr, double* y)
+        const double t_start, const double t_end, const double pr, double* __restrict__ y)
     {
         int index = omp_get_thread_num();
 
         // copy parameter into into evaluator
         evaluators[index]->set_state_var(pr);
 
+        // copy into state vector
+        std::memcpy(&state_vectors[index][0], y, _neq * sizeof(double));
+
         // and integrate
-        //integrate_adaptive(controllers[index], *evaluators[index], y, t_start, t_end, t_end - t_start);
+        integrate_adaptive(controllers[index], *evaluators[index], state_vectors[index], t_start, t_end, t_end - t_start);
 
         return ErrorCode::SUCCESS;
     }
