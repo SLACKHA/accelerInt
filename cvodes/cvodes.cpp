@@ -7,7 +7,7 @@
  *
  */
 
-#include "solver_cvodes.hpp"
+#include "cvodes_solver.hpp"
 #include <cstdlib>
 #include <cstring>
 
