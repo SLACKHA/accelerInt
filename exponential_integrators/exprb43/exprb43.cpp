@@ -220,7 +220,7 @@ namespace c_solvers {
 			if (err <= 1.0) {
 
 				#ifdef LOG_KRYLOV_AND_STEPSIZES
-					fprintf (logFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+					subspaceLog.push_back(std::make_tuple(t, h, err, m, m1, m2));
 	  			#endif
 
 				memcpy(sc, f_temp, _neq * sizeof(double));
@@ -254,7 +254,7 @@ namespace c_solvers {
 			} else {
 
 				#ifdef LOG_KRYLOV_AND_STEPSIZES
-					fprintf (rFile, "%.15le\t%.15le\t%.15le\t%d\t%d\t%d\n", t, h, err, m, m1, m2);
+					subspaceLog.push_back(std::make_tuple(t, h, err, m, m1, m2));
 	  			#endif
 
 				// limit to 0.2 <= (h_new/8) <= 8.0
@@ -275,11 +275,6 @@ namespace c_solvers {
 	#endif
 
 		} // end while
-
-		#ifdef LOG_KRYLOV_AND_STEPSIZES
-			fclose(logFile);
-			fclose(rFile);
-		#endif
 
 		return ErrorCode::SUCCESS;
 	}

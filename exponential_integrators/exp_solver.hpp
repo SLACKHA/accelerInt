@@ -62,7 +62,12 @@ namespace c_solvers
         }
 
     protected:
+        //! log format t, h, err, m, m1, m2
+        std::vector<std::tuple<double, double, double, int, int, int>> subspaceLog;
+
+        //! poles for matrix exponentiation via CF
         std::vector<std::complex<double>> poles;
+        //! residuals for matrix exponentiation via CF
         std::vector<std::complex<double>> res;
 
         //! offsets

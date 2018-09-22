@@ -30,8 +30,6 @@ namespace c_solvers
     class EXPRB43Integrator : public ExponentialIntegrator
     {
     protected:
-        // log format t, h, err, m, m1, m2
-        std::vector<std::tuple<double, double, double, int, int, int>> subspaceLog;
 
         //! offsets
 
