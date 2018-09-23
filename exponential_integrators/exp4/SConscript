@@ -3,13 +3,13 @@ cObj = []
 c_src = Glob('*.cpp')
 
 for src in c_src:
-	cObj.append(env.SharedObject(src, variant_dir=env['variant']))
+    cObj.append(env.SharedObject(src, variant_dir=env['variant']))
 
 cudaObj = []
 cuda_src = Glob('*.cu')
 
 if env['build_cuda']:
-	for src in cuda_src:
-		cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
+    for src in cuda_src:
+        cudaObj.append(env.CUDAObject(src, variant_dir=env['variant']))
 
 Return ('cObj', 'cudaObj')

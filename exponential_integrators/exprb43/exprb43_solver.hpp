@@ -40,6 +40,21 @@ namespace c_solvers
         // action vector offset
         std::size_t _savedActions;
 
+        /** \brief Compute the correct order Phi (exponential) matrix function.
+         *         This is dependent on the exponential solver type, and hence must be
+         *         overridden in the subclasses.
+         *
+         *  \param[in]      m       The Hessenberg matrix size (mxm)
+         *  \param[in]      A       The input Hessenberg matrix
+         *  \param[in]      c       The scaling factor
+         *  \param[out]     phiA    The resulting exponential matrix
+         */
+        inline int exponential(const int m, const double* A, const double c, double* phiA)
+        {
+            return expAc_variable (m, A, c, phiA);
+        }
+
+
     public:
 
         //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector

@@ -5,14 +5,9 @@
  * Adapted from [Lapack](http://www.netlib.org/lapack/) LU factorization and inversion routines
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include <complex.h>
-#include <string.h>
-#include "solver_props.h"
 #include "lapack_dfns.h"
+#include "complexInverse.hpp"
+#include <cstring>
 
 /**
  * \brief Computes the LU factorization of a (n x STRIDE) Hessenberg Matrix using partial pivoting with row interchanges.
@@ -32,45 +27,45 @@
  * G. W. Stewart, Matrix Algorithms: Volume 1: Basic Decompositions, SIAM, Philadelphia, 1998. doi:10.1137/1.9781611971408.
  */
 static inline
-int getHessenbergLU(const int n, double complex* __restrict__ A,
-						int* __restrict__ indPivot)
+int getHessenbergLU(const int n, const int STRIDE, std::complex<double>* __restrict__ A,
+                    int* __restrict__ indPivot)
 {
-	int last_pivot = 0;
-	for (int i = 0; i < n - 1; i ++)
-	{
-		if (cabs(A[i * STRIDE + i]) < cabs(A[i * STRIDE + i + 1]))
-		{
-			//swap rows
-			for(int k = last_pivot; k < n; ++k)
-			{
-				double complex temp = A[k * STRIDE + i];
-				A[k * STRIDE + i] = A[k * STRIDE + i + 1];
-				A[k * STRIDE + i + 1] = temp;
-			}
-			indPivot[i] = i + 1;
-		}
-		else
-		{
-			indPivot[i] = i;
-			last_pivot = i;
-		}
-		if (cabs(A[i * STRIDE + i]) > 0.0)
-		{
-			double complex tau = A[i * STRIDE + i + 1] / A[i * STRIDE + i];
-			for (int j = i + 1; j < n; j++)
-			{
-				A[j * STRIDE + i + 1] -= tau * A[j * STRIDE + i];
-			}
-			A[i * STRIDE + i + 1] = tau;
-		}
-		else
-		{
-			return i;
-		}
-	}
-	//last index is not pivoted
-	indPivot[n - 1] = n - 1;
-	return 0;
+    int last_pivot = 0;
+    for (int i = 0; i < n - 1; i ++)
+    {
+        if (std::abs(A[i * STRIDE + i]) < std::abs(A[i * STRIDE + i + 1]))
+        {
+            //swap rows
+            for(int k = last_pivot; k < n; ++k)
+            {
+                std::complex<double> temp = A[k * STRIDE + i];
+                A[k * STRIDE + i] = A[k * STRIDE + i + 1];
+                A[k * STRIDE + i + 1] = temp;
+            }
+            indPivot[i] = i + 1;
+        }
+        else
+        {
+            indPivot[i] = i;
+            last_pivot = i;
+        }
+        if (std::abs(A[i * STRIDE + i]) > 0.0)
+        {
+            std::complex<double> tau = A[i * STRIDE + i + 1] / A[i * STRIDE + i];
+            for (int j = i + 1; j < n; j++)
+            {
+                A[j * STRIDE + i + 1] -= tau * A[j * STRIDE + i];
+            }
+            A[i * STRIDE + i + 1] = tau;
+        }
+        else
+        {
+            return i;
+        }
+    }
+    //last index is not pivoted
+    indPivot[n - 1] = n - 1;
+    return 0;
 }
 
 /**
@@ -80,7 +75,7 @@ int getHessenbergLU(const int n, double complex* __restrict__ A,
  * \param[out]      arrX        The vector to scale
  *
  */
-void scaleComplex (const int n, const double complex val, double complex* __restrict__ arrX) {
+void scaleComplex (const int n, const std::complex<double>& val, std::complex<double>* __restrict__ arrX) {
 
     for (int i = 0; i < n; ++i) {
         arrX[i] *= val;
@@ -105,12 +100,12 @@ void scaleComplex (const int n, const double complex val, double complex* __rest
  *
  * Note: These pointers can't use the \_\_restrict\_\_ attribute, as they may overlap
  */
-void multiplyComplexUpperMV (const int n, double complex* x, const int lda,
-								const double complex* A) {
+void multiplyComplexUpperMV (const int n, std::complex<double>* x, const int lda,
+                             const std::complex<double>* A) {
 
     for (int j = 0; j < n; ++j) {
-        if (cabs(x[j]) > 0.0) {
-            double complex temp = x[j];
+        if (std::abs(x[j]) > 0.0) {
+            std::complex<double> temp = x[j];
             for (int i = 0; i < j; ++i) {
                 x[i] += temp * A[i + (lda * j)];
                 //x[INDEX(i)] = cuCfma(temp, A[INDEX(i + (lda * j))], x[INDEX(i)]);
@@ -143,8 +138,8 @@ void multiplyComplexUpperMV (const int n, double complex* x, const int lda,
  *
  * Note: These pointers cannot use the \_\_restrict\_\_ modifier, as they may overlap
  */
-void complexGEMV (const int m, const int n, const int lda, const double alpha, const double complex* __restrict__ A,
-                                    const double complex* arrX, double complex* arrY) {
+void complexGEMV (const int m, const int n, const int lda, const double alpha, const std::complex<double>* __restrict__ A,
+                  const std::complex<double>* arrX, std::complex<double>* arrY) {
 
     // first: y = beta*y
     // beta = 1, so nothing
@@ -153,8 +148,8 @@ void complexGEMV (const int m, const int n, const int lda, const double alpha, c
 
     for (int j = 0; j < n - 1; ++j) {
 
-        if (cabs(arrX[j]) > 0.0) {
-            double complex temp = alpha * arrX[j];
+        if (std::abs(arrX[j]) > 0.0) {
+            std::complex<double> temp = alpha * arrX[j];
             for (int i = 0; i < m; ++i) {
                 arrY[i] += temp * A[i + (lda * j)];
                 //arrY[INDEX(i)] = cuCfma(temp, A[INDEX(i + (lda * j))], arrY[INDEX(i)]);
@@ -175,17 +170,16 @@ void complexGEMV (const int m, const int n, const int lda, const double alpha, c
                                     The pivot indices from getHessenbergLU; for 0<=i<=n-1, row i of the
                                     matrix was interchanged with row indPiv[i].
  */
-int getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
-										const int* __restrict__ indPivot) {
+int getComplexInverseHessenbergLU (const int n, const int STRIDE, std::complex<double>* __restrict__ A,
+                                   const int* __restrict__ indPivot, std::complex<double>* __restrict__ work) {
 
-	double complex work[STRIDE] = {0};
-
+    std::memset(work, 0, n * sizeof(std::complex<double>));
     // form inv(U)
     for (int j = 0; j < n; ++j) {
-    	if (cabs(A[j + (STRIDE * j)]) == 0)
-    		return j;
+        if (std::abs(A[j + (STRIDE * j)]) == 0)
+            return j;
         A[j + (STRIDE * j)] = 1.0 / A[j + (STRIDE * j)];
-        double complex Ajj = -A[j + (STRIDE * j)];
+        std::complex<double> Ajj = -A[j + (STRIDE * j)];
 
         // compute elements 0:j-1 of jth column
         multiplyComplexUpperMV (j, &A[STRIDE * j], STRIDE, A);
@@ -216,11 +210,11 @@ int getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
 
         if (indPivot[j] != j)
         {
-        	for (int i = 0; i < n; ++i) {
-				double complex temp = A[STRIDE * j + i];
-				A[STRIDE * j + i] = A[STRIDE * indPivot[j] + i];
-				A[STRIDE * indPivot[j] + i] = temp;
-			}
+            for (int i = 0; i < n; ++i) {
+                std::complex<double> temp = A[STRIDE * j + i];
+                A[STRIDE * j + i] = A[STRIDE * indPivot[j] + i];
+                A[STRIDE * indPivot[j] + i] = temp;
+            }
         }
     }
     return 0;
@@ -229,21 +223,24 @@ int getComplexInverseHessenbergLU (const int n, double complex* __restrict__ A,
 /** \brief getComplexInverseHessenberg computes the inverse of an upper Hessenberg matrix A using a LU factorization method
  *
  *  \param[in]          n           The order of the matrix A.  n >= 0.
+ *  \param[in]          STRIDE      The leading dimension of A (LDA)
  *  \param[in,out]      A           The array, dimension (STRIDE, n) @see STRIDE
  *  \param[out]         ipiv        ipiv is an array of dimension (n).
                                     The pivot indices from getHessenbergLU; for 0<=i<=n-1, row i of the
                                     matrix was interchanged with row indPiv[i].
  *  \param[out]         info        If not zero, an error occured during factorization
  */
-void getComplexInverseHessenberg (const int n, double complex* __restrict__ A,
-									int* __restrict__ ipiv, int* __restrict__ info)
+void getComplexInverseHessenberg (const int n, const int STRIDE,
+                                  std::complex<double>* __restrict__ A,
+                                  int* __restrict__ ipiv, int* __restrict__ info,
+                                  std::complex<double>* __restrict__ work)
 {
-	// first get LU factorization
-	*info = getHessenbergLU (n, A, ipiv);
+    // first get LU factorization
+    *info = getHessenbergLU (n, STRIDE, A, ipiv);
 
-	if (*info != 0)
-		return;
+    if (*info != 0)
+        return;
 
-	// now get inverse
-	*info = getComplexInverseHessenbergLU(n, A, ipiv);
+    // now get inverse
+    *info = getComplexInverseHessenbergLU(n, STRIDE, A, ipiv, work);
 }

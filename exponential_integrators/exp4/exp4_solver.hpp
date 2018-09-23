@@ -44,6 +44,20 @@ namespace c_solvers
         std::size_t _k6;
         std::size_t _k7;
 
+        /** \brief Compute the correct order Phi (exponential) matrix function.
+         *         This is dependent on the exponential solver type, and hence must be
+         *         overridden in the subclasses.
+         *
+         *  \param[in]      m       The Hessenberg matrix size (mxm)
+         *  \param[in]      A       The input Hessenberg matrix
+         *  \param[in]      c       The scaling factor
+         *  \param[out]     phiA    The resulting exponential matrix
+         */
+        inline int exponential(const int m, const double* A, const double c, double* phiA)
+        {
+            return phiAc_variable (m, A, c, phiA);
+        }
+
     public:
 
         //! max order of the phi functions (for error estimation)

@@ -17,7 +17,7 @@ extern "C" {
 /**
 * \brief get poles and residues for rational approximant to matrix exponential
 */
-void find_poles_and_residuals(std::vector<std::complex<double>>& poles, std::vector<std::complex<double>>& res)
+void find_poles_and_residuals(const int N_RA, std::vector<std::complex<double>>& poles, std::vector<std::complex<double>>& res)
 {
 	// get poles and residues for rational approximant to matrix exponential
     double *poles_r = (double *) calloc (N_RA, sizeof(double));
@@ -29,8 +29,8 @@ void find_poles_and_residuals(std::vector<std::complex<double>>& poles, std::vec
 
     for (int i = 0; i < N_RA; ++i)
     {
-        poles[i].emplace_back(std::complex<double>(poles_r[i], poles_i[i]));
-        res[i].emplace_back(std::complex<double>(res_r[i], res_i[i]));
+        poles.emplace_back(std::complex<double>(poles_r[i], poles_i[i]));
+        res.emplace_back(std::complex<double>(res_r[i], res_i[i]));
     }
 
     // free memory

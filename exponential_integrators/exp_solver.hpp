@@ -42,7 +42,7 @@ namespace c_solvers
             M_MAX(M_MAX < 0 ? _neq : M_MAX),
             STRIDE(stride)
         {
-            find_poles_and_residuals(poles, res);
+            find_poles_and_residuals(N_RA, poles, res);
         }
 
         std::size_t requiredSolverMemorySize()
@@ -57,6 +57,7 @@ namespace c_solvers
             // w
             _w = working;
             working += _neq * sizeof(double);
+            //
 
             return working;
         }
@@ -76,8 +77,19 @@ namespace c_solvers
         std::size_t _invA;
         //! ipiv
         std::size_t _ipiv;
-        //! arnoldi working vector
+        //! working vector for arnoldi & getComplexInverseHessenbergLU
         std::size_t _w;
+
+        /** \brief Compute the correct order Phi (exponential) matrix function.
+         *         This is dependent on the exponential solver type, and hence must be
+         *         overridden in the subclasses.
+         *
+         *  \param[in]      m       The Hessenberg matrix size (mxm)
+         *  \param[in]      A       The input Hessenberg matrix
+         *  \param[in]      c       The scaling factor
+         *  \param[out]     phiA    The resulting exponential matrix
+         */
+        virtual int exponential(const int m, const double* A, const double c, double* phiA) = 0;
 
 
         //! Krylov matrix stride
