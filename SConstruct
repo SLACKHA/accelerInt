@@ -596,6 +596,13 @@ exprb43_c, exprb43_cuda = build_lib(env_save, core, new_defines, exprb43_int_dir
 # exprb43_c = env.Alias('exprb43-cpu', exprb43_c)
 # exprb43_cuda = env.Alias('exprb43-gpu', exprb43_cuda)
 
+# linear algebra
+new_defines = {}
+new_defines['CPPPATH'] = [linalg_dir]
+new_defines['NVCC_INC_PATH'] = [linalg_dir]
+linalg_c, linalg_cu = build_lib(env_save, core, new_defines, linalg_dir,
+                                variant, 'linalg')
+
 # rkc
 new_defines = {}
 new_defines['CPPPATH'] = [rkc_dir]
@@ -624,7 +631,7 @@ rk78_c, _ = build_lib(env_save, core, new_defines, rk78_dir, variant,
 # rk78_c = env.Alias('rk78-cpu', rk78_c)
 
 cpu_vals = [rkc_c, rk78_c, radau_c, exp4_c, exprb43_c, cvodes_c,
-            exp_c]
+            exp_c, linalg_c]
 gpu_vals = []
 lib_dir = os.path.join(home, 'lib')
 
@@ -640,7 +647,10 @@ def build_multitarget(save, defines, cpulibs, gpulibs):
     return caccel, cuaccel
 
 
-cpu, gpu = build_multitarget(env_save, {}, cpu_vals, gpu_vals)
+new_defines = {}
+new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir']]
+new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
+cpu, gpu = build_multitarget(env_save, new_defines, cpu_vals, gpu_vals)
 
 
 def build_fullib(save, defines):
