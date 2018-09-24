@@ -105,7 +105,7 @@ namespace c_solvers {
         void log(int NUM, double t, double* __restrict__ phi)
         {
             // allocate new memory
-            _log.emplace_back(std::unique_ptr<double>(new double[1 + NUM * _neq]));
+            _log.emplace_back(std::move(std::unique_ptr<double[]>(new double[1 + NUM * _neq])));
             double* __restrict__ set = _log.back().get();
             // and set
             set[0] = t;
@@ -117,7 +117,7 @@ namespace c_solvers {
             this->clean();
             _numThreads = numThreads;
             std::size_t _memSize = requiredSolverMemorySize();
-            working_buffer = std::move(std::unique_ptr<char>(new char[_memSize * _numThreads]));
+            working_buffer = std::move(std::unique_ptr<char[]>(new char[_memSize * _numThreads]));
             std::memset(working_buffer.get(), 0, _memSize * _numThreads);
         }
 
@@ -222,9 +222,9 @@ namespace c_solvers {
         //! the number of equations to solver per-IVP
         const int _neq;
         //! working memory for this integrator
-        std::unique_ptr<char> working_buffer;
+        std::unique_ptr<char[]> working_buffer;
         //! log of state vectors / times
-        std::vector<std::unique_ptr<double>> _log;
+        std::vector<std::unique_ptr<double[]>> _log;
         //! solver options
         const SolverOptions& _options;
 
