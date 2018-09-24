@@ -50,12 +50,15 @@ namespace c_solvers {
         static constexpr double eps = EPS;
         static constexpr double small = SMALL;
 
-        Integrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-6) :
+        Integrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-6,
+                   bool logging=false) :
             _numThreads(numThreads),
             _neq(neq),
             _atol(atol),
             _rtol(rtol),
-            _memSize(requiredSolverMemorySize())
+            _memSize(requiredSolverMemorySize()),
+            _logging_enabled(logging),
+            _log(),
         {
             working_buffer = std::unique_ptr<char>(new char[_memSize * _numThreads]);
             std::memset(working_buffer.get(), 0, _memSize * _numThreads);
@@ -66,8 +69,20 @@ namespace c_solvers {
             this->clean();
         }
 
-        virtual void initSolverLog() = 0;
-        virtual void solverLog() = 0;
+        void log(int NUM, double t, double* __restrict__ phi)
+        {
+            // allocate new memory
+            log.emplace_back(std::unique_ptr<double>(new double[1 + NUM * _neq]));
+            double* __restrict__ set = log.back().get();
+            // and set
+            set[0] = t;
+            std::memcpy(&set[1], phi, NUM * _neq * sizeof(double));
+        }
+
+        inline bool logging_enabled()
+        {
+            return _logging_enabled;
+        }
 
         void reinitialize(int numThreads)
         {
@@ -180,20 +195,20 @@ namespace c_solvers {
 
         //! the number of OpenMP threads to use
         int _numThreads;
-
         //! the number of equations to solver per-IVP
         const int _neq;
-
         //! the absolute tolerance for this integrator
         const double _atol;
-
         //! the relative tolerance for this integrator
         const double _rtol;
         //! the required memory size (in bytes) for this solver
         std::size_t _memSize;
-
+        //! whether logging is enabled or not
+        bool _logging_enabled;
         //! working memory for this integrator
         std::unique_ptr<char> working_buffer;
+        //! log of state vectors / times
+        std::vector<std::unique_ptr<double>> _log;
 
         //! Return unique memory access
         template <typename T> T* _unique(int tid, std::size_t offset)
