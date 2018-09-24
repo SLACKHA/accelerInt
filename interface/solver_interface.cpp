@@ -75,6 +75,9 @@ namespace c_solvers
                      const double * __restrict__ var_host)
     {
 
+        // set # of threads
+        omp_set_num_threads(integrator.numThreads());
+
         auto t1 = std::chrono::high_resolution_clock::now();
         double t = t_start;
         double stepsize = step;
