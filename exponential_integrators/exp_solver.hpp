@@ -308,8 +308,10 @@ namespace c_solvers
          * \param[out]          Hm      the constructed Hessenberg matrix, used in actual exponentials
          * \param[out]          phiHm   the exponential matrix computed from h * scale * Hm
          */
-        int arnoldi(const double scale, const int p, const double h, const double* A, const double* v, const double* sc,
-                    double* beta, double* Vm, double* Hm, double* phiHm);
+        int arnoldi(const double scale, const int p, const double h, const double* __restrict__ A,
+                    const double* __restrict__ v, const double* __restrict__ sc,
+                    double* __restrict__ beta, double* __restrict__ Vm, double* __restrict__ Hm,
+                    double* __restrict__ phiHm);
 
         /** \brief Compute the 2nd order Phi (exponential) matrix function
          *

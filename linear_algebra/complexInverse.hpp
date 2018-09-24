@@ -8,7 +8,6 @@
 
 #include <complex>
 
-void getComplexInverseHessenberg (const int, const int, std::complex<double>* __restrict__, int * __restrict__,
-								  int * __restrict__, std::complex<double>* __restrict__);
-
+void getComplexInverseHessenberg (const int, const int, std::complex<double>* __restrict__, int* __restrict__,
+                                  int* __restrict__, std::complex<double>* __restrict__);
 #endif

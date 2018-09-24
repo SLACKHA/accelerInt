@@ -9,9 +9,6 @@
   		 criteria in determining end of krylov iteration
  */
 
-#ifndef ARNOLDI_H
-#define ARNOLDI_H
-
 #include <cstring>
 // include exp solver for sparse multiplier defn
 #include "exp_solver.hpp"
@@ -40,8 +37,10 @@ namespace c_solvers
 	 * \param[out]			Hm 		the constructed Hessenberg matrix, used in actual exponentials
 	 * \param[out] 			phiHm   the exponential matrix computed from h * scale * Hm
 	 */
-	inline
-	int ExponentialIntegrator::arnoldi(const double scale, const int p, const double h, const double* A, const double* v, const double* sc, double* beta, double* Vm, double* Hm, double* phiHm)
+	int ExponentialIntegrator::arnoldi(const double scale, const int p, const double h, const double* __restrict__ A,
+									   const double* __restrict__ v, const double* __restrict__ sc,
+									   double* __restrict__ beta, double* __restrict__ Vm, double* __restrict__ Hm,
+									   double* __restrict__ phiHm)
 	{
 		//the temporary work array
 		double* __restrict__ w = _unique<double>(omp_get_thread_num(), _w);
@@ -134,4 +133,3 @@ namespace c_solvers
 	}
 
 }
-#endif
