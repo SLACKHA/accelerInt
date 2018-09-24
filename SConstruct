@@ -6,11 +6,15 @@ import os
 import sys
 import errno
 import platform
-from buildutils import listify, formatOption
 import shutil
+import subprocess
+import textwrap
+from distutils.version import LooseVersion
 
-valid_commands = ('cvodes-cpu', 'exp4-cpu', 'exprb43-cpu', 'radau2a-cpu', 'rkc-cpu',
-                  'rk78-cpu', 'cpu', 'gpu', 'cpu-full', 'help')
+from buildutils import listify, formatOption, getCommandOutput
+
+
+valid_commands = ('cpu', 'gpu', 'cpu-wrapper', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -207,7 +211,12 @@ config_options = [
     ('CV_HMAX', 'If specified, the maximum stepsize for CVode', '0'),
     ('CV_MAX_STEPS', 'If specified, the maximum stepsize for CVode', '20000'),
     ('CONST_TIME_STEP', 'If specified, adaptive timestepping will be turned off '
-     '(for logging purposes)', False)
+     '(for logging purposes)', False),
+    PathVariable(
+        'python_cmd',
+        'The python interpreter to use to generate python wrappers for '
+        'accelerInt.  If not specified, the python interpreter used by '
+        'scons will be used.', sys.executable, PathVariable.PathAccept)
 ]
 
 opts.AddVariables(*config_options)
@@ -278,6 +287,7 @@ cvodes_dir = os.path.join(home, 'cvodes')
 rk78_dir = os.path.join(home, 'rk78')
 rkc_dir = os.path.join(home, 'rkc')
 lib_dir = os.path.join(home, 'lib')
+driver_dir = os.path.join(home, 'driver')
 
 common_dir_list = [generic_dir, mech_dir, linalg_dir]
 
@@ -704,10 +714,69 @@ new_defines['RPATH'] = [lib_dir]
 cpu, gpu = build_multitarget(env_save, new_defines, cpu_vals, gpu_vals)
 
 
+def run_with_our_python(env, target, source, action):
+    # Test to see if we can import numpy and Cython
+    script = textwrap.dedent("""\
+        import sys
+        print('{v.major}.{v.minor}'.format(v=sys.version_info))
+        err = ''
+        try:
+            import numpy
+            print(numpy.__version__)
+        except ImportError as np_err:
+            print('0.0.0')
+            err += str(np_err) + '\\n'
+        try:
+            import Cython
+            print(Cython.__version__)
+        except ImportError as cython_err:
+            print('0.0.0')
+            err += str(cython_err) + '\\n'
+        if err:
+            print(err)
+    """)
+
+    try:
+        if 'python_cmd' not in env:
+            env['python_cmd'] = sys.executable
+        info = getCommandOutput(env['python_cmd'], '-c', script).splitlines()
+    except OSError as err:
+        print('Error checking for Python:')
+        print(err)
+        sys.exit(err.output)
+    except subprocess.CalledProcessError as err:
+        print('Error checking for Python:')
+        print(err, err.output)
+        sys.exit(err.output)
+    else:
+        numpy_version = LooseVersion(info[1])
+        cython_version = LooseVersion(info[2])
+
+    missing = [x[0] for x in [('numpy', numpy_version), ('cython', cython_version)]
+               if x[1] == LooseVersion('0.0.0')]
+    if missing:
+        print('ERROR: Could not import required packages ({}) the Python interpreter'
+              ' {!r}. Did you mean to set the "python_cmd" option?"'.format(
+                ', '.join(missing), env['python_cmd']))
+        sys.exit(1)
+
+    return env.Command(target=target,
+                       source=source,
+                       action=action.format(python=env['python_cmd']))
+
+
 def build_wrapper(save, defines):
     env = get_env(save, defines)
-    full_c = env.SharedLibrary(target='accelerint_specialized', source=mech_c)
+    full_c = env.SharedLibrary(target='accelerint_problem', source=mech_c)
     full_c = env.Install(lib_dir, full_c)
+    # and build wrapper
+    driver = os.path.join(driver_dir, 'setup.py')
+    wrapper_c = run_with_our_python(env,
+                                    target='pyccelerInt-cpu',
+                                    source=[driver],
+                                    action='{{python}} {} build_ext --inplace'
+                                    .format(driver))
+    full_c += wrapper_c
     full_cu = []
     if build_cuda:
         full_cu = env.SharedLibrary(target='accelerint_specialized',
@@ -723,11 +792,11 @@ if mech_c:
     defines = {}
     defines['RPATH'] = [lib_dir]
     defines['LIBPATH'] = [lib_dir]
-    defines['LIBS'] = ['accelerint']
-    full_c, full_cu = build_wrapper(env_save, defines)
-    full_c = Alias('cpu-full', full_c)
+    defines['LIBS'] = [cpu]
+    wrapper_c, wrapper_cu = build_wrapper(env_save, defines)
+    full_c = Alias('cpu-wrapper', wrapper_c)
     if build_cuda:
-        full_cu = Alias('gpu-full', full_cu)
+        full_cu = Alias('gpu-wrapper', wrapper_cu)
 
 
 Alias('cpu', cpu)

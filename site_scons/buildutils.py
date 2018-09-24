@@ -1,5 +1,8 @@
 import textwrap
 import re
+import os
+import subprocess
+import sys
 
 optionWrapper = textwrap.TextWrapper(initial_indent='    ',
                                      subsequent_indent='    ',
@@ -76,3 +79,18 @@ def formatOption(env, opt):
     lines.append('')
 
     return lines
+
+
+def getCommandOutput(cmd, *args):
+    """
+    Run a command with arguments and return its output.
+    """
+    environ = dict(os.environ)
+    if 'PYTHONHOME' in environ:
+        # Can cause problems when trying to run a different Python interpreter
+        del environ['PYTHONHOME']
+    data = subprocess.check_output([cmd] + list(args), env=environ)
+    if sys.version_info.major == 3:
+        return data.strip().decode('utf-8')
+    else:
+        return data.strip()
