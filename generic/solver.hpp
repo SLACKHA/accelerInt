@@ -15,6 +15,7 @@
 #include <iostream>
 #include <memory>
 #include <complex>
+#include <cstring>
 #include "error_codes.hpp"
 
 extern "C"
@@ -57,11 +58,12 @@ namespace c_solvers {
             _memSize(requiredSolverMemorySize())
         {
             working_buffer = std::unique_ptr<char>(new char[_memSize * _numThreads]);
+            std::memset(working_buffer.get(), 0, _memSize * _numThreads);
         }
 
         ~Integrator()
         {
-
+            this->clean();
         }
 
         virtual void initSolverLog() = 0;
@@ -72,6 +74,7 @@ namespace c_solvers {
             _numThreads = numThreads;
             _memSize = requiredSolverMemorySize();
             working_buffer = std::unique_ptr<char>(new char[_memSize * _numThreads]);
+            std::memset(working_buffer.get(), 0, _memSize * _numThreads);
         }
         void clean(){}
 
