@@ -38,7 +38,7 @@ namespace c_solvers {
         int tid = omp_get_thread_num();
 
         // local array with initial values
-        N_Vector fill = y_locals[tid].vector;
+        N_Vector fill = (N_Vector)y_locals[tid].get();
 
         // copy initial values into NVector array
         double* __restrict__ y_local = NV_DATA_S(fill);

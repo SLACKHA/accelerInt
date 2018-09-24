@@ -32,7 +32,12 @@ extern "C"
 void delete_integrator(void* integrator)
 {
     CVodeFree(&integrator);
-    free(integrator);
+}
+
+//! unique_ptr deleter support for N_Vector
+void delete_nvector(void* n_vector)
+{
+    N_VDestroy((N_Vector)n_vector);
 }
 
 namespace c_solvers
@@ -63,25 +68,10 @@ namespace c_solvers
         }
     }
 
-    class NVSerialWrapper
-    {
-    public:
-        NVSerialWrapper(N_Vector vector)
-        {
-            this->vector = vector;
-        }
-        ~NVSerialWrapper()
-        {
-            N_VDestroy(vector);
-        }
-
-        N_Vector vector;
-    };
-
     class CVODEIntegrator : public Integrator
     {
     protected:
-        std::vector<NVSerialWrapper> y_locals;
+        std::vector<std::unique_ptr<void, void(*)(void *)>> y_locals;
         std::vector<std::unique_ptr<void, void(*)(void *)>> integrators;
 
     public:
@@ -89,6 +79,7 @@ namespace c_solvers
         CVODEIntegrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-10) :
             Integrator(neq, numThreads, atol, rtol)
         {
+            this->reinitialize(numThreads);
         }
 
         /*!
@@ -122,7 +113,10 @@ namespace c_solvers
                         CVodeCreate(CV_BDF, CV_NEWTON),
                         delete_integrator));
                 // create N_Vector
-                y_locals[i] = NVSerialWrapper(N_VMake_Serial(_neq, phi));
+                y_locals.push_back(
+                    std::unique_ptr<void, void(*)(void*)>(
+                        (void*)N_VMake_Serial(_neq, phi),
+                        delete_nvector));
 
                 // check
                 if (integrators[i] == NULL)
@@ -132,7 +126,7 @@ namespace c_solvers
                 }
 
                 //initialize
-                CVODEErrorCheck(CVodeInit(integrators[i].get(), dydt_cvodes, 0, y_locals[i].vector));
+                CVODEErrorCheck(CVodeInit(integrators[i].get(), dydt_cvodes, 0, (N_Vector)y_locals[i].get()));
 
                 //set tolerances
                 CVODEErrorCheck(CVodeSStolerances(integrators[i].get(), _rtol, _atol));
