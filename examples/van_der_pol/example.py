@@ -21,4 +21,6 @@ params = 5 * np.random.random(num)
 integrator = pycel.PyIntegrator(pycel.IntegratorType.CVODES, 2, 40)
 
 # and integrate
-integrator.integrate(num, 0., 100., phi.flatten('F'), params.flatten('F'))
+time = integrator.integrate(num, 0., 100., phi.flatten('F'), params.flatten('F'))
+
+print('Integration completed in {} (ms)'.format(time))
