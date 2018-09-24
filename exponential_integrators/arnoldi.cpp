@@ -65,7 +65,7 @@ namespace c_solvers
 					scale_subtract(Hm[j * STRIDE + i], &Vm[i * _neq], w);
 				}
 				Hm[j * STRIDE + j + 1] = two_norm(w);
-				if (fabs(Hm[j * STRIDE + j + 1]) < _atol)
+				if (std::fabs(Hm[j * STRIDE + j + 1]) < _atol)
 				{
 					//happy breakdown
 					j++;
@@ -107,7 +107,7 @@ namespace c_solvers
 			}
 
 			//3. Get error
-			err = h * (*beta) * fabs(store * phiHm[(j) * STRIDE + (j) - 1]) * sc_norm(&Vm[(j) * _neq], sc);
+			err = h * (*beta) * std::fabs(store * phiHm[(j) * STRIDE + (j) - 1]) * sc_norm(&Vm[(j) * _neq], sc);
 
 			//restore Hm(m, m + 1)
 			Hm[(j - 1) * STRIDE + j] = store;
@@ -117,7 +117,7 @@ namespace c_solvers
 	#if defined(LOG_OUTPUT) && defined(EXACT_KRYLOV)
 			//kill the error such that we will continue
 			//and greatly reduce the subspace approximation error
-			if (index_list[index] + p < STRIDE  && fabs(Hm[(j - 1) * STRIDE + j]) >= _atol)
+			if (index_list[index] + p < STRIDE  && std::fabs(Hm[(j - 1) * STRIDE + j]) >= _atol)
 			{
 				err = 10;
 			}

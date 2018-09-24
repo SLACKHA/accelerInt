@@ -51,19 +51,19 @@ namespace c_solvers
             nrm1 += (y[i] * y[i]);
             nrm2 += (v[i] * v[i]);
         }
-        nrm1 = sqrt(nrm1);
-        nrm2 = sqrt(nrm2);
+        nrm1 = std::sqrt(nrm1);
+        nrm2 = std::sqrt(nrm2);
 
         double dynrm;
         if ((nrm1 != ZERO) && (nrm2 != ZERO)) {
-            dynrm = nrm1 * sqrt(UROUND);
+            dynrm = nrm1 * std::sqrt(UROUND);
             for (int i = 0; i < _neq; ++i) {
                 v[i] = y[i] + v[i] * (dynrm / nrm2);
             }
         } else if (nrm1 != ZERO) {
-            dynrm = nrm1 * sqrt(UROUND);
+            dynrm = nrm1 * std::sqrt(UROUND);
             for (int i = 0; i < _neq; ++i) {
-                v[i] = y[i] * (ONE + sqrt(UROUND));
+                v[i] = y[i] * (ONE + std::sqrt(UROUND));
             }
         } else if (nrm2 != ZERO) {
             dynrm = UROUND;
@@ -87,10 +87,10 @@ namespace c_solvers
             for (int i = 0; i < _neq; ++i) {
                 nrm1 += ((Fv[i] - F[i]) * (Fv[i] - F[i]));
             }
-            nrm1 = sqrt(nrm1);
+            nrm1 = std::sqrt(nrm1);
             nrm2 = sigma;
             sigma = nrm1 / dynrm;
-            if ((iter >= 2) && (fabs(sigma - nrm2) <= (fmax(sigma, small) * P01))) {
+            if ((iter >= 2) && (std::fabs(sigma - nrm2) <= (std::fmax(sigma, small) * P01))) {
                 for (int i = 0; i < _neq; ++i) {
                     v[i] = v[i] - y[i];
                 }
@@ -130,9 +130,9 @@ namespace c_solvers
 
         const double w0 = ONE + TWO / (13.0 * (double)(s * s));
         double temp1 = (w0 * w0) - ONE;
-        double temp2 = sqrt(temp1);
-        double arg = (double)(s) * log(w0 + temp2);
-        const double w1 = sinh(arg) * temp1 / (cosh(arg) * (double)(s) * temp2 - w0 * sinh(arg));
+        double temp2 = std::sqrt(temp1);
+        double arg = (double)(s) * std::log(w0 + temp2);
+        const double w1 = std::sinh(arg) * temp1 / (std::cosh(arg) * (double)(s) * temp2 - w0 * std::sinh(arg));
 
         double b_jm1 = ONE / (FOUR * (w0 * w0));
         double b_jm2 = b_jm1;
@@ -213,7 +213,7 @@ namespace c_solvers
         double* __restrict__ work = _unique<double>(tid, _work);
         std::memset(work, 0, (4 + _neq) * sizeof(double));
 
-        int m_max = (int)(round(sqrt(_rtol / (10.0 * UROUND))));
+        int m_max = (int)(std::round(std::sqrt(_rtol / (10.0 * UROUND))));
 
         if (m_max < 2) {
             m_max = 2;
@@ -235,8 +235,8 @@ namespace c_solvers
             }
         }
 
-        const double hmax = fabs(tEnd - t);
-        double hmin = TEN * UROUND * fmax(fabs(t), hmax);
+        const double hmax = std::fabs(tEnd - t);
+        double hmin = TEN * UROUND * std::fmax(std::fabs(t), hmax);
 
         double* __restrict__ temp_arr = _unique<double>(tid, _temp_arr);
         double* __restrict__ temp_arr2 = _unique<double>(tid, _temp_arr2);
@@ -260,7 +260,7 @@ namespace c_solvers
                 if ((work[3] * work[2]) > ONE) {
                     work[2] = ONE / work[3];
                 }
-                work[2] = fmax(work[2], hmin);
+                work[2] = std::fmax(work[2], hmin);
 
                 for (int i = 0; i < _neq; ++i) {
                     temp_arr[i] = y_n[i] + (work[2] * F_n[i]);
@@ -269,32 +269,32 @@ namespace c_solvers
 
                 err = ZERO;
                 for (int i = 0; i < _neq; ++i) {
-                    double est = (temp_arr2[i] - F_n[i]) / (_atol + _rtol * fabs(y_n[i]));
+                    double est = (temp_arr2[i] - F_n[i]) / (_atol + _rtol * std::fabs(y_n[i]));
                     err += est * est;
                 }
-                err = work[2] * sqrt(err / _neq);
+                err = work[2] * std::sqrt(err / _neq);
 
-                if ((P1 * work[2]) < (hmax * sqrt(err))) {
-                    work[2] = fmax(P1 * work[2] / sqrt(err), hmin);
+                if ((P1 * work[2]) < (hmax * std::sqrt(err))) {
+                    work[2] = std::fmax(P1 * work[2] / std::sqrt(err), hmin);
                 } else {
                     work[2] = hmax;
                 }
             }
 
             // check if last step
-            if ((ONEP1 * work[2]) >= fabs(tEnd - t)) {
-                work[2] = fabs(tEnd - t);
+            if ((ONEP1 * work[2]) >= std::fabs(tEnd - t)) {
+                work[2] = std::fabs(tEnd - t);
             }
 
             // calculate number of steps
-            int m = 1 + (int)(sqrt(ONEP54 * work[2] * work[3] + ONE));
+            int m = 1 + (int)(std::sqrt(ONEP54 * work[2] * work[3] + ONE));
 
             if (m > m_max) {
                 m = m_max;
                 work[2] = (double)(m * m - 1) / (ONEP54 * work[3]);
             }
 
-            hmin = TEN * UROUND * fmax(fabs(t), fabs(t + work[2]));
+            hmin = TEN * UROUND * std::fmax(std::fabs(t), std::fabs(t + work[2]));
 
             // perform tentative time step
             rkc_step (t, pr, work[2], y_n, F_n, m, y, y_jm1, y_jm2);
@@ -306,10 +306,10 @@ namespace c_solvers
             err = ZERO;
             for (int i = 0; i < _neq; ++i) {
                 double est = P8 * (y_n[i] - y[i]) + P4 * work[2] * (F_n[i] + temp_arr[i]);
-                est /= (_atol + _rtol * fmax(fabs(y[i]), fabs(y_n[i])));
+                est /= (_atol + _rtol * std::fmax(std::fabs(y[i]), std::fabs(y_n[i])));
                 err += est * est;
             }
-            err = sqrt(err / ((double)_neq));
+            err = std::sqrt(err / ((double)_neq));
 
             if (err > ONE) {
                 // error too large, step is rejected
@@ -349,8 +349,8 @@ namespace c_solvers
                 }
 
                 // store next time step
-                work[2] *= fmax(P1, fac);
-                work[2] = fmax(hmin, fmin(hmax, work[2]));
+                work[2] *= std::fmax(P1, fac);
+                work[2] = std::fmax(hmin, std::fmin(hmax, work[2]));
 
                 /* currently not supported
                 if (task == 0) {

@@ -38,7 +38,7 @@ namespace c_solvers
                                         double * __restrict__ sc) {
 
         for (int i = 0; i < _neq; ++i) {
-            sc[i] = 1.0 / (atol() + fmax(fabs(y0[i]), fabs(y[i])) * rtol());
+            sc[i] = 1.0 / (atol() + std::fmax(std::fabs(y0[i]), std::fabs(y[i])) * rtol());
         }
     }
 
@@ -51,7 +51,7 @@ namespace c_solvers
                                              double * __restrict__ sc) {
 
         for (int i = 0; i < _neq; ++i) {
-            sc[i] = 1.0 / (atol() + fabs(y0[i]) * rtol());
+            sc[i] = 1.0 / (atol() + std::fabs(y0[i]) * rtol());
         }
     }
 
@@ -263,7 +263,7 @@ namespace c_solvers
         for (int i = 0; i < _neq; ++i){
             sum += (scale[i] * scale[i] * DY[i] * DY[i]);
         }
-        return fmax(sqrt(sum / ((double)_neq)), 1e-10);
+        return std::fmax(sqrt(sum / ((double)_neq)), 1e-10);
     }
 
     /**
@@ -339,7 +339,7 @@ namespace c_solvers
     #ifdef CONST_TIME_STEP
         double H = t_end - t_start;
     #else
-        double H = fmin(5e-7, t_end - t_start);
+        double H = std::fmin(5e-7, t_end - t_start);
     #endif
         double Hnew;
         double t = t_start;
@@ -413,7 +413,7 @@ namespace c_solvers
             if (Nsteps >= Max_no_steps) {
                 return ErrorCode::MAX_STEPS_EXCEEDED;
             }
-            if (0.1 * fabs(H) <= fabs(t) * Roundoff) {
+            if (0.1 * std::fabs(H) <= std::fabs(t) * Roundoff) {
                 return ErrorCode::H_PLUS_T_EQUALS_H;
             }
             if (FirstStep || !StartNewton) {
@@ -430,7 +430,7 @@ namespace c_solvers
             double Theta = 0;
 
             //reuse previous NewtonRate
-            NewtonRate = pow(fmax(NewtonRate, EPS), 0.8);
+            NewtonRate = pow(std::fmax(NewtonRate, EPS), 0.8);
 
             for (; NewtonIter < NewtonMaxit; NewtonIter++) {
                 RK_PrepareRHS(t, pr, H, y, Z1, Z2, Z3, DZ1, DZ2, DZ3);
@@ -454,14 +454,14 @@ namespace c_solvers
                         double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (1.0 - Theta);
                         if (NewtonPredictedErr >= NewtonTol) {
                             //Non-convergence of Newton: predicted error too large
-                            double Qnewton = fmin(10.0, NewtonPredictedErr / NewtonTol);
+                            double Qnewton = std::fmin(10.0, NewtonPredictedErr / NewtonTol);
                             Fac = 0.8 * pow(Qnewton, -1.0/((double)(NewtonMaxit-NewtonIter)));
                             break;
                         }
                     }
                 }
 
-                NewtonIncrementOld = fmax(NewtonIncrement, Roundoff);
+                NewtonIncrementOld = std::fmax(NewtonIncrement, Roundoff);
                 // Update solution
 
                 for (int i = 0; i < _neq; i++)
@@ -489,18 +489,18 @@ namespace c_solvers
             double Err = RK_ErrorEstimate(H, t, pr, y, F0, F1, F2, TMP, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
             //~~~> Computation of new step size Hnew
             Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
-            Fac = fmin(FacMax, fmax(FacMin, Fac));
+            Fac = std::fmin(FacMax, std::fmax(FacMin, Fac));
             Hnew = Fac * H;
             if (Err < 1.0) {
     #ifdef Gustafsson
                 if (!FirstStep) {
                     double FacGus = FacSafe * (H / Hacc) * pow(Err * Err / ErrOld, -0.25);
-                    FacGus = fmin(FacMax, fmax(FacMin, FacGus));
-                    Fac = fmin(Fac, FacGus);
+                    FacGus = std::fmin(FacMax, std::fmax(FacMin, FacGus));
+                    Fac = std::fmin(Fac, FacGus);
                     Hnew = Fac * H;
                 }
                 Hacc = H;
-                ErrOld = fmax(1e-2, Err);
+                ErrOld = std::fmax(1e-2, Err);
     #endif
                 FirstStep = false;
                 Hold = H;
@@ -515,9 +515,9 @@ namespace c_solvers
                 }
                 scale(y, y0, sc);
                 std::memcpy(y0, y, _neq * sizeof(double));
-                Hnew = fmin(fmax(Hnew, Hmin), t_end - t);
+                Hnew = std::fmin(std::fmax(Hnew, Hmin), t_end - t);
                 if (Reject) {
-                    Hnew = fmin(Hnew, H);
+                    Hnew = std::fmin(Hnew, H);
                 }
                 Reject = false;
                 if (t + Hnew / Qmin - t_end >= 0.0) {

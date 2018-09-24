@@ -86,9 +86,9 @@ namespace c_solvers
             stepsize = t_end - t_start;
         }
 
-        if integrator.doLog()
+        if (integrator.logging_enabled())
         {
-            integrator.solverLog(t_start, NUM, y_host);
+            integrator.log(t_start, NUM, y_host);
         }
 
         int numSteps = 0;
@@ -99,11 +99,11 @@ namespace c_solvers
             numSteps++;
             integrator.intDriver(NUM, t, t_end, var_host, y_host);
             t = t_next;
-            if integrator.logging_enabled()
+            if (integrator.logging_enabled())
             {
-                integrator.log(t_start, NUM, y_host);
+                integrator.log(t, NUM, y_host);
             }
-            t_next = fmin(t_end, (numSteps + 1) * stepsize);
+            t_next = std::fmin(t_end, (numSteps + 1) * stepsize);
         }
         auto t2 = std::chrono::high_resolution_clock::now();
 

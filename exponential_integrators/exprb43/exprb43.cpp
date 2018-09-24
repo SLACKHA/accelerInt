@@ -39,7 +39,7 @@ namespace c_solvers {
 	#ifdef CONST_TIME_STEP
 		double h = t_end - t_start;
 	#else
-		double h = fmin(1.0e-8, t_end - t_start);
+		double h = std::fmin(1.0e-8, t_end - t_start);
 	#endif
 		double h_new;
 
@@ -208,7 +208,7 @@ namespace c_solvers {
 	#ifndef CONST_TIME_STEP
 			//scale and find err
 			scale (y, y1, f_temp);
-			err = fmax(EPS, sc_norm(temp, f_temp));
+			err = std::fmax(EPS, sc_norm(temp, f_temp));
 
 			// classical step size calculation
 			h_new = pow(err, -1.0 / ORD);
@@ -223,10 +223,10 @@ namespace c_solvers {
 				memcpy(sc, f_temp, _neq * sizeof(double));
 
 				// minimum of classical and Gustafsson step size prediction
-				h_new = fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
+				h_new = std::fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
 
 				// limit to 0.2 <= (h_new/8) <= 8.0
-				h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
+				h_new = h * std::fmax(std::fmin(0.9 * h_new, 8.0), 0.2);
 
 				// update y and t
 
@@ -237,15 +237,15 @@ namespace c_solvers {
 				t += h;
 
 				// store time step and error
-				err_old = fmax(1.0e-2, err);
+				err_old = std::fmax(1.0e-2, err);
 				h_old = h;
 
 				// check if last step rejected
 				if (reject) {
 					reject = false;
-					h_new = fmin(h, h_new);
+					h_new = std::fmin(h, h_new);
 				}
-				h = fmin(h_new, t_end - t);
+				h = std::fmin(h_new, t_end - t);
 				numSteps++;
 
 			} else {
@@ -255,11 +255,11 @@ namespace c_solvers {
 	  			#endif
 
 				// limit to 0.2 <= (h_new/8) <= 8.0
-				h_new = h * fmax(fmin(0.9 * h_new, 8.0), 0.2);
-				h_new = fmin(h_new, t_end - t);
+				h_new = h * std::fmax(std::fmin(0.9 * h_new, 8.0), 0.2);
+				h_new = std::fmin(h_new, t_end - t);
 
 				reject = true;
-				h = fmin(h, h_new);
+				h = std::fmin(h, h_new);
 			}
 	#else
 			//constant time stepping
