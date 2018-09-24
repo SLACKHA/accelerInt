@@ -86,7 +86,7 @@ namespace c_solvers
             stepsize = t_end - t_start;
         }
 
-        if (integrator.logging_enabled())
+        if (integrator.logging())
         {
             integrator.log(t_start, NUM, y_host);
         }
@@ -99,7 +99,7 @@ namespace c_solvers
             numSteps++;
             integrator.intDriver(NUM, t, t_end, var_host, y_host);
             t = t_next;
-            if (integrator.logging_enabled())
+            if (integrator.logging())
             {
                 integrator.log(t, NUM, y_host);
             }

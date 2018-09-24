@@ -49,7 +49,7 @@ namespace c_solvers {
         SolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false):
             _atol(atol),
             _rtol(rtol),
-            _logging_enabled(logging)
+            _logging(logging)
         {
 
         }
@@ -64,9 +64,9 @@ namespace c_solvers {
             return _rtol;
         }
 
-        inline bool logging_enabled() const
+        inline bool logging() const
         {
-            return _logging_enabled;
+            return _logging;
         }
 
     protected:
@@ -75,7 +75,7 @@ namespace c_solvers {
         //! the relative tolerance for this integrator
         const double _rtol;
         //! whether logging is enabled or not
-        bool _logging_enabled;
+        bool _logging;
     };
 
     // skeleton of the c-solver
@@ -181,9 +181,9 @@ namespace c_solvers {
             return _options.rtol();
         }
 
-        inline bool logging_enabled() const
+        inline bool logging() const
         {
-            return _options.logging_enabled();
+            return _options.logging();
         }
 
         //! return the number of equations to solve
