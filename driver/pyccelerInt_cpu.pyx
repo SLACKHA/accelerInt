@@ -51,5 +51,5 @@ cdef class PyIntegrator:
     def integrate(self, np.int32_t num, np.float64_t t_start,
                   np.float64_t t_end, np.ndarray[np.float64_t] y_host,
                   np.ndarray[np.float64_t] var_host, np.float64_t step=-1):
-        return integrate(deref(self.integrator), num, t_start,
+        return integrate(deref(self.integrator.get()), num, t_start,
                          t_end, step, &y_host[0], &var_host[0])
