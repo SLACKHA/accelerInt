@@ -9,11 +9,9 @@
 #define CVODES_SOLVER_HPP
 
 #include <vector>
-#include "dydt.h"
 #include "solver.hpp"
 extern "C"
 {
-
     #include "cvodes_dydt.h"
 
     #ifndef FINITE_DIFFERENCE

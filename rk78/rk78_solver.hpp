@@ -8,7 +8,6 @@
 #ifndef RK78_SOLVER_H
 #define RK78_SOLVER_H
 
-#include "dydt.h"
 #include "solver.hpp"
 
 #include <cstdio>

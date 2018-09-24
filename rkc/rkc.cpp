@@ -21,7 +21,6 @@
  *
  */
 
-#include "dydt.h"
 #include "rkc_solver.hpp"
 #include <cstring>
 
