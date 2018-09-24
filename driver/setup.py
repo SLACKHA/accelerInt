@@ -9,8 +9,8 @@ topdir = os.path.abspath(os.path.join(path, os.pardir))
 libdir = os.path.join(topdir, 'lib')
 includes = [os.path.join(topdir, 'generic'), os.path.join(topdir, 'interface')]
 
-ext_module = Extension('pyccelerInt-cpu',
-                       sources=[os.path.join(path, 'integrator.pyx')],
+ext_module = Extension('pyccelerInt_cpu',
+                       sources=[os.path.join(path, 'pyccelerInt_cpu.pyx')],
                        include_dirs=includes + [numpy.get_include()],
                        language="c++",
                        extra_compile_args=['-frounding-math', '-fsignaling-nans',
@@ -20,6 +20,6 @@ ext_module = Extension('pyccelerInt-cpu',
                        library_dirs=[libdir])
 
 setup(
-    name='pyccelerInt-cpu',
+    name='pyccelerInt_cpu',
     ext_modules=cythonize(ext_module)
 )
