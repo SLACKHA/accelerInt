@@ -772,7 +772,7 @@ def build_wrapper(save, defines):
     # and build wrapper
     driver = os.path.join(driver_dir, 'setup.py')
     wrapper_c = run_with_our_python(env,
-                                    target='pyccelerInt-cpu',
+                                    target='pyccelerInt_cpu',
                                     source=[driver],
                                     action='{{python}} {} build_ext --inplace'
                                     .format(driver))
