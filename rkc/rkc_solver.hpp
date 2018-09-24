@@ -32,6 +32,8 @@ namespace c_solvers
 
     class RKCIntegrator : public Integrator
     {
+    private:
+        std::size_t _ourMemSize;
     protected:
         //! offsets
 
@@ -42,6 +44,43 @@ namespace c_solvers
         std::size_t _temp_arr2;
         std::size_t _y_jm1;
         std::size_t _y_jm2;
+
+        std::size_t setOffsets()
+        {
+            std::size_t working = Integrator::requiredSolverMemorySize();
+            // work
+            _work = working;
+            working += (4 + _neq) * sizeof(double);
+            // yn
+            _y_n = working;
+            working += _neq * sizeof(double);
+            // fn
+            _F_n = working;
+            working += _neq * sizeof(double);
+            // temp1
+            _temp_arr = working;
+            working += _neq * sizeof(double);
+            // temp2
+            _temp_arr2 = working;
+            working += _neq * sizeof(double);
+            // y_jm1
+            _y_jm1 = working;
+            working += _neq * sizeof(double);
+            // y_jm2
+            _y_jm2 = working;
+            working += _neq * sizeof(double);
+
+            return working;
+        }
+
+        /*
+         * \brief Return the required memory size (per-thread) in bytes
+         */
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            return _ourMemSize;
+        }
+
 
         /**
          * \brief Function to estimate spectral radius.
@@ -76,9 +115,11 @@ namespace c_solvers
 
     public:
 
-        RKCIntegrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-6) :
-            Integrator(neq, numThreads, atol, rtol)
+        RKCIntegrator(int neq, int numThreads, const SolverOptions& options) :
+            Integrator(neq, numThreads, options)
         {
+            _ourMemSize = this->setOffsets();
+            this->reinitialize(numThreads);
         }
 
         /*!
@@ -96,34 +137,6 @@ namespace c_solvers
 
         void solverLog() {
             // pass
-        }
-
-        std::size_t requiredSolverMemorySize()
-        {
-            std::size_t working = Integrator::requiredSolverMemorySize();
-            // work
-            _work = working;
-            working += (4 + _neq) * sizeof(double);
-            // yn
-            _y_n = working;
-            working += _neq * sizeof(double);
-            // fn
-            _F_n = working;
-            working += _neq * sizeof(double);
-            // temp1
-            _temp_arr = working;
-            working += _neq * sizeof(double);
-            // temp2
-            _temp_arr2 = working;
-            working += _neq * sizeof(double);
-            // y_jm1
-            _y_jm1 = working;
-            working += _neq * sizeof(double);
-            // y_jm2
-            _y_jm2 = working;
-            working += _neq * sizeof(double);
-
-            return working;
         }
 
         /**

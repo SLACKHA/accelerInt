@@ -43,6 +43,41 @@ namespace c_solvers {
     /*! Smallest representable double */
     #define SMALL DBL_MIN
 
+    class SolverOptions
+    {
+    public:
+        SolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false):
+            _atol(atol),
+            _rtol(rtol),
+            _logging_enabled(logging)
+        {
+
+        }
+
+        inline double atol() const
+        {
+            return _atol;
+        }
+
+        inline double rtol() const
+        {
+            return _rtol;
+        }
+
+        inline bool logging_enabled() const
+        {
+            return _logging_enabled;
+        }
+
+    protected:
+        //! the absolute tolerance for this integrator
+        const double _atol;
+        //! the relative tolerance for this integrator
+        const double _rtol;
+        //! whether logging is enabled or not
+        bool _logging_enabled;
+    };
+
     // skeleton of the c-solver
     class Integrator
     {
@@ -51,18 +86,15 @@ namespace c_solvers {
         static constexpr double eps = EPS;
         static constexpr double small = SMALL;
 
-        Integrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-6,
-                   bool logging=false) :
+        Integrator(int neq, int numThreads,
+                   const SolverOptions& options) :
             _numThreads(numThreads),
             _neq(neq),
-            _atol(atol),
-            _rtol(rtol),
-            _memSize(requiredSolverMemorySize()),
-            _logging_enabled(logging),
-            _log()
+            _log(),
+            _options(options),
+            _ourMemSize(_neq * sizeof(double))
         {
-            working_buffer = std::unique_ptr<char>(new char[_memSize * _numThreads]);
-            std::memset(working_buffer.get(), 0, _memSize * _numThreads);
+
         }
 
         ~Integrator()
@@ -80,19 +112,14 @@ namespace c_solvers {
             std::memcpy(&set[1], phi, NUM * _neq * sizeof(double));
         }
 
-        inline bool logging_enabled()
-        {
-            return _logging_enabled;
-        }
-
         void reinitialize(int numThreads)
         {
+            this->clean();
             _numThreads = numThreads;
-            _memSize = requiredSolverMemorySize();
-            working_buffer = std::unique_ptr<char>(new char[_memSize * _numThreads]);
+            std::size_t _memSize = requiredSolverMemorySize();
+            working_buffer = std::move(std::unique_ptr<char>(new char[_memSize * _numThreads]));
             std::memset(working_buffer.get(), 0, _memSize * _numThreads);
         }
-        void clean(){}
 
         virtual const char* solverName() const = 0;
 
@@ -131,15 +158,6 @@ namespace c_solvers {
             }
         }
 
-        /*
-         * \brief Return the required memory size (per-thread) in bytes
-         */
-        std::size_t requiredSolverMemorySize()
-        {
-            // phi local
-            return _neq * sizeof(double);
-        }
-
         /**
         * \brief A header definition of the integrate method, that must be implemented by various solvers
         * \param[in]          t_start             the starting IVP integration time
@@ -154,13 +172,18 @@ namespace c_solvers {
         //! return the absolute tolerance
         inline const double atol() const
         {
-            return _atol;
+            return _options.atol();
         }
 
         //! return the relative tolerance
         inline const double rtol() const
         {
-            return _rtol;
+            return _options.rtol();
+        }
+
+        inline bool logging_enabled() const
+        {
+            return _options.logging_enabled();
         }
 
         //! return the number of equations to solve
@@ -198,24 +221,36 @@ namespace c_solvers {
         int _numThreads;
         //! the number of equations to solver per-IVP
         const int _neq;
-        //! the absolute tolerance for this integrator
-        const double _atol;
-        //! the relative tolerance for this integrator
-        const double _rtol;
-        //! the required memory size (in bytes) for this solver
-        std::size_t _memSize;
-        //! whether logging is enabled or not
-        bool _logging_enabled;
         //! working memory for this integrator
         std::unique_ptr<char> working_buffer;
         //! log of state vectors / times
         std::vector<std::unique_ptr<double>> _log;
+        //! solver options
+        const SolverOptions& _options;
+
 
         //! Return unique memory access
         template <typename T> T* _unique(int tid, std::size_t offset)
         {
-            return (T*)(&working_buffer.get()[tid * _memSize + offset]);
+            return (T*)(&working_buffer.get()[tid * requiredSolverMemorySize() + offset]);
         }
+
+        /*
+         * \brief Return the required memory size (per-thread) in bytes
+         */
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            return _ourMemSize;
+        }
+
+    private:
+        void clean()
+        {
+            _log.clear();
+        }
+
+        //! The required memory size of this integrator in bytes.
+        std::size_t _ourMemSize;
 
     };
 

@@ -23,29 +23,65 @@
 namespace c_solvers
 {
 
+    class EXPSolverOptions : public SolverOptions
+    {
+    public:
+        EXPSolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false,
+                         int N_RA=10, int M_MAX=-1):
+                SolverOptions(atol, rtol, logging),
+                N_RA(N_RA),
+                M_MAX(M_MAX)
+            {
+
+            }
+
+        //! The number of rational approximants to utilize for the exponential approximation [default 10]
+        inline int num_rational_approximants() const
+        {
+            return N_RA;
+        }
+
+        //! the allowed maximum krylov subspace size [defaults to #_neq]
+        inline int krylov_subspace_size(int neq) const
+        {
+            if (M_MAX < 0)
+            {
+                return neq;
+            }
+            return M_MAX;
+        }
+
+    protected:
+        //! The number of rational approximants to utilize for the exponential approximation [default 10]
+        const int N_RA;
+        //! the maximum krylov subspace size
+        const int M_MAX;
+    };
+
     class ExponentialIntegrator : public Integrator
     {
 
-    public:
+    private:
+        //! The required memory size of this integrator in bytes.
+        //! This is cummulative with any base classes
+        std::size_t _ourMemSize;
 
+    protected:
         /*
          * \brief a shared base-class for the exponential integrators
          */
-        ExponentialIntegrator(int neq, int numThreads,
-                              int stride, double atol=1e-10,
-                              double rtol=1e-6, int n_ra=10,
-                              int M_MAX=-1) :
-            Integrator(neq, numThreads, atol, rtol),
-            poles(n_ra, 0),
-            res(n_ra, 0),
-            STRIDE(stride),
-            N_RA(n_ra),
-            M_MAX(M_MAX < 0 ? _neq : M_MAX)
+        ExponentialIntegrator(int neq, int numThreads, int order,
+                              const EXPSolverOptions& options) :
+            Integrator(neq, numThreads, options),
+            poles(options.num_rational_approximants(), 0),
+            res(options.num_rational_approximants(), 0),
+            STRIDE(options.krylov_subspace_size(neq) + order)
         {
-            find_poles_and_residuals(N_RA, poles, res);
+            _ourMemSize = this->setOffsets();
+            find_poles_and_residuals(N_RA(), poles, res);
         }
 
-        std::size_t requiredSolverMemorySize()
+        virtual std::size_t setOffsets()
         {
             std::size_t working = Integrator::requiredSolverMemorySize();
             // invA from hessenberg inversions
@@ -57,12 +93,17 @@ namespace c_solvers
             // w
             _w = working;
             working += _neq * sizeof(double);
-            //
-
             return working;
         }
 
-    protected:
+        /*
+         * \brief Return the required memory size (per-thread) in bytes
+         */
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            return _ourMemSize;
+        }
+
         //! log format t, h, err, m, m1, m2
         std::vector<std::tuple<double, double, double, int, int, int>> subspaceLog;
 
@@ -73,10 +114,11 @@ namespace c_solvers
 
         //! Krylov matrix stride
         const int STRIDE;
-        //! The number of rational approximants to utilize for the exponential approximation [default 10]
-        const int N_RA;
-        //! The maximum allowed krylov subspace size [defaults to #_neq]
-        const int M_MAX;
+        //! \brief Return the number of rational approximants to utilize for the exponential approximation
+        const int N_RA()
+        {
+            return static_cast<const EXPSolverOptions&>(_options).num_rational_approximants();
+        }
 
         //! offsets
 

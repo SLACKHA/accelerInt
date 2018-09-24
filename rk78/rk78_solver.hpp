@@ -53,80 +53,71 @@ namespace c_solvers
 
     class RK78Integrator : public Integrator
     {
-        protected:
-            RK78 wrapper;
-            std::vector<std::unique_ptr<RK78>> evaluators;
-            std::vector<state_type> state_vectors;
-            std::vector<std::unique_ptr<stepper>> steppers;
-            std::vector<controller> controllers;
+    private:
+        void clean() {
+            evaluators.clear();
+            steppers.clear();
+            state_vectors.clear();
+            controllers.clear();
+        }
+    protected:
+        RK78 wrapper;
+        std::vector<std::unique_ptr<RK78>> evaluators;
+        std::vector<state_type> state_vectors;
+        std::vector<std::unique_ptr<stepper>> steppers;
+        std::vector<controller> controllers;
 
-        public:
+    public:
 
-            RK78Integrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-6) :
-                Integrator(neq, numThreads, atol, rtol)
+        RK78Integrator(int neq, int numThreads, const SolverOptions& options) :
+            Integrator(neq, numThreads, options)
+        {
+            this->reinitialize(numThreads);
+        }
+
+        ~RK78Integrator()
+        {
+            this->clean();
+        }
+
+        /*!
+           \fn char* solver_name()
+           \brief Returns a descriptive solver name
+        */
+        const char* solverName() const {
+            const char* name = "rk78-int";
+            return name;
+        }
+
+
+        void reinitialize(int numThreads)
+        {
+            // re-init base
+            Integrator::reinitialize(numThreads);
+            for (int i = 0; i < numThreads; ++i)
             {
-                this->reinitialize(numThreads);
+                // initialize boost interface
+                evaluators.push_back(std::unique_ptr<RK78>(new RK78()));
+                steppers.push_back(std::unique_ptr<stepper>(new stepper()));
+                state_vectors.push_back(state_type(_neq, 0.0));
+                controllers.push_back(make_controlled<stepper>(atol(), rtol(), *steppers[i]));
             }
+        }
 
-            ~RK78Integrator()
-            {
-                this->clean();
-            }
+        /**
+         *  \brief RK78 CPU implementation
+         *
+         *  \param[in]          t_start             The starting time
+         *  \param[in]          t_end               The end integration time
+         *  \param[in]          pr                  The system constant variable (pressure/density)
+         *  \param[in,out]      y                   The system state vector at time `t_start`.
+                                                    Overwritten with the system state at time `t_end`
+         *  \returns Return code, @see RK_ErrCodes
+         */
+        ErrorCode integrate (
+            const double t_start, const double t_end, const double pr, double* y);
 
-            /*!
-               \fn char* solver_name()
-               \brief Returns a descriptive solver name
-            */
-            const char* solverName() const {
-                const char* name = "rk78-int";
-                return name;
-            }
-
-            void clean() {
-                evaluators.clear();
-                steppers.clear();
-                state_vectors.clear();
-                controllers.clear();
-            }
-            void reinitialize(int numThreads) {
-                for (int i = 0; i < numThreads; ++i)
-                {
-                    // initialize boost interface
-                    evaluators.push_back(std::unique_ptr<RK78>(new RK78()));
-                    steppers.push_back(std::unique_ptr<stepper>(new stepper()));
-                    state_vectors.push_back(state_type(_neq, 0.0));
-                    controllers.push_back(make_controlled<stepper>(atol(), rtol(), *steppers[i]));
-                }
-            }
-
-            void initSolverLog() {
-                // pass
-            }
-
-            void solverLog() {
-                // pass
-            }
-
-            std::size_t requiredSolverMemorySize()
-            {
-                // C-solvers don't require pre-allocation
-                return 0;
-            }
-
-            /**
-             *  \brief 5th-order Radau2A CPU implementation
-             *
-             *  \param[in]          t_start             The starting time
-             *  \param[in]          t_end               The end integration time
-             *  \param[in]          pr                  The system constant variable (pressure/density)
-             *  \param[in,out]      y                   The system state vector at time `t_start`.
-                                                        Overwritten with the system state at time `t_end`
-             *  \returns Return code, @see RK_ErrCodes
-             */
-            ErrorCode integrate (
-                const double t_start, const double t_end, const double pr, double* y);
-
-        };
+    };
 }
 
 #endif

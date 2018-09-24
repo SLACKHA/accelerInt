@@ -15,6 +15,11 @@ namespace c_solvers
 
     class EXP4Integrator : public ExponentialIntegrator
     {
+    private:
+        //! The required memory size of this integrator in bytes.
+        //! This is cummulative with any base classes
+        std::size_t _ourMemSize;
+
     protected:
         // log format t, h, err, m, m1, m2
         std::vector<std::tuple<double, double, double, int, int, int>> subspaceLog;
@@ -58,44 +63,7 @@ namespace c_solvers
             return phiAc_variable (m, A, c, phiA);
         }
 
-    public:
-
-        //! max order of the phi functions (for error estimation)
-        static constexpr int P = 1;
-        //! order of embedded methods
-        static constexpr double ORD = 3.0;
-        //! Maximum allowed internal timesteps per integration step
-        static constexpr int MAX_STEPS = 100000;
-        //! Number of consecutive errors on internal integration steps allowed before exit
-        static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
-
-
-        EXP4Integrator(int neq, int numThreads,
-                       double atol=1e-10, double rtol=1e-6,
-                       int N_RA=10, int M_MAX=-1) :
-            ExponentialIntegrator(neq, numThreads, M_MAX + P, atol, rtol, N_RA, M_MAX)
-        {
-
-        }
-
-        /*!
-           \fn char* solverName()
-           \brief Returns a descriptive solver name
-        */
-        const char* solverName() const {
-            const char* name = "exp4-int";
-            return name;
-        }
-
-        void initSolverLog() {
-            // pass
-        }
-
-        void solverLog() {
-            // pass
-        }
-
-        std::size_t requiredSolverMemorySize()
+        std::size_t setOffsets()
         {
             std::size_t working = ExponentialIntegrator::requiredSolverMemorySize();
             // sc
@@ -147,6 +115,35 @@ namespace c_solvers
             _k7 = working;
             working += _neq * sizeof(double);
             return working;
+        }
+
+
+    public:
+
+        //! max order of the phi functions (for error estimation)
+        static constexpr int P = 1;
+        //! order of embedded methods
+        static constexpr double ORD = 3.0;
+        //! Maximum allowed internal timesteps per integration step
+        static constexpr int MAX_STEPS = 100000;
+        //! Number of consecutive errors on internal integration steps allowed before exit
+        static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
+
+
+        EXP4Integrator(int neq, int numThreads, const EXPSolverOptions& options) :
+            ExponentialIntegrator(neq, numThreads, P, options)
+        {
+            _ourMemSize = this->setOffsets();
+            this->reinitialize(numThreads);
+        }
+
+        /*!
+           \fn char* solverName()
+           \brief Returns a descriptive solver name
+        */
+        const char* solverName() const {
+            const char* name = "exp4-int";
+            return name;
         }
 
         /**

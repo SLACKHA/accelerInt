@@ -185,11 +185,13 @@ namespace c_solvers
 
     public:
 
-        RadauIntegrator(int neq, int numThreads) :
-            Integrator(neq, numThreads),
+        RadauIntegrator(int neq, int numThreads, const SolverOptions& options) :
+            Integrator(neq, numThreads, options),
             ARRSIZE(neq),
             STRIDE(neq)
         {
+            _ourMemSize = this->setOffsets();
+            this->reinitialize(numThreads);
         }
 
         /*!
@@ -212,7 +214,54 @@ namespace c_solvers
             // pass
         }
 
-        std::size_t requiredSolverMemorySize()
+        /**
+         *  \brief 5th-order Radau2A CPU implementation
+         *
+         *  \param[in]          t_start             The starting time
+         *  \param[in]          t_end               The end integration time
+         *  \param[in]          pr                  The system constant variable (pressure/density)
+         *  \param[in,out]      y                   The system state vector at time `t_start`.
+                                                    Overwritten with the system state at time `t_end`
+         *  \returns Return code, @see RK_ErrCodes
+         */
+        ErrorCode integrate (
+            const double t_start, const double t_end, const double pr, double* y);
+
+    protected:
+
+        //! offsets
+        std::size_t _sc;
+        std::size_t _A;
+        std::size_t _E1;
+        std::size_t _E2;
+        std::size_t _ipiv1;
+        std::size_t _ipiv2;
+        std::size_t _Z1;
+        std::size_t _Z2;
+        std::size_t _Z3;
+        #ifdef SDIRK_ERROR
+        std::size_t _Z4;
+        std::size_t _DZ4;
+        std::size_t _G;
+        std::size_t _TMP_SDIRK;
+        #endif
+        std::size_t _DZ1;
+        std::size_t _DZ2;
+        std::size_t _DZ3;
+        std::size_t _CONT;
+        std::size_t _y0;
+        std::size_t _F0;
+        std::size_t _F1;
+        std::size_t _F2;
+        std::size_t _TMP;
+
+    private:
+        //! the total amount of memory (in bytes) required for this solver
+        std::size_t _ourMemSize;
+
+    protected:
+
+        virtual std::size_t setOffsets()
         {
             std::size_t working = Integrator::requiredSolverMemorySize();
             // sc
@@ -287,46 +336,13 @@ namespace c_solvers
             return working;
         }
 
-        /**
-         *  \brief 5th-order Radau2A CPU implementation
-         *
-         *  \param[in]          t_start             The starting time
-         *  \param[in]          t_end               The end integration time
-         *  \param[in]          pr                  The system constant variable (pressure/density)
-         *  \param[in,out]      y                   The system state vector at time `t_start`.
-                                                    Overwritten with the system state at time `t_end`
-         *  \returns Return code, @see RK_ErrCodes
+        /*
+         * \brief Return the required memory size (per-thread) in bytes
          */
-        ErrorCode integrate (
-            const double t_start, const double t_end, const double pr, double* y);
-
-    protected:
-
-        //! offsets
-        std::size_t _sc;
-        std::size_t _A;
-        std::size_t _E1;
-        std::size_t _E2;
-        std::size_t _ipiv1;
-        std::size_t _ipiv2;
-        std::size_t _Z1;
-        std::size_t _Z2;
-        std::size_t _Z3;
-        #ifdef SDIRK_ERROR
-        std::size_t _Z4;
-        std::size_t _DZ4;
-        std::size_t _G;
-        std::size_t _TMP_SDIRK;
-        #endif
-        std::size_t _DZ1;
-        std::size_t _DZ2;
-        std::size_t _DZ3;
-        std::size_t _CONT;
-        std::size_t _y0;
-        std::size_t _F0;
-        std::size_t _F1;
-        std::size_t _F2;
-        std::size_t _TMP;
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            return _ourMemSize;
+        }
 
 
         //! Lapack - Array size

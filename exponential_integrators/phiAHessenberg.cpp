@@ -39,7 +39,7 @@ namespace c_solvers
 		}
 
 
-		for (int q = 0; q < N_RA; q += 2) {
+		for (int q = 0; q < N_RA(); q += 2) {
 
 			// init invA
 			for (int i = 0; i < m; ++i) {
@@ -97,7 +97,7 @@ namespace c_solvers
 		}
 
 
-		for (int q = 0; q < N_RA; q += 2) {
+		for (int q = 0; q < N_RA(); q += 2) {
 
 			// init invA
 			for (int i = 0; i < m; ++i) {
@@ -156,7 +156,7 @@ namespace c_solvers
 		}
 
 
-		for (int q = 0; q < N_RA; q += 2) {
+		for (int q = 0; q < N_RA(); q += 2) {
 
 			// compute transpose and multiply with constant
 			for (int i = 0; i < m; ++i) {

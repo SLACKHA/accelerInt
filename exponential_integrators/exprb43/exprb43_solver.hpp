@@ -17,6 +17,11 @@ namespace c_solvers
 
     class EXPRB43Integrator : public ExponentialIntegrator
     {
+    private:
+        //! The required memory size of this integrator in bytes.
+        //! This is cummulative with any base classes
+        std::size_t _ourMemSize;
+
     protected:
 
         //! offsets
@@ -54,46 +59,7 @@ namespace c_solvers
             return expAc_variable (m, A, c, phiA);
         }
 
-
-    public:
-
-        //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
-        //#define USE_SMOOTHED_ERROR
-        //! max order of the phi functions (for error estimation)
-        static constexpr int P = 4;
-        //! order of embedded methods
-        static constexpr double ORD = 3.0;
-        //! Maximum allowed internal timesteps per integration step
-        static constexpr int MAX_STEPS = 100000;
-        //! Number of consecutive errors on internal integration steps allowed before exit
-        static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
-
-        EXPRB43Integrator(int neq, int numThreads,
-                          double atol=1e-10, double rtol=1e-6,
-                          int N_RA=10, int M_MAX=-1) :
-            ExponentialIntegrator(neq, numThreads, M_MAX + P, atol, rtol, N_RA, M_MAX)
-        {
-
-        }
-
-        /*!
-           \fn char* solverName()
-           \brief Returns a descriptive solver name
-        */
-        const char* solverName() const {
-            const char* name = "exprb43-int";
-            return name;
-        }
-
-        void initSolverLog() {
-            // pass
-        }
-
-        void solverLog() {
-            // pass
-        }
-
-        std::size_t requiredSolverMemorySize()
+        virtual std::size_t setOffsets()
         {
             std::size_t working = ExponentialIntegrator::requiredSolverMemorySize();
             // sc
@@ -130,6 +96,44 @@ namespace c_solvers
             _savedActions = working;
             working += 5 * _neq * sizeof(double);
             return working;
+        }
+
+        /*
+         * \brief Return the required memory size (per-thread) in bytes
+         */
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            return _ourMemSize;
+        }
+
+
+    public:
+
+        //if defined, uses (I - h * Hm)^-1 to smooth the krylov error vector
+        //#define USE_SMOOTHED_ERROR
+        //! max order of the phi functions (for error estimation)
+        static constexpr int P = 4;
+        //! order of embedded methods
+        static constexpr double ORD = 3.0;
+        //! Maximum allowed internal timesteps per integration step
+        static constexpr int MAX_STEPS = 100000;
+        //! Number of consecutive errors on internal integration steps allowed before exit
+        static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
+
+        EXPRB43Integrator(int neq, int numThreads, const EXPSolverOptions& options) :
+            ExponentialIntegrator(neq, numThreads, P, options)
+        {
+            _ourMemSize = this->setOffsets();
+            this->reinitialize(numThreads);
+        }
+
+        /*!
+           \fn char* solverName()
+           \brief Returns a descriptive solver name
+        */
+        const char* solverName() const {
+            const char* name = "exprb43-int";
+            return name;
         }
 
         /**

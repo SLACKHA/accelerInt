@@ -242,7 +242,7 @@ namespace c_solvers
     /*!
      *  \brief Get scaling for weighted norm
      *
-     *  Computes \f$\frac{1.0}{_atol + \max\left(\left|y0\right|, \left|y1\right|) * _rtol\right)}\f$
+     *  Computes \f$\frac{1.0}{atol() + \max\left(\left|y0\right|, \left|y1\right|) * rtol()\right)}\f$
      *
      * \param[in]       y0      values at current timestep
      * \param[in]       y1      values at next timestep
@@ -251,7 +251,7 @@ namespace c_solvers
     void ExponentialIntegrator::scale(const double* __restrict__ y0, const double* __restrict__ y1, double* __restrict__ sc) {
 
         for (int i = 0; i < _neq; ++i) {
-            sc[i] = 1.0 / (_atol + std::fmax(std::fabs(y0[i]), std::fabs(y1[i])) * _rtol);
+            sc[i] = 1.0 / (atol() + std::fmax(std::fabs(y0[i]), std::fabs(y1[i])) * rtol());
         }
     }
 
@@ -266,7 +266,7 @@ namespace c_solvers
     void ExponentialIntegrator::scale_init (const double* __restrict__ y0, double* __restrict__ sc) {
 
         for (int i = 0; i < _neq; ++i) {
-            sc[i] = 1.0 / (_atol + std::fabs(y0[i]) * _rtol);
+            sc[i] = 1.0 / (atol() + std::fabs(y0[i]) * rtol());
         }
     }
 

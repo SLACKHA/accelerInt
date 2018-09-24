@@ -70,16 +70,56 @@ namespace c_solvers
 
     class CVODEIntegrator : public Integrator
     {
+    private:
+        void clean()
+        {
+            //free the integrators and nvectors
+            y_locals.clear();
+            integrators.clear();
+        }
+
+        //! The required memory size of this integrator in bytes.
+        //! This is cummulative with any base classes
+        std::size_t _ourMemSize;
+
     protected:
         std::vector<std::unique_ptr<void, void(*)(void *)>> y_locals;
         std::vector<std::unique_ptr<void, void(*)(void *)>> integrators;
 
+        //! the offset to the CVODEs state vectors
+        std::size_t _phi_cvodes;
+
+        /*
+         * \brief Determines offsets for memory access from #working_buffer in integrator
+         */
+        std::size_t setOffsets()
+        {
+            _phi_cvodes = Integrator::requiredSolverMemorySize();
+            return _phi_cvodes + _neq * sizeof(double);
+        }
+
+        /*
+         * \brief Return the required memory size (per-thread) in bytes
+         */
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            return _ourMemSize;
+        }
+
+
     public:
 
-        CVODEIntegrator(int neq, int numThreads, double atol=1e-10, double rtol=1e-10) :
-            Integrator(neq, numThreads, atol, rtol)
+        CVODEIntegrator(int neq, int numThreads, const SolverOptions& options) :
+            Integrator(neq, numThreads, options)
         {
+            _ourMemSize = this->setOffsets();
             this->reinitialize(numThreads);
+        }
+
+
+        ~CVODEIntegrator()
+        {
+            this->clean();
         }
 
         /*!
@@ -95,18 +135,16 @@ namespace c_solvers
             return name;
         }
 
+        void reinitialize(int numThreads)
+        {
+            // clear our memory
+            this->clean();
+            // re-init base
+            Integrator::reinitialize(numThreads);
 
-        void clean() {
-            //free the integrators and nvectors
-            y_locals.clear();
-            integrators.clear();
-            // and clean parent
-            Integrator::clean();
-        }
-        void reinitialize(int numThreads) {
             for (int i = 0; i < numThreads; i++)
             {
-                double* phi = this->phi(i);
+                double* __restrict__ phi = _unique<double>(i, _phi_cvodes);
                 // create intgerator
                 integrators.push_back(
                     std::unique_ptr<void, void(*)(void *)>(
@@ -129,7 +167,7 @@ namespace c_solvers
                 CVODEErrorCheck(CVodeInit(integrators[i].get(), dydt_cvodes, 0, (N_Vector)y_locals[i].get()));
 
                 //set tolerances
-                CVODEErrorCheck(CVodeSStolerances(integrators[i].get(), _rtol, _atol));
+                CVODEErrorCheck(CVodeSStolerances(integrators[i].get(), rtol(), atol()));
 
                 //setup the solver
                 CVODEErrorCheck(CVLapackDense(integrators[i].get(), _neq));
@@ -142,6 +180,7 @@ namespace c_solvers
                     CVODEErrorCheck(CVodeSetMaxOrd(integrators[i].get(), CV_MAX_ORD));
                 #endif
 
+                #define CV_MAX_STEPS (100000)
                 #ifdef CV_MAX_STEPS
                     CVODEErrorCheck(CVodeSetMaxNumSteps(integrators[i].get(), CV_MAX_STEPS));
                 #endif
@@ -159,15 +198,6 @@ namespace c_solvers
                     CVODEErrorCheck(CVodeSetMaxHnilWarns(integrators[i].get(), CV_MAX_HNIL));
                 #endif
             }
-        }
-
-
-        void initSolverLog() {
-            // pass
-        }
-
-        void solverLog() {
-            // pass
         }
 
         /**

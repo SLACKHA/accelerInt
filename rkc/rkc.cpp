@@ -213,7 +213,7 @@ namespace c_solvers
         double* __restrict__ work = _unique<double>(tid, _work);
         std::memset(work, 0, (4 + _neq) * sizeof(double));
 
-        int m_max = (int)(std::round(std::sqrt(_rtol / (10.0 * UROUND))));
+        int m_max = (int)(std::round(std::sqrt(rtol() / (10.0 * UROUND))));
 
         if (m_max < 2) {
             m_max = 2;
@@ -269,7 +269,7 @@ namespace c_solvers
 
                 err = ZERO;
                 for (int i = 0; i < _neq; ++i) {
-                    double est = (temp_arr2[i] - F_n[i]) / (_atol + _rtol * std::fabs(y_n[i]));
+                    double est = (temp_arr2[i] - F_n[i]) / (atol() + rtol() * std::fabs(y_n[i]));
                     err += est * est;
                 }
                 err = work[2] * std::sqrt(err / _neq);
@@ -306,7 +306,7 @@ namespace c_solvers
             err = ZERO;
             for (int i = 0; i < _neq; ++i) {
                 double est = P8 * (y_n[i] - y[i]) + P4 * work[2] * (F_n[i] + temp_arr[i]);
-                est /= (_atol + _rtol * std::fmax(std::fabs(y[i]), std::fabs(y_n[i])));
+                est /= (atol() + rtol() * std::fmax(std::fabs(y[i]), std::fabs(y_n[i])));
                 err += est * est;
             }
             err = std::sqrt(err / ((double)_neq));

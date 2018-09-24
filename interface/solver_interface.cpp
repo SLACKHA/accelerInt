@@ -36,17 +36,17 @@ namespace c_solvers
         switch(type)
         {
             case IntegratorType::RADAU_II_A:
-                return std::unique_ptr<RadauIntegrator>(new RadauIntegrator(neq, numThreads));
+                return std::unique_ptr<RadauIntegrator>(new RadauIntegrator(neq, numThreads, SolverOptions()));
             case IntegratorType::RK_78:
-                return std::unique_ptr<RK78Integrator>(new RK78Integrator(neq, numThreads));
+                return std::unique_ptr<RK78Integrator>(new RK78Integrator(neq, numThreads, SolverOptions()));
             case IntegratorType::RKC:
-                return std::unique_ptr<RKCIntegrator>(new RKCIntegrator(neq, numThreads));
+                return std::unique_ptr<RKCIntegrator>(new RKCIntegrator(neq, numThreads, SolverOptions()));
             case IntegratorType::EXP4:
-                return std::unique_ptr<EXP4Integrator>(new EXP4Integrator(neq, numThreads));
+                return std::unique_ptr<EXP4Integrator>(new EXP4Integrator(neq, numThreads, EXPSolverOptions()));
             case IntegratorType::EXPRB43:
-                return std::unique_ptr<EXPRB43Integrator>(new EXPRB43Integrator(neq, numThreads));
+                return std::unique_ptr<EXPRB43Integrator>(new EXPRB43Integrator(neq, numThreads, EXPSolverOptions()));
             case IntegratorType::CVODES:
-                return std::unique_ptr<CVODEIntegrator>(new CVODEIntegrator(neq, numThreads));
+                return std::unique_ptr<CVODEIntegrator>(new CVODEIntegrator(neq, numThreads, SolverOptions()));
             default:
                 std::ostringstream ss;
                 ss << "Integrator type: " << type << " not implemented for C!" << std::endl;
@@ -107,7 +107,7 @@ namespace c_solvers
         }
         auto t2 = std::chrono::high_resolution_clock::now();
 
-        return std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t2).count();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     }
 
 }
