@@ -85,13 +85,6 @@ namespace c_solvers
             return name;
         }
 
-        void clean() {
-            // pass
-        }
-        void reinitialize(int numThreads) {
-            // pass
-        }
-
         void initSolverLog() {
             // pass
         }

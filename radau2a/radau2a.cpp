@@ -21,8 +21,6 @@ Problems, 2nd Edition, Springer-Verlag, Berlin, 1996. doi:10.1007/978-3-642-
 #include <cstring>
 #include "radau2a_solver.hpp"
 #include "lapack_dfns.h"
-#include "dydt.h"
-#include "jacob.h"
 
 
 namespace c_solvers

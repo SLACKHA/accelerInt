@@ -36,11 +36,11 @@ namespace c_solvers
                               double rtol=1e-6, int n_ra=10,
                               int M_MAX=-1) :
             Integrator(neq, numThreads, atol, rtol),
-            N_RA(n_ra),
             poles(n_ra, 0),
             res(n_ra, 0),
-            M_MAX(M_MAX < 0 ? _neq : M_MAX),
-            STRIDE(stride)
+            STRIDE(stride),
+            N_RA(n_ra),
+            M_MAX(M_MAX < 0 ? _neq : M_MAX)
         {
             find_poles_and_residuals(N_RA, poles, res);
         }
@@ -71,6 +71,13 @@ namespace c_solvers
         //! residuals for matrix exponentiation via CF
         std::vector<std::complex<double>> res;
 
+        //! Krylov matrix stride
+        const int STRIDE;
+        //! The number of rational approximants to utilize for the exponential approximation [default 10]
+        const int N_RA;
+        //! The maximum allowed krylov subspace size [defaults to #_neq]
+        const int M_MAX;
+
         //! offsets
 
         //! invA
@@ -92,12 +99,6 @@ namespace c_solvers
         virtual int exponential(const int m, const double* A, const double c, double* phiA) = 0;
 
 
-        //! Krylov matrix stride
-        const int STRIDE;
-        //! The number of rational approximants to utilize for the exponential approximation [default 10]
-        const int N_RA;
-        //! The maximum allowed krylov subspace size [defaults to #_neq]
-        const int M_MAX;
 
         /*!
          * \brief Matrix-vector multiplication of a matrix sized MxM and a vector Mx1

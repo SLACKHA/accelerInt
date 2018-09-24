@@ -202,15 +202,6 @@ namespace c_solvers
             return name;
         }
 
-        void clean()
-        {
-            // pass
-        }
-        void reinitialize(int numThreads)
-        {
-            // pass
-        }
-
         void initSolverLog()
         {
             // pass
@@ -289,8 +280,11 @@ namespace c_solvers
             // F2
             _F2 = working;
             working += _neq * sizeof(double);
+            // TMP
             _TMP = working;
             working += _neq * sizeof(double);
+            // and return required work size
+            return working;
         }
 
         /**

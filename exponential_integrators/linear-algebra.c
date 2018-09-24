@@ -161,8 +161,8 @@ void roots (int n, double* v, double complex* rt) {
 	}
 
 	int info, lwork;
-	double* vl;
-	double* vr;
+	double* vl = NULL;
+	double* vr = NULL;
 	double wkopt;
 	double* work;
 

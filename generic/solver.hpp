@@ -17,6 +17,12 @@
 #include <complex>
 #include "error_codes.hpp"
 
+extern "C"
+{
+    #include "jacob.h"
+    #include "dydt.h"
+}
+
 //include OpenMP if available
 #ifdef _OPENMP
  #include <omp.h>
@@ -61,8 +67,13 @@ namespace c_solvers {
         virtual void initSolverLog() = 0;
         virtual void solverLog() = 0;
 
-        virtual void reinitialize(int numThreads) = 0;
-        virtual void clean() = 0;
+        void reinitialize(int numThreads)
+        {
+            _numThreads = numThreads;
+            _memSize = requiredSolverMemorySize();
+            working_buffer = std::unique_ptr<char>(new char[_memSize * _numThreads]);
+        }
+        void clean(){}
 
         virtual const char* solverName() const = 0;
 
@@ -162,10 +173,10 @@ namespace c_solvers {
     protected:
         //! return reference to the beginning of the working memory
         //! for this thread `tid`
-        virtual double* phi(int tid) final;
+        double* phi(int tid);
 
         //! the number of OpenMP threads to use
-        const int _numThreads;
+        int _numThreads;
 
         //! the number of equations to solver per-IVP
         const int _neq;

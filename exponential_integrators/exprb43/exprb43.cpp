@@ -17,9 +17,6 @@
 /** Include common code. */
 #include <cmath>
 #include <cstring>
-
-#include "dydt.h"
-#include "jacob.h"
 #include "exprb43_solver.hpp"
 
 namespace c_solvers {

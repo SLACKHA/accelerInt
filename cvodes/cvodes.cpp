@@ -64,6 +64,8 @@ namespace c_solvers {
         }
         // copy back integrated values
         std::memcpy(y, y_local, _neq * sizeof(double));
+
+        return ErrorCode::SUCCESS;
     }
 
 }

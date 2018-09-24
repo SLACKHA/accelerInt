@@ -15,9 +15,6 @@
 /** Include common code. */
 #include <cmath>
 #include <cstring>
-
-#include "dydt.h"
-#include "jacob.h"
 #include "exp4_solver.hpp"
 
 namespace c_solvers {
