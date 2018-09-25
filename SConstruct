@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import textwrap
 from distutils.version import LooseVersion
+from distutils.spawn import find_executable
 
 from buildutils import listify, formatOption, getCommandOutput
 
@@ -714,6 +715,14 @@ new_defines['RPATH'] = [lib_dir]
 cpu, gpu = build_multitarget(env_save, new_defines, cpu_vals, gpu_vals)
 
 
+def find_current_python(env):
+    our_env = env.Clone()
+    our_env['PATH'] = os.environ['PATH']
+    if 'python_cmd' not in our_env:
+        our_env['python_cmd'] = sys.executable
+    return find_executable(our_env['python_cmd'], path=our_env['PATH'])
+
+
 def run_with_our_python(env, target, source, action):
     # Test to see if we can import numpy and Cython
     script = textwrap.dedent("""\
@@ -737,8 +746,7 @@ def run_with_our_python(env, target, source, action):
     """)
 
     try:
-        if 'python_cmd' not in env:
-            env['python_cmd'] = sys.executable
+        env['python_cmd'] = find_current_python(env)
         info = getCommandOutput(env['python_cmd'], '-c', script).splitlines()
     except OSError as err:
         print('Error checking for Python:')
