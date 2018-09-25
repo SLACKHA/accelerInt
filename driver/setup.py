@@ -7,7 +7,8 @@ import os
 path = os.path.dirname(__file__)
 topdir = os.path.abspath(os.path.join(path, os.pardir))
 libdir = os.path.join(topdir, 'lib')
-includes = [os.path.join(topdir, 'generic'), os.path.join(topdir, 'interface')]
+includes = [os.path.join(topdir, 'generic'), os.path.join(topdir, 'interface'),
+            os.path.join(topdir, 'exponential_integrators')]
 
 ext_module = Extension('pyccelerInt_cpu',
                        sources=[os.path.join(path, 'pyccelerInt_cpu.pyx')],

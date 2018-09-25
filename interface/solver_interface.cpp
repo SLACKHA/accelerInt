@@ -31,26 +31,49 @@ namespace c_solvers
      *
      * \param[out]      solver              The initialized solver
      */
-    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads)
+    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads, const SolverOptions& options)
     {
         switch(type)
         {
             case IntegratorType::RADAU_II_A:
-                return std::unique_ptr<RadauIntegrator>(new RadauIntegrator(neq, numThreads, SolverOptions()));
+                return std::unique_ptr<RadauIntegrator>(new RadauIntegrator(neq, numThreads, options));
             case IntegratorType::RK_78:
-                return std::unique_ptr<RK78Integrator>(new RK78Integrator(neq, numThreads, SolverOptions()));
+                return std::unique_ptr<RK78Integrator>(new RK78Integrator(neq, numThreads, options));
             case IntegratorType::RKC:
-                return std::unique_ptr<RKCIntegrator>(new RKCIntegrator(neq, numThreads, SolverOptions()));
+                return std::unique_ptr<RKCIntegrator>(new RKCIntegrator(neq, numThreads, options));
             case IntegratorType::EXP4:
-                return std::unique_ptr<EXP4Integrator>(new EXP4Integrator(neq, numThreads, EXPSolverOptions()));
+                return std::unique_ptr<EXP4Integrator>(new EXP4Integrator(neq, numThreads,
+                    static_cast<const EXPSolverOptions&>(options)));
             case IntegratorType::EXPRB43:
-                return std::unique_ptr<EXPRB43Integrator>(new EXPRB43Integrator(neq, numThreads, EXPSolverOptions()));
+                return std::unique_ptr<EXPRB43Integrator>(new EXPRB43Integrator(neq, numThreads,
+                    static_cast<const EXPSolverOptions&>(options)));
             case IntegratorType::CVODES:
-                return std::unique_ptr<CVODEIntegrator>(new CVODEIntegrator(neq, numThreads, SolverOptions()));
+                return std::unique_ptr<CVODEIntegrator>(new CVODEIntegrator(neq, numThreads, options));
             default:
                 std::ostringstream ss;
                 ss << "Integrator type: " << type << " not implemented for C!" << std::endl;
                 throw std::invalid_argument(ss.str());
+        }
+    }
+
+    /**
+     * \brief Initializes the solver
+     * \param[in]       type                The type of solver to use
+     * \param[in]       neq                 The number of equations to solve
+     * \param[in]       numThreads          The number of OpenMP threads to use
+     *
+     * \param[out]      solver              The initialized solver
+     */
+    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads)
+    {
+        switch(type)
+        {
+            case IntegratorType::EXP4:
+            case IntegratorType::EXPRB43:
+                return init(type, neq, numThreads, EXPSolverOptions());
+            default:
+                return init(type, neq, numThreads, SolverOptions());
+
         }
     }
 
