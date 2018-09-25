@@ -111,7 +111,7 @@ namespace c_solvers
 
         if (integrator.logging())
         {
-            integrator.log(t_start, NUM, y_host);
+            integrator.log(NUM, t_start, y_host);
         }
 
         int numSteps = 0;
@@ -124,7 +124,7 @@ namespace c_solvers
             t = t_next;
             if (integrator.logging())
             {
-                integrator.log(t, NUM, y_host);
+                integrator.log(NUM, t, y_host);
             }
             t_next = std::fmin(t_end, (numSteps + 1) * stepsize);
         }
