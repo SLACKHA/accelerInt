@@ -29,8 +29,8 @@ void find_poles_and_residuals(const int N_RA, std::vector<std::complex<double>>&
 
     for (int i = 0; i < N_RA; ++i)
     {
-        poles.emplace_back(std::complex<double>(poles_r[i], poles_i[i]));
-        res.emplace_back(std::complex<double>(res_r[i], res_i[i]));
+        poles[i] = std::complex<double>(poles_r[i], poles_i[i]);
+        res[i] = std::complex<double>(res_r[i], res_i[i]);
     }
 
     // free memory
