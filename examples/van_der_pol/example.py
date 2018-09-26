@@ -17,28 +17,30 @@ def run(num, num_threads, itype):
     neq = 2
 
     # create state vectors
-    phi = 2 * np.random.random((num, 2))
+    phi = 2 * np.zeros((num, 2), dtype=np.float64)
+    phi[:, 0] = 2
+    phi[:, 1] = 0
 
     # set parameters
-    params = 5 * np.random.random(num)
+    params = np.zeros(num, dtype=np.float64)
+    params[:] = 1000
 
     # create options
-    options = pycel.PySolverOptions(itype, atol=1e-15,
-                                    rtol=1e-10, logging=True)
+    options = pycel.PySolverOptions(itype, atol=1e-10,
+                                    rtol=1e-6, logging=True)
 
     # create the integrator
     integrator = pycel.PyIntegrator(itype, neq,
                                     num_threads, options)
 
     # and integrate
-    time = integrator.integrate(num, 0., 10., phi.flatten('F'), params.flatten('F'),
+    time = integrator.integrate(num, 0., 2000., phi.flatten('F'), params.flatten('F'),
                                 step=1.)
 
     print('Integration completed in {} (ms)'.format(time))
 
     # get output
     t, phi = integrator.state()
-    print(phi)
 
 
 if __name__ == '__main__':
@@ -63,5 +65,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     int_type = next(x for x in pycel.IntegratorType if args.int_type in str(x))
     print('Integrating {} IVPs with method {}, and {} threads...'.format(
-        args.num_ivp, args.num_threads, int_type))
+        args.num_ivp, int_type, args.num_threads))
     run(args.num_ivp, args.num_threads, int_type)
