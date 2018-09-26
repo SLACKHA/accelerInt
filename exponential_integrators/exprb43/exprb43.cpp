@@ -211,7 +211,7 @@ namespace c_solvers {
 			err = std::fmax(EPS, sc_norm(temp, f_temp));
 
 			// classical step size calculation
-			h_new = pow(err, -1.0 / ORD);
+			h_new = std::pow(err, -1.0 / ORD);
 
 			failures = 0;
 			if (err <= 1.0) {
@@ -223,7 +223,7 @@ namespace c_solvers {
 				memcpy(sc, f_temp, _neq * sizeof(double));
 
 				// minimum of classical and Gustafsson step size prediction
-				h_new = std::fmin(h_new, (h / h_old) * pow((err_old / (err * err)), (1.0 / ORD)));
+				h_new = std::fmin(h_new, (h / h_old) * std::pow((err_old / (err * err)), (1.0 / ORD)));
 
 				// limit to 0.2 <= (h_new/8) <= 8.0
 				h_new = h * std::fmax(std::fmin(0.9 * h_new, 8.0), 0.2);

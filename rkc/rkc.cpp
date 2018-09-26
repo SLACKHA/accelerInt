@@ -315,7 +315,7 @@ namespace c_solvers
                 // error too large, step is rejected
 
                 // select smaller step size
-                work[2] = P8 * work[2] / (pow(err, ONE3RD));
+                work[2] = P8 * work[2] / (std::pow(err, ONE3RD));
 
                 // reevaluate spectral radius
                 work[3] = rkc_spec_rad (t, pr, hmax, y_n, F_n, &work[4], temp_arr2);
@@ -327,13 +327,13 @@ namespace c_solvers
                 double fac = TEN;
 
                 if (work[1] < UROUND) {
-                    double temp2 = pow(err, ONE3RD);
+                    double temp2 = std::pow(err, ONE3RD);
                     if (P8 < (fac * temp2)) {
                         fac = P8 / temp2;
                     }
                 } else {
-                    double temp1 = P8 * work[2] * pow(work[0], ONE3RD);
-                    double temp2 = work[1] * pow(err, TWO3RD);
+                    double temp1 = P8 * work[2] * std::pow(work[0], ONE3RD);
+                    double temp2 = work[1] * std::pow(err, TWO3RD);
                     if (temp1 < (fac * temp2)) {
                         fac = temp1 / temp2;
                     }

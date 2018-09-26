@@ -157,17 +157,17 @@ namespace c_solvers {
                     exit(code);
                 case ErrorCode::MAX_STEPS_EXCEEDED:
                     std::cerr << "During integration of ODE#" << tid <<
-                        "the allowed number of integration steps was exceeded,"
+                        ", the allowed number of integration steps was exceeded,"
                         "exiting..." << std::endl;
                     exit(code);
                 case ErrorCode::H_PLUS_T_EQUALS_H:
                     std::cerr << "During integration of ODE#" << tid <<
-                    "the stepsize 'h' was decreased such that h = t + h,"
+                    ", the stepsize 'h' was decreased such that h = t + h,"
                     "exiting..." << std::endl;
                     exit(code);
                 case ErrorCode::MAX_NEWTON_ITER_EXCEEDED:
                     std::cerr << "During integration of ODE#" << tid <<
-                    "the allowed number of newton iteration steps was exceeded,"
+                    ", the allowed number of newton iteration steps was exceeded,"
                     "exiting..." << std::endl;
                     exit(code);
                 default:

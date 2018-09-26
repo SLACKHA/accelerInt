@@ -380,7 +380,7 @@ namespace c_solvers
         int info = 0;
         int Nconsecutive = 0;
         int Nsteps = 0;
-        double NewtonRate = pow(2.0, 1.25);
+        double NewtonRate = std::pow(2.0, 1.25);
 
         while (t + Roundoff < t_end) {
             if (!Reject) {
@@ -430,7 +430,7 @@ namespace c_solvers
             double Theta = 0;
 
             //reuse previous NewtonRate
-            NewtonRate = pow(std::fmax(NewtonRate, EPS), 0.8);
+            NewtonRate = std::pow(std::fmax(NewtonRate, EPS), 0.8);
 
             for (; NewtonIter < NewtonMaxit; NewtonIter++) {
                 RK_PrepareRHS(t, pr, H, y, Z1, Z2, Z3, DZ1, DZ2, DZ3);
@@ -451,11 +451,11 @@ namespace c_solvers
                     }
                     if (NewtonIter < NewtonMaxit) {
                         //Predict error at the end of Newton process
-                        double NewtonPredictedErr = (NewtonIncrement * pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (1.0 - Theta);
+                        double NewtonPredictedErr = (NewtonIncrement * std::pow(Theta, (NewtonMaxit - NewtonIter - 1))) / (1.0 - Theta);
                         if (NewtonPredictedErr >= NewtonTol) {
                             //Non-convergence of Newton: predicted error too large
                             double Qnewton = std::fmin(10.0, NewtonPredictedErr / NewtonTol);
-                            Fac = 0.8 * pow(Qnewton, -1.0/((double)(NewtonMaxit-NewtonIter)));
+                            Fac = 0.8 * std::pow(Qnewton, -1.0/((double)(NewtonMaxit-NewtonIter)));
                             break;
                         }
                     }
@@ -488,13 +488,13 @@ namespace c_solvers
 
             double Err = RK_ErrorEstimate(H, t, pr, y, F0, F1, F2, TMP, Z1, Z2, Z3, sc, E1, ipiv1, FirstStep, Reject);
             //~~~> Computation of new step size Hnew
-            Fac = pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
+            Fac = std::pow(Err, (-1.0 / rkELO)) * (1.0 + 2 * NewtonMaxit) / (NewtonIter + 1.0 + 2 * NewtonMaxit);
             Fac = std::fmin(FacMax, std::fmax(FacMin, Fac));
             Hnew = Fac * H;
             if (Err < 1.0) {
     #ifdef Gustafsson
                 if (!FirstStep) {
-                    double FacGus = FacSafe * (H / Hacc) * pow(Err * Err / ErrOld, -0.25);
+                    double FacGus = FacSafe * (H / Hacc) * std::pow(Err * Err / ErrOld, -0.25);
                     FacGus = std::fmin(FacMax, std::fmax(FacMin, FacGus));
                     Fac = std::fmin(Fac, FacGus);
                     Hnew = Fac * H;
