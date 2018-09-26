@@ -263,7 +263,7 @@ namespace c_solvers
         for (int i = 0; i < _neq; ++i){
             sum += (scale[i] * scale[i] * DY[i] * DY[i]);
         }
-        return std::fmax(sqrt(sum / ((double)_neq)), 1e-10);
+        return std::fmax(std::sqrt(sum / ((double)_neq)), 1e-10);
     }
 
     /**
@@ -438,7 +438,7 @@ namespace c_solvers
                 double d1 = RK_ErrorNorm(sc, DZ1);
                 double d2 = RK_ErrorNorm(sc, DZ2);
                 double d3 = RK_ErrorNorm(sc, DZ3);
-                double NewtonIncrement = sqrt((d1 * d1 + d2 * d2 + d3 * d3) / 3.0);
+                double NewtonIncrement = std::sqrt((d1 * d1 + d2 * d2 + d3 * d3) / 3.0);
                 Theta = ThetaMin;
                 if (NewtonIter > 0)
                 {
