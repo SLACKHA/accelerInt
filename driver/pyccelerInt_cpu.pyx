@@ -88,7 +88,7 @@ cdef class PyIntegrator:
             The array of times that this integrator has reached
         state: np.ndarray
             The state vectors at each time, shape is
-            (times.size, :attr:`num`, :attr:`neq`)
+            (:attr:`num`, :attr:`neq`, times.size)
         """
         assert self.num > 0 and self.neq > 0
         n_steps = deref(self.integrator.get()).numSteps()
@@ -99,7 +99,7 @@ cdef class PyIntegrator:
         # get phi
         deref(self.integrator.get()).getLog(self.num, &times[0], &phi[0])
         # and reshape
-        return times, np.reshape(phi, (n_steps, self.num, self.neq), order='F')
+        return times, np.reshape(phi, (self.num, self.neq, n_steps), order='F')
 
 
 cdef class PySolverOptions:

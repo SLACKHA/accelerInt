@@ -7,6 +7,12 @@ import sys
 import multiprocessing
 import os
 import argparse
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print('Matplotlib not found, not plotting...')
+    plt = None
+
 sys.path.insert(0, os.getcwd())
 import pyccelerInt_cpu as pycel
 np.random.seed(0)
@@ -34,13 +40,19 @@ def run(num, num_threads, itype):
                                     num_threads, options)
 
     # and integrate
-    time = integrator.integrate(num, 0., 2000., phi.flatten('F'), params.flatten('F'),
-                                step=1.)
+    time = integrator.integrate(num, 0., 2000., phi.flatten('F'),
+                                params.flatten('F'), step=1.)
 
     print('Integration completed in {} (ms)'.format(time))
 
     # get output
     t, phi = integrator.state()
+    if plt:
+        plt.plot(t, phi[0, 0, :], label='y1')
+        plt.plot(t, phi[0, 1, :], label='y2')
+        plt.legend(loc=0)
+        plt.title('van der Pol equation')
+        plt.show()
 
 
 if __name__ == '__main__':
