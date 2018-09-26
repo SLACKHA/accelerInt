@@ -92,7 +92,7 @@ namespace c_solvers
             // _phiHm
             _phiHm = working;
             working += STRIDE * STRIDE * sizeof(double);
-            // k1
+            // saved actions
             _savedActions = working;
             working += 5 * _neq * sizeof(double);
             return working;

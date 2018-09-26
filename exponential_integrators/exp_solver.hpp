@@ -100,7 +100,7 @@ namespace c_solvers
             working += _neq * sizeof(double);
             // work (from hessenberg LU)
             _work = working;
-            working += _neq * sizeof(double);
+            working += STRIDE * sizeof(double);
             return working;
         }
 
