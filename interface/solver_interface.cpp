@@ -120,7 +120,7 @@ namespace c_solvers
         while (t + EPS < t_end)
         {
             numSteps++;
-            integrator.intDriver(NUM, t, t_end, var_host, y_host);
+            integrator.intDriver(NUM, t, t_next, var_host, y_host);
             t = t_next;
             if (integrator.logging())
             {
