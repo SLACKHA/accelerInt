@@ -37,6 +37,7 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
         const double rtol() except +
         const double neq() except +
         const double numThreads() except +
+        void getLog(const int, double*) except +
 
     cdef cppclass SolverOptions:
         SolverOptions(double, double, bool) except +
@@ -54,6 +55,8 @@ cdef extern from "<utility>" namespace "std" nogil:
 
 cdef class PyIntegrator:
     cdef unique_ptr[Integrator] integrator  # hold our integrator
+    cdef num # number of IVPs
+    cdef neq # number of equations
 
     def __cinit__(self, IntegratorType itype, int neq, size_t numThreads,
                   PySolverOptions options=None):
@@ -63,11 +66,29 @@ cdef class PyIntegrator:
         else:
             self.integrator = move(init(itype, neq, numThreads))
 
+    def __init__(self, itype, neq, numThreads, options):
+        self.num = -1
+        self.neq = neq
+
     def integrate(self, np.int32_t num, np.float64_t t_start,
                   np.float64_t t_end, np.ndarray[np.float64_t] y_host,
                   np.ndarray[np.float64_t] var_host, np.float64_t step=-1):
+
+        # store # of IVPs
+        self.num = num
         return integrate(deref(self.integrator.get()), num, t_start,
                          t_end, step, &y_host[0], &var_host[0])
+
+    def state(self, np.int32_t n_steps):
+        assert self.num > 0 and self.neq > 0
+        cdef np.ndarray[np.float64_t, ndim=1] phi = np.zeros(
+            (1 + self.num * self.neq) * n_steps, dtype=np.float64)
+        # get phi
+        deref(self.integrator.get()).getLog(self.num, &phi[0])
+        return phi
+        # and reshape
+        return np.reshape(phi, (self.num, self.neq), order='F')
+
 
 cdef class PySolverOptions:
     cdef unique_ptr[SolverOptions] options # hold our options

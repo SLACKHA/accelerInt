@@ -102,7 +102,7 @@ namespace c_solvers {
             this->clean();
         }
 
-        void log(int NUM, double t, double* __restrict__ phi)
+        void log(const int NUM, const double t, double const * __restrict__ phi)
         {
             // allocate new memory
             _log.emplace_back(std::move(std::unique_ptr<double[]>(new double[1 + NUM * _neq])));
@@ -110,6 +110,17 @@ namespace c_solvers {
             // and set
             set[0] = t;
             std::memcpy(&set[1], phi, NUM * _neq * sizeof(double));
+        }
+
+        /*! \brief Copy the current log of data to the given array */
+        void getLog(const int NUM, double* __restrict__ phi) const
+        {
+            std::size_t offset = 0;
+            for (const auto& log_entry : _log)
+            {
+                std::memcpy(&phi[offset], log_entry.get(), (1 + NUM * _neq) * sizeof(double));
+                offset += (1 + NUM * _neq);
+            }
         }
 
         void reinitialize(int numThreads)

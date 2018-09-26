@@ -21,14 +21,23 @@ def run(num, num_threads):
     # set parameters
     params = 5 * np.random.random(num)
 
+    # create options
+    options = pycel.PySolverOptions(pycel.IntegratorType.CVODES, atol=1e-15,
+                                    rtol=1e-10, logging=True)
+
     # create the integrator
-    integrator = pycel.PyIntegrator(pycel.IntegratorType.CVODES, neq, num_threads)
+    integrator = pycel.PyIntegrator(pycel.IntegratorType.CVODES, neq, num_threads,
+                                    options)
 
     # and integrate
     time = integrator.integrate(num, 0., 10., phi.flatten('F'), params.flatten('F'),
                                 step=1.)
 
     print('Integration completed in {} (ms)'.format(time))
+
+    # get output
+    phi = integrator.state(11)
+    print(phi)
 
 
 if __name__ == '__main__':
