@@ -15,13 +15,6 @@ namespace van_der_pol_cu {
 #endif
 
 /**
- * \brief An implementation of the RHS of the van der Pol equation
- * \param[in]        t         The current system time
- * \param[in]        mu        The van der Pol parameter
- * \param[in]        y         The state vector
- * \param[out]       dy        The output RHS (dydt) vector
- * \param[in]        d_mem     The mechanism_memory struct.  In future versions, this will be used to access the \f$\mu\f$ parameter to have a consistent interface.
- *
  * The `y` and `dy` vectors supplied here are the global state vectors.
  * Hence the vector accesses must be done with the global thread ID.
  * The gpu_macros.cuh file defines some useful macros to simplify indexing

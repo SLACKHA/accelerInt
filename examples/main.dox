@@ -22,11 +22,15 @@ A number of stiff integration methods are available in <code>accelerInt</code> o
 | Radau-IIa<sup>2</sup>   | Implicit RK               | 5th                   |  X  |  X  |
 | EXP4<sup>3</sup>        | Semi-implicit Exponential | Nominally 4th         |  X  |  X  |
 | EXPRB43<sup>4</sup>     | Semi-implicit Exponential | 4th                   |  X  |  X  |
+| RKC<sup>5</sup>         | Explicit Runge Kutta      | Stabilized 2nd        |  X  |  X  |
+
+Note: The RKC integrator is in prelimary support, and has not been fully validated in this work.
 
 1.  A. C. Hindmarsh, P. N. Brown, K. E. Grant, S. L. Lee, R. Serban, D. E. Shumaker, C. S. Woodward, SUNDIALS: Suite of nonlinear and differential/algebraic equation solvers, ACMT. Math. Softw. 31 (3) (2005) 363–396. [doi:10.1145/1089014.1089020](https://doi.org/10.1145/1089014.1089020).
 2.  G. Wanner, E. Hairer, Solving Ordinary Differential Equations II: Stiff and Differential Algebraic Problems, 2nd Edition, Springer-Verlag, Berlin, 1996. [doi:10.1007/978-3-642-05221-7](https://doi.org/10.1007/978-3-642-05221-7).
 3.  M. Hochbruck, C. Lubich, H. Selhofer, Exponential integrators for large systems of differential equations, SIAM J. Sci. Comput. 19 (5) (1998) 1552–1574. [doi:10.1137/S1064827595295337](https://doi.org/10.1137/S1064827595295337)
 4.  M. Hochbruck, A. Ostermann, J. Schweitzer, Exponential Rosenbrock-type methods, SIAM J. Numer. Anal. 47 (1) (2009) 786–803. [doi:10.1137/080717717](https://doi.org/10.1137/080717717).
+5.  "Accelerating moderately stiff chemical kinetics in reactive-flow simulations using GPUs," J Comput Phys 256 (2014) 854-871. [doi:10.1016/j.jcp.2013.09.025](https://doi.org/10.1016/j.jcp.2013.09.025)
 
 \section install Compilation and Dependencies
 
@@ -69,16 +73,28 @@ Disabling solvers based on available libaries is a feature that may be added to 
 
 \section main_mem Memory Format
 
-<code>accelerInt</code> uses a Column-major (Fortran) data formatting scheme, future versions will include optional use of the Row-major (C) data ordering.
+The state vector expected by <code>accelerInt</code> should be formatted in Column-major (Fortan) order, future versions will include optional use of the Row-major (C) data ordering.
 
-For a state vector entry \f$\vec{y} = \{ y_1, y_1, \ldots y_N \}\f$
-and IVPs \f$1, 2, \ldots N_{\text{state}}\f$, this equates to storing the state vectors in memory as:
+For a state vector with \f$N\f$ entries, and \f$N_{p}\f$ separate initial value problems (IVPs) to solve, with \f$y_{i, j}\f$ the *j*-th entry in the state vector for the *i*-th IVP.
+The resulting data-matrix looks like:
 
-        \f{align}{ \nonumber
-           y_{1,1}, y_{1,2},& \ldots y_{1,N_{\text{state}}} \\ \nonumber
-           y_{2,1}, y_{2,2},& \ldots y_{2,N_{\text{state}}} \\ \nonumber
-           \vdots& \\ \nonumber
-           y_{N,1}, y_{N,2},& \ldots y_{N,N_{\text{state}}} \\ \nonumber
+        \f{align}{
+          \Phi &= \left[
+            \begin{array}{cccc}
+               y_{1,1} & y_{1,2} & \ldots & y_{1,N} \\
+               y_{2,1} & y_{2,2} & \ldots & y_{2,N} \\
+               \vdots & \vdots  & \ddots & \vdots \\
+               y_{N_{p},1} & y_{N_{p},2} & \ldots & y_{N_{p},N}
+            \end{array}
+          \right]
         \f}
-For a pratical example see the \ref accelerint_indx "van der Pol equation example"
+
+This is then flattened in column-major order:
+        \f{align}{
+            \vec{\Phi} = \left\{ y_{1,1}, y_{2,1} \ldots y_{N_{p},1}, y_{1,2} \ldots, y_{N_{p},2} \ldots y_{N_{p},N} \right\}
+        \f}
+
+\section examples Examples
+For a fully worked integration problem, see the \ref vdp "van der Pol equation example"
+Another recently added example (thanks to Andrew Alferman) implements \ref accelerint_indx "the Oregonator problem".
 */

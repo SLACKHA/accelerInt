@@ -3,6 +3,7 @@
  * \brief Headers for GPU memory initialization
  */
 
+
 #ifndef GPU_MEM_CUH
 #define GPU_MEM_CUH
 
@@ -18,19 +19,14 @@ namespace van_der_pol_cu {
  *        Along with the solver_memory struct, this must be initialized and passed to the solvers
  *        the run.  @see solver_memory, initialize_gpu_memory, required_mechanism_size
  *
- * \param           y               The global state vector arrays
- * \param           dy              The global dydt vector arrays
- * \param           var             The global param array [Used for \f$\mu\f$]
- * \param           jac             The global Jacobian arrays
- *
  * This is also heavily used when using with @pyJac to hold additional arrays
  * for evaluating chemical kinetic reactions.
  */
 struct mechanism_memory {
-  double * y;
-  double * dy;
-  double * var;
-  double * jac;
+  double * y; //! The global state vector arrays
+  double * dy; //!  The global dydt vector arrays
+  double * var; //! The global param array [Used for \f$\mu\f$]
+  double * jac; //! The global Jacobian arrays
 };
 
 /**
@@ -55,6 +51,4 @@ void free_gpu_memory(mechanism_memory** h_mem, mechanism_memory** d_mem);
 
 #ifdef GENERATE_DOCS
 }
-#endif
-
 #endif
