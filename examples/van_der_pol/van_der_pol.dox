@@ -13,7 +13,7 @@ The van der Pol problem can be written as a set of two first-order of non-linear
 
         \f{align}{
             & y_1^\prime =&& y_2 \, & y_1(0) =&& y_1^\circ \nonumber \\
-            & y_2^\prime =&& \mu \left(1 - y_1^2y_2\right) - y_1 \, & y_2(0) =&&  y_2^\circ \nonumber
+            & y_2^\prime =&& \mu \left(1 - y_1^2\right)y_2 - y_1 \, & y_2(0) =&&  y_2^\circ \nonumber
           \f}
 
 For our purposes, we shall use:
