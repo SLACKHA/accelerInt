@@ -14,9 +14,14 @@
 #include "solver.hpp"
 #include "rational_approximant.hpp"
 
+#define HAVE_SPARSE_MULTIPLIER
 #ifdef HAVE_SPARSE_MULTIPLIER
-#include "sparse_multiplier.h"
+extern "C"
+{
+    void sparse_multiplier(const double * A, const double * Vm, double* w);
+}
 #else
+#warning ("This isn't correct.")
 #define sparse_multiplier(A, v, o) (matvec_m_by_m(_neq, (A), (v), (o)))
 #endif
 
