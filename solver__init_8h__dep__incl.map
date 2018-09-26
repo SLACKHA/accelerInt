@@ -1,11 +1,11 @@
-<map id="/home/nick/Documents/software_repos/accelerInt/generic/solver_init.h" name="/home/nick/Documents/software_repos/accelerInt/generic/solver_init.h">
-<area shape="rect" id="node2" href="$solver_8h.html" title="Contains skeleton of all methods that need to be defined on a per solver basis. " alt="" coords="473,117,649,173"/>
-<area shape="rect" id="node5" href="$solver__interface_8h.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="805,228,981,284"/>
-<area shape="rect" id="node9" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="861,109,1037,180"/>
-<area shape="rect" id="node10" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1061,109,1237,180"/>
-<area shape="rect" id="node3" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="5,228,181,284"/>
-<area shape="rect" id="node4" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="205,228,381,284"/>
-<area shape="rect" id="node7" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="405,228,581,284"/>
-<area shape="rect" id="node8" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="605,228,781,284"/>
-<area shape="rect" id="node6" href="$solver__interface_8c.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="805,332,981,388"/>
+<map id="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/solver_init.h" name="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/solver_init.h">
+<area shape="rect" id="node2" href="$solver_8h.html" title="Contains skeleton of all methods that need to be defined on a per solver basis. " alt="" coords="530,117,706,173"/>
+<area shape="rect" id="node5" href="$solver__interface_8h.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="864,228,1071,284"/>
+<area shape="rect" id="node9" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="930,109,1122,180"/>
+<area shape="rect" id="node10" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1146,109,1338,180"/>
+<area shape="rect" id="node3" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="5,228,204,284"/>
+<area shape="rect" id="node4" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="228,228,427,284"/>
+<area shape="rect" id="node7" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="451,228,636,284"/>
+<area shape="rect" id="node8" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="661,228,839,284"/>
+<area shape="rect" id="node6" href="$solver__interface_8c.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="864,332,1071,388"/>
 </map>

@@ -1,22 +1,22 @@
-<map id="/home/nick/Documents/software_repos/accelerInt/generic/solver_options.h" name="/home/nick/Documents/software_repos/accelerInt/generic/solver_options.h">
-<area shape="rect" id="node2" href="$cvodes__init_8c.html" title="Implementation of the necessary initialization for the CVODE interface. " alt="" coords="5,117,181,173"/>
-<area shape="rect" id="node3" href="$exponential__linear__algebra_8h.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="206,109,397,180"/>
-<area shape="rect" id="node7" href="$cf_8c.html" title="File containing functions for best rational approximation to matrix exponential. " alt="" coords="421,117,608,173"/>
-<area shape="rect" id="node8" href="$phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="632,109,808,180"/>
-<area shape="rect" id="node9" href="$rational__approximant_8c.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="832,109,1008,180"/>
-<area shape="rect" id="node10" href="$fd__jacob_8c.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="1032,117,1208,173"/>
-<area shape="rect" id="node11" href="$solver_8h.html" title="Contains skeleton of all methods that need to be defined on a per solver basis. " alt="" coords="1232,117,1408,173"/>
-<area shape="rect" id="node18" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="1432,117,1608,173"/>
-<area shape="rect" id="node19" href="$rk78__typedefs_8hpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="1632,117,1808,173"/>
-<area shape="rect" id="node21" href="$rkc_8c.html" title="Defines interface for Runge&#45;Kutta&#45;Chebyshev (RKC) solver. " alt="" coords="1832,117,2008,173"/>
-<area shape="rect" id="node4" href="$arnoldi_8h.html" title="Implementation of the arnoldi iteration methods. " alt="" coords="213,228,389,299"/>
-<area shape="rect" id="node5" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="101,347,277,417"/>
-<area shape="rect" id="node6" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="313,347,489,417"/>
-<area shape="rect" id="node12" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="832,235,1008,291"/>
-<area shape="rect" id="node13" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="1032,235,1208,291"/>
-<area shape="rect" id="node14" href="$solver__interface_8h.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="1232,235,1408,291"/>
-<area shape="rect" id="node16" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="1432,235,1608,291"/>
-<area shape="rect" id="node17" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="1632,235,1808,291"/>
-<area shape="rect" id="node15" href="$solver__interface_8c.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="1232,354,1408,410"/>
-<area shape="rect" id="node20" href="$rk78__init_8cpp.html" title="Implementation of the necessary initialization for Boost&#39;s RK78&#45;Felhberg solver. " alt="" coords="1832,235,2008,291"/>
+<map id="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/solver_options.h" name="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/solver_options.h">
+<area shape="rect" id="node2" href="$cvodes__init_8c.html" title="Implementation of the necessary initialization for the CVODE interface. " alt="" coords="5,117,187,173"/>
+<area shape="rect" id="node3" href="$exponential__linear__algebra_8h.html" title="Implementation of various linear algebra functions needed in the exponential integrators. " alt="" coords="211,109,403,180"/>
+<area shape="rect" id="node7" href="$cf_8c.html" title="File containing functions for best rational approximation to matrix exponential. " alt="" coords="427,117,645,173"/>
+<area shape="rect" id="node8" href="$phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="669,109,861,180"/>
+<area shape="rect" id="node9" href="$rational__approximant_8c.html" title="The generic initialization file for poles/hosts for RA based evaulation of the matrix exponential..." alt="" coords="885,109,1077,180"/>
+<area shape="rect" id="node10" href="$fd__jacob_8c.html" title="Finite Difference Jacobian implementation based on CVODEs. " alt="" coords="1101,117,1277,173"/>
+<area shape="rect" id="node11" href="$solver_8h.html" title="Contains skeleton of all methods that need to be defined on a per solver basis. " alt="" coords="1301,117,1477,173"/>
+<area shape="rect" id="node18" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="1501,117,1677,173"/>
+<area shape="rect" id="node19" href="$rk78__typedefs_8hpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="1701,117,1896,173"/>
+<area shape="rect" id="node21" href="$rkc_8c.html" title="Defines interface for Runge&#45;Kutta&#45;Chebyshev (RKC) solver. " alt="" coords="1920,117,2096,173"/>
+<area shape="rect" id="node4" href="$arnoldi_8h.html" title="Implementation of the arnoldi iteration methods. " alt="" coords="211,228,403,299"/>
+<area shape="rect" id="node5" href="$exp4_8c.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="91,347,283,417"/>
+<area shape="rect" id="node6" href="$exprb43_8c.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="319,347,511,417"/>
+<area shape="rect" id="node12" href="$solver__cvodes_8c.html" title="The integration driver for the CVODE solver. " alt="" coords="823,235,1022,291"/>
+<area shape="rect" id="node13" href="$solver__generic_8c.html" title="the generic integration driver for the CPU solvers " alt="" coords="1046,235,1245,291"/>
+<area shape="rect" id="node14" href="$solver__interface_8h.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="1269,235,1475,291"/>
+<area shape="rect" id="node16" href="$solver__main_8c.html" title="the generic main file for all CPU solvers " alt="" coords="1499,235,1685,291"/>
+<area shape="rect" id="node17" href="$solver__rk78_8cpp.html" title="Defines an interface for boost&#39;s runge_kutta_fehlberg78 solver. " alt="" coords="1709,235,1888,291"/>
+<area shape="rect" id="node15" href="$solver__interface_8c.html" title="Interface implementation for CPU solvers to be called as a library. " alt="" coords="1269,354,1475,410"/>
+<area shape="rect" id="node20" href="$rk78__init_8cpp.html" title="Implementation of the necessary initialization for Boost&#39;s RK78&#45;Felhberg solver. " alt="" coords="1912,235,2088,291"/>
 </map>

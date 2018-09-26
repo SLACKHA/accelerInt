@@ -1,5 +1,5 @@
-<map id="/home/nick/Documents/software_repos/accelerInt/generic/lapack_dfns.h" name="/home/nick/Documents/software_repos/accelerInt/generic/lapack_dfns.h">
-<area shape="rect" id="node2" href="$phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="5,109,181,180"/>
-<area shape="rect" id="node3" href="$complexInverse_8c.html" title="Implementation of LU factorization of complex (variable&#45;sized) matricies. " alt="" coords="205,117,381,173"/>
-<area shape="rect" id="node4" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="405,117,581,173"/>
+<map id="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/lapack_dfns.h" name="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/lapack_dfns.h">
+<area shape="rect" id="node2" href="$phiAHessenberg_8c.html" title="Computes various matrix exponential functions on the Krylov Hessenberg matricies. ..." alt="" coords="5,109,197,180"/>
+<area shape="rect" id="node3" href="$complexInverse_8c.html" title="Implementation of LU factorization of complex (variable&#45;sized) matricies. " alt="" coords="222,117,429,173"/>
+<area shape="rect" id="node4" href="$radau2a_8c.html" title="A Radau2A IRK implementation for C Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE in..." alt="" coords="453,117,629,173"/>
 </map>

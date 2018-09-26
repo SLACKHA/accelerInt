@@ -17,7 +17,7 @@ var searchData=
   ['const_5ftime_5fstep',['CONST_TIME_STEP',['../solver__options_8cuh.html#a66c8290aad471b0be7768f635f03c349',1,'CONST_TIME_STEP():&#160;solver_options.cuh'],['../solver__options_8h.html#a66c8290aad471b0be7768f635f03c349',1,'CONST_TIME_STEP():&#160;solver_options.h']]],
   ['cont',['CONT',['../structradau2acu_1_1solver__memory.html#a6b70e663fca70c209479ba26b89518d9',1,'radau2acu::solver_memory']]],
   ['controller',['controller',['../namespacerk78.html#aba972d6260988e04e23d64437536c04c',1,'rk78']]],
-  ['controllers',['controllers',['../namespacerk78.html#a7f7ff39cbfddcdc41eb68fd64749997f',1,'rk78']]],
+  ['controllers',['controllers',['../namespacerk78.html#a4587d4197ba30def4596272159795102',1,'rk78']]],
   ['createandzero',['createAndZero',['../namespaceexp4cu.html#abcdabb48b002afcaf4520f85bb06c156',1,'exp4cu::createAndZero()'],['../namespaceexprb43cu.html#a411c61dc481c439d2a19e8f17ec5af63',1,'exprb43cu::createAndZero()']]],
   ['cudaerrorcheck',['cudaErrorCheck',['../gpu__macros_8cuh.html#a30443b62930197b53c467b008efd5a52',1,'gpu_macros.cuh']]],
   ['cv_5fmax_5ferrtest_5ffails',['CV_MAX_ERRTEST_FAILS',['../solver__options_8cuh.html#ac42e0287ba619ab25b7d767a81f48082',1,'CV_MAX_ERRTEST_FAILS():&#160;solver_options.cuh'],['../solver__options_8h.html#ac42e0287ba619ab25b7d767a81f48082',1,'CV_MAX_ERRTEST_FAILS():&#160;solver_options.h']]],

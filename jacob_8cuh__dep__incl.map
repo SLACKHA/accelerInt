@@ -1,5 +1,5 @@
-<map id="/home/nick/Documents/software_repos/accelerInt/examples/van_der_pol/jacob.cuh" name="/home/nick/Documents/software_repos/accelerInt/examples/van_der_pol/jacob.cuh">
-<area shape="rect" id="node2" href="$radau2a_8cu.html" title="A Radau2A IRK implementation for CUDA Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE..." alt="" coords="5,117,181,173"/>
-<area shape="rect" id="node3" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="205,109,381,180"/>
-<area shape="rect" id="node4" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="405,109,581,180"/>
+<map id="/home/nick/Documents/software_repos/accelerInt&#45;docs/examples/van_der_pol/jacob.cuh" name="/home/nick/Documents/software_repos/accelerInt&#45;docs/examples/van_der_pol/jacob.cuh">
+<area shape="rect" id="node2" href="$radau2a_8cu.html" title="A Radau2A IRK implementation for CUDA Adapted from Hairer and Wanner&#39;s RADAU5 code and the FATODE ODE..." alt="" coords="5,131,181,187"/>
+<area shape="rect" id="node3" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="205,124,397,195"/>
+<area shape="rect" id="node4" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="421,124,613,195"/>
 </map>

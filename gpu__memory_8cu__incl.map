@@ -1,4 +1,4 @@
-<map id="/home/nick/Documents/software_repos/accelerInt/examples/van_der_pol/gpu_memory.cu" name="/home/nick/Documents/software_repos/accelerInt/examples/van_der_pol/gpu_memory.cu">
+<map id="/home/nick/Documents/software_repos/accelerInt&#45;docs/examples/van_der_pol/gpu_memory.cu" name="/home/nick/Documents/software_repos/accelerInt&#45;docs/examples/van_der_pol/gpu_memory.cu">
 <area shape="rect" id="node2" href="$gpu__memory_8cuh.html" title="Headers for GPU memory initialization. " alt="" coords="116,124,239,151"/>
 <area shape="rect" id="node3" href="$header_8cuh.html" title="An example header file that defines system size, memory functions and other required methods for inte..." alt="" coords="134,199,221,225"/>
 <area shape="rect" id="node5" href="$gpu__macros_8cuh.html" title="Defines some simple macros to simplify GPU indexing. " alt="" coords="118,273,237,300"/>

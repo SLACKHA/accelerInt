@@ -1,11 +1,11 @@
-<map id="/home/nick/Documents/software_repos/accelerInt/generic/solver_init.cuh" name="/home/nick/Documents/software_repos/accelerInt/generic/solver_init.cuh">
-<area shape="rect" id="node2" href="$solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="225,117,401,173"/>
-<area shape="rect" id="node4" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="405,228,595,284"/>
-<area shape="rect" id="node7" href="$radau2a__init_8cu.html" title="Implementation of the necessary initialization for the Radau&#45;IIA solver. " alt="" coords="516,117,692,173"/>
-<area shape="rect" id="node8" href="$rkc__init_8cu.html" title="Implementation of the necessary initialization for the RKC GPU solver. " alt="" coords="716,117,892,173"/>
-<area shape="rect" id="node9" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="916,109,1092,180"/>
-<area shape="rect" id="node10" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1116,109,1292,180"/>
-<area shape="rect" id="node3" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="5,228,181,284"/>
-<area shape="rect" id="node6" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="205,228,381,284"/>
-<area shape="rect" id="node5" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="409,332,591,388"/>
+<map id="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/solver_init.cuh" name="/home/nick/Documents/software_repos/accelerInt&#45;docs/generic/solver_init.cuh">
+<area shape="rect" id="node2" href="$solver_8cuh.html" title="the generic main file for all GPU solvers " alt="" coords="271,117,447,173"/>
+<area shape="rect" id="node4" href="$solver__interface_8cuh.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="453,228,674,284"/>
+<area shape="rect" id="node7" href="$radau2a__init_8cu.html" title="Implementation of the necessary initialization for the Radau&#45;IIA solver. " alt="" coords="575,117,771,173"/>
+<area shape="rect" id="node8" href="$rkc__init_8cu.html" title="Implementation of the necessary initialization for the RKC GPU solver. " alt="" coords="795,117,971,173"/>
+<area shape="rect" id="node9" href="$exp4_8cu.html" title="A krylov subspace integrator using the fourth&#45;order (3rd order embedded) Rosenbrock&#45;like solver of Ho..." alt="" coords="995,109,1187,180"/>
+<area shape="rect" id="node10" href="$exprb43_8cu.html" title="A krylov subspace integrator using a 4th order (3rd&#45;order embedded) exponential Rosenbrock method of ..." alt="" coords="1211,109,1403,180"/>
+<area shape="rect" id="node3" href="$solver__generic_8cu.html" title="the generic integration driver for the GPU solvers " alt="" coords="5,228,212,284"/>
+<area shape="rect" id="node6" href="$solver__main_8cu.html" title="the generic main file for all GPU solvers " alt="" coords="237,228,429,284"/>
+<area shape="rect" id="node5" href="$solver__interface_8cu.html" title="Interface implementation for GPU solvers to be called as a library. " alt="" coords="456,332,671,388"/>
 </map>
