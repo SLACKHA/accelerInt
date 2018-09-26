@@ -36,7 +36,7 @@ def run(num, num_threads):
     print('Integration completed in {} (ms)'.format(time))
 
     # get output
-    phi = integrator.state(11)
+    t, phi = integrator.state()
     print(phi)
 
 

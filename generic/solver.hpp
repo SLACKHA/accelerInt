@@ -113,14 +113,20 @@ namespace c_solvers {
         }
 
         /*! \brief Copy the current log of data to the given array */
-        void getLog(const int NUM, double* __restrict__ phi) const
+        void getLog(const int NUM, double* __restrict__ times, double* __restrict__ phi) const
         {
-            std::size_t offset = 0;
-            for (const auto& log_entry : _log)
+            for (std::size_t index = 0; index < _log.size(); ++index)
             {
-                std::memcpy(&phi[offset], log_entry.get(), (1 + NUM * _neq) * sizeof(double));
-                offset += (1 + NUM * _neq);
+                const double* __restrict__ log_entry = _log[index].get();
+                times[index] = log_entry[0];
+                std::memcpy(&phi[index * NUM * _neq], &log_entry[1], NUM * _neq * sizeof(double));
             }
+        }
+
+        /*! \brief Return the number of integration steps completed by this Integrator */
+        std::size_t numSteps() const
+        {
+            return _log.size();
         }
 
         void reinitialize(int numThreads)

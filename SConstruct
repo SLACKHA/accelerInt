@@ -770,13 +770,14 @@ def run_with_our_python(env, target, source, action):
 
     return env.Command(target=target,
                        source=source,
-                       action=action.format(python=env['python_cmd']))
+                       action=action.format(python=env['python_cmd']),
+                       )
 
 
 def build_wrapper(save, defines):
     env = get_env(save, defines)
-    full_c = env.SharedLibrary(target='accelerint_problem', source=mech_c)
-    full_c = env.Install(lib_dir, full_c)
+    lib_c = env.SharedLibrary(target='accelerint_problem', source=mech_c)
+    full_c = env.Install(lib_dir, lib_c)
     # and build wrapper
     driver = os.path.join(driver_dir, 'setup.py')
     wrapper_c = run_with_our_python(env,
@@ -784,6 +785,7 @@ def build_wrapper(save, defines):
                                     source=[driver],
                                     action='{{python}} {} build_ext --inplace'
                                     .format(driver))
+    env.Depends(wrapper_c, lib_c)
     full_c += wrapper_c
     full_cu = []
     if build_cuda:

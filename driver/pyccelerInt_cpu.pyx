@@ -37,7 +37,8 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
         const double rtol() except +
         const double neq() except +
         const double numThreads() except +
-        void getLog(const int, double*) except +
+        void getLog(const int, double*, double*) except +
+        size_t numSteps() except +
 
     cdef cppclass SolverOptions:
         SolverOptions(double, double, bool) except +
@@ -79,15 +80,26 @@ cdef class PyIntegrator:
         return integrate(deref(self.integrator.get()), num, t_start,
                          t_end, step, &y_host[0], &var_host[0])
 
-    def state(self, np.int32_t n_steps):
+    def state(self):
+        """
+        Returns
+        -------
+        times: np.ndarray
+            The array of times that this integrator has reached
+        state: np.ndarray
+            The state vectors at each time, shape is
+            (times.size, :attr:`num`, :attr:`neq`)
+        """
         assert self.num > 0 and self.neq > 0
+        n_steps = deref(self.integrator.get()).numSteps()
         cdef np.ndarray[np.float64_t, ndim=1] phi = np.zeros(
-            (1 + self.num * self.neq) * n_steps, dtype=np.float64)
+            self.num * self.neq * n_steps, dtype=np.float64)
+        cdef np.ndarray[np.float64_t, ndim=1] times = np.zeros(
+            n_steps, dtype=np.float64)
         # get phi
-        deref(self.integrator.get()).getLog(self.num, &phi[0])
-        return phi
+        deref(self.integrator.get()).getLog(self.num, &times[0], &phi[0])
         # and reshape
-        return np.reshape(phi, (self.num, self.neq), order='F')
+        return times, np.reshape(phi, (n_steps, self.num, self.neq), order='F')
 
 
 cdef class PySolverOptions:
