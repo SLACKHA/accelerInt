@@ -373,8 +373,8 @@ namespace c_solvers
         std::memcpy(y0, y, _neq * sizeof(double));
         double* F0 = _unique<double>(tid, _F0);
         double* F1 = _unique<double>(tid, _F1);
-        double* F2 = _unique<double>(tid, _F0);
-        double* TMP = _unique<double>(tid, _F2);
+        double* F2 = _unique<double>(tid, _F2);
+        double* TMP = _unique<double>(tid, _TMP);
 
 
         int info = 0;
