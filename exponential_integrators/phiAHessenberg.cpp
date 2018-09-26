@@ -28,7 +28,7 @@ namespace c_solvers
 		int tid = omp_get_thread_num();
 		int* ipiv = _unique<int>(tid, _ipiv);
 		std::complex<double>* invA = _unique<std::complex<double>>(tid, _invA);
-		std::complex<double>* work = _unique<std::complex<double>>(tid, _w);
+		std::complex<double>* work = _unique<std::complex<double>>(tid, _work);
 		int info = 0;
 
 		for (int i = 0; i < m; ++i) {

@@ -98,6 +98,9 @@ namespace c_solvers
             // w
             _w = working;
             working += _neq * sizeof(double);
+            // work (from hessenberg LU)
+            _work = working;
+            working += _neq * sizeof(double);
             return working;
         }
 
@@ -131,8 +134,10 @@ namespace c_solvers
         std::size_t _invA;
         //! ipiv
         std::size_t _ipiv;
-        //! working vector for arnoldi & getComplexInverseHessenbergLU
+        //! working vector for arnoldi
         std::size_t _w;
+        //! working vector for getComplexInverseHessenbergLU
+        std::size_t _work;
 
         /** \brief Compute the correct order Phi (exponential) matrix function.
          *         This is dependent on the exponential solver type, and hence must be

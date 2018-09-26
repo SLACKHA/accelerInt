@@ -117,6 +117,13 @@ namespace c_solvers
             return working;
         }
 
+        /*
+         * \brief Return the required memory size (per-thread) in bytes
+         */
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            return _ourMemSize;
+        }
 
     public:
 
