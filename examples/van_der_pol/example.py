@@ -9,9 +9,10 @@ import os
 import argparse
 sys.path.insert(0, os.getcwd())
 import pyccelerInt_cpu as pycel
+np.random.seed(0)
 
 
-def run(num, num_threads):
+def run(num, num_threads, itype):
     # number of equations
     neq = 2
 
@@ -22,12 +23,12 @@ def run(num, num_threads):
     params = 5 * np.random.random(num)
 
     # create options
-    options = pycel.PySolverOptions(pycel.IntegratorType.CVODES, atol=1e-15,
+    options = pycel.PySolverOptions(itype, atol=1e-15,
                                     rtol=1e-10, logging=True)
 
     # create the integrator
-    integrator = pycel.PyIntegrator(pycel.IntegratorType.CVODES, neq, num_threads,
-                                    options)
+    integrator = pycel.PyIntegrator(itype, neq,
+                                    num_threads, options)
 
     # and integrate
     time = integrator.integrate(num, 0., 10., phi.flatten('F'), params.flatten('F'),
@@ -54,5 +55,13 @@ if __name__ == '__main__':
                         help='The number of threads to use during solution '
                              '[default: # of logical cores].')
 
+    parser.add_argument('-it', '--int_type',
+                        type=str,
+                        default=pycel.IntegratorType.CVODES,
+                        help='The integrator type to uses [default CVODES]')
+
     args = parser.parse_args()
-    run(args.num_ivp, args.num_threads)
+    int_type = next(x for x in pycel.IntegratorType if args.int_type in str(x))
+    print('Integrating {} IVPs with method {}, and {} threads...'.format(
+        args.num_ivp, args.num_threads, int_type))
+    run(args.num_ivp, args.num_threads, int_type)
