@@ -66,14 +66,12 @@ cdef class PyIntegrator:
                                         deref(options.options.get())))
         else:
             self.integrator = move(init(itype, neq, numThreads))
-
-    def __init__(self, itype, neq, numThreads, options):
         self.num = -1
         self.neq = neq
 
-    def integrate(self, np.int32_t num, np.float64_t t_start,
-                  np.float64_t t_end, np.ndarray[np.float64_t] y_host,
-                  np.ndarray[np.float64_t] var_host, np.float64_t step=-1):
+    cpdef integrate(self, np.int32_t num, np.float64_t t_start,
+                    np.float64_t t_end, np.ndarray[np.float64_t] y_host,
+                    np.ndarray[np.float64_t] var_host, np.float64_t step=-1):
 
         # store # of IVPs
         self.num = num
