@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-it', '--int_type',
                         type=str,
-                        default=pycel.IntegratorType.CVODES,
+                        default='CVODES',
                         help='The integrator type to uses [default CVODES]')
 
     args = parser.parse_args()

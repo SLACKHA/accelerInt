@@ -83,7 +83,7 @@ namespace c_solvers
             STRIDE(options.krylov_subspace_size(neq) + order)
         {
             _ourMemSize = this->setOffsets();
-            find_poles_and_residuals(N_RA(), poles, res);
+            find_poles_and_residuals(N_RA(), atol(), poles, res);
         }
 
         virtual std::size_t setOffsets()

@@ -13,6 +13,8 @@
 
 #include <vector>
 #include <complex>
-void find_poles_and_residuals(const int N_RA, std::vector<std::complex<double>>& poles, std::vector<std::complex<double>>& res);
+void find_poles_and_residuals(const int N_RA, const double,
+                              std::vector<std::complex<double>>& poles,
+                              std::vector<std::complex<double>>& res);
 
 #endif

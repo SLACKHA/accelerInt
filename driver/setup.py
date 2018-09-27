@@ -7,8 +7,9 @@ import os
 path = os.path.dirname(__file__)
 topdir = os.path.abspath(os.path.join(path, os.pardir))
 libdir = os.path.join(topdir, 'lib')
-includes = [os.path.join(topdir, 'generic'), os.path.join(topdir, 'interface'),
-            os.path.join(topdir, 'exponential_integrators')]
+includes = [os.path.join(topdir, 'generic', 'cpu'),
+            os.path.join(topdir, 'interface', 'cpu'),
+            os.path.join(topdir, 'exponential_integrators', 'cpu')]
 
 ext_module = Extension('pyccelerInt_cpu',
                        sources=[os.path.join(path, 'pyccelerInt_cpu.pyx')],
@@ -16,7 +17,7 @@ ext_module = Extension('pyccelerInt_cpu',
                        language="c++",
                        extra_compile_args=['-frounding-math', '-fsignaling-nans',
                                            '-std=c++11', '-fopenmp'],
-                       libraries=['accelerint_problem'],
+                       libraries=['accelerint_problem', 'accelerint'],
                        runtime_library_dirs=[libdir],
                        library_dirs=[libdir])
 

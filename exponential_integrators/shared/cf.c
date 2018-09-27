@@ -10,8 +10,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-#include "solver_options.h"
 #include "linear-algebra.h"
 
 /** Defined for pi */
@@ -33,12 +31,14 @@
  * and rational approximations," BIT Numer. Math. 46 (2006) 653–670.
  *
  * \param[in]	n				size of approximation (n, n)
+ * \param[in]   atol    		the absolute tolerance used for scaling
  * \param[out]	poles_r			array with real parts of poles, size n
  * \param[out]	poles_i			array with imaginary parts of poles, size n
  * \param[out]	res_r			array with real parts of residuals, size n
  * \param[out]	res_i			array with imaginary parts of residuals, size n
  */
-void cf ( int n, double* poles_r, double* poles_i, double* res_r, double* res_i ) {
+void cf ( const int n, const double atol, double* poles_r, double* poles_i,
+		  double* res_r, double* res_i ) {
 	// number of Chebyshev coefficients
 	const int K = 75;
 
@@ -63,7 +63,7 @@ void cf ( int n, double* poles_r, double* poles_i, double* res_r, double* res_i 
 	// exp(x) transpl. to [-1,1]
 	fftw_complex *F = fftw_alloc_complex(nf);
 	for (int i = 0; i < nf; ++i) {
-		F[i] = cexp(scl * (t[i] - 1.0) / (t[i] + 1.0 + ATOL));
+		F[i] = cexp(scl * (t[i] - 1.0) / (t[i] + 1.0 + atol));
 	}
 
 	free (t);

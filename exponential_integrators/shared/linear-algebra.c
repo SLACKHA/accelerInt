@@ -56,7 +56,15 @@ void getInverseComplex (int n, double complex* A) {
 
 	// increase size of work array
 	lwork = (int) creal(work[0]);
-	work = (double complex*) realloc (work, lwork * sizeof(double complex));
+	double complex* twork = (double complex*) realloc (work, lwork * sizeof(double complex));
+	if (twork == NULL)
+	{
+		// work still active
+		free(work);
+		printf("Could not realloc work array\n");
+		exit(-1);
+	}
+	work = twork;
 
 	// now call zgetri for inversion
 	zgetri_ (&n, A, &n, ipiv, work, &lwork, &info);
