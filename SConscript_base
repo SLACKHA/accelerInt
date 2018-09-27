@@ -1,0 +1,19 @@
+import os
+from build_utils import getPlatformObject
+Import('env')
+Import('platform')
+
+# get platform path
+base = os.path.abspath(os.path.dirname(__file__))
+path = os.path.join(base, platform)
+# get source
+src = env.Glob(os.path.join(path, '*.cpp'))
+obj = getPlatformObject(env, platform)
+
+if 'extra_dirs' in env:
+    for d in env['extra_dirs']:
+        path = os.path.join(base, d)
+        src += env.Glob(os.path.join(path, '*.cpp'))
+
+obj = [obj(file, variant_dir=env['variant']) for file in src]
+Return('obj')

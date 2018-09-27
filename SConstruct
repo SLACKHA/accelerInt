@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import os
 import sys
-import errno
 import platform
 import shutil
 import subprocess
@@ -452,10 +451,6 @@ def write_options(lang, dir):
             """)
 
 
-#write_options('c++', generic_dir)
-#if build_cuda:
-#    write_options('cuda', generic_dir)
-
 NVCCFlags = listify(NVCCFlags)
 CFlags = listify(CFlags)
 CCFlags = listify(CCFlags)
@@ -487,17 +482,6 @@ if build_cuda:
 
 target_list = {}
 
-# copy a good SConscript into the mechanism dir
-try:
-    shutil.copyfile(os.path.join(defaults.mechanism_dir, 'SConscript'),
-                    os.path.join(mech_dir, 'SConscript'))
-except shutil.Error:
-    pass
-except IOError as e:
-    if e.errno == errno.ENOENT:
-        pass
-
-
 def get_env(save, defines):
     env = save.Clone()
 
@@ -510,11 +494,11 @@ def get_env(save, defines):
     return env
 
 
-env['build_cuda'] = build_cuda
+platforms = ['cpu']
+if build_cuda:
+    platforms += ['cuda']
+
 env_save = env.Clone()
-mech_c, mech_cuda = env.SConscript(os.path.join(mech_dir, 'SConscript'),
-                                   variant_dir=os.path.join(mech_dir, variant),
-                                   exports=['env'])
 
 
 def libname(node):
@@ -527,23 +511,6 @@ def libname(node):
     # drop exension
     filename = filename[:filename.rindex('.')]
     return filename
-
-
-def build_core(save, defines, variant):
-    env = get_env(save, defines)
-
-    # build generic for this lib
-    cgen, cugen = env.SConscript(os.path.join(generic_dir, 'SConscript'),
-                                 variant_dir=os.path.join(generic_dir, variant),
-                                 src_dir=generic_dir,
-                                 exports=['env'])
-
-    ccore = env.SharedLibrary(target='core', source=cgen)
-    ccore = env.Install(lib_dir, ccore)
-    cucore = None
-    if build_cuda:
-        cucore = env.SharedLibrary(target='core', source=cugen)
-    return ccore, cucore
 
 
 def add_libs_to_defines(libs, defines):
@@ -560,159 +527,41 @@ def add_libs_to_defines(libs, defines):
     return defines
 
 
-def copy_core(core):
-    out = []
-    for x in core:
-        if x is not None:
-            out.append(x[:])
-        else:
-            out.append(x)
-    return tuple(out)
-
-
-def build_lib(save, core, defines, src, variant, target_base, filter=None,
+def build_lib(save, platform, defines, src, variant, target_base,
               extra_libs=[]):
-    extra_clibs, extra_culibs = copy_core(core)
-    if extra_libs:
-        extra_clibs += extra_libs[0]
-        if build_cuda:
-            extra_culibs += extra_libs[1]
-    cdef = add_libs_to_defines(extra_clibs, defines.copy())
+    extra = extra_libs[:]
+
+    cdef = add_libs_to_defines(extra, defines.copy())
     env = get_env(save, cdef)
 
+    # copy sconscript into dir
+    shutil.copyfile(os.path.join(home, 'SConscript_base'),
+                    os.path.join(src, 'SConscript'))
+
     # build integrator for this lib
-    cint, cuint = env.SConscript(os.path.join(src, 'SConscript'),
-                                 variant_dir=os.path.join(src, variant),
-                                 src_dir=src,
-                                 exports=['env'])
+    intlib = env.SConscript(os.path.join(src, 'SConscript'),
+                            variant_dir=os.path.join(src, variant),
+                            src_dir=src,
+                            exports=['env', 'platform'])
+    if not intlib:
+        return None
 
-    clib = env.SharedLibrary(target=target_base, source=cint)
-    clib = env.Install(lib_dir, clib)
-    culib = []
-    if build_cuda:
-        culib = env.SharedLibrary(target=target_base, source=cuint)
-        culib = env.Install(lib_dir, culib)
-
-    return clib, culib
+    lib = env.SharedLibrary(target=target_base, source=intlib)
+    lib = env.Install(lib_dir, lib)
+    return lib
 
 
-new_defines = {}
-new_defines['CPPPATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
-                          exprb43_int_dir, exp_int_dir, cvodes_dir]
-new_defines['NVCC_INC_PATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
-                                exprb43_int_dir, exp_int_dir, cvodes_dir]
-core = build_core(env_save, new_defines, variant)
-
-# linear algebra
-new_defines = {}
-new_defines['CPPPATH'] = [linalg_dir]
-new_defines['NVCC_INC_PATH'] = [linalg_dir]
-linalg_c, linalg_cu = build_lib(env_save, core, new_defines, linalg_dir,
-                                variant, 'linalg')
-
-# radua
-new_defines = {}
-new_defines['CPPPATH'] = [radau2a_dir]
-new_defines['NVCC_INC_PATH'] = [radau2a_dir]
-radau_c, radau_cuda = build_lib(env_save, core, new_defines, radau2a_dir,
-                                variant, 'radau2a', extra_libs=([], linalg_cu))
-radau_c_builder = env.Alias('radau2a-cpu', radau_c)
-# radau_cuda = env.Alias('radau2a-gpu', radau_cuda)
-
-# exponentials
-new_defines = {}
-new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir]
-new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
-new_defines['LIBS'] = ['fftw3']
-new_defines['NVCC_INC_PATH'] = [exp_int_dir]
-exp_c, exp_cuda = build_lib(env_save, core, new_defines, exp_int_dir,
-                            variant, 'exp', extra_libs=(linalg_c, linalg_cu))
-
-# exp4
-new_defines = {}
-new_defines['CPPPATH'] = [exp_int_dir, exp4_int_dir]
-new_defines['NVCC_INC_PATH'] = [exp_int_dir, exp4_int_dir]
-new_defines['CPPDEFINES'] = ['EXP4']
-new_defines['NVCCDEFINES'] = ['EXP4']
-exp4_c, exp4_cuda = build_lib(env_save, core, new_defines, exp4_int_dir,
-                              variant, 'exp4', extra_libs=(exp_c, exp_cuda))
-# exp4_c = env.Alias('exp4-cpu', exp4_c)
-# exp4_cuda = env.Alias('exp4-gpu', exp4_cuda)
-
-# exprb43
-new_defines = {}
-new_defines['CPPPATH'] = [exp_int_dir, exprb43_int_dir]
-new_defines['LIBS'] = ['fftw3']
-new_defines['NVCC_INC_PATH'] = [exp_int_dir, exprb43_int_dir]
-new_defines['CPPDEFINES'] = ['RB43']
-new_defines['NVCCDEFINES'] = ['RB43']
-exprb43_c, exprb43_cuda = build_lib(env_save, core, new_defines, exprb43_int_dir,
-                                    variant, 'exprb43', extra_libs=(exp_c, exp_cuda)
-                                    )
-# exprb43_c = env.Alias('exprb43-cpu', exprb43_c)
-# exprb43_cuda = env.Alias('exprb43-gpu', exprb43_cuda)
-
-# rkc
-new_defines = {}
-new_defines['CPPPATH'] = [rkc_dir]
-new_defines['NVCC_INC_PATH'] = [rkc_dir]
-rkc_c, rkc_cuda = build_lib(env_save, core, new_defines, rkc_dir,
-                            variant, 'rkc')
-# rkc_c = env.Alias('rkc-cpu', rkc_c)
-# rkc_cuda = env.Alias('rkc-gpu', rkc_cuda)
+def build_core(save, platform, defines, variant):
+    return build_lib(save, platform, defines, 'generic', variant, 'core')
 
 
-# cvodes
-new_defines = {}
-new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
-new_defines['LIBPATH'] = [env['sundials_lib_dir']]
-new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
-cvodes_c, _ = build_lib(env_save, core, new_defines, cvodes_dir,
-                        variant, 'cvodes')
-# cvodes_c = env.Alias('cvodes-cpu', cvodes_c)
-
-# rk78
-new_defines = {}
-env_cpp = env_save.Clone()
-new_defines['CPPPATH'] = [rk78_dir, env['boost_inc_dir']]
-rk78_c, _ = build_lib(env_save, core, new_defines, rk78_dir, variant,
-                      'rk78')
-# rk78_c = env.Alias('rk78-cpu', rk78_c)
-
-cpu_vals = [rkc_c, rk78_c, radau_c, exp4_c, exprb43_c, cvodes_c,
-            exp_c, linalg_c]
-cpu_vals = [x for y in cpu_vals for x in y]
-gpu_vals = []
-
-
-def build_multitarget(save, defines, cpulibs, gpulibs):
-    defines = add_libs_to_defines(cpulibs, defines.copy())
+def build_multitarget(save, defines, libs):
+    defines = add_libs_to_defines(libs, defines.copy())
     env = get_env(save, defines)
-    # add interface
-    cinterface, cuinterface = env.SConscript(
-        os.path.join(interface_dir, 'SConscript'),
-        variant_dir=os.path.join(interface_dir, variant),
-        src_dir=interface_dir,
-        exports=['env'])
 
-    caccel = env.SharedLibrary(target='accelerint', source=cinterface)
-    caccel = env.Install(lib_dir, caccel)
-    cuaccel = []
-    if build_cuda:
-        cuaccel = env.SharedLibrary(target='accelerint', source=cuinterface)
-        cuaccel = env.Install(lib_dir, cuaccel)
-    return caccel, cuaccel
-
-
-new_defines = {}
-new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
-new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
-new_defines['CPPPATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
-                          exprb43_int_dir, exp_int_dir, cvodes_dir]
-new_defines['NVCC_INC_PATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
-                                exprb43_int_dir, exp_int_dir, cvodes_dir]
-new_defines['RPATH'] = [lib_dir]
-cpu, gpu = build_multitarget(env_save, new_defines, cpu_vals, gpu_vals)
+    accel = env.SharedLibrary(target='accelerint')
+    accel = env.Install(lib_dir, accel)
+    return accel
 
 
 def find_current_python(env):
@@ -770,46 +619,129 @@ def run_with_our_python(env, target, source, action):
 
     return env.Command(target=target,
                        source=source,
-                       action=action.format(python=env['python_cmd']),
-                       )
+                       action=action.format(python=env['python_cmd']))
 
 
-def build_wrapper(save, defines):
+def build_wrapper(save, defines, libs):
+    defines = add_libs_to_defines(libs, defines.copy())
     env = get_env(save, defines)
-    lib_c = env.SharedLibrary(target='accelerint_problem', source=mech_c)
-    full_c = env.Install(lib_dir, lib_c)
+    wrapper = env.SharedLibrary(target='accelerint_problem')
+    wrapper = env.Install(lib_dir, wrapper)
     # and build wrapper
     driver = os.path.join(driver_dir, 'setup.py')
-    wrapper_c = run_with_our_python(env,
-                                    target='pyccelerInt_cpu',
-                                    source=[driver],
-                                    action='{{python}} {} build_ext --inplace'
-                                    .format(driver))
-    env.Depends(wrapper_c, lib_c)
-    full_c += wrapper_c
-    full_cu = []
-    if build_cuda:
-        full_cu = env.SharedLibrary(target='accelerint_specialized',
-                                    source=mech_cuda)
-        full_cu = env.Install(lib_dir, full_cu)
-    return full_c, full_cu
+    wrapper_py = run_with_our_python(env,
+                                     target='pyccelerInt_cpu',
+                                     source=[driver],
+                                     action='{{python}} {} build_ext --inplace'
+                                     .format(driver))
+    env.Depends(wrapper_py, wrapper)
+    return wrapper
 
 
-defaults = [cpu]
-if build_cuda:
-    defaults += [gpu]
-if mech_c:
+for p in platforms:
+    new_defines = {}
+    new_defines['CPPPATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
+                              exprb43_int_dir, exp_int_dir, cvodes_dir]
+    new_defines['NVCC_INC_PATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
+                                    exprb43_int_dir, exp_int_dir, cvodes_dir]
+    core = build_core(env_save, p, new_defines, variant)
+
+    # linear algebra
+    new_defines = {}
+    new_defines['CPPPATH'] = [linalg_dir]
+    new_defines['NVCC_INC_PATH'] = [linalg_dir]
+    linalg = build_lib(env_save, p, new_defines, linalg_dir,
+                       variant, 'linalg', extra_libs=core)
+
+    # radua
+    new_defines = {}
+    new_defines['CPPPATH'] = [radau2a_dir]
+    new_defines['NVCC_INC_PATH'] = [radau2a_dir]
+    radau = build_lib(env_save, p, core, new_defines, radau2a_dir,
+                      variant, 'radau2a', extra_libs=core + linalg)
+
+    # exponentials
+    new_defines = {}
+    new_defines['CPPPATH'] = [env['fftw3_inc_dir'], exp_int_dir]
+    new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
+    new_defines['LIBS'] = ['fftw3']
+    new_defines['NVCC_INC_PATH'] = [exp_int_dir]
+    exp = build_lib(env_save, p, new_defines, exp_int_dir,
+                    variant, 'exp', extra_libs=core + linalg)
+
+    # exp4
+    new_defines = {}
+    new_defines['CPPPATH'] = [exp_int_dir, exp4_int_dir]
+    new_defines['NVCC_INC_PATH'] = [exp_int_dir, exp4_int_dir]
+    new_defines['CPPDEFINES'] = ['EXP4']
+    new_defines['NVCCDEFINES'] = ['EXP4']
+    exp4 = build_lib(env_save, p, new_defines, exp4_int_dir,
+                     variant, 'exp4', extra_libs=exp)
+
+    # exprb43
+    new_defines = {}
+    new_defines['CPPPATH'] = [exp_int_dir, exprb43_int_dir]
+    new_defines['LIBS'] = ['fftw3']
+    new_defines['NVCC_INC_PATH'] = [exp_int_dir, exprb43_int_dir]
+    new_defines['CPPDEFINES'] = ['RB43']
+    new_defines['NVCCDEFINES'] = ['RB43']
+    exprb43 = build_lib(env_save, p, new_defines, exprb43_int_dir,
+                        variant, 'exprb43', extra_libs=exp)
+
+    # rkc
+    new_defines = {}
+    new_defines['CPPPATH'] = [rkc_dir]
+    new_defines['NVCC_INC_PATH'] = [rkc_dir]
+    rkc = build_lib(env_save, p, new_defines, rkc_dir,
+                    variant, 'rkc', extra_libs=core)
+    # cvodes
+    new_defines = {}
+    new_defines['CPPPATH'] = [cvodes_dir, env['sundials_inc_dir']]
+    new_defines['LIBPATH'] = [env['sundials_lib_dir']]
+    new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
+    cvodes = build_lib(env_save, p, new_defines, cvodes_dir,
+                       variant, 'cvodes', extra_libs=core)
+
+    # rk78
+    new_defines = {}
+    env_cpp = env_save.Clone()
+    new_defines['CPPPATH'] = [rk78_dir, env['boost_inc_dir']]
+    rk78 = build_lib(env_save, p, new_defines, rk78_dir, variant,
+                     'rk78', extra_libs=core)
+
+    # add interface / problem definition
+    new_defines = {}
+    new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
+    new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
+    new_defines['CPPPATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
+                              exprb43_int_dir, exp_int_dir, cvodes_dir]
+    new_defines['NVCC_INC_PATH'] = [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
+                                    exprb43_int_dir, exp_int_dir, cvodes_dir]
+    new_defines['RPATH'] = [lib_dir]
+
+    # problem definition, if available
+    problem = build_lib(env_save, p, new_defines, mech_dir, variant,
+                        'specialize')
+
+    interface = build_lib(env_save, p, new_defines, mech_dir, variant,
+                          'interface', extra_libs=core)
+
+    # filter out non-existant
+    vals = [rkc, rk78, radau, exp4, exprb43, cvodes, exp, linalg, problem, core,
+            interface]
+    vals = [x for x in vals if x]
+
+    # add the multitarget
+    target = build_multitarget(env_save, new_defines, vals)
+
+    # add an alias
+    Alias(p, target)
+
+    # and finally build wrapper
     defines = {}
     defines['RPATH'] = [lib_dir]
     defines['LIBPATH'] = [lib_dir]
-    defines['LIBS'] = [cpu]
-    wrapper_c, wrapper_cu = build_wrapper(env_save, defines)
-    full_c = Alias('cpu-wrapper', wrapper_c)
-    if build_cuda:
-        full_cu = Alias('gpu-wrapper', wrapper_cu)
-
-
-Alias('cpu', cpu)
-Alias('gpu', gpu)
-
-Default(defaults)
+    defines['LIBS'] = target
+    wrapper = build_wrapper(env_save, defines, target)
+    # and wrapper
+    Alias(p + '-wrapper', wrapper)

@@ -9,6 +9,19 @@ optionWrapper = textwrap.TextWrapper(initial_indent='    ',
                                      width=72)
 
 
+def getPlatformObject(env, platform):
+    """
+    Return the correct SCons object type from the given environment and platform
+    """
+
+    if platform == 'cpu':
+        return env.SharedObject
+    elif platform == 'cuda':
+        return env.CUDAObject
+    else:
+        raise NotImplementedError
+
+
 def listify(value):
     """
     Convert an option specified as a string to a list.  Allow both
