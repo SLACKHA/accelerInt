@@ -220,7 +220,6 @@ namespace c_solvers {
 					subspaceLog.push_back(std::make_tuple(t, h, err, m, m1, m2));
 	  			#endif
 
-				memcpy(sc, f_temp, _neq * sizeof(double));
 
 				// minimum of classical and Gustafsson step size prediction
 				h_new = std::fmin(h_new, (h / h_old) * std::pow((err_old / (err * err)), (1.0 / ORD)));
@@ -229,11 +228,8 @@ namespace c_solvers {
 				h_new = h * std::fmax(std::fmin(0.9 * h_new, 8.0), 0.2);
 
 				// update y and t
-
-				for (int i = 0; i < _neq; ++i) {
-					y[i] = y1[i];
-				}
-
+				std::memcpy(sc, f_temp, _neq * sizeof(double));
+				std::memcpy(y, y1, _neq * sizeof(double));
 				t += h;
 
 				// store time step and error

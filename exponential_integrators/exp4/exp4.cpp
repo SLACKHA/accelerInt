@@ -246,8 +246,8 @@ namespace c_solvers {
 				h_new = h * std::fmax(std::fmin(0.9 * h_new, 8.0), 0.2);
 
 				// update y, t and sc
-				memcpy(sc, f_temp, _neq * sizeof(double));
-				memcpy(y, y1, _neq * sizeof(double));
+				std::memcpy(sc, f_temp, _neq * sizeof(double));
+				std::memcpy(y, y1, _neq * sizeof(double));
 				t += h;
 
 				// store time step and error
