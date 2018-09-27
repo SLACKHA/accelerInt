@@ -32,8 +32,8 @@ namespace c_solvers
     {
     public:
         EXPSolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false,
-                         int N_RA=10, int M_MAX=-1):
-                SolverOptions(atol, rtol, logging),
+                         double h_init=1e-6, int N_RA=10, int M_MAX=-1):
+                SolverOptions(atol, rtol, logging, h_init),
                 N_RA(N_RA),
                 M_MAX(M_MAX)
             {

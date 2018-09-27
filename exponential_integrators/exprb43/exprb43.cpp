@@ -39,7 +39,7 @@ namespace c_solvers {
 	#ifdef CONST_TIME_STEP
 		double h = t_end - t_start;
 	#else
-		double h = std::fmin(1.0e-8, t_end - t_start);
+		double h = h_init();
 	#endif
 		double h_new;
 

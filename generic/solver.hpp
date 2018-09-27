@@ -46,10 +46,12 @@ namespace c_solvers {
     class SolverOptions
     {
     public:
-        SolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false):
+        SolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false,
+                      double h_init=1e-6):
             _atol(atol),
             _rtol(rtol),
-            _logging(logging)
+            _logging(logging),
+            _h_init(h_init)
         {
 
         }
@@ -69,6 +71,11 @@ namespace c_solvers {
             return _logging;
         }
 
+        inline double h_init() const
+        {
+            return _h_init;
+        }
+
     protected:
         //! the absolute tolerance for this integrator
         const double _atol;
@@ -76,6 +83,8 @@ namespace c_solvers {
         const double _rtol;
         //! whether logging is enabled or not
         bool _logging;
+        //! The initial step-size
+        const double _h_init;
     };
 
     // skeleton of the c-solver
@@ -214,6 +223,13 @@ namespace c_solvers {
         {
             return _numThreads;
         }
+
+        //! return the initial step-size
+        inline const double h_init() const
+        {
+            return _options.h_init();
+        }
+
 
        /**
         * \brief Integration driver for the CPU integrators
