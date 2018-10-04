@@ -37,7 +37,13 @@ ifneq ($(omp),0)
 endif
 endif
 
-CFLAGS  = -I. #-std=c99
+CFLAGS  = -I. -g #-std=c99
+
+ifneq ($(verbose),)
+ ifneq ($(verbose),0)
+   CFLAGS += -DVERBOSE=10
+ endif
+endif
 
 ifeq ($(intel),1)
    CC	= icc -std=c99
@@ -53,7 +59,7 @@ else
    OMP	= -fopenmp
 endif
 
-   CFLAGS += -O3
+   CFLAGS += -O2
 #  CFLAGS += -no-vec
 ifeq ($(opt),3)
    CFLAGS += -DFAST_MATH
@@ -75,7 +81,8 @@ ifneq ($(USE_OMP),0)
    CFLAGS += $(OMP)
 endif
 
-CXXFLAGS= ${CFLAGS} -std=c++0x -Wno-enum-compare
+#CXXFLAGS= ${CFLAGS} -std=c++0x -Wno-enum-compare
+CXXFLAGS= ${CFLAGS} -std=c++11 -Wno-enum-compare
 
 FC	= ifort
 FFLAGS	= -O2 -r8
@@ -85,6 +92,13 @@ LDFLAGS = -lstdc++
 #ifeq ($(intel),1)
 #LDFLAGS+= -mkl=sequential
 #endif
+
+ifneq ($(pyjac),)
+ ifneq ($(pyjac),0)
+   CFLAGS += -D__ENABLE_PYJAC -I$(PYJACPATH)
+   LDFLAGS += -L$(PYJACPATH) -lc_pyjac
+ endif
+endif
 
 ifneq ($(CL),0)
    CFLAGS += -I$(CLINCPATH) -D__ENABLE_OPENCL
@@ -116,10 +130,6 @@ else
 endif
 
 ifeq ($(intel),1)
-   ifneq ($(verbose),)
-      CFLAGS += -vec-report=$(verbose)
-   endif
-
    MIC_ = 0
    OFFLOAD_ = 0
 
@@ -160,6 +170,10 @@ all: exec
 
 $(EXEC) : test_ck.cxx ${OBJS}
 #%.exe : test_ck.cxx ${OBJS}
+	@echo "Building executable $@"
+	${CXX} ${CXXFLAGS} -o $@ $< ${OBJS} ${LDFLAGS}
+
+driver : driver.cxx ${OBJS}
 	@echo "Building executable $@"
 	${CXX} ${CXXFLAGS} -o $@ $< ${OBJS} ${LDFLAGS}
 

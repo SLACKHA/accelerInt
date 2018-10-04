@@ -51,13 +51,13 @@ typedef struct
 }
 ros_counters_t;
 
-//#if defined(__OPENCL_VERSION__)
+#if defined(__OPENCL_VERSION__)
 typedef void* ROS_Function_t;
 typedef void* ROS_Jacobian_t;
-//#else
-//typedef int (*ROS_Function_t)(int neq, double tcur, double *y, double *fy, void *user_data);
-//typedef int (*ROS_Jacobian_t)(int neq, double tcur, double *y, double *Jy, void *user_data);
-//#endif
+#else
+typedef int (*ROS_Function_t)(int neq, double tcur, double *y, double *fy, void *user_data);
+typedef int (*ROS_Jacobian_t)(int neq, double tcur, double *y, double *Jy, void *user_data);
+#endif
 
 int ros_create (__global ros_t *ros, const int neq, ros_solverTags solver_tag);
 int ros_lenrwk (__global const ros_t *ros);

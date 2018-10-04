@@ -27,6 +27,25 @@
 #include <ros.h>
 #include <sdirk.h>
 
+// Don't solve the last species. Needed for PyJac w/ analytical Jacobian.
+static bool skipLastSpecies = false;
+static bool usePyJac = false;
+
+#ifdef __ENABLE_PYJAC
+# warning 'Enabled PyJac RHS'
+namespace pyjac
+{
+#ifndef __restrict__
+#define __restrict__
+#endif
+   extern "C" void dydt (const double, const double, const double * __restrict__, double * __restrict__);
+   extern "C" void eval_jacob (const double, const double, const double * __restrict__, double * __restrict__);
+
+   int N2_idx = -1;
+
+} // namespace-pyjac
+#endif
+
 #if defined(__ENABLE_OPENCL) && (__ENABLE_OPENCL != 0)
    extern "C" {
       //void cl_driver (double p, double T, double *u, ckdata_t*, double *udot, int numProblems, rk_t *rk);
@@ -47,11 +66,12 @@ extern "C"
 #include <TC_defs.h>
 }
 
-static bool isInit_ = false;
-static int nsp_ = 0;
-static std::vector<double> ytmp_, fytmp_, Jytmp_;
-static bool enableRHS_ = false;
-static bool enableJacobian_ = false;
+bool isInit_ = false;
+int nsp_ = 0;
+std::vector<double> ytmp_, fytmp_, Jytmp_;
+bool enableRHS_ = false;
+bool enableJacobian_ = false;
+int nrhs_ = 0, njac_ = 0;
 
 void init(int nsp)
 {
@@ -120,6 +140,8 @@ void rhs (const int neq, const double t, double *y, double *fy)
    //init(nsp);
    assert (isInit_ and enableRHS_);
 
+   nrhs_++;
+
    //TC_setThermoPres (p);
    const int nsp = neq-1;
 
@@ -128,6 +150,7 @@ void rhs (const int neq, const double t, double *y, double *fy)
    {
       //ytmp_[i+1] = fmax(y[i], 1.e-64);
       ytmp_[i+1] = y[i];
+      //ytmp_[i+1] = fmin( fmax(y[i], 1.e-64), 1.0);
    }
 
    TC_getSrc (&ytmp_[0], neq, &fytmp_[0] );
@@ -149,6 +172,15 @@ void jac (const int neq, const double t, double *y, double *Jy)
    //init(nsp);
    assert (isInit_ and enableJacobian_);
 
+   njac_++;
+
+   static bool has_been_called = false;
+   if (not(has_been_called))
+   {
+      fprintf(stderr,"Inside TChem::jac\n");
+      has_been_called = true;
+   }
+
    //const int neq = nsp+1;
    const int nsp = neq-1;
 
@@ -160,10 +192,11 @@ void jac (const int neq, const double t, double *y, double *Jy)
    {
       ytmp_[i+1] = y[i];
       //ytmp_[i+1] = fmax(y[i], 1.e-64);
+      //ytmp_[i+1] = std::fmin( std::fmax( y[i], 1e-30), 1.0 );
    }
 
-   //TC_getJacTYNanl (&ytmp_[0], nsp, &Jytmp_[0] );
-   TC_getJacTYN (&ytmp_[0], nsp, &Jytmp_[0], 0 /* Analytical? */ );
+   TC_getJacTYNanl (&ytmp_[0], nsp, &Jytmp_[0] );
+   //TC_getJacTYN (&ytmp_[0], nsp, &Jytmp_[0], 0 /* Analytical? */ );
 
    // Rotate entries to match the Y_k,T ordering.
 
@@ -182,6 +215,11 @@ void jac (const int neq, const double t, double *y, double *Jy)
       Jy_out(nsp,j) = Jy_in(0,j+1);
 
    Jy_out(nsp,nsp) = Jy_in(0,0);
+
+   //for (int j = 0; j < neq; ++j)
+   //   for (int i = 0; i < neq; ++i)
+   //      printf("tcjac: %d %d %e\n", i, j, Jy_out(i,j));
+   //exit(1);
 
    #undef Jy_out
    #undef Jy_in
@@ -419,13 +457,116 @@ struct cklib_functor
    void operator() (const int &neq, const double &time, double y[], double ydot[])
    {
       double time_start = WallClock();
+      const int kk = this->ck_->n_species;
 
-      const int kk = neq-1;
-      assert(ck_->n_species == kk);
+      if (usePyJac)
+      {
+#ifdef __ENABLE_PYJAC
+         if ( skipLastSpecies == false )
+         {
+            fprintf(stderr,"Must use skipLastSpecies for pyJac\n");
+            exit(-1);
+         }
 
-#if 1
-      ckrhs (this->pres_, y[neq-1], y, ydot, this->ck_, rwk_);
+         if ( neq != kk )
+         {
+            fprintf(stderr,"Equation set is not ==kk\n");
+            exit(-1);
+         }
+
+         VectorType<double> y_in_(neq), dy_out_(neq);
+         y_in_[0] = y[neq-1];
+         for (int k = 0; k < kk-1; ++k)
+            y_in_[k+1] = y[k];
+
+         pyjac::dydt( time, 0.1*this->pres_, &y_in_[0], &dy_out_[0] );
+
+         ydot[neq-1] = dy_out_[0];
+         for (int k = 0; k < kk-1; ++k)
+            ydot[k] = dy_out_[k+1];
+
+         //for (int k = 0; k < neq; ++k)
+         //   printf("pyJac: ydot[%d] = %e\n", k, ydot[k]);
+
+         //const int iN2 = pyjac::N2_idx;
+         //if (iN2 < 0 or iN2 >= kk)
+         //{
+         //   fprintf(stderr,"pyjac: not able to find N2 %d\n", iN2);
+         //   exit(-1);
+         //}
+
+         //std::vector<double> pyjac_in( neq );
+         //std::vector<double> pyjac_out( neq );
+
+         //pyjac_in[0] = y[kk]; // T
+         //for (int k = 0; k < iN2; ++k)
+         //   pyjac_in[k+1] = y[k];
+
+         //pyjac_in[kk] = y[iN2];
+
+         //for (int k = iN2+1; k < kk; ++k)
+         //   pyjac_in[k+1-1] = y[k];
+
+         //pyjac::dydt( time, 0.1*this->pres_, &pyjac_in[0], &pyjac_out[0] );
+
+         //ydot[kk] = pyjac_out[0];
+         //for (int k = 0; k < iN2; ++k)
+         //   ydot[k] = pyjac_out[k+1];
+
+         //ydot[iN2] = pyjac_out[kk];
+
+         //for (int k = iN2+1; k < kk; ++k)
+         //   ydot[k] = pyjac_out[k+1-1];
+
+         //for (int k = 0; k < neq; ++k)
+         //   printf("pyJac N2: ydot[%d] = %e\n", k, ydot[k]);
+
+         return;
 #else
+         fprintf(stderr,"pyJac requested but not available at run-time\n");
+         exit(-1);
+#endif
+      }
+
+#if defined(__ENABLE_TCHEM) && (__ENABLE_TCHEM != 0)
+      if (TChem::enableRHS_)
+      {
+         assert( skipLastSpecies == false ); // Not supported for TChem (yet).
+
+         TChem::rhs (neq, time, y, ydot);
+         return;
+      }
+#endif
+
+      if ( skipLastSpecies )
+      {
+         const double T = y[neq-1];
+         VectorType<double> z(kk+1), zdot(kk+1);
+
+         double ysum = 0;
+         for (int k = 0; k < kk-1; ++k)
+         {
+            ysum += y[k];
+            z[k] = y[k];
+         }
+         double y_last = 1.0 - ysum;
+
+         z[kk-1]  = y_last;
+
+         ckrhs (this->pres_, T, &z[0], &zdot[0], this->ck_, rwk_);
+
+         for (int k = 0; k < kk-1; ++k)
+            ydot[k] = zdot[k];
+         ydot[neq-1] = zdot[kk];
+      }
+      else
+         ckrhs (this->pres_, y[neq-1], y, ydot, this->ck_, rwk_);
+
+      //for (int k = 0; k < neq; ++k)
+      //   printf("cklib: ydot[%d] = %e\n", k, ydot[k]);
+      //exit(-1);
+
+#if 0
       for (int k = 0; k < neq; ++k)
          ydot[k] = 0.0;
 
@@ -486,6 +627,81 @@ struct cklib_functor
       //delete [] h;
 #endif
       return;
+   }
+
+   int jac (const int &neq, double t, double y[], double dfdy[])
+   {
+      const int kk = ck_->n_species;
+
+      if (usePyJac)
+      {
+#ifdef __ENABLE_PYJAC
+         if ( skipLastSpecies == false )
+         {
+            fprintf(stderr,"Must enable skipLastSpecies with pyJac %s %d\n", __FILE__, __LINE__);
+            exit(-1);
+         }
+         if ( neq != kk )
+         {
+            fprintf(stderr,"Must solve KK-1 species with pyJac %d %s %d\n", neq, __FILE__, __LINE__);
+            exit(-1);
+         }
+
+         VectorType<double> y_in_(neq), df_out_(neq*neq);
+
+         const int kkm1 = kk-1;
+
+         y_in_[0] = y[neq-1];
+         for (int k = 0; k < kkm1; ++k)
+            y_in_[k+1] = y[k];
+
+         pyjac::eval_jacob( t, 0.1*this->pres_, &y_in_[0], &df_out_[0] );
+
+#define  jac_out(i,j) dfdy[(i) + (j)*neq]
+
+// pyJac uses C row-major ordering ... faster along the row.
+#define  jac_in(i,j) df_out_[(i) + (j)*neq]
+//#define  jac_in(i,j) jtmp[(i) + (j)*neq]
+
+         // dYi/dYj
+         for (int j = 0; j < kkm1; ++j)
+            for (int i = 0; i < kkm1; ++i)
+               jac_out(i,j) = jac_in(i+1,j+1);
+
+         // dYi/dT
+         for (int i = 0; i < kkm1; ++i)
+            jac_out(i,kkm1) = jac_in(i+1,0);
+
+         // dT/dYj
+         for (int j = 0; j < kkm1; ++j)
+            jac_out(kkm1,j) = jac_in(0,j+1);
+
+         // dT/dT
+         jac_out(kkm1,kkm1) = jac_in(0,0);
+
+         //for (int j = 0; j < neq; ++j)
+         //   for (int i = 0; i < neq; ++i)
+         //      printf("pyjac: %d %d %e\n", i, j, jac_out(i,j));
+         //exit(1);
+#undef jac_in
+#undef jac_out
+
+#else
+         fprintf(stderr,"pyJac Jacobian requested but not available at run-time.\n");
+         exit(-1);
+#endif
+      }
+#if defined(__ENABLE_TCHEM) && (__ENABLE_TCHEM != 0)
+      else if (TChem::enableJacobian_)
+         TChem::jac( neq, t, y, dfdy);
+#endif
+      else
+      {
+         fprintf(stderr,"Analytical Jacobian called but not enabled.\n");
+         exit(2);
+      }
+
+      return 0;
    }
 };
 int cklib_functor_callback (const int neq, const double time, double y[], double ydot[], void *vptr)
@@ -554,8 +770,7 @@ int cv_driver (int neq, ValueType u_in[], const _T& t_stop, Solver &solver, Func
       if (i == nsteps-1) t_next = t_stop;
       double _t0 = WallClock();
 
-      //const int itask = CV_NORMAL;
-      const int itask = CV_ONE_STEP;
+      const int itask = CV_NORMAL;
       solver.solve(t, t_next, u, func, itask);
 
       if (nsteps > 1)
@@ -682,9 +897,21 @@ int main (int argc, char* argv[])
             read_file = argv[index];
             read_data = 1;
          }
+         else if (strcmp(argv[index], "-binary") == 0)
+         {
+            read_csv = 0;
+         }
          else if (strcmp(argv[index], "-csv") == 0)
          {
             read_csv = 1;
+         }
+         else if (strcmp(argv[index], "-pyjac") == 0)
+         {
+            usePyJac = true;
+#ifndef __ENABLE_PYJAC
+            fprintf(stderr,"PyJac enabled at run-time but not compiled.\n");
+            return -1;
+#endif
          }
          else if (strcmp(argv[index], "-nohost") == 0)
          {
@@ -790,7 +1017,12 @@ int main (int argc, char* argv[])
 
    printf("iH2=%d, iO2=%d, iN2=%d\n", iH2, iO2, iN2);
 
+#ifdef __ENABLE_PYJAC
+   pyjac::N2_idx = iN2;
+#endif
+
    x[iH2] = 2.0; x[iO2] = 1.0; x[iN2] = 4.0;
+   //x[iH2] = 2.0; x[iO2] = 1.0; x[iN2] = 0.0;
 
    double x_sum(0);
    for (int k = 0; k < ck.n_species; ++k)
@@ -808,6 +1040,7 @@ int main (int argc, char* argv[])
 
 #if defined(__ENABLE_TCHEM)
    TChem::init(ck.n_species);
+   TChem::TC_setThermoPres (p/10.0);
 #endif
 
    ckdata_t *ckptr = NULL;
@@ -903,6 +1136,13 @@ int main (int argc, char* argv[])
       printf("adjusting num_problems to be multiple of max_threads %d %d %d\n", max_threads, num_problems, round_up);
       num_problems += round_up;
    }
+#endif
+
+   if (usePyJac)
+      std::cout << "Using PyJac RHS instead of internal functions." << std::endl;
+#ifdef __ENABLE_PYJAC
+   else
+      std::cout << "PyJac disabled at run-time." << std::endl;
 #endif
 
    std::cout << "num_problems = " << num_problems << " delta = " << delta << std::endl;
@@ -1098,14 +1338,21 @@ int main (int argc, char* argv[])
       user_data.iterate_for_temp = 0;
       user_data.constant_pres = 1;
 
-      const int neq = kk+1;
+      const int neq = (skipLastSpecies == true) ? kk : kk+1;
 
       VectorType<double> u(neq);
 
       cklib_functor cklib_func(ckptr);
 
 #ifdef USE_SUNDIALS
-       CV::Integrator< cklib_functor > cv_cklib_obj(neq, false);
+       bool use_analytical_jacobian = false;
+
+#if defined(__ENABLE_PYJAC) || (defined(__ENABLE_TCHEM) && (__ENABLE_TCHEM != 0))
+       if (usePyJac or TChem::enableJacobian_)
+          use_analytical_jacobian = true;
+#endif
+
+       CV::Integrator< cklib_functor > cv_cklib_obj(neq, use_analytical_jacobian);
 #endif
 
       cklib_func.pres_ = p;
@@ -1122,8 +1369,15 @@ int main (int argc, char* argv[])
          double t0 = WallClock();
 
          //for (int k = 0; k < kk; ++k)
-         for (int k = 0; k < neq; ++k)
-            u[k] = u_in[problem_id * neq + k];
+         if (skipLastSpecies)
+         {
+            u[neq-1] = u_in[problem_id * (kk+1) + kk];
+            for (int k = 0; k < kk-1; ++k)
+               u[k] = u_in[problem_id * (kk+1) + k];
+         }
+         else
+            for (int k = 0; k < neq; ++k)
+               u[k] = u_in[problem_id * neq + k];
 
          double To = u[neq-1];
 
@@ -1142,6 +1396,9 @@ int main (int argc, char* argv[])
             int write_stride = std::max(1,num_problems / 16);
             if (problem_id % write_stride == 0)
                printf("%d: %d %d %f %f\n", problem_id, cv_cklib_obj.nst, cv_cklib_obj.nfe, u[neq-1], To);
+#if (defined(__ENABLE_TCHEM) && (__ENABLE_TCHEM != 0))
+            printf("nrhs_= %d %d\n", TChem::nrhs_, TChem::njac_);
+#endif
 #else
              std::cerr << "recompile with -DUSE_SUNDIALS" << std::endl;
 #endif
@@ -1200,7 +1457,7 @@ int main (int argc, char* argv[])
 
             ros_init (&ros_, t_, t_stop);
 
-#if defined(__ENABLE_TCHEM)
+#if defined(__ENABLE_TCHEM) //&& (0)
             if (TChem::enableJacobian_)
             {
                //ros_solve (&ros_, &t_, &h_, &counters_, &u[0], ros_iwk, ros_rwk, cklib_callback, TChem::jac, &cklib_func);
@@ -1242,6 +1499,7 @@ int main (int argc, char* argv[])
             if (TChem::enableJacobian_)
             {
                sdirk_solve (&sdirk_obj, &t_, &h_, &counters_, &u[0], &_iwk[0], &_rwk[0], TChem::rhs, TChem::jac, NULL);
+               printf("nrhs_= %d %d\n", TChem::nrhs_, TChem::njac_);
             }
             else
 #endif
@@ -1263,11 +1521,20 @@ int main (int argc, char* argv[])
 
          if (u_out.size() > 0 and read_data == 0)
          {
-            for (int k = 0; k < kk+1; ++k)
-               u_out[k+problem_id*neq] = u[k];
+            const double Tout = skipLastSpecies ? u[kk-1] : u[kk];
+
+            if (skipLastSpecies)
+            {
+               u_out[(kk)+problem_id*(kk+1)] = Tout;
+               for (int k = 0; k < kk-1; ++k)
+                  u_out[k+problem_id*(kk+1)] = u[k];
+            }
+            else
+               for (int k = 0; k < kk+1; ++k)
+                  u_out[k+problem_id*(kk+1)] = u[k];
 
             if (num_problems < 16)
-               printf("u[%d] = %f %f %f\n", problem_id, u[kk], u_in[kk+problem_id*neq], 1000*(WallClock() - t0));
+               printf("u[%d] = %f %f %f\n", problem_id, Tout, u_in[kk+problem_id*neq], 1000*(WallClock() - t0));
 
          }
 

@@ -57,7 +57,7 @@ namespace CV
 {
 
 template <class Func>
-int CV_UserDefinedRHS (realtype t, N_Vector y, N_Vector ydot, void *user_data)
+static int CV_UserDefinedRHS (realtype t, N_Vector y, N_Vector ydot, void *user_data)
 {
    int neq = NV_LENGTH_S(y);
    double *y_data = NV_DATA_S(y);
@@ -66,6 +66,22 @@ int CV_UserDefinedRHS (realtype t, N_Vector y, N_Vector ydot, void *user_data)
    Func &func = *((Func *) user_data);
 
    func (neq, t, y_data, ydot_data);
+
+   return (0);
+}
+
+template <class Func>
+static int CV_UserDefinedJac (long int N, realtype t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,
+                       N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+{
+   int neq = NV_LENGTH_S(y);
+   double *y_data = NV_DATA_S(y);
+   double *fy_data = NV_DATA_S(fy);
+   double *Jac_data = Jac->data;
+
+   Func &func = *((Func *) user_data);
+
+   func.jac (neq, t, y_data, Jac_data);
 
    return (0);
 }
@@ -86,7 +102,7 @@ struct Integrator
 
    int nst, nfe, nje, nni, nlu;
 
-   Integrator(const int _neq, bool use_cvdiag = false) :
+   Integrator(const int _neq, bool use_analytical_jacobian = false) :
       neq(_neq),
       itol(1), atol(1.e-9), rtol(1.e-11),
       min_iters(0), max_iters(2000),
@@ -121,14 +137,23 @@ struct Integrator
       assert(ierr == CV_SUCCESS);
 
       /* Initialize the SUNDIALS dense matrix object */
-      if (use_cvdiag)
+      //if (use_cvdiag)
+      //{
+      //   ierr = CVDiag(this->cv_mem);
+      //   assert(ierr == CV_SUCCESS);
+      //   printf("initialized CVDiag\n");
+      //}
       {
-         ierr = CVDiag(this->cv_mem);
-         printf("initialized CVDiag\n");
-      }
-      else
          ierr = CVDense(this->cv_mem, this->neq);
-      assert(ierr == CV_SUCCESS);
+         assert(ierr == CV_SUCCESS);
+
+         if (use_analytical_jacobian)
+         {
+            /* Set the Jacobian function, if available. */
+            ierr = CVDlsSetDenseJacFn (cv_mem, CV_UserDefinedJac<Func>);
+            assert(ierr == CV_SUCCESS);
+         }
+      }
 
       N_VDestroy_Serial(y);
    }
