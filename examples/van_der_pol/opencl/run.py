@@ -14,7 +14,7 @@ except ImportError:
     plt = None
 
 sys.path.insert(0, os.getcwd())
-import pyccelerInt_cpu as pycel
+import pyccelerInt_ocl as pycel
 np.random.seed(0)
 
 
@@ -71,8 +71,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-it', '--int_type',
                         type=str,
-                        default='CVODES',
-                        help='The integrator type to uses [default CVODES]')
+                        default='RKF45',
+                        help='The integrator type to use [default RKF45]')
 
     args = parser.parse_args()
     int_type = next(x for x in pycel.IntegratorType if args.int_type in str(x))

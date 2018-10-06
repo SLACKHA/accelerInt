@@ -30,7 +30,7 @@ cdef extern from "exp_solver.hpp" namespace "c_solvers":
 
 cdef extern from "solver_interface.hpp" namespace "c_solvers":
     cdef cppclass Integrator:
-        Integrator(int, int, double, double) except +
+        Integrator(int, int, SolverOptions&) except +
         ErrorCode integrate(const double, const double,
                             const double, double*) except +
         const double atol() except +
@@ -52,9 +52,6 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
                           const double, double * __restrict__,
                           const double * __restrict__)
 
-cdef extern from "<utility>" namespace "std" nogil:
-    cdef unique_ptr[Integrator] move(unique_ptr[Integrator])
-
 cdef class PyIntegrator:
     cdef unique_ptr[Integrator] integrator  # hold our integrator
     cdef num # number of IVPs
@@ -63,10 +60,10 @@ cdef class PyIntegrator:
     def __cinit__(self, IntegratorType itype, int neq, size_t numThreads,
                   PySolverOptions options=None):
         if options is not None:
-            self.integrator = move(init(itype, neq, numThreads,
-                                        deref(options.options.get())))
+            self.integrator.reset(init(itype, neq, numThreads,
+                                       deref(options.options.get())))
         else:
-            self.integrator = move(init(itype, neq, numThreads))
+            self.integrator.reset(init(itype, neq, numThreads))
         self.num = -1
         self.neq = neq
 

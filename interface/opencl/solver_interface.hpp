@@ -1,0 +1,93 @@
+/**
+ * \file
+ * \brief Interface implementation for CPU solvers to be called as a library
+ *
+ * \author Nicholas Curtis
+ * \date 10/06/18
+ *
+ * \brief Interface to create / call OpenCL integrators
+ *
+ */
+
+#ifndef SOLVER_INTERFACE_H
+#define SOLVER_INTERFACE_H
+
+#include <memory>
+#include <vector>
+
+#include "solver.hpp"
+#include "solver_types.hpp"
+
+namespace opencl_solvers
+{
+
+    /**
+     * \brief Initializes the solver
+     * \param[in]       type                The type of solver to use
+     * \param[in]       neq                 The number of equations to solve for each IVP
+     * \param[in]       numThreads          The number of OpenMP threads to use
+     * \param[in]       options             The SolverOptions to use
+     * \param[in]       ivp                 The SolverIVP object describing the initial value problem to solve
+     * \param[out]      solver              The initialized solver
+     */
+    std::unique_ptr<OpenCLIntegrator> init(IntegratorType type, int neq, int numThreads,
+                                           const IVP& ivp,
+                                           const SolverOptions& options);
+
+    /**
+     * \brief Initializes the solver
+     * \param[in]       type                The type of solver to use
+     * \param[in]       neq                 The number of equations to solve for each IVP
+     * \param[in]       numThreads          The number of OpenMP threads to use
+     * \param[in]       ivp                 The SolverIVP object describing the initial value problem to solve
+     * \param[out]      solver              The initialized solver
+     */
+    std::unique_ptr<OpenCLIntegrator> init(IntegratorType type, int neq, int numThreads,
+                                           const IVP& ivp);
+
+
+    /**
+     * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
+     *
+     * \param[in]           integrator      The integator object to use
+     * \param[in]           NUM             The number of ODEs to integrate.  This should be the size of the leading dimension of `y_host` and `var_host`.  @see accelerint_indx
+     * \param[in]           t               The system time
+     * \param[in]           t_end           The end time
+     * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
+     * \param[in,out]       phi_host        The state vectors to integrate.
+     * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
+     * \returns             timing          The wall-clock duration spent in integration in milliseconds
+     *
+     */
+    double integrate(OpenCLIntegrator& integrator,
+                     const int NUM, const double t, const double t_end,
+                     const double stepsize, double * __restrict__ phi_host,
+                     const double * __restrict__ param_host)
+    {
+        std::vector<double> t0(t, NUM);
+        std::vector<double> tf(t_end, NUM);
+        return integrate(integrator, NUM, &t0[0], &tf[0], stepsize, phi_host, param_host);
+    }
+
+    /**
+     * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
+     *
+     * \param[in]           integrator      The integator object to use
+     * \param[in]           NUM             The number of ODEs to integrate.  This should be the size of the leading dimension of `y_host` and `var_host`.  @see accelerint_indx
+     * \param[in]           t               The array of system times
+     * \param[in]           t_end           The array end times
+     * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
+     * \param[in,out]       phi_host        The state vectors to integrate.
+     * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
+     * \returns             timing          The wall-clock duration spent in integration in milliseconds
+     *
+     */
+    double integrate(OpenCLIntegrator& integrator,
+                     const int NUM, const double* __restrict__ t,
+                     const double* __restrict__  t_end, const double stepsize,
+                     double * __restrict__ phi_host,
+                     const double * __restrict__ param_host);
+
+}
+
+#endif

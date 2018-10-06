@@ -14,7 +14,7 @@ from distutils.spawn import find_executable
 from buildutils import listify, formatOption, getCommandOutput
 
 
-valid_commands = ('cpu', 'gpu', 'cpu-wrapper', 'help')
+valid_commands = ('cpu', 'opencl', 'gpu', 'cpu-wrapper', 'opencl-wrapper', 'help')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -280,6 +280,7 @@ interface_dir = os.path.join(home, 'interface')
 linalg_dir = os.path.join(home, 'linear_algebra')
 generic_dir = os.path.join(home, 'generic')
 radau2a_dir = os.path.join(home, 'radau2a')
+rkf45_dir = os.path.join(home, 'rkf45')
 exp_int_dir = os.path.join(home, 'exponential_integrators')
 exp4_int_dir = os.path.join(home, 'exponential_integrators', 'exp4')
 exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
@@ -493,7 +494,7 @@ def get_env(save, defines):
     return env
 
 
-platforms = ['cpu']
+platforms = ['cpu', 'opencl']
 if build_cuda:
     platforms += ['cuda']
 
@@ -647,7 +648,7 @@ def get_includes(platform, includes, new_defines={},
     includes = [os.path.join(x, platform) for x in includes]
     # include any full paths
     includes += full_includes
-    if platform == 'cpu':
+    if platform in ['cpu', 'opencl']:
         new_defines['CPPPATH'] = includes[:]
     elif platform == 'cuda':
         new_defines['NVCC_INC_PATH'] = includes[:]
@@ -712,16 +713,21 @@ for p in platforms:
     rk78 = build_lib(env_save, p, new_defines, rk78_dir, variant,
                      'rk78', extra_libs=core)
 
+    # rkf45
+    new_defines = get_includes(p,  [generic_dir, rkf45_dir])
+    rkf45 = build_lib(env_save, p, new_defines, rkf45_dir, variant,
+                      'rkf45', extra_libs=core)
+
     # add interface / problem definition
     new_defines = get_includes(p,  [generic_dir, radau2a_dir, rk78_dir, rkc_dir,
                                     exp4_int_dir, exprb43_int_dir, exp_int_dir,
-                                    cvodes_dir])
+                                    cvodes_dir, rkf45_dir])
     new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
     new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
     new_defines['RPATH'] = [lib_dir]
 
     # filter out non-existant
-    vals = [rkc, rk78, radau, exp4, exprb43, cvodes, exp, linalg, core]
+    vals = [rkc, rk78, radau, exp4, exprb43, cvodes, exp, linalg, core, rkf45]
     vals = [x for x in vals if x]
     vals = [y for x in vals for y in x]
 
