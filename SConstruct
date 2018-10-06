@@ -547,9 +547,9 @@ def build_lib(save, platform, defines, src, variant, target_base,
                             src_dir=src,
                             exports=['env', 'platform'])
     if not intlib:
-        return None
+        return []
 
-    lib = env.SharedLibrary(target=target_base, source=intlib)
+    lib = env.SharedLibrary(target=target_base + '_' + platform, source=intlib)
     lib = env.Install(lib_dir, lib)
     return lib
 
@@ -568,7 +568,11 @@ def find_current_python(env):
     our_env['PATH'] = os.environ['PATH']
     if 'python_cmd' not in our_env:
         our_env['python_cmd'] = sys.executable
-    return find_executable(our_env['python_cmd'], path=our_env['PATH'])
+    python = find_executable(our_env['python_cmd'], path=our_env['PATH'])
+    if python is None:
+        raise Exception('Critical error: python_cmd ({}) not found, possibly moved '
+                        'or deleted.'.format(our_env['python_cmd']))
+    return python
 
 
 def run_with_our_python(env, target, source, action):
@@ -629,11 +633,14 @@ def build_wrapper(save, platform, defines, libs, variant):
         raise Exception('Cannot build wrapper as problem definition not found in '
                         '{}'.format(os.path.join(mech_dir, platform)))
 
+    short_names = {'cpu': 'cpu',
+                   'opencl': 'ocl'}
     # and build wrapper
     env = get_env(save, defines)
-    driver = os.path.join(driver_dir, 'setup.py')
+    driver = os.path.join(driver_dir, platform, 'setup.py')
     wrapper_py = run_with_our_python(env,
-                                     target='pyccelerInt_cpu',
+                                     target='pyccelerInt_{}'.format(
+                                        short_names[platform]),
                                      source=[driver],
                                      action='{{python}} {} build_ext --inplace'
                                      .format(driver))
@@ -642,12 +649,9 @@ def build_wrapper(save, platform, defines, libs, variant):
     return wrapper_py
 
 
-def get_includes(platform, includes, new_defines={},
-                 full_includes=[]):
+def get_includes(platform, includes, new_defines={}):
     # include platform in path
     includes = [os.path.join(x, platform) for x in includes]
-    # include any full paths
-    includes += full_includes
     if platform in ['cpu', 'opencl']:
         new_defines['CPPPATH'] = includes[:]
     elif platform == 'cuda':
@@ -675,7 +679,7 @@ for p in platforms:
     # exponentials
     shared = os.path.join(exp_int_dir, 'shared')
     new_defines = get_includes(p, [generic_dir, env['fftw3_inc_dir'], exp_int_dir,
-                                   linalg_dir], full_includes=[shared])
+                                   linalg_dir, shared])
     new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
     new_defines['LIBS'] = ['fftw3']
     exp = build_lib(env_save, p, new_defines, exp_int_dir,

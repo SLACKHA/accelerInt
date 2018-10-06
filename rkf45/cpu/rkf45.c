@@ -9,7 +9,7 @@
 
 //#include <assert.h>
 
-#include <rfk45.h>
+#include "rkf45.h"
 
 #define __inline inline
 
@@ -27,6 +27,11 @@
 //     fourth-order runge-kutta integration
 //        x  = x + a1*f1 + a3*f3 + a4*f4 + a5*f5
 
+void cklib_callback(int neq, double t, double* y, double* dy, void* user_data)
+{
+
+}
+
 #define _func(neq,t,y,f,vdat) { \
    if (func) { \
       func((neq),(t),(y),(f),(vdat)); \
@@ -37,7 +42,6 @@
 }
 
 // Single-step function
-__inline
 int rkf45 (const int neq, const double h, __global double *restrict y, __global double *restrict y_out, __global double *rwk, RHS_Function_t func, __private void *user_data)
 {
    #define c20 ( 0.25)
@@ -212,7 +216,6 @@ int rkf45 (const int neq, const double h, __global double *restrict y, __global 
    #undef b6
 }
 
-__inline
 double rk_wnorm (__global const rk_t *restrict rk, __global const double *restrict x, __global const double *restrict y)
 {
    const int neq = rk->neq;

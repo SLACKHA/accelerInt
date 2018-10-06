@@ -30,9 +30,9 @@ namespace opencl_solvers
      * \param[in]       ivp                 The SolverIVP object describing the initial value problem to solve
      * \param[out]      solver              The initialized solver
      */
-    std::unique_ptr<OpenCLIntegrator> init(IntegratorType type, int neq, int numThreads,
-                                           const IVP& ivp,
-                                           const SolverOptions& options);
+    std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads,
+                                         const IVP& ivp,
+                                         const SolverOptions& options);
 
     /**
      * \brief Initializes the solver
@@ -42,8 +42,8 @@ namespace opencl_solvers
      * \param[in]       ivp                 The SolverIVP object describing the initial value problem to solve
      * \param[out]      solver              The initialized solver
      */
-    std::unique_ptr<OpenCLIntegrator> init(IntegratorType type, int neq, int numThreads,
-                                           const IVP& ivp);
+    std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads,
+                                         const IVP& ivp);
 
 
     /**
@@ -59,7 +59,7 @@ namespace opencl_solvers
      * \returns             timing          The wall-clock duration spent in integration in milliseconds
      *
      */
-    double integrate(OpenCLIntegrator& integrator,
+    double integrate(IntegratorBase& integrator,
                      const int NUM, const double t, const double t_end,
                      const double stepsize, double * __restrict__ phi_host,
                      const double * __restrict__ param_host)
@@ -82,7 +82,7 @@ namespace opencl_solvers
      * \returns             timing          The wall-clock duration spent in integration in milliseconds
      *
      */
-    double integrate(OpenCLIntegrator& integrator,
+    double integrate(IntegratorBase& integrator,
                      const int NUM, const double* __restrict__ t,
                      const double* __restrict__  t_end, const double stepsize,
                      double * __restrict__ phi_host,

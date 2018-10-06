@@ -32,8 +32,9 @@ def run(num, num_threads, itype):
     params[:] = 1000
 
     # create options
-    options = pycel.PySolverOptions(itype, atol=1e-10,
-                                    rtol=1e-6, logging=True, h_init=1e-3)
+    options = pycel.PySolverOptions(itype, vectorSize=8,
+                                    atol=1e-10, rtol=1e-6, logging=True,
+                                    order='F')
 
     # create the integrator
     integrator = pycel.PyIntegrator(itype, neq,

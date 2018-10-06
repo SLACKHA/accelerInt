@@ -9,7 +9,7 @@ def getPlatformObject(env, platform):
     Return the correct SCons object type from the given environment and platform
     """
 
-    if platform == 'cpu':
+    if platform in ['cpu', 'opencl']:
         return env.SharedObject
     elif platform == 'cuda':
         return env.CUDAObject
@@ -31,7 +31,7 @@ obj = getPlatformObject(env, platform)
 
 if 'extra_dirs' in env:
     for d in env['extra_dirs']:
-        path = os.path.join(base, d)
+        path = os.path.join(base, d, platform)
         src += get_files(path)
 
 obj = [obj(file, variant_dir=env['variant']) for file in src]

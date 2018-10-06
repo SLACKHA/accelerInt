@@ -28,7 +28,7 @@ namespace c_solvers
      *
      * \param[out]      solver              The initialized solver
      */
-    std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads, const SolverOptions& options);
+    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads, const SolverOptions& options);
 
     /**
      * \brief Initializes the solver
@@ -38,7 +38,7 @@ namespace c_solvers
      *
      * \param[out]      solver              The initialized solver
      */
-    std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads);
+    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads);
 
 
     /**
@@ -54,7 +54,7 @@ namespace c_solvers
      * \returns             timing          The wall-clock duration spent in integration in milliseconds
      *
      */
-    double integrate(IntegratorBase& integrator,
+    double integrate(Integrator& integrator,
                      const int NUM, const double t, const double t_end,
                      const double stepsize, double * __restrict__ phi_host,
                      const double * __restrict__ param_host);
