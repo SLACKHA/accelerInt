@@ -178,7 +178,7 @@ namespace opencl_solvers {
 
         size_t blockSize;
         size_t numBlocks;
-        int vectorSize;
+        size_t vectorSize;
 
         int use_queue;
     } cl_data_t;
@@ -220,7 +220,7 @@ namespace opencl_solvers {
         SolverOptions(std::size_t vectorSize=1, std::size_t blockSize=1,
                       int numBlocks=-1, double atol=1e-10, double rtol=1e-6,
                       bool logging=false, double h_init=1e-6,
-                      bool use_queue=true, char order='C',
+                      bool use_queue=true, std::string order="C",
                       std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
@@ -234,7 +234,7 @@ namespace opencl_solvers {
             _platform(platform),
             _deviceType(deviceType)
         {
-            if (!(order == 'C' || order == 'F'))
+            if (order.compare("C") && order.compare("F"))
             {
                 std::ostringstream err;
                 err << "Order " << order << " not recognized";
@@ -277,7 +277,7 @@ namespace opencl_solvers {
             return _numBlocks;
         }
 
-        inline char order() const
+        inline std::string order() const
         {
             return _order;
         }
@@ -313,7 +313,7 @@ namespace opencl_solvers {
         //! The initial step-size
         const double _h_init;
         //! The data-ordering
-        const char _order;
+        const std::string _order;
         //! Use queue driver?
         const bool _use_queue;
         //! OpenCL platform to use
@@ -567,8 +567,6 @@ namespace opencl_solvers {
 
         void getPlatformInfo (platformInfo_t *info)
         {
-            cl_int ret;
-
             CL_EXEC ( clGetPlatformIDs ((cl_uint)cl_max_platforms, info->platform_ids, &info->num_platforms) );
             if (info->num_platforms == 0)
             {
@@ -630,7 +628,6 @@ namespace opencl_solvers {
                             const platformInfo_t *platform_info)
         {
             const int verbose = 1;
-            cl_uint ret;
 
             CL_EXEC( clGetDeviceIDs (platform_info->platform_id, CL_DEVICE_TYPE_ALL, (cl_uint)cl_max_devices, device_info->device_ids, &device_info->num_devices) );
             if (device_info->num_devices == 0)
@@ -643,18 +640,18 @@ namespace opencl_solvers {
 
             #define get_char_info(__str__, __val__, __verbose__) { \
                 CL_EXEC( clGetDeviceInfo (device_info->device_id, (__str__), sizeof(__val__), __val__, NULL) ); \
-                if (__verbose__) printf("\t%-40s = %s\n", #__str__, __val__); \
+                if (__verbose__) std::cout << "\t" << #__str__ << " = " << __val__ << std::endl; \
             }
             #define get_info(__str__, __val__, __verbose__) { \
                 CL_EXEC( clGetDeviceInfo (device_info->device_id, __str__, sizeof(__val__), &__val__, NULL) ); \
-                if (__verbose__) printf("\t%-40s = %ld\n", #__str__, __val__); \
+                if (__verbose__) std::cout << "\t" << #__str__ << " = " << __val__ << std::endl; \
             }
 
             std::cout << "Device Info:" << std::endl;
 
             get_info( CL_DEVICE_TYPE, device_info->type, verbose);
 
-            for (int i = 0; i < device_info->num_devices; ++i)
+            for (std::size_t i = 0; i < device_info->num_devices; ++i)
             {
                 cl_device_type val;
                 //get_info( CL_DEVICE_TYPE, val, 1);
@@ -849,7 +846,7 @@ namespace opencl_solvers {
                 std::ostringstream oqueue;
                 oqueue << "#define __EnableQueue" << std::endl;
                 program_source_str << oqueue.str();
-                program_source_size << oqueue.str().size();
+                program_source_size += oqueue.str().size();
             }
 
             // Load the common macros ...
@@ -976,8 +973,6 @@ namespace opencl_solvers {
             cl_init(&data);
             cl_int ret;
 
-            auto t_start = std::chrono::high_resolution_clock::now();
-
             /* get the kernel name */
             std::ostringstream kernel_name;
             kernel_name << this->solverName();
@@ -1005,7 +1000,7 @@ namespace opencl_solvers {
 
 
             std::size_t lenrwk = (_ivp.requiredMemorySize() + requiredSolverMemorySize())*data.vectorSize;
-            std::cout << "lenrwk = "<< lenrwk << std::endl;;
+            std::cout << "lenrwk = "<< lenrwk << std::endl;
 
             size_t numThreads = data.blockSize * data.numBlocks;
             std::cout << "NP = " << NUM << ", blockSize = " << data.blockSize <<
@@ -1041,7 +1036,7 @@ namespace opencl_solvers {
             std::cout << "Host->Dev + alloc = " <<
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::high_resolution_clock::now() - t_data).count() <<
-                " (ms)" << std::endl;;
+                " (ms)" << std::endl;
 
             /* Set kernel argument */
             int argc = 0;

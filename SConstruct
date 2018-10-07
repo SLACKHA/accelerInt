@@ -134,6 +134,10 @@ config_options = [
         'opencl_inc_dir',
         'The path to the OpenCL header directory to use.', '',
         PathVariable.PathAccept),
+    PathVariable(
+        'opencl_lib_dir',
+        'The path to the OpenCL library.', '',
+        PathVariable.PathAccept),
     ('toolchain',
         'The compiler tools to use for C/C++ code',
         'gnu'),
@@ -360,9 +364,10 @@ if 'NVCC_INC_PATH' not in env:
     env['NVCC_INC_PATH'] = []
 if build_cuda:
     env['NVCC_INC_PATH'] += common_dir_list
-if not env['opencl_inc_dir']:
-    print('OpenCL not found, no OpenCL integrators will be built...')
+if not (env['opencl_inc_dir'] or env['opencl_lib_dir']):
+    print('OpenCL not specified, no OpenCL integrators will be built...')
 env['OCL_INC_DIR'] = listify(env['opencl_inc_dir'])
+env['OCL_LIB_DIR'] = listify(env['opencl_lib_dir'])
 
 
 def get_env(save, defines):
@@ -435,8 +440,8 @@ def build_lib(save, platform, defines, src, variant, target_base,
         return []
 
     lib = env.SharedLibrary(target=target_base + '_' + platform, source=intlib)
-    lib = env.Install(lib_dir, lib)
-    return lib
+    ilib = env.Install(lib_dir, lib)
+    return ilib
 
 
 def build_core(save, platform, defines, variant):
@@ -510,7 +515,7 @@ def run_with_our_python(env, target, source, action):
                        action=action.format(python=env['python_cmd']))
 
 
-def build_wrapper(save, platform, defines, libs, variant):
+def build_wrapper(save, platform, defines, libs, variant, multi):
     # problem definition, if available
     wrapper = build_lib(save, platform, defines, mech_dir, variant,
                         'accelerint_problem')
@@ -522,6 +527,8 @@ def build_wrapper(save, platform, defines, libs, variant):
                    'opencl': 'ocl'}
     # and build wrapper
     env = get_env(save, defines)
+    # add dependecy to multitarget
+    env.Depends(wrapper, multi)
     driver = os.path.join(driver_dir, platform, 'setup.py')
     wrapper_py = run_with_our_python(env,
                                      target='pyccelerInt_{}'.format(
@@ -534,19 +541,20 @@ def build_wrapper(save, platform, defines, libs, variant):
     return wrapper_py
 
 
-def get_includes(platform, includes, new_defines={}):
+def get_includes(platform, includes):
+    ndef = {}
     # include platform in path
     includes = [os.path.join(x, platform) for x in includes]
     if platform in ['cpu', 'opencl']:
-        new_defines['CPPPATH'] = includes[:]
+        ndef['CPPPATH'] = includes[:]
         if platform == 'opencl':
-            new_defines['CPPPATH'] += env['OCL_INC_DIR']
+            ndef['CPPPATH'] += env['OCL_INC_DIR']
     elif platform == 'cuda':
-        new_defines['NVCC_INC_PATH'] = includes[:]
+        ndef['NVCC_INC_PATH'] = includes[:]
     else:
         print('Platform {} not implemented'.format(platform))
         raise NotImplementedError
-    return new_defines
+    return ndef
 
 
 for p in platforms:
@@ -618,6 +626,10 @@ for p in platforms:
     new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
     new_defines['RPATH'] = [lib_dir]
 
+    if p == 'opencl':
+        new_defines['LIBPATH'] += env['OCL_LIB_DIR']
+        new_defines['LIBS'] += ['OpenCL']
+
     # filter out non-existant
     vals = [rkc, rk78, radau, exp4, exprb43, cvodes, exp, linalg, core, rkf45]
     vals = [x for x in vals if x]
@@ -634,6 +646,6 @@ for p in platforms:
     defines['RPATH'] = [lib_dir]
     defines['LIBPATH'] = [lib_dir]
     defines = add_libs_to_defines(vals, defines)
-    wrapper = build_wrapper(env_save, p, defines, vals, variant)
+    wrapper = build_wrapper(env_save, p, defines, vals, variant, target)
     # and wrapper
     Alias(p + '-wrapper', wrapper)

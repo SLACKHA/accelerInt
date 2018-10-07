@@ -27,7 +27,7 @@ namespace opencl_solvers
         RKF45SolverOptions(std::size_t vectorSize=1, std::size_t blockSize=1,
                            int numBlocks=-1, double atol=1e-10, double rtol=1e-6,
                            bool logging=false, double h_init=1e-6,
-                           bool use_queue=true, char order='C',
+                           bool use_queue=true, std::string order="C",
                            std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT,
                            size_t minIters = 1, size_t maxIters = 1000):
             SolverOptions(vectorSize, blockSize, numBlocks, atol, rtol,

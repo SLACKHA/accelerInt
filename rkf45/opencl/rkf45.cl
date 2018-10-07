@@ -447,7 +447,7 @@ __IntType FUNC_TYPE(rk_solve) (
 void __kernel
 __attribute__((reqd_work_group_size(__blockSize, 1, 1)))
 rkf45_driver (__global const double * __restrict__ param,
-              __global const double * __restrict__ t_start,
+                 __global const double t_start,
               __global const double * __restrict__ t_end,
               __global double * __restrict__ phi,
               __global const rk_t * __restrict__ rk,
@@ -478,8 +478,9 @@ rkf45_driver (__global const double * __restrict__ param,
         #endif
 
         __ValueType h = 0;
+        __ValueType t = t_start;
         __IntType rkerr = FUNC_SIZE(rk_solve) (
-                rk, t_start + i, t_end + i,
+                rk, &t, t_end + i,
                 &h, &my_counters, &my_limits, rwk, rwk_rk);
 
         #if __ValueSize > 1
@@ -519,7 +520,7 @@ rkf45_driver (__global const double * __restrict__ param,
 void __kernel
 __attribute__((reqd_work_group_size(__blockSize, 1, 1)))
 rk_driver_queue (__global const double * __restrict__ param,
-                 __global const double * __restrict__ t_start,
+                 __global const double t_start,
                  __global const double * __restrict__ t_end,
                  __global double * __restrict__ phi,
                  __global const rk_t * __restrict__ rk,
@@ -567,8 +568,9 @@ rk_driver_queue (__global const double * __restrict__ param,
 
         // determine maximum / minumum time steps for this set of problems
         __ValueType h = 0;
+                __ValueType t = t_start;
         __IntType rkerr = FUNC_SIZE(rk_solve) (
-                rk, t_start + i, t_end + i,
+                rk, &t, t_end + i,
                 &h, &my_counters, &my_limits, rwk, rwk_rk);
 
         for (int k = 0; k < neq; ++k)

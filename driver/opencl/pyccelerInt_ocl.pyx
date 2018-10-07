@@ -1,13 +1,20 @@
 # distutils: language = c++
+# cython: c_string_type=unicode, c_string_encoding=ascii
 
 import cython
 import numpy as np
 cimport numpy as np
 from libcpp cimport bool as bool_t
-from libcpp cimport string as string_t
-from libcpp cimport size_t, vector
+from libcpp.string cimport string as string_t
+from libcpp.vector cimport vector
 from libcpp.memory cimport unique_ptr
 from cython.operator cimport dereference as deref
+from cpython.version cimport PY_MAJOR_VERSION
+
+cdef unicode _bytes(s):
+    py_byte_string = s.encode('UTF-8')
+    cdef string_t c_string = py_byte_string
+    return c_string
 
 cdef extern from "solver_types.hpp" namespace "opencl_solvers":
     cpdef enum IntegratorType:
@@ -24,10 +31,16 @@ cdef extern from "error_codes.hpp" namespace "opencl_solvers":
 cdef extern from "rkf45_solver.hpp" namespace "opencl_solvers":
     cdef cppclass RKF45SolverOptions:
         RKF45SolverOptions(size_t, size_t, int, double, double,
-                            bool, double, bool, char,
+                            bool, double, bool, string_t, string_t, DeviceType,
                             size_t, size_t) except +
 
 cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
+    cpdef enum DeviceType:
+        CPU,
+        GPU,
+        ACCELERATOR,
+        DEFAULT
+
     cdef cppclass IntegratorBase:
         IntegratorBase(int, int, const IVP&,
                        const SolverOptions&) except +
@@ -38,25 +51,28 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         size_t numSteps() except +
 
     cdef cppclass IVP:
-        IVP(const vector<string_t>&, size_t) except +
+        IVP(const vector[string_t]&, size_t) except +
 
     cdef cppclass SolverOptions:
         SolverOptions(size_t, size_t, int, double, double,
-                            bool, double, bool, char) except +
+                            bool, double, bool, string_t, string_t, DeviceType) except +
 
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
                                          const IVP&, const SolverOptions&) except +
-    cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int, const IVP&) except +
+    cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
+                                         const IVP&) except +
 
-    cdef double integrate(Integrator&, const int, const double, const double,
+    cdef double integrate(IntegratorBase&, const int, const double, const double,
                           const double, double * __restrict__,
                           const double * __restrict__)
 
-    cdef double integrate(Integrator&, const int, const double * __restrict__,
+    cdef double integrate_varying(IntegratorBase&, const int, const double,
                           const double * __restrict__,
                           const double, double * __restrict__,
                           const double * __restrict__)
 
+cdef extern from "<utility>" namespace "std" nogil:
+    cdef unique_ptr[IntegratorBase] move(unique_ptr[IntegratorBase])
 
 cdef class PyIntegrator:
     cdef unique_ptr[IntegratorBase] integrator  # hold our integrator
@@ -66,16 +82,18 @@ cdef class PyIntegrator:
     def __cinit__(self, IntegratorType itype, int neq, size_t numThreads,
                   PyIVP ivp, PySolverOptions options=None):
         if options is not None:
-            self.integrator.reset(init(itype, neq, numThreads, deref(ivp.ivp.get()),
-                                       deref(options.options.get())))
+            self.integrator = move(
+                init(itype, neq, numThreads, deref(ivp.ivp.get()),
+                     deref(options.options.get())))
         else:
-            self.integrator.reset(init(itype, neq, numThreads, deref(ivp.ivp.get())))
+            self.integrator = move(
+                init(itype, neq, numThreads, deref(ivp.ivp.get())))
         self.num = -1
         self.neq = neq
 
     cpdef integrate(self, np.int32_t num, np.float64_t t_start,
-                    np.float64_t t_end, np.ndarray[np.float64_t] y_host,
-                    np.ndarray[np.float64_t] var_host, np.float64_t step=-1):\
+                    np.float64_t t_end, np.ndarray[np.float64_t] phi_host,
+                    np.ndarray[np.float64_t] param_host, np.float64_t step=-1):
         """
         Integrate :param:`num` IVPs, with varying start (:param:`t_start`) and
         end-times (:param:`t_end`)
@@ -96,15 +114,14 @@ cdef class PyIntegrator:
             If supplied, use global integration time-steps of size :param:`step`.
             Useful for logging.
         """
-
         # store # of IVPs
         self.num = num
         return integrate(deref(self.integrator.get()), num, t_start,
-                         t_end, step, &y_host[0], &var_host[0])
+                         t_end, step, &phi_host[0], &param_host[0])
 
     cpdef integrate_varying(
-                    self, np.int32_t num, np.ndarray[np.float64_t] t_start,
-                    np.np.ndarray[np.float64_t] t_end,
+                    self, np.int32_t num, np.float64_t t_start,
+                    np.ndarray[np.float64_t] t_end,
                     np.ndarray[np.float64_t] phi_host,
                     np.ndarray[np.float64_t] param_host, np.float64_t step=-1):
         """
@@ -115,8 +132,8 @@ cdef class PyIntegrator:
         ----------
         num: int
             The number of IVPs to integrate
-        t_start: array of doubles
-            The integration start times
+        t_start: double
+            The integration start time
         t_end: array of doubles
             The integration end times
         phi_host: array of doubles
@@ -130,8 +147,8 @@ cdef class PyIntegrator:
 
         # store # of IVPs
         self.num = num
-        return integrate(deref(self.integrator.get()), num, t_start,
-                         t_end, step, &y_host[0], &var_host[0])
+        return integrate_varying(deref(self.integrator.get()), num, t_start,
+                                 &t_end[0], step, &phi_host[0], &param_host[0])
 
 
     def state(self):
@@ -159,25 +176,32 @@ cdef class PyIntegrator:
 cdef class PySolverOptions:
     cdef unique_ptr[SolverOptions] options # hold our options
 
-    def __cinit__(self, size_t vectorSize=1, size_t blockSize=1,
-                  int numBlocks=-1, double atol=1e-10, double rtol=1e-6,
-                  bool logging=False, double h_init=1e-6,
-                  bool use_queue=True, char order='C',
-                  size_t minIters=1, size_t maxIters = 1000):
-        if itype in [IntegratorType.EXP4, IntegratorType.EXPRB43]:
+    def __cinit__(self, IntegratorType itype, size_t vectorSize=1,
+                  size_t blockSize=1, int numBlocks=-1, double atol=1e-10,
+                  double rtol=1e-6, bool_t logging=False, double h_init=1e-6,
+                  bool_t use_queue=True, string_t order="C", string_t platform="",
+                  DeviceType deviceType = DeviceType.DEFAULT,  size_t minIters=1,
+                  size_t maxIters = 1000,):
+
+        cdef string_t c_order = _bytes(order)
+        if itype in [IntegratorType.RKF45]:
             self.options.reset(
-                new EXPSolverOptions(atol, rtol, logging, h_init,
-                                     num_rational_approximants,
-                                     max_krylov_subspace_dimension))
+                new RKF45SolverOptions(vectorSize, blockSize, numBlocks,
+                                       atol, rtol, logging, h_init, use_queue,
+                                       c_order, platform, deviceType,
+                                       minIters, maxIters))
         else:
-            self.options.reset(new SolverOptions(atol, rtol, logging, h_init))
+            self.options.reset(new SolverOptions(
+                vectorSize, blockSize, numBlocks,
+                atol, rtol, logging, h_init, use_queue,
+                c_order, platform, deviceType))
 
 cdef class PyIVP:
     cdef unique_ptr[IVP] ivp # hold our ivp implementation
     cdef vector[string_t] source
     cdef int mem
 
-    def __cinit__(self, kernel_source, required_memory):
+    def __cinit__(self, kernel_source, int required_memory):
         """
         Create an IVP implementation object, from:
 
@@ -192,9 +216,10 @@ cdef class PyIVP:
         """
 
         for x in kernel_source:
-            assert isinstance(x, str), "Kernel path ({}) not string!".format(x)
-            source.push_back(x)
+            assert isinstance(x, basestring), "Kernel path ({}) not string!".format(
+                x)
+            self.source.push_back(_bytes(x))
 
-        mem = required_memory
+        self.mem = required_memory
 
-        ivp = unique_ptr[IntegratorBase](new IVP())
+        self.ivp.reset(new IVP(self.source, self.mem))

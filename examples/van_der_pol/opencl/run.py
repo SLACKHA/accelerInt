@@ -31,6 +31,9 @@ def run(num, num_threads, itype):
     params = np.zeros(num, dtype=np.float64)
     params[:] = 1000
 
+    # create ivp
+    ivp = pycel.PyIVP(['dydt.cl'], 0)
+
     # create options
     options = pycel.PySolverOptions(itype, vectorSize=8,
                                     atol=1e-10, rtol=1e-6, logging=True,
@@ -38,7 +41,7 @@ def run(num, num_threads, itype):
 
     # create the integrator
     integrator = pycel.PyIntegrator(itype, neq,
-                                    num_threads, options)
+                                    num_threads, ivp, options)
 
     # and integrate
     time = integrator.integrate(num, 0., 2000., phi.flatten('F'),
