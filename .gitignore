@@ -35,11 +35,6 @@
 .dropbox
 *.ini
 *.obj
-Hochbruck/
-derivations/
-validation/
-performance/
-StiffnessPrediction/
 *.pyc
 
 #auto-populated files/folders
@@ -58,12 +53,7 @@ examples/*/Sconscript
 #ignore pyJac example output
 examples/pyJac/out/
 
-#ignore solvers
-cvodes-int
-rk78-int
-radau-int*
-exprb43-int*
-exp4-int*
+SConscript
 
 # ignore command compile for linting
 compile_commands.json
