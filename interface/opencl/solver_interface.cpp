@@ -14,9 +14,15 @@
 #include <cmath>
 #include <sstream>
 #include <chrono>
+#include <cfloat>
 
-namespace c_solvers
+namespace opencl_solvers
 {
+
+    /*! Machine precision constant. */
+    #define EPS DBL_EPSILON
+    /*! Smallest representable double */
+    #define SMALL DBL_MIN
 
     /**
      * \brief Initializes the solver
@@ -34,7 +40,7 @@ namespace c_solvers
         {
             case IntegratorType::RKF45:
                 return std::unique_ptr<RKF45Integrator>(new RKF45Integrator(
-                    neq, numThreads, ivp, std::static_cast<RKF45SolverOptions>(options)));
+                    neq, numThreads, ivp, static_cast<const RKF45SolverOptions&>(options)));
             default:
                 std::ostringstream ss;
                 ss << "Integrator type: " << type << " not implemented for OpenCL!" << std::endl;
@@ -55,7 +61,7 @@ namespace c_solvers
         switch(type)
         {
             case IntegratorType::RKF45:
-                return init(type, neq, numThreads, RKF45SolverOptions());
+                return init(type, neq, numThreads, ivp, RKF45SolverOptions());
             default:
                 std::ostringstream ss;
                 ss << "Integrator type: " << type << " not implemented for OpenCL!" << std::endl;
@@ -77,38 +83,37 @@ namespace c_solvers
      * \returns             timing          The wall-clock duration spent in integration in milliseconds
      *
      */
-    double integrate(IntegratorBase& integrator,
-                     const int NUM, const double* t_start,
-                     const double* t_end, const double step,
-                     double * __restrict__ phi_host,
-                     const double * __restrict__ param_host)
+    double integrate_varying(IntegratorBase& integrator,
+                             const int NUM, const double t_start,
+                             const double* __restrict__ t_end, const double step,
+                             double * __restrict__ phi_host,
+                             const double * __restrict__ param_host)
     {
         auto t1 = std::chrono::high_resolution_clock::now();
         double t = t_start;
         double stepsize = step;
+        double t_max = *std::max_element(t_end, t_end + NUM);
         if (step < 0)
         {
-            stepsize = t_end - t_start;
+            stepsize = t_max - t_start;
         }
-
         if (integrator.logging())
         {
-            integrator.log(NUM, t_start, y_host);
+            integrator.log(NUM, t_start, phi_host);
         }
 
-        int numSteps = 0;
-        double t_next = t + step;
+        std::vector<double> times(t_end, t_end + NUM);
         // time integration loop
-        while (t + EPS < t_end)
+        while (t + EPS < t_max)
         {
-            numSteps++;
-            integrator.intDriver(NUM, t, t_next, var_host, y_host);
-            t = t_next;
+            // update times
+            std::for_each(times.begin(), times.end(), [stepsize](double& d) { d+=stepsize;});
+            integrator.intDriver(NUM, t, &times[0], param_host, phi_host);
             if (integrator.logging())
             {
-                integrator.log(NUM, t, y_host);
+                integrator.log(NUM, t, phi_host);
             }
-            t_next = std::fmin(t_end, (numSteps + 1) * stepsize);
+            t = std::fmin(t_max, t + stepsize);
         }
         auto t2 = std::chrono::high_resolution_clock::now();
 

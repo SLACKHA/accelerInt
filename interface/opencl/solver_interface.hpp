@@ -45,6 +45,24 @@ namespace opencl_solvers
     std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads,
                                          const IVP& ivp);
 
+    /**
+     * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
+     *
+     * \param[in]           integrator      The integator object to use
+     * \param[in]           NUM             The number of ODEs to integrate.  This should be the size of the leading dimension of `y_host` and `var_host`.  @see accelerint_indx
+     * \param[in]           t               The array of system times
+     * \param[in]           t_end           The array end times
+     * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
+     * \param[in,out]       phi_host        The state vectors to integrate.
+     * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
+     * \returns             timing          The wall-clock duration spent in integration in milliseconds
+     *
+     */
+    double integrate_varying(IntegratorBase& integrator,
+                             const int NUM, const double t_start,
+                             const double* __restrict__  t_end, const double stepsize,
+                             double * __restrict__ phi_host,
+                             const double * __restrict__ param_host);
 
     /**
      * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
@@ -64,29 +82,10 @@ namespace opencl_solvers
                      const double stepsize, double * __restrict__ phi_host,
                      const double * __restrict__ param_host)
     {
-        std::vector<double> t0(t, NUM);
         std::vector<double> tf(t_end, NUM);
-        return integrate(integrator, NUM, &t0[0], &tf[0], stepsize, phi_host, param_host);
+        return integrate_varying(integrator, NUM, t, &tf[0], stepsize, phi_host, param_host);
     }
 
-    /**
-     * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
-     *
-     * \param[in]           integrator      The integator object to use
-     * \param[in]           NUM             The number of ODEs to integrate.  This should be the size of the leading dimension of `y_host` and `var_host`.  @see accelerint_indx
-     * \param[in]           t               The array of system times
-     * \param[in]           t_end           The array end times
-     * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
-     * \param[in,out]       phi_host        The state vectors to integrate.
-     * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
-     * \returns             timing          The wall-clock duration spent in integration in milliseconds
-     *
-     */
-    double integrate(IntegratorBase& integrator,
-                     const int NUM, const double* __restrict__ t,
-                     const double* __restrict__  t_end, const double stepsize,
-                     double * __restrict__ phi_host,
-                     const double * __restrict__ param_host);
 
 }
 
