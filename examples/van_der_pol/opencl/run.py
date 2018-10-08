@@ -32,7 +32,10 @@ def run(num, num_threads, itype):
     params[:] = 1000
 
     # create ivp
-    ivp = pycel.PyIVP(['dydt.cl'], 0)
+    # Note: we need to pass the full paths to the PyIVP such that accelerInt
+    # can find our kernel files
+    path = os.path.dirname(__file__)
+    ivp = pycel.PyIVP([os.path.join(path, 'dydt.cl')], 0)
 
     # create options
     options = pycel.PySolverOptions(itype, vectorSize=8,

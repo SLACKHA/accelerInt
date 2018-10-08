@@ -20,48 +20,117 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
+#include <stdexcept>
 #include "error_codes.hpp"
+#include "../paths/path.h"
+#include "../paths/resolver.h"
 extern "C" {
 #include "CL/cl.h"
 }
 
 // #include <ros.h>
 
-#define CL_EXEC(__cmd__) {\
-            cl_uint _ret = (__cmd__); \
-            if (_ret != CL_SUCCESS) \
-            { \
-                 std::cerr << "Error executing CL cmd =" << std::endl; \
-                 std::cerr << "\t" << #__cmd__ << std::endl; \
-                 std::cerr << "\t" << "ret  = " << _ret << std::endl; \
-                 std::cerr << "\t" << "line = " << __LINE__ << std::endl; \
-                 std::cerr << "\t" << "file = " << __FILE__ << std::endl; \
-                 exit(-1); \
-            } \
-     }
+const std::string getErrorString(cl_int error)
+{
+    switch(error){
+        // run-time and JIT compiler errors
+        case 0: return "CL_SUCCESS";
+        case -1: return "CL_DEVICE_NOT_FOUND";
+        case -2: return "CL_DEVICE_NOT_AVAILABLE";
+        case -3: return "CL_COMPILER_NOT_AVAILABLE";
+        case -4: return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+        case -5: return "CL_OUT_OF_RESOURCES";
+        case -6: return "CL_OUT_OF_HOST_MEMORY";
+        case -7: return "CL_PROFILING_INFO_NOT_AVAILABLE";
+        case -8: return "CL_MEM_COPY_OVERLAP";
+        case -9: return "CL_IMAGE_FORMAT_MISMATCH";
+        case -10: return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
+        case -11: return "CL_BUILD_PROGRAM_FAILURE";
+        case -12: return "CL_MAP_FAILURE";
+        case -13: return "CL_MISALIGNED_SUB_BUFFER_OFFSET";
+        case -14: return "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
+        case -15: return "CL_COMPILE_PROGRAM_FAILURE";
+        case -16: return "CL_LINKER_NOT_AVAILABLE";
+        case -17: return "CL_LINK_PROGRAM_FAILURE";
+        case -18: return "CL_DEVICE_PARTITION_FAILED";
+        case -19: return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE";
+
+        // compile-time errors
+        case -30: return "CL_INVALID_VALUE";
+        case -31: return "CL_INVALID_DEVICE_TYPE";
+        case -32: return "CL_INVALID_PLATFORM";
+        case -33: return "CL_INVALID_DEVICE";
+        case -34: return "CL_INVALID_CONTEXT";
+        case -35: return "CL_INVALID_QUEUE_PROPERTIES";
+        case -36: return "CL_INVALID_COMMAND_QUEUE";
+        case -37: return "CL_INVALID_HOST_PTR";
+        case -38: return "CL_INVALID_MEM_OBJECT";
+        case -39: return "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR";
+        case -40: return "CL_INVALID_IMAGE_SIZE";
+        case -41: return "CL_INVALID_SAMPLER";
+        case -42: return "CL_INVALID_BINARY";
+        case -43: return "CL_INVALID_BUILD_OPTIONS";
+        case -44: return "CL_INVALID_PROGRAM";
+        case -45: return "CL_INVALID_PROGRAM_EXECUTABLE";
+        case -46: return "CL_INVALID_KERNEL_NAME";
+        case -47: return "CL_INVALID_KERNEL_DEFINITION";
+        case -48: return "CL_INVALID_KERNEL";
+        case -49: return "CL_INVALID_ARG_INDEX";
+        case -50: return "CL_INVALID_ARG_VALUE";
+        case -51: return "CL_INVALID_ARG_SIZE";
+        case -52: return "CL_INVALID_KERNEL_ARGS";
+        case -53: return "CL_INVALID_WORK_DIMENSION";
+        case -54: return "CL_INVALID_WORK_GROUP_SIZE";
+        case -55: return "CL_INVALID_WORK_ITEM_SIZE";
+        case -56: return "CL_INVALID_GLOBAL_OFFSET";
+        case -57: return "CL_INVALID_EVENT_WAIT_LIST";
+        case -58: return "CL_INVALID_EVENT";
+        case -59: return "CL_INVALID_OPERATION";
+        case -60: return "CL_INVALID_GL_OBJECT";
+        case -61: return "CL_INVALID_BUFFER_SIZE";
+        case -62: return "CL_INVALID_MIP_LEVEL";
+        case -63: return "CL_INVALID_GLOBAL_WORK_SIZE";
+        case -64: return "CL_INVALID_PROPERTY";
+        case -65: return "CL_INVALID_IMAGE_DESCRIPTOR";
+        case -66: return "CL_INVALID_COMPILER_OPTIONS";
+        case -67: return "CL_INVALID_LINKER_OPTIONS";
+        case -68: return "CL_INVALID_DEVICE_PARTITION_COUNT";
+
+        // extension errors
+        case -1000: return "CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR";
+        case -1001: return "CL_PLATFORM_NOT_FOUND_KHR";
+        case -1002: return "CL_INVALID_D3D10_DEVICE_KHR";
+        case -1003: return "CL_INVALID_D3D10_RESOURCE_KHR";
+        case -1004: return "CL_D3D10_RESOURCE_ALREADY_ACQUIRED_KHR";
+        case -1005: return "CL_D3D10_RESOURCE_NOT_ACQUIRED_KHR";
+        default: return "Unknown OpenCL error";
+    }
+}
 
 #define __clerror(__errcode, CMD) \
-     { \
-            std::cerr << "Error executing CL cmd = " << CMD << std::endl; \
-            std::cerr << "\terrcode = " << (__errcode); \
-            if ((__errcode) == CL_INVALID_CONTEXT) \
-                 std::cerr << "CL_INVALID_CONTEXT"; \
-            else if ((__errcode) == CL_INVALID_VALUE) \
-                 std::cerr << "CL_INVALID_VALUE"; \
-            else if ((__errcode) == CL_INVALID_BUFFER_SIZE) \
-                 std::cerr << "CL_INVALID_BUFFER_SIZE"; \
-            else if ((__errcode) == CL_INVALID_HOST_PTR) \
-                 std::cerr << "CL_INVALID_HOST_PTR"; \
-            else if ((__errcode) == CL_MEM_OBJECT_ALLOCATION_FAILURE) \
-                 std::cerr << "CL_MEM_OBJECT_ALLOCATION_FAILURE"; \
-            else if ((__errcode) == CL_OUT_OF_RESOURCES) \
-                 std::cerr << "CL_OUT_OF_RESOURCES"; \
-            else if ((__errcode) == CL_OUT_OF_HOST_MEMORY) \
-                 std::cerr << "CL_OUT_OF_HOST_MEMORY"; \
-            std::cerr << std::endl; \
-     }
+{ \
+    std::cerr << "Error executing CL cmd = " << CMD << std::endl; \
+    std::cerr << "\terrcode = " << (__errcode); \
+    std::cerr << ", " << getErrorString(__errcode) << std::endl; \
+}
+
+#define CL_EXEC(__cmd__) {\
+    cl_uint _ret = (__cmd__); \
+    if (_ret != CL_SUCCESS) \
+    { \
+        __clerror(_ret, __cmd__); \
+        exit(-1); \
+    } \
+}
 
 namespace opencl_solvers {
+    class OpenCLException : public std::runtime_error {
+    public:
+        explicit OpenCLException(std::string message) : std::runtime_error(message)
+        {
+
+        }
+    };
 
     //! \brief A wrapper that contains information for the OpenCL kernel
     typedef struct
@@ -238,7 +307,7 @@ namespace opencl_solvers {
             {
                 std::ostringstream err;
                 err << "Order " << order << " not recognized";
-                throw err.str();
+                throw OpenCLException(err.str());
             }
         }
 
@@ -372,7 +441,7 @@ namespace opencl_solvers {
 
         void reinitialize(int numThreads)
         {
-            throw "not implemented";
+            throw std::runtime_error("not implemented");
         }
 
         /*! checkError
@@ -383,7 +452,7 @@ namespace opencl_solvers {
         */
         void checkError(int tid, ErrorCode code) const
         {
-            throw "not implemented";
+            throw std::runtime_error("not implemented");
         }
 
         //! return the absolute tolerance
@@ -485,12 +554,38 @@ namespace opencl_solvers {
         //! \brief return the list of files for this solver
         virtual const std::vector<std::string>& solverFiles() const = 0;
 
+        //! \brief return the list of include paths for this solver
+        virtual const std::vector<std::string>& solverIncludePaths() const = 0;
+
+
+        const std::string path_of(const std::string& owner) const
+        {
+            // base path
+            filesystem::path thisfile = filesystem::path(owner);
+            thisfile.make_absolute();
+            return thisfile.parent_path().str();
+        }
+
+
+        const std::string file_relative_to_me(const std::string& owner, const std::string& filename) const
+        {
+            filesystem::path source_dir(path_of(owner));
+            // get parent and return
+            return (source_dir/filesystem::path(filename)).str();
+        }
+
 
         std::size_t load_source_from_file (const std::string& flname, std::ostringstream& source_str)
         {
             std::ifstream ifile(flname);
             std::string content ((std::istreambuf_iterator<char>(ifile)),
                                  (std::istreambuf_iterator<char>()));
+            if (!content.length())
+            {
+                std::ostringstream err;
+                err << "Kernel file " << flname << " not found!" << std::endl;
+                throw OpenCLException(err.str());
+            }
             size_t sz = content.length();
             source_str << content;
             return sz;
@@ -720,7 +815,7 @@ namespace opencl_solvers {
             get_info( CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, device_info->global_mem_cache_type, verbose);
             if (verbose)
             {
-                std::cout << "\t" << " = " << "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE";
+                std::cout << "\t" << "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE = ";
                 if (device_info->global_mem_cache_type == CL_NONE)
                      std::cout << "CL_NONE" << std::endl;
                 else if (device_info->global_mem_cache_type == CL_READ_ONLY_CACHE)
@@ -733,7 +828,7 @@ namespace opencl_solvers {
             get_info( CL_DEVICE_LOCAL_MEM_TYPE, device_info->local_mem_type, verbose );
             if (verbose)
             {
-                std::cout << "\t" << " = " << "CL_DEVICE_LOCAL_MEM_TYPE" <<
+                std::cout << "\t" << "CL_DEVICE_LOCAL_MEM_TYPE = " <<
                           ((device_info->local_mem_type == CL_LOCAL) ? "LOCAL" : "GLOBAL") <<
                           std::endl;
             }
@@ -781,12 +876,13 @@ namespace opencl_solvers {
             {
                 std::ostringstream err;
                 err << "Vector size: " << data->vectorSize << " is not a power of 2!";
-                throw err.str();
+                throw OpenCLException(err.str());
             }
             if (!isPower2(data->blockSize))
             {
-                std::ostringstream err2;
-                err2 << "Block size: " << data->blockSize << " is not a power of 2!";
+                std::ostringstream err;
+                err << "Block size: " << data->blockSize << " is not a power of 2!";
+                throw OpenCLException(err.str());
             }
 
             if (data->blockSize < data->vectorSize)
@@ -815,7 +911,7 @@ namespace opencl_solvers {
             }
 
             std::ostringstream vsize;
-            vsize << "#define __ValueSize (" << data->vectorSize  << ")" << std::endl;
+            vsize << "#define __ValueSize " << data->vectorSize << std::endl;
             program_source_str << vsize.str();
             program_source_size += vsize.str().length();
 
@@ -850,14 +946,8 @@ namespace opencl_solvers {
             }
 
             // Load the common macros ...
-            program_source_size += load_source_from_file ("cl_macros.h", program_source_str);
-            program_source_size += load_source_from_file ("solver.h", program_source_str);
-
-            // load the user specified kernels
-            for (const std::string& kernel : _ivp.kernelSource())
-            {
-                program_source_size += load_source_from_file(kernel, program_source_str);
-            }
+            program_source_size += load_source_from_file (file_relative_to_me(__FILE__, "cl_macros.h"), program_source_str);
+            program_source_size += load_source_from_file (file_relative_to_me(__FILE__, "solver.h"), program_source_str);
 
             // Load the header and source files text ...
             for (const std::string& file : solverFiles())
@@ -865,6 +955,12 @@ namespace opencl_solvers {
                 program_source_size += load_source_from_file (file, program_source_str);
             }
 
+            // load the user specified kernels last such that any macros we use there are already
+            // defined
+            for (const std::string& kernel : _ivp.kernelSource())
+            {
+                program_source_size += load_source_from_file(kernel, program_source_str);
+            }
 
             /* Build Program */
             std::string psource_str = program_source_str.str();
@@ -878,7 +974,12 @@ namespace opencl_solvers {
             }
 
             std::ostringstream build_options;
-            build_options << "-I. ";
+            build_options << "-I" << path_of(__FILE__);
+            for (const std::string& ipath : solverIncludePaths())
+            {
+                build_options << " -I" << ipath;
+            }
+
             if (data->platform_info.is_nvidia)
                     build_options << " -cl-nv-verbose";
 
@@ -888,10 +989,15 @@ namespace opencl_solvers {
             ret = clBuildProgram(data->program, 1, &data->device_info.device_id, cbuild.c_str(), NULL, NULL);
             std::cerr << "clBuildProgram = " << ret << std::endl;
 
+            // write to file
+            std::ofstream temp("temp.cl");
+            temp << psource_str;
+            temp.close();
+
             cl_build_status build_status;
             CL_EXEC( clGetProgramBuildInfo (data->program, data->device_info.device_id, CL_PROGRAM_BUILD_STATUS,
                                             sizeof(cl_build_status), &build_status, NULL) );
-            std::cout << "CL_PROGRAM_BUILD_STATUS = " << build_status;
+            std::cout << "CL_PROGRAM_BUILD_STATUS = " << build_status << std::endl;;
 
             // get the program build log size
             size_t build_log_size;

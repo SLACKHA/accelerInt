@@ -15,7 +15,10 @@
  * \param[in]        param     The system parameter
  * \param[in]        y         The state vector
  * \param[out]       dy        The output RHS (dydt) vector
+ * \param[in]        rwk       The working buffer for source rate evaluation
  */
-void dydt (const __ValueType* t, const __ValueType* param, const __ValueType * __restrict__ y, __ValueType * __restrict__ dy);
+void dydt (__private __ValueType const t, __global __ValueType const * __restrict__ param,
+           __global __ValueType const * __restrict__ y, __global __ValueType * __restrict__ dy,
+           __global __ValueType* __restrict__ rwk);
 
 #endif

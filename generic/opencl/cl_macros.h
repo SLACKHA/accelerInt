@@ -25,7 +25,7 @@
 #define __inline inline
 
 #define VERBOSE
-#if VERBOSE
+#ifdef VERBOSE
   #pragma message "__blockSize   = " STRINGIFY(__blockSize)
   #pragma message "__getIndex    = " STRINGIFY(__getIndex(1))
   #pragma message "__arrayStride = " STRINGIFY(__arrayStride)
