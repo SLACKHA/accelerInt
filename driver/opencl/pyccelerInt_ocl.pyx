@@ -30,9 +30,9 @@ cdef extern from "error_codes.hpp" namespace "opencl_solvers":
 
 cdef extern from "rkf45_solver.hpp" namespace "opencl_solvers":
     cdef cppclass RKF45SolverOptions:
-        RKF45SolverOptions(size_t, size_t, int, double, double,
-                            bool, double, bool, string_t, string_t, DeviceType,
-                            size_t, size_t) except +
+        RKF45SolverOptions(size_t, size_t, double, double,
+                           bool, double, bool, string_t, string_t, DeviceType,
+                           size_t, size_t) except +
 
 cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
     cpdef enum DeviceType:
@@ -42,7 +42,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         DEFAULT
 
     cdef cppclass IntegratorBase:
-        IntegratorBase(int, int, const IVP&,
+        IntegratorBase(int, size_t, const IVP&,
                        const SolverOptions&) except +
         const double atol() except +
         const double rtol() except +
@@ -54,8 +54,8 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         IVP(const vector[string_t]&, size_t) except +
 
     cdef cppclass SolverOptions:
-        SolverOptions(size_t, size_t, int, double, double,
-                            bool, double, bool, string_t, string_t, DeviceType) except +
+        SolverOptions(size_t, size_t, double, double,
+                      bool, double, bool, string_t, string_t, DeviceType) except +
 
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
                                          const IVP&, const SolverOptions&) except +
@@ -177,7 +177,7 @@ cdef class PySolverOptions:
     cdef unique_ptr[SolverOptions] options # hold our options
 
     def __cinit__(self, IntegratorType itype, size_t vectorSize=1,
-                  size_t blockSize=1, int numBlocks=-1, double atol=1e-10,
+                  size_t blockSize=1, double atol=1e-10,
                   double rtol=1e-6, bool_t logging=False, double h_init=1e-6,
                   bool_t use_queue=True, string_t order="C", string_t platform="",
                   DeviceType deviceType = DeviceType.DEFAULT,  size_t minIters=1,
@@ -186,13 +186,13 @@ cdef class PySolverOptions:
         cdef string_t c_order = _bytes(order)
         if itype in [IntegratorType.RKF45]:
             self.options.reset(
-                new RKF45SolverOptions(vectorSize, blockSize, numBlocks,
+                new RKF45SolverOptions(vectorSize, blockSize,
                                        atol, rtol, logging, h_init, use_queue,
                                        c_order, platform, deviceType,
                                        minIters, maxIters))
         else:
             self.options.reset(new SolverOptions(
-                vectorSize, blockSize, numBlocks,
+                vectorSize, blockSize,
                 atol, rtol, logging, h_init, use_queue,
                 c_order, platform, deviceType))
 

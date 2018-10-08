@@ -5,6 +5,8 @@
 #include "solver.h"
 // include the source rate evaluation header
 #include "dydt.h"
+// and the struct types
+#include "rkf45_types.h"
 
 // check for required defines
 #ifndef neq
@@ -13,8 +15,6 @@
 #ifndef rk_lensrc
 #pragma error "Length of source-rate evaluation working buffer not defined"
 #endif
-// \brief required work-space for RKF45 internals
-#define lenrwk_rk (8 * neq)
 
 // \brief Indexing macro for _all_ arrays in RKF45 solver (all arrays are size neq)
 #define __getIndex(idx) (__getIndex1D(neq, idx))
@@ -64,7 +64,6 @@ int FUNC_TYPE(rkf45) (const __ValueType h, const __ValueType t,
     #define h4 (0.92307692307692307) // 12 / 13
     #define h5 (1.0)
     #define h6 (0.5)
-    #define
     /*   const double c20 = 0.25,
                             c21 = 0.25,
                             c30 = 0.375,
@@ -147,7 +146,7 @@ int FUNC_TYPE(rkf45) (const __ValueType h, const __ValueType t,
     }
 
     // 5)
-    dydt(t + h5 * h, user_data, ytmp, f5);
+    dydt(t + h5 * h, user_data, ytmp, f5, rwk_dydt);
 
     for (int k = 0; k < neq; k++) {
         //f5[k] = h * ydot[k];
@@ -224,13 +223,13 @@ __ValueType FUNC_TYPE(rk_wnorm) (__global const rk_t *rk, __global const __Value
 }
 
 int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
-                                             __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
-                                             __global __ValueType * __restrict__ rwk,
-                                             __global __ValueType const * __restrict__ user_data)
+                       __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
+                       __global __ValueType * __restrict__ rwk,
+                       __global __ValueType const * __restrict__ user_data)
 {
     #define t_round ((t_end - t) * DBL_EPSILON)
     #define h_min (t_round * 100)
-    #define h_max ((tf - t) / rk->min_iters)
+    #define h_max ((t_end - t) / rk->min_iters)
 
     __global __ValueType * __restrict__ ydot  = rwk;
     __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(neq);
@@ -238,20 +237,18 @@ int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __Val
     // portion of the rwk vector used by source rate evaluation
     __global __ValueType * __restrict__ rwk_dydt = rwk + __getOffset1D(8 * neq);
 
-    double hlb = h_min;
-    double hub = h_max;
+    __ValueType hlb = h_min;
+    __ValueType hub = h_max;
     //double hlb = h_min;
     //double hub = h_max;
 
-    // Alread done ...
+    // Already done ...
     __MaskType done = isgreaterequal(*h0, h_min);
-
     __ValueType hg = sqrt(hlb*hub);
 
-    if (hub < hlb)
+    if (__all(hub < hlb))
     {
         *h0 = __select(hg, *h0, done);
-
         return RK_SUCCESS;
     }
 
@@ -266,7 +263,9 @@ int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __Val
     // compute ydot at t=t0
     dydt(t, user_data, y, ydot, rwk_dydt);
 
-    while(1)
+    // maximum of 2 iterations
+    #define MAX_HINIT_ITERS (1)
+    for(; iter < MAX_HINIT_ITERS; ++iter)
     {
         // Estimate y'' with finite-difference ...
         //double t1 = hg;
@@ -315,7 +314,6 @@ int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __Val
         }
 
         hg = hnew;
-        iter ++;
     }
 
     // bound and bias estimate
@@ -343,44 +341,45 @@ FUNC_SIZE(rk_counters_t);
 
 __IntType FUNC_TYPE(rk_solve) (
                              __global const rk_t * __restrict__ rk,
-                             __global __ValueType * const __restrict__ t_start,
-                             __global __ValueType * const __restrict__ t_end,
-                             __private __ValueType * const __restrict__ hcur,
+                             __private __ValueType const t_start,
+                             __private __ValueType const t_end,
+                             __private __ValueType hcur,
                              __private FUNC_SIZE(rk_counters_t) * __restrict__ counters,
                              __global __ValueType* __restrict__ y,
                              __global __ValueType* __restrict__ rwk,
                              __global __ValueType* __restrict__ user_data)
 {
-     int ierr = RK_SUCCESS;
-     // Estimate the initial step size ...
-     {
-        __MaskType test = isless(*hcur, rk->h_min);
+
+    __ValueType t = t_start;
+    #define tf (t_end)
+    #define t_round ((tf - t) * DBL_EPSILON)
+    #define h (hcur)
+    #define h_min (t_round * 100)
+    #define h_max ((tf - t) / rk->min_iters)
+    #define iter (counters->niters)
+    #define nst (counters->nsteps)
+
+    __IntType ierr = RK_SUCCESS;
+    // Estimate the initial step size ...
+    {
+        __MaskType test = isless(h, h_min);
         if (__any(test))
         {
-            ierr = FUNC_TYPE(rk_hin) (rk, *tcur, *t_end, hcur, y, rwk, user_data);
+            ierr = FUNC_TYPE(rk_hin) (rk, t, tf, &hcur, y, rwk, user_data);
         }
-     }
+    }
 
-     #define t (*t_start)
-     #define tf (*t_end)
-     #define t_round ((tf - t) * DBL_EPSILON)
-     #define h (*hcur)
-     #define h_min (t_round * 100)
-     #define h_max ((tf - t) / rk->min_iters)
-     #define iter (counters->niters)
-     #define nst (counters->nsteps)
+    nst = 0;
+    iter = 0;
 
-     nst = 0;
-     iter = 0;
-
-     __MaskType done = isless(fabs(t - tf), fabs(t_round));
+    __MaskType done = isless(fabs(t - tf), fabs(t_round));
 
     while (__any(__not(done)))
     {
         __global __ValueType *ytmp = rwk + __getOffset1D(neq*7);
 
         // Take a trial step over h_cur ...
-        FUNC_TYPE(rkf45) (neq, h, t, y, ytmp, rwk, user_data);
+        FUNC_TYPE(rkf45) (h, t, y, ytmp, rwk, user_data);
 
         __ValueType herr = fmax(1.0e-20, FUNC_TYPE(rk_wnorm) (rk, rwk, y));
 
@@ -430,7 +429,6 @@ __IntType FUNC_TYPE(rk_solve) (
 
     return ierr;
 
-    #undef t
     #undef tf
     #undef t_round
     #undef h
@@ -447,19 +445,21 @@ __IntType FUNC_TYPE(rk_solve) (
 void __kernel
 __attribute__((reqd_work_group_size(__blockSize, 1, 1)))
 rkf45_driver (__global const double * __restrict__ param,
-                 __global const double t_start,
+              const double t_start,
               __global const double * __restrict__ t_end,
               __global double * __restrict__ phi,
               __global const rk_t * __restrict__ rk,
-              __global double * __restrict__ rwk,
+              __global __ValueType * __restrict__ rwk,
               __global rk_counters_t * __restrict__ rk_counters,
               const int numProblems)
 {
     // Thread-local pointers ...
     // Ordering is phi_woring, rkf working, RHS working
     // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType *__restrict__ rwk_rk = rwk_src + __getOffset1D(neq);
+    __global __ValueType const * __restrict__ my_param = rwk + __getOffset1D(1);
+    __global __ValueType *__restrict__ rwk_rk = my_param + __getOffset1D(neq);
     __private FUNC_SIZE(rk_counters_t) my_counters;
+    __private __ValueType tf;
 
     for (int i = __ValueSize * get_global_id(0); i < numProblems; i += __ValueSize * get_global_size(0))
     {
@@ -469,76 +469,78 @@ rkf45_driver (__global const double * __restrict__ param,
             for (int lane = 0; lane < __ValueSize; ++lane)
             {
                 const int problem_id = min(i + lane, numProblems-1);
-                __write_to(u_in[problem_id * neq + k], lane, rwk[__getIndex(k)]);
+                __write_to(phi[problem_id * neq + k], lane, rwk[__getIndex(k)]);
+                __write_to(param[problem_id], lane, my_param[__getIndex1D(1, 0)]);
+                __write_to(t_end[problem_id], lane, tf);
             }
         }
         #else
         for (int k = 0; k < neq; ++k)
-            rwk[__getIndex(k)] = u_in[i*neq+ k ];
+            rwk[__getIndex(k)] = phi[i*neq+ k ];
+        my_param[__getIndex1D(1, 0)] = param[i];
+        tf[__getIndex1D(1, 0)] = t_end[problem_idx];
         #endif
 
-        __ValueType h = 0;
-        __ValueType t = t_start;
-        __IntType rkerr = FUNC_SIZE(rk_solve) (
-                rk, &t, t_end + i,
-                &h, &my_counters, &my_limits, rwk, rwk_rk);
+        __IntType rkerr = FUNC_TYPE(rk_solve)(
+                rk, t_start, tf, 0, &my_counters, rwk, rwk_rk, my_param);
 
         #if __ValueSize > 1
+        for (int lane = 0; lane < __ValueSize; ++lane)
+        {
+            const int problem_id = i + lane;
+            if (problem_id < numProblems)
+            {
+                for (int k = 0; k < neq; ++k)
+                    __read_from(rwk[__getIndex(k)], lane, phi[neq * problem_id + k]);
+
+                __read_from(my_counters.nsteps, lane, rk_counters[problem_id].nsteps);
+                // Each lane has the same value ...
+                rk_counters[problem_id].niters = my_counters.niters;
+                if (__any(rkerr != RK_SUCCESS))
+                {
+                    __read_from(rkerr, lane, rk_counters[problem_id].niters);
+                }
+            }
+        }
+        #else
         for (int k = 0; k < neq; ++k)
         {
-            u_out[neq * i + k] = rwk[__getIndex(k)];
+            phi[neq * i + k] = rwk[__getIndex(k)];
         }
         rk_counters[i].niters = my_counters.niters;
         rk_counters[i].nsteps = my_counters.nsteps;
         if (rkerr != RK_SUCCESS)
             rk_counters[i].niters = rkerr;
-        #else
-            for (int lane = 0; lane < __ValueSize; ++lane)
-            {
-                const int problem_id = problem_idx + lane;
-                if (problem_id < numProblems)
-                {
-                    for (int k = 0; k < neq; ++k)
-                        __read_from(rwk[__getIndex(k)], lane, u_out[neq * i + k]);
-
-                    __read_from(my_counters.nsteps, lane, rk_counters[i].nsteps);
-                    // Each lane has the same value ...
-                    rk_counters[i].niters = my_counters.niters;
-                    if (rkerr != RK_SUCCESS)
-                        rk_counters[i].niters = rkerr;
-                }
-            }
         #endif
     }
 }
 #endif
 
 #ifndef __EnableQueue
-#warning 'Skipping rk_driver_queue kernel'
+#warning 'Skipping rkf45_driver_queue kernel'
 #else
 
 void __kernel
 __attribute__((reqd_work_group_size(__blockSize, 1, 1)))
-rk_driver_queue (__global const double * __restrict__ param,
-                 __global const double t_start,
-                 __global const double * __restrict__ t_end,
-                 __global double * __restrict__ phi,
-                 __global const rk_t * __restrict__ rk,
-                 __global double * __restrict__ rwk,
-                 __global rk_counters_t * __restrict__ rk_counters,
-                 const int numProblems,
-                 __global int *problemCounter)
+rkf45_driver_queue (__global const double * __restrict__ param,
+                    const double t_start,
+                    __global const double * __restrict__ t_end,
+                    __global double * __restrict__ phi,
+                    __global const rk_t * __restrict__ rk,
+                    __global __ValueType * __restrict__ rwk,
+                    __global rk_counters_t * __restrict__ rk_counters,
+                    const int numProblems,
+                    __global int *problemCounter)
 {
     const int tid = get_global_id(0);
-
-    const int lenrwk_rk = rk_lenrwk(rk);
 
     // Thread-local pointers ...
     // Ordering is phi_woring, rkf working, RHS working
     // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType *__restrict__ rwk_rk = rwk_src + __getOffset1D(neq);
+    __global __ValueType const * __restrict__ my_param = rwk + __getOffset1D(1);
+    __global __ValueType *__restrict__ rwk_rk = rwk + __getOffset1D(1 + neq);
     __private FUNC_SIZE(rk_counters_t) my_counters;
-
+    __private __ValueType tf;
     __private int problem_idx;
 
     // Initial problem set and global counter.
@@ -557,32 +559,52 @@ rk_driver_queue (__global const double * __restrict__ param,
         {
             for (int lane = 0; lane < __ValueSize; ++lane)
             {
-                const int problem_id = min(i + lane, numProblems-1);
-                __write_to(u_in[problem_id * neq + k], lane, rwk[__getIndex(k)]);
+                const int problem_id = min(problem_idx + lane, numProblems-1);
+                __write_to(phi[problem_id * neq + k], lane, rwk[__getIndex(k)]);
+                __write_to(param[problem_id], lane, my_param[__getIndex1D(1, 0)]);
+                __write_to(t_end[problem_id], lane, tf);
             }
         }
         #else
         for (int k = 0; k < neq; ++k)
-            rwk[__getIndex(k)] = u_in[problem_idx * neq + k];
+            rwk[__getIndex(k)] = phi[problem_idx * neq + k];
+        my_param[__getIndex1D(1, 0)] = param[problem_idx];
+        tf[__getIndex1D(1, 0)] = t_end[problem_idx];
         #endif
 
         // determine maximum / minumum time steps for this set of problems
-        __ValueType h = 0;
-                __ValueType t = t_start;
-        __IntType rkerr = FUNC_SIZE(rk_solve) (
-                rk, &t, t_end + i,
-                &h, &my_counters, &my_limits, rwk, rwk_rk);
+        __IntType rkerr = FUNC_TYPE(rk_solve)(
+                rk, t_start, tf, 0, &my_counters, rwk, rwk_rk, my_param);
 
+        #if __ValueSize > 1
+        for (int lane = 0; lane < __ValueSize; ++lane)
+        {
+            const int problem_id = problem_idx + lane;
+            if (problem_id < numProblems)
+            {
+                for (int k = 0; k < neq; ++k)
+                    __read_from(rwk[__getIndex(k)], lane, phi[neq * problem_id + k]);
+
+                __read_from(my_counters.nsteps, lane, rk_counters[problem_id].nsteps);
+                // Each lane has the same value ...
+                // Each lane has the same value ...
+                rk_counters[problem_id].niters = my_counters.niters;
+                if (__any(rkerr != RK_SUCCESS))
+                {
+                    __read_from(rkerr, lane, rk_counters[problem_id].niters);
+                }
+            }
+        }
+        #else
         for (int k = 0; k < neq; ++k)
         {
-            u_out[neq*(problem_idx) + k] = my_u[__getIndex(k)];
+            phi[neq * problem_idx + k] = rwk[__getIndex(k)];
         }
-
         rk_counters[problem_idx].niters = my_counters.niters;
         rk_counters[problem_idx].nsteps = my_counters.nsteps;
         if (rkerr != RK_SUCCESS)
             rk_counters[problem_idx].niters = rkerr;
-
+        #endif
         // Get a new problem atomically.
         problem_idx = atomic_inc(problemCounter);
     }

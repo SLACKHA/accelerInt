@@ -287,13 +287,12 @@ namespace opencl_solvers {
     {
     public:
         SolverOptions(std::size_t vectorSize=1, std::size_t blockSize=1,
-                      int numBlocks=-1, double atol=1e-10, double rtol=1e-6,
+                      double atol=1e-10, double rtol=1e-6,
                       bool logging=false, double h_init=1e-6,
                       bool use_queue=true, std::string order="C",
                       std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
-            _numBlocks(numBlocks),
             _atol(atol),
             _rtol(rtol),
             _logging(logging),
@@ -341,11 +340,6 @@ namespace opencl_solvers {
             return _blockSize;
         }
 
-        inline double numBlocks() const
-        {
-            return _numBlocks;
-        }
-
         inline std::string order() const
         {
             return _order;
@@ -371,8 +365,6 @@ namespace opencl_solvers {
         std::size_t _vectorSize;
         //! block size
         std::size_t _blockSize;
-        //! number of blocks to launch
-        std::size_t _numBlocks;
         //! the absolute tolerance for this integrator
         const double _atol;
         //! the relative tolerance for this integrator
@@ -395,10 +387,10 @@ namespace opencl_solvers {
     class IntegratorBase
     {
     public:
-        IntegratorBase(int neq, int numThreads,
+        IntegratorBase(int neq, std::size_t numWorkGroups,
                          const IVP& ivp,
                          const SolverOptions& options):
-            _numThreads(numThreads),
+            _numWorkGroups(numWorkGroups),
             _neq(neq),
             _log(),
             _ivp(ivp),
@@ -439,7 +431,7 @@ namespace opencl_solvers {
             return _log.size();
         }
 
-        void reinitialize(int numThreads)
+        void reinitialize(int numWorkGroups)
         {
             throw std::runtime_error("not implemented");
         }
@@ -472,16 +464,18 @@ namespace opencl_solvers {
             return _options.logging();
         }
 
-        //! return the number of equations to solve
+        //! \brief return the number of equations to solve
         inline const int neq() const
         {
             return _neq;
         }
 
-        //! return the number of equations to solve
-        inline const int numThreads() const
+        //! \brief Return the number of OpenCL work-groups to launch
+        //         On the CPU / Accelerators this corresponds to the # of threads
+        //         On the GPU, this corresponds to the # of "thread-blocks", in CUDA terminology
+        inline const int numWorkGroups() const
         {
-            return _numThreads;
+            return _numWorkGroups;
         }
 
         //! return the initial step-size
@@ -530,8 +524,8 @@ namespace opencl_solvers {
         //! for this thread `tid`
         double* phi(int tid);
 
-        //! the number of OpenMP threads to use
-        int _numThreads;
+        //! the number of OpenCL work-groups to launch
+        int _numWorkGroups;
         //! the number of equations to solver per-IVP
         const int _neq;
         //! working memory for this integrator
@@ -634,8 +628,8 @@ namespace opencl_solvers {
             std::cout << "\t" << "num_args = " << info->num_args << std::endl;
             std::cout << "\t" << "reference_count = " << info->reference_count << std::endl;
             std::cout << "\t" << "compile_work_group_size = (" << info->compile_work_group_size[0] <<
-                                    "," << info->compile_work_group_size[1] << "," << info->compile_work_group_size[2] <<
-                                    ")" << std::endl;
+                      "," << info->compile_work_group_size[1] << "," << info->compile_work_group_size[2] <<
+                      ")" << std::endl;
             std::cout << "\t" << "work_group_size = " << info->work_group_size << std::endl;
             std::cout << "\n" << "preferred_work_group_size_multiple = " <<
                                     info->preferred_work_group_size_multiple << std::endl;
@@ -867,9 +861,10 @@ namespace opencl_solvers {
             data->use_queue = _options.useQueue();
             data->blockSize = _options.blockSize();
             data->numBlocks = data->device_info.max_compute_units;
-            if (_options.numBlocks() > 0)
+            if (numWorkGroups() > 0)
             {
-                data->numBlocks = _options.numBlocks();
+                // if user has specified the number of work groups to use
+                data->numBlocks = numWorkGroups();
             }
             data->vectorSize = _options.vectorSize();
             if (!isPower2(data->vectorSize))
@@ -981,7 +976,7 @@ namespace opencl_solvers {
             }
 
             if (data->platform_info.is_nvidia)
-                    build_options << " -cl-nv-verbose";
+                 build_options << " -cl-nv-verbose";
 
             std::cout << "build_options = " << build_options.str();
 
@@ -989,10 +984,12 @@ namespace opencl_solvers {
             ret = clBuildProgram(data->program, 1, &data->device_info.device_id, cbuild.c_str(), NULL, NULL);
             std::cerr << "clBuildProgram = " << ret << std::endl;
 
+            #ifdef DEBUG_CL_COMPILATION
             // write to file
             std::ofstream temp("temp.cl");
             temp << psource_str;
             temp.close();
+            #endif
 
             cl_build_status build_status;
             CL_EXEC( clGetProgramBuildInfo (data->program, data->device_info.device_id, CL_PROGRAM_BUILD_STATUS,
@@ -1053,8 +1050,8 @@ namespace opencl_solvers {
     {
     public:
         Integrator(int neq, int numThreads,
-                         const IVP& ivp,
-                         const SolverOptions& options) :
+                   const IVP& ivp,
+                   const SolverOptions& options) :
             IntegratorBase(neq, numThreads, ivp, options)
         {
 
@@ -1120,7 +1117,7 @@ namespace opencl_solvers {
             cl_mem tf = CreateBuffer (&data.context, CL_MEM_READ_ONLY, sizeof(double)*NUM, NULL);
             cl_mem buffer_phi = CreateBuffer (&data.context, CL_MEM_READ_WRITE, sizeof(double)*_neq*NUM, NULL);
             cl_mem buffer_solver = CreateBuffer (&data.context, CL_MEM_READ_ONLY, sizeof(solver_struct), NULL);
-            cl_mem buffer_rwk = CreateBuffer (&data.context, CL_MEM_READ_WRITE, sizeof(double)*lenrwk*numThreads, NULL);
+            cl_mem buffer_rwk = CreateBuffer (&data.context, CL_MEM_READ_WRITE, lenrwk*numThreads, NULL);
             cl_mem buffer_counters = CreateBuffer (&data.context, CL_MEM_READ_WRITE, sizeof(counter_struct)*NUM, NULL);
 
             /* transfer data to device */
