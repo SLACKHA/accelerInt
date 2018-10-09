@@ -18,7 +18,7 @@ import pyccelerInt_ocl as pycel
 np.random.seed(0)
 
 
-def run(num, num_threads, itype, options):
+def run(num, num_threads, itype, tf, options):
     # number of equations
     neq = 2
 
@@ -42,7 +42,7 @@ def run(num, num_threads, itype, options):
                                     num_threads, ivp, options)
 
     # and integrate
-    time = integrator.integrate(num, 0., 2000., phi.flatten(options.order()),
+    time = integrator.integrate(num, 0., tf, phi.flatten(options.order()),
                                 params.flatten(options.order()), step=1.)
 
     print('Integration completed in {} (ms)'.format(time))
@@ -120,6 +120,7 @@ if __name__ == '__main__':
                         action='store_true',
                         dest='useQueue',
                         help='Use the queue-based integration drivers.')
+
     parser.add_argument('-s', '--useStatic',
                         default=True,
                         action='store_false',
@@ -143,6 +144,11 @@ if __name__ == '__main__':
                         default=pycel.DeviceType.DEFAULT,
                         help='The device type to use (e.g., CPU, GPU, ACCELERATOR).')
 
+    parser.add_argument('-tf', '--end_time',
+                        type=float,
+                        default=2000.,
+                        help='The simulation end-time.')
+
     args = parser.parse_args()
     assert not (args.vectorSize and args.blockSize), (
         'Cannot specify vectorSize and blockSize concurrently')
@@ -159,4 +165,4 @@ if __name__ == '__main__':
 
     print('Integrating {} IVPs with method {}, and {} threads...'.format(
         args.num_ivp, args.int_type, args.num_threads))
-    run(args.num_ivp, args.num_threads, args.int_type, options)
+    run(args.num_ivp, args.num_threads, args.int_type, args.end_time, options)
