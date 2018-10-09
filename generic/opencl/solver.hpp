@@ -340,7 +340,7 @@ namespace opencl_solvers {
             return _blockSize;
         }
 
-        inline std::string order() const
+        inline const std::string& order() const
         {
             return _order;
         }
@@ -395,7 +395,20 @@ namespace opencl_solvers {
             _log(),
             _ivp(ivp),
             _options(options),
-            _verbose(true)
+            _verbose(true),
+            _data(),
+            _clmem(),
+            _kernel_info(),
+            _kernel(),
+            _storedNumProblems(0),
+            _start_time_index(-1),
+            _end_time_index(-1),
+            _param_index(-1),
+            _phi_index(-1),
+            _solver_index(-1),
+            _counter_index(-1),
+            _queue_index(-1),
+            _initialized(false)
         {
 
         }
@@ -432,10 +445,8 @@ namespace opencl_solvers {
             return _log.size();
         }
 
-        void reinitialize(int numWorkGroups)
-        {
-            throw std::runtime_error("not implemented");
-        }
+        /*! \brief Resize the Integrator to utilize the specified number of work groups and solve #numProblems */
+        virtual void reinitialize(std::size_t numWorkGroups, std::size_t numProblems) = 0;
 
         /*! checkError
                 \brief Checks the return code of the given thread (IVP) for an error, and exits if found
@@ -463,6 +474,11 @@ namespace opencl_solvers {
         inline bool logging() const
         {
             return _options.logging();
+        }
+
+        inline const std::string& order() const
+        {
+            return _options.order();
         }
 
         //! \brief return the number of equations to solve
@@ -539,6 +555,33 @@ namespace opencl_solvers {
         const SolverOptions& _options;
         //! \brief Verbosity of kernel compilation
         bool _verbose;
+        //! \brief struct holding opencl context, program, etc.
+        cl_data_t _data;
+        //! \brief CL memory
+        std::vector<cl_mem> _clmem;
+        //! \brief CL Kernel holder
+        kernelInfo_t _kernel_info;
+        //! \brief CL Kernel
+        cl_kernel _kernel;
+        //! \brief # of problems previous solved, used to detect if we must resize the buffers
+        std::size_t _storedNumProblems;
+        //! \brief The kernel argument index of the start time
+        int _start_time_index;
+        //! \brief The index of the end time buffer in #_clmem
+        int _end_time_index;
+        //! \brief The index of the parameter buffer in #_clmem
+        int _param_index;
+        //! \brief The index of the state vector buffer in #_clmem
+        int _phi_index;
+        //! \brief The index of the solution struct buffer in #_clmem
+        int _solver_index;
+        //! \brief The index of the counter struct buffer in #_clmem
+        int _counter_index;
+        //! \brief The index of the queue buffer in #_clmem
+        int _queue_index;
+        //! \brief simple flag to mark whether the device / context / kernel have been created
+        bool _initialized;
+
 
         /*
          * \brief Return the required memory size in bytes (per-IVP)
@@ -546,7 +589,43 @@ namespace opencl_solvers {
         virtual std::size_t requiredSolverMemorySize() = 0;
 
         //! \brief return the base kernel name
-        virtual std::string solverName() const = 0;
+        virtual const char* solverName() const = 0;
+
+        //! \brief an initialization function for the kernel, to be called from
+        //!        the final derived integrator class's constructor
+        void initialize_kernel()
+        {
+            cl_int ret;
+
+            /* get device, context, platform, etc. */
+            cl_init(&_data);
+
+            /* get the kernel name */
+            std::ostringstream kernel_name;
+            kernel_name << this->solverName();
+            // all named driver
+            kernel_name << "_driver";
+            // and queue
+            if (_options.useQueue())
+            {
+                kernel_name << "_queue";
+            }
+            std::string k_name = kernel_name.str();
+
+            /* Extract the kernel from the program */
+            _kernel = clCreateKernel(_data.program, k_name.c_str(), &ret);
+            if (ret != CL_SUCCESS)
+            {
+
+                __clerror(ret, "clCreateKernel");
+                exit(-1);
+            }
+
+            // Query the kernel's info
+            getKernelInfo (&_kernel_info, _kernel, _data.device_info.device_id);
+            // mark initialized
+            _initialized = true;
+        }
 
         //! \brief return the list of files for this solver
         virtual const std::vector<std::string>& solverFiles() const = 0;
@@ -636,8 +715,8 @@ namespace opencl_solvers {
                 std::cout << "\t" << "work_group_size = " << info->work_group_size << std::endl;
                 std::cout << "\n" << "preferred_work_group_size_multiple = " <<
                                         info->preferred_work_group_size_multiple << std::endl;
-                std::cout << "local_mem_size" << info->local_mem_size << std::endl;
-                std::cout << "private_mem_size" << info->private_mem_size << std::endl;
+                std::cout << "local_mem_size =" << info->local_mem_size << std::endl;
+                std::cout << "private_mem_size = " << info->private_mem_size << std::endl;
             }
         }
 
@@ -1038,6 +1117,32 @@ namespace opencl_solvers {
             return CL_SUCCESS;
         }
 
+        //! \brief Return the total number of OpenCL "threads" to launch, i.e., the global size
+        std::size_t numThreads() const
+        {
+            return _data.blockSize * _data.numBlocks;
+        }
+
+        //! \brief Set the starting time on our kernel
+        void set_start_time(const double t_start)
+        {
+            if (_start_time_index < 0)
+            {
+                throw std::runtime_error("Not implemented!");
+            }
+            CL_EXEC( clSetKernelArg(_kernel, _start_time_index, sizeof(double), &t_start) );
+        }
+
+        //! \brief free the OpenCL memory
+        void release_memory()
+        {
+            for (cl_mem buffer : _clmem)
+            {
+                clReleaseMemObject (buffer);
+            }
+        }
+
+
 
     private:
         void clean()
@@ -1061,6 +1166,99 @@ namespace opencl_solvers {
 
         }
 
+        ~Integrator()
+        {
+            // free memory
+            this->release_memory();
+            // release kernel
+            CL_EXEC(clReleaseKernel(_kernel));
+            // release program
+            CL_EXEC(clReleaseProgram(_data.program));
+            // release queue
+            CL_EXEC(clReleaseCommandQueue(_data.command_queue));
+            // and context
+            CL_EXEC(clReleaseContext(_data.context));
+        }
+
+    protected:
+
+        void resize(const int NUM)
+        {
+            // create memory
+            std::size_t lenrwk = (_ivp.requiredMemorySize() + requiredSolverMemorySize())*_data.vectorSize;
+            if (_verbose)
+                std::cout << "lenrwk = "<< lenrwk << std::endl;
+
+            if (_verbose)
+                std::cout << "NP = " << NUM << ", blockSize = " << _data.blockSize <<
+                             ", vectorSize = " << _data.vectorSize <<
+                             ", numBlocks = " << _data.numBlocks <<
+                             ", numThreads = " << numThreads() << std::endl;
+
+            cl_mem buffer_param = CreateBuffer (&_data.context, CL_MEM_READ_ONLY, sizeof(double)*NUM, NULL);
+            cl_mem tf = CreateBuffer (&_data.context, CL_MEM_READ_ONLY, sizeof(double)*NUM, NULL);
+            cl_mem buffer_phi = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(double)*_neq*NUM, NULL);
+            cl_mem buffer_solver = CreateBuffer (&_data.context, CL_MEM_READ_ONLY, sizeof(solver_struct), NULL);
+            cl_mem buffer_rwk = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, lenrwk*numThreads(), NULL);
+            cl_mem buffer_counters = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(counter_struct)*NUM, NULL);
+            _clmem.assign({buffer_param, tf, buffer_phi, buffer_solver, buffer_rwk, buffer_counters});
+            _param_index = 0;
+            _end_time_index = 1;
+            _phi_index = 2;
+            _solver_index = 3;
+            _counter_index = 5;
+
+            cl_mem buffer_queue;
+            if (_options.useQueue())
+            {
+                buffer_queue = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(int), NULL);
+                _clmem.push_back(buffer_queue);
+                _queue_index = 6;
+            }
+
+            /* Set kernel arguments */
+            int argc = 0;
+            // dummy time
+            double t = 0;
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_param) );
+            _start_time_index = argc;
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(double), &t) );
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &tf) );
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_phi) );
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_solver) );
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_rwk) );
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_counters) );
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(int), &NUM) );
+            if (_options.useQueue())
+            {
+                CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_queue) );
+            }
+
+        }
+
+    public:
+
+        /*! \brief Resize the Integrator to utilize the specified number of work groups and solve #numProblems */
+        void reinitialize(std::size_t numWorkGroups, std::size_t numProblems)
+        {
+            if (numProblems < 1)
+            {
+                throw std::runtime_error("Number of problems to solve must be at least one!");
+            }
+            if (numWorkGroups != _numWorkGroups)
+            {
+                // set internal
+                _numWorkGroups = numWorkGroups;
+                // set data
+                _data.numBlocks = numWorkGroups;
+            }
+            if (numProblems != _storedNumProblems)
+            {
+                // have to reset the memory arrays
+                this->release_memory();
+                this->resize(numProblems);
+            }
+        }
 
         /**
          * \brief Integration driver for the CPU integrators
@@ -1076,103 +1274,59 @@ namespace opencl_solvers {
                         const double* __restrict__ t_end,
                         const double* __restrict__ param, double* __restrict__ phi)
         {
-            cl_data_t data;
-            cl_init(&data);
-            cl_int ret;
 
-            /* get the kernel name */
-            std::ostringstream kernel_name;
-            kernel_name << this->solverName();
-            // all named driver
-            kernel_name << "_driver";
-            // and queue
-            if (_options.useQueue())
+            if (NUM < 1)
             {
-                kernel_name << "_queue";
-            }
-            std::string k_name = kernel_name.str();
-
-            /* Extract the kernel from the program */
-            cl_kernel kernel = clCreateKernel(data.program, k_name.c_str(), &ret);
-            if (ret != CL_SUCCESS)
-            {
-
-                __clerror(ret, "clCreateKernel");
-                exit(-1);
+                throw std::runtime_error("Number of problems to solve must be at least one!");
             }
 
-            // Query the kernel's info
-            kernelInfo_t kernel_info;
-            getKernelInfo (&kernel_info, kernel, data.device_info.device_id);
+            if (NUM != _storedNumProblems)
+            {
+                // resize data if needed
+                this->reinitialize(_numWorkGroups, NUM);
+            }
 
-
-            std::size_t lenrwk = (_ivp.requiredMemorySize() + requiredSolverMemorySize())*data.vectorSize;
-            if (_verbose)
-                std::cout << "lenrwk = "<< lenrwk << std::endl;
-
-            size_t numThreads = data.blockSize * data.numBlocks;
-            if (_verbose)
-                std::cout << "NP = " << NUM << ", blockSize = " << data.blockSize <<
-                             ", vectorSize = " << data.vectorSize <<
-                             ", numBlocks = " << data.numBlocks <<
-                             ", numThreads = " << numThreads << std::endl;
+            // set start
+            set_start_time(t);
 
             auto t_data = std::chrono::high_resolution_clock::now();
 
-            cl_mem buffer_param = CreateBuffer (&data.context, CL_MEM_READ_ONLY, sizeof(double)*NUM, NULL);
-            cl_mem tf = CreateBuffer (&data.context, CL_MEM_READ_ONLY, sizeof(double)*NUM, NULL);
-            cl_mem buffer_phi = CreateBuffer (&data.context, CL_MEM_READ_WRITE, sizeof(double)*_neq*NUM, NULL);
-            cl_mem buffer_solver = CreateBuffer (&data.context, CL_MEM_READ_ONLY, sizeof(solver_struct), NULL);
-            cl_mem buffer_rwk = CreateBuffer (&data.context, CL_MEM_READ_WRITE, lenrwk*numThreads, NULL);
-            cl_mem buffer_counters = CreateBuffer (&data.context, CL_MEM_READ_WRITE, sizeof(counter_struct)*NUM, NULL);
+            if (_end_time_index < 0 || _phi_index < 0 || _param_index < 0 || _solver_index < 0 || !_initialized)
+            {
+                throw std::runtime_error("Implementation error!");
+            }
 
             /* transfer data to device */
-            CL_EXEC( clEnqueueWriteBuffer(data.command_queue, buffer_param, CL_TRUE, 0, sizeof(double)*NUM, param, 0, NULL, NULL) );
-            CL_EXEC( clEnqueueWriteBuffer(data.command_queue, tf, CL_TRUE, 0, sizeof(double)*NUM, t_end, 0, NULL, NULL) );
-            CL_EXEC( clEnqueueWriteBuffer(data.command_queue, buffer_phi, CL_TRUE, 0, sizeof(double)*NUM*_neq, phi, 0, NULL, NULL) );
-            CL_EXEC( clEnqueueWriteBuffer(data.command_queue, buffer_solver, CL_TRUE, 0, sizeof(solver_struct),
-                                                                        &this->getSolverStruct(), 0, NULL, NULL) );
-            cl_mem buffer_queue = NULL;
+            CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_param_index], CL_TRUE, 0, sizeof(double)*NUM, param, 0, NULL, NULL) );
+            CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_end_time_index], CL_TRUE, 0, sizeof(double)*NUM, t_end, 0, NULL, NULL) );
+            CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_phi_index], CL_TRUE, 0, sizeof(double)*NUM*_neq, phi, 0, NULL, NULL) );
+            CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_solver_index], CL_TRUE, 0, sizeof(solver_struct),
+                                          &this->getSolverStruct(), 0, NULL, NULL) );
             if (_options.useQueue())
             {
-                buffer_queue = CreateBuffer (&data.context, CL_MEM_READ_WRITE, sizeof(int), NULL);
                 int queue_val = 0;
-                CL_EXEC( clEnqueueWriteBuffer(data.command_queue, buffer_queue, CL_TRUE, 0, sizeof(int),
-                                                                            &queue_val, 0, NULL, NULL) )
+                CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_queue_index], CL_TRUE, 0, sizeof(int),
+                                              &queue_val, 0, NULL, NULL) )
                 if (_verbose)
                     std::cout << "Queue enabled" << std::endl;
             }
 
             if (_verbose)
-                std::cout << "Host->Dev + alloc = " <<
+                std::cout << "Host->Dev = " <<
                     std::chrono::duration_cast<std::chrono::milliseconds>(
                             std::chrono::high_resolution_clock::now() - t_data).count() <<
                     " (ms)" << std::endl;
-
-            /* Set kernel argument */
-            int argc = 0;
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(cl_mem), &buffer_param) );
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(double), &t) );
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(cl_mem), &tf) );
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(cl_mem), &buffer_phi) );
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(cl_mem), &buffer_solver) );
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(cl_mem), &buffer_rwk) );
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(cl_mem), &buffer_counters) );
-            CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(int), &NUM) );
-            if (_options.useQueue())
-            {
-                CL_EXEC( clSetKernelArg(kernel, argc++, sizeof(cl_mem), &buffer_queue) );
-            }
 
 
             /* Execute kernel */
             auto tk = std::chrono::high_resolution_clock::now();
             cl_event ev;
-            CL_EXEC( clEnqueueNDRangeKernel (data.command_queue, kernel,
+            std::size_t nt = numThreads();
+            CL_EXEC( clEnqueueNDRangeKernel (_data.command_queue, _kernel,
                                              1 /* work-group dims */,
                                              NULL /* offset */,
-                                             &numThreads /* global work size */,
-                                             &data.blockSize /* local work-group size */,
+                                             &nt /* global work size */,
+                                             &_data.blockSize /* local work-group size */,
                                              0, NULL, /* wait list */
                                              &ev /* this kernel's event */) );
             /* Wait for the kernel to finish */
@@ -1186,7 +1340,7 @@ namespace opencl_solvers {
 
             t_data = std::chrono::high_resolution_clock::now();
             /* copy out */
-            CL_EXEC( clEnqueueReadBuffer(data.command_queue, buffer_phi, CL_TRUE, 0, sizeof(double)*_neq*NUM, phi, 0, NULL, NULL) );
+            CL_EXEC( clEnqueueReadBuffer(_data.command_queue, _clmem[_phi_index], CL_TRUE, 0, sizeof(double)*_neq*NUM, phi, 0, NULL, NULL) );
 
             counter_struct* counters = (counter_struct*) malloc(sizeof(counter_struct)*NUM);
             if (counters == NULL)
@@ -1194,7 +1348,7 @@ namespace opencl_solvers {
                 fprintf(stderr,"Allocation error %s %d\n", __FILE__, __LINE__);
                 exit(-1);
             }
-            CL_EXEC( clEnqueueReadBuffer(data.command_queue, buffer_counters, CL_TRUE, 0, sizeof(counter_struct)*NUM, counters, 0, NULL, NULL) );
+            CL_EXEC( clEnqueueReadBuffer(_data.command_queue, _clmem[_counter_index], CL_TRUE, 0, sizeof(counter_struct)*NUM, counters, 0, NULL, NULL) );
 
             int nst_ = 0, nit_ = 0;
             for (int i = 0; i < NUM; ++i)
@@ -1204,14 +1358,6 @@ namespace opencl_solvers {
             }
             if (_verbose)
                 std::cout << "nst = " << nst_ << ", nit = " << nit_ << std::endl;
-
-            clReleaseKernel(kernel);
-            clReleaseMemObject (buffer_param);
-            clReleaseMemObject (tf);
-            clReleaseMemObject (buffer_phi);
-            clReleaseMemObject (buffer_solver);
-            clReleaseMemObject (buffer_rwk);
-            clReleaseMemObject (buffer_counters);
 
             free(counters);
             // turn off messaging after first compilation

@@ -16,9 +16,6 @@ cdef unicode _bytes(s):
     cdef string_t c_string = py_byte_string
     return c_string
 
-cdef unicode _str(string_t s):
-    return s
-
 cdef extern from "solver_types.hpp" namespace "opencl_solvers":
     cpdef enum IntegratorType:
         ROSENBROCK,
@@ -52,6 +49,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         const double neq() except +
         void getLog(const int, double*, double*) except +
         size_t numSteps() except +
+        string_t order() except+
 
     cdef cppclass IVP:
         IVP(const vector[string_t]&, size_t) except +
@@ -175,7 +173,8 @@ cdef class PyIntegrator:
         # get phi
         deref(self.integrator.get()).getLog(self.num, &times[0], &phi[0])
         # and reshape
-        return times, np.reshape(phi, (self.num, self.neq, n_steps), order='F')
+        return times, np.reshape(phi, (self.num, self.neq, n_steps),
+                                 order=deref(self.integrator.get()).order())
 
 
 cdef class PySolverOptions:
@@ -202,7 +201,7 @@ cdef class PySolverOptions:
                 c_order, platform, deviceType))
 
     cpdef order(self):
-        return _str(deref(self.options.get()).order())
+        return deref(self.options.get()).order()
 
 
 

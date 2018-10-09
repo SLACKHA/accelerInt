@@ -78,10 +78,13 @@ public:
             rk_vals.adaption_limit = options.adaptionLimit();
             rk_vals.s_rtol = options.rtol();
             rk_vals.s_atol = options.atol();
+
+            // and initialize the kernel
+            this->initialize_kernel();
         }
 
 protected:
-        std::string solverName() const
+        const char* solverName() const
         {
             return "rkf45";
         }
