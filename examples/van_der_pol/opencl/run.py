@@ -42,8 +42,8 @@ def run(num, num_threads, itype, options):
                                     num_threads, ivp, options)
 
     # and integrate
-    time = integrator.integrate(num, 0., 2000., phi.flatten(options.order),
-                                params.flatten(options.order), step=1.)
+    time = integrator.integrate(num, 0., 2000., phi.flatten(options.order()),
+                                params.flatten(options.order()), step=1.)
 
     print('Integration completed in {} (ms)'.format(time))
 
@@ -63,7 +63,7 @@ def vector_width(v):
             v))
     try:
         v = int(v)
-        if v not in [2, 3, 4, 8, 16]:
+        if v not in [1, 2, 3, 4, 8, 16]:
             __raise()
         return v
     except ValueError:

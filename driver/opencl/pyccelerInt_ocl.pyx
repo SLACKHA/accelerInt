@@ -16,6 +16,9 @@ cdef unicode _bytes(s):
     cdef string_t c_string = py_byte_string
     return c_string
 
+cdef unicode _str(string_t s):
+    return s
+
 cdef extern from "solver_types.hpp" namespace "opencl_solvers":
     cpdef enum IntegratorType:
         ROSENBROCK,
@@ -197,6 +200,11 @@ cdef class PySolverOptions:
                 vectorSize, blockSize,
                 atol, rtol, logging, h_init, use_queue,
                 c_order, platform, deviceType))
+
+    cpdef order(self):
+        return _str(deref(self.options.get()).order())
+
+
 
 cdef class PyIVP:
     cdef unique_ptr[IVP] ivp # hold our ivp implementation

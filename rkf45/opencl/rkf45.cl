@@ -21,6 +21,8 @@
 
 // \brief Indexing macro for _all_ arrays in RKF45 solver (all arrays are size neq)
 #define __getIndex(idx) (__getIndex1D(neq, idx))
+// \brief Indexing macro for _all_ global arrays in RKF45 solver (all arrays are size neq)
+#define __getGlobalIndex(pid, idx) (__globalIndex1D(numProblems, neq, pid, idx))
 
 
 // Single-step function
@@ -238,7 +240,7 @@ int rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_en
     __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(neq);
     __global __ValueType * __restrict__ ydot1 = y1 + __getOffset1D(neq);
     // portion of the rwk vector used by source rate evaluation
-    __global __ValueType * __restrict__ rwk_dydt = rwk + __getOffset1D(8 * neq);
+    __global __ValueType * __restrict__ rwk_dydt = rwk + __getOffset1D(2 * neq);
 
     __ValueType hlb = h_min;
     __ValueType hub = h_max;
@@ -467,7 +469,7 @@ rkf45_driver (__global const double * __restrict__ param,
             for (int lane = 0; lane < __ValueSize; ++lane)
             {
                 const int problem_id = min(i + lane, numProblems-1);
-                __write_to(phi[problem_id * neq + k], lane, rwk[__getIndex(k)]);
+                __write_to(phi[__getGlobalIndex(problem_id, k)], lane, rwk[__getIndex(k)]);
                 __write_to(param[problem_id], lane, my_param[__getIndex1D(1, 0)]);
                 __write_to(t_end[problem_id], lane, tf);
             }
@@ -489,7 +491,7 @@ rkf45_driver (__global const double * __restrict__ param,
             if (problem_id < numProblems)
             {
                 for (int k = 0; k < neq; ++k)
-                    __read_from(rwk[__getIndex(k)], lane, phi[neq * problem_id + k]);
+                    __read_from(rwk[__getIndex(k)], lane, phi[__getGlobalIndex(problem_id, k)]);
 
                 __read_from(my_counters.nsteps, lane, rk_counters[problem_id].nsteps);
                 // Each lane has the same value ...
@@ -558,14 +560,16 @@ rkf45_driver_queue (__global const double * __restrict__ param,
             for (int lane = 0; lane < __ValueSize; ++lane)
             {
                 const int problem_id = min(problem_idx + lane, numProblems-1);
-                __write_to(phi[problem_id * neq + k], lane, rwk[__getIndex(k)]);
+                __write_to(phi[__getGlobalIndex(problem_id, k)], lane, rwk[__getIndex(k)]);
                 __write_to(param[problem_id], lane, my_param[__getIndex1D(1, 0)]);
                 __write_to(t_end[problem_id], lane, tf);
             }
         }
         #else
         for (int k = 0; k < neq; ++k)
-            rwk[__getIndex(k)] = phi[problem_idx * neq + k];
+        {
+            rwk[__getIndex(k)] = phi[__getGlobalIndex(problem_idx, k)];
+        }
         my_param[__getIndex1D(1, 0)] = param[problem_idx];
         tf = t_end[problem_idx];
         #endif
@@ -581,7 +585,7 @@ rkf45_driver_queue (__global const double * __restrict__ param,
             if (problem_id < numProblems)
             {
                 for (int k = 0; k < neq; ++k)
-                    __read_from(rwk[__getIndex(k)], lane, phi[neq * problem_id + k]);
+                    __read_from(rwk[__getIndex(k)], lane, phi[__globalIndex1D(problem_id, neq, k)]);
 
                 __read_from(my_counters.nsteps, lane, rk_counters[problem_id].nsteps);
                 // Each lane has the same value ...
@@ -596,7 +600,7 @@ rkf45_driver_queue (__global const double * __restrict__ param,
         #else
         for (int k = 0; k < neq; ++k)
         {
-            phi[neq * problem_idx + k] = rwk[__getIndex(k)];
+            phi[__getGlobalIndex(problem_idx, k)] = rwk[__getIndex(k)];
         }
         rk_counters[problem_idx].niters = my_counters.niters;
         rk_counters[problem_idx].nsteps = my_counters.nsteps;

@@ -45,19 +45,21 @@
   #define __MaskType int
 #endif
 
+#ifndef __order
+#define __order 'C'
+#endif
+
 #ifdef VERBOSE
   #pragma message "__ValueSize  = " STRINGIFY(__ValueSize)
   #pragma message "__ValueType  = " STRINGIFY(__ValueType)
   #pragma message "__MaskType   = " STRINGIFY(__MaskType)
+  #pragma message "__order      = " STRINGIFY(__order)
   //#pragma message "FUNC_TYPE(func)   = " FUNC_TYPE("func")
 #endif
 
 //! \brief Macro to determine offsets for pointer unpacking
 #define __getOffset1D(dim0) (dim0 * get_global_size(0))
 
-#ifndef __order
-#define __order 'C'
-#endif
 #if (__order == 'C')
   /*!
     Use row-major ordering -- this results in (1-D, neq-sized) arrays that are shaped as:
@@ -72,17 +74,25 @@
       with indexing strides:
       > (neq, 1)
 
-  Hence, a 1-D accessor looks like:
   */
 
   #if (__ValueSize == 1)
     //! \brief Indexer macro for C-ordered implict-SIMD
-    #define __getIndex1D(dim0, idx) (get_group_id(0) * dim0 * __arrayStride + idx * __arrayStride + get_local_id(0))
+    #define __getIndex1D(dim0, idx) (get_group_id(0) * (dim0) * __arrayStride + (idx) * __arrayStride + get_local_id(0))
   #else
     // \brief Indexer macro for C-ordered explicit-SIMD
     // using explicit SIMD -> don't need to refer to local index (identically 0)
-    #define __getIndex1D(dim0, idx) (get_group_id(0) * dim0 + idx)
+    #define __getIndex1D(dim0, idx) (get_group_id(0) * (dim0) + (idx))
   #endif
+
+  /*! \brief Row-major indexing macro for global arrays
+
+      The array is shaped as (nprob, dim0), while the index arguements correspond to:
+      \param[in]    pid     the global problem index
+      \param[in]    idx     the index inside the array for problem index pid
+   */
+  #define __globalIndex1D(nprob, dim0, pid, idx) ((dim0) * (pid) + (idx))
+
 #elif (__order == 'F')
   /*
     Use column-major ordering -- this results in (1-D, neq-sized) arrays that are shaped as:
@@ -102,11 +112,19 @@
 
   #if (__ValueSize == 1)
     //! \brief Indexer macro for F-ordered implict-SIMD
-    #define __getIndex1D(dim0, idx) (get_local_id(0) + __arrayStride * get_group_id(0) + idx * get_num_groups(0) * __arrayStride)
+    #define __getIndex1D(dim0, idx) (get_local_id(0) + __arrayStride * get_group_id(0) + (idx) * get_num_groups(0) * __arrayStride)
   #else
     // using explicit SIMD -> don't need to refer to local index (identically 0)
-    #define __getIndex1D(dim0, idx) (get_group_id(0) + idx * get_num_groups(0))
+    #define __getIndex1D(dim0, idx) (get_group_id(0) + (idx) * get_num_groups(0))
   #endif
+
+  /*! \brief Column-major indexing macro for global arrays
+
+      The array is shaped as (nprob, dim0), while the index arguements correspond to:
+      \param[in]    pid     the global problem index
+      \param[in]    idx     the index inside the array for problem index pid
+   */
+  #define __globalIndex1D(nprob, dim0, pid, idx) ((nprob) * (idx) + (pid))
 
 #else
 #pragma error "Order " STRINGIFY(__order) " not recognized"
