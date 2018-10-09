@@ -628,6 +628,7 @@ for p in platforms:
 
     if p == 'opencl':
         new_defines['LIBPATH'] += env['OCL_LIB_DIR']
+        new_defines['RPATH'] += env['OCL_LIB_DIR']
         new_defines['LIBS'] += ['OpenCL']
 
     # filter out non-existant
