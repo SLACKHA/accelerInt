@@ -57,6 +57,8 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         SolverOptions(size_t, size_t, double, double,
                       bool, double, bool, string_t, string_t, DeviceType) except +
 
+        string_t order() except+
+
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
                                          const IVP&, const SolverOptions&) except +
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
