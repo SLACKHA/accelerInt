@@ -82,7 +82,7 @@ namespace opencl_solvers
                      const double stepsize, double * __restrict__ phi_host,
                      const double * __restrict__ param_host)
     {
-        std::vector<double> tf(t_end, NUM);
+        std::vector<double> tf(NUM, t_end);
         return integrate_varying(integrator, NUM, t, &tf[0], stepsize, phi_host, param_host);
     }
 

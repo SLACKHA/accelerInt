@@ -394,7 +394,8 @@ namespace opencl_solvers {
             _neq(neq),
             _log(),
             _ivp(ivp),
-            _options(options)
+            _options(options),
+            _verbose(true)
         {
 
         }
@@ -536,6 +537,8 @@ namespace opencl_solvers {
         const IVP& _ivp;
         //! \brief Solver options for OpenCL execution
         const SolverOptions& _options;
+        //! \brief Verbosity of kernel compilation
+        bool _verbose;
 
         /*
          * \brief Return the required memory size in bytes (per-IVP)
@@ -618,21 +621,24 @@ namespace opencl_solvers {
 
         void printKernelInfo (const kernelInfo_t* info)
         {
-            std::cout << "Kernel Info:" << std::endl;
-            std::cout << "\t" << "function_name = " << info->function_name << std::endl;
-            #if (__OPENCL_VERSION__ >= 120)
-            std::cout << "\t" << "attributes = " << info->attributes << std::endl;
-            #endif
-            std::cout << "\t" << "num_args = " << info->num_args << std::endl;
-            std::cout << "\t" << "reference_count = " << info->reference_count << std::endl;
-            std::cout << "\t" << "compile_work_group_size = (" << info->compile_work_group_size[0] <<
-                      "," << info->compile_work_group_size[1] << "," << info->compile_work_group_size[2] <<
-                      ")" << std::endl;
-            std::cout << "\t" << "work_group_size = " << info->work_group_size << std::endl;
-            std::cout << "\n" << "preferred_work_group_size_multiple = " <<
-                                    info->preferred_work_group_size_multiple << std::endl;
-            std::cout << "local_mem_size" << info->local_mem_size << std::endl;
-            std::cout << "private_mem_size" << info->private_mem_size << std::endl;
+            if (_verbose)
+            {
+                std::cout << "Kernel Info:" << std::endl;
+                std::cout << "\t" << "function_name = " << info->function_name << std::endl;
+                #if (__OPENCL_VERSION__ >= 120)
+                std::cout << "\t" << "attributes = " << info->attributes << std::endl;
+                #endif
+                std::cout << "\t" << "num_args = " << info->num_args << std::endl;
+                std::cout << "\t" << "reference_count = " << info->reference_count << std::endl;
+                std::cout << "\t" << "compile_work_group_size = (" << info->compile_work_group_size[0] <<
+                          "," << info->compile_work_group_size[1] << "," << info->compile_work_group_size[2] <<
+                          ")" << std::endl;
+                std::cout << "\t" << "work_group_size = " << info->work_group_size << std::endl;
+                std::cout << "\n" << "preferred_work_group_size_multiple = " <<
+                                        info->preferred_work_group_size_multiple << std::endl;
+                std::cout << "local_mem_size" << info->local_mem_size << std::endl;
+                std::cout << "private_mem_size" << info->private_mem_size << std::endl;
+            }
         }
 
         void getKernelInfo (kernelInfo_t *info, cl_kernel kernel, cl_device_id device_id)
@@ -675,7 +681,8 @@ namespace opencl_solvers {
                     std::transform(cname.begin(), cname.end(), cname.begin(), ::tolower);
                     if (cname.find(test) != std::string::npos)
                     {
-                        std::cout << "Found user specified platform " << _options.platform() << std::endl;
+                        if (_verbose)
+                            std::cout << "Found user specified platform " << _options.platform() << std::endl;
                         info->platform_id = info->platform_ids[i];
                         found = true;
                         break;
@@ -687,16 +694,19 @@ namespace opencl_solvers {
             {
                 char name[1024] = {0};
                 CL_EXEC( clGetPlatformInfo (info->platform_ids[0], CL_PLATFORM_NAME, sizeof(name), name, NULL) );
-                std::cout << "User specified platform either not specified or not found, defaulting to platform: (" <<
-                    name << ")" << std::endl;
+                if (_verbose)
+                    std::cout << "User specified platform either not specified or not found, defaulting to platform: (" <<
+                        name << ")" << std::endl;
                 info->platform_id = info->platform_ids[0];
             }
 
             #define __getInfo( __STR, __VAR) { \
                 CL_EXEC( clGetPlatformInfo (info->platform_id, (__STR), sizeof(__VAR), __VAR, NULL) ); \
-                std::cout << "\t" << #__STR << " = " << __VAR << std::endl; }
+                if (_verbose)\
+                    std::cout << "\t" << #__STR << " = " << __VAR << std::endl; }
 
-            std::cout << "Platform Info:" << std::endl;
+            if (_verbose)
+                std::cout << "Platform Info:" << std::endl;
             __getInfo( CL_PLATFORM_NAME,       info->name);
             __getInfo( CL_PLATFORM_VERSION,    info->version);
             __getInfo( CL_PLATFORM_VENDOR,     info->vendor);
@@ -707,14 +717,14 @@ namespace opencl_solvers {
             info->is_nvidia = 0; // Is an NVIDIA device?
             if (strstr(info->vendor, "NVIDIA") != NULL)
                 info->is_nvidia = 1;
-            std::cout << "\tIs-NVIDIA = " << info->is_nvidia << std::endl;
+            if (_verbose)
+                std::cout << "\tIs-NVIDIA = " << info->is_nvidia << std::endl;
         }
 
         void getDeviceInfo (const cl_uint& device_type,
                             deviceInfo_t *device_info,
                             const platformInfo_t *platform_info)
         {
-            const int verbose = 1;
 
             CL_EXEC( clGetDeviceIDs (platform_info->platform_id, CL_DEVICE_TYPE_ALL, (cl_uint)cl_max_devices, device_info->device_ids, &device_info->num_devices) );
             if (device_info->num_devices == 0)
@@ -734,16 +744,17 @@ namespace opencl_solvers {
                 if (__verbose__) std::cout << "\t" << #__str__ << " = " << __val__ << std::endl; \
             }
 
-            std::cout << "Device Info:" << std::endl;
+            if (_verbose)
+                std::cout << "Device Info:" << std::endl;
 
-            get_info( CL_DEVICE_TYPE, device_info->type, verbose);
+            get_info( CL_DEVICE_TYPE, device_info->type, _verbose);
 
             for (std::size_t i = 0; i < device_info->num_devices; ++i)
             {
                 cl_device_type val;
                 //get_info( CL_DEVICE_TYPE, val, 1);
                 CL_EXEC( clGetDeviceInfo (device_info->device_ids[i], CL_DEVICE_TYPE, sizeof(cl_device_type), &val, NULL) );
-                if (verbose)
+                if (_verbose)
                 {
                     std::cout << "\t" << "CL_DEVICE_TYPE" << " = " << val << std::endl;
                 }
@@ -767,45 +778,45 @@ namespace opencl_solvers {
                 else if (device_info->type == CL_DEVICE_TYPE_DEFAULT)
                      device_type_name = "DEFAULT";
             }
-            if (verbose) std::cout<< "\t" << "Type Name = " << device_type_name << std::endl;
+            if (_verbose) std::cout<< "\t" << "Type Name = " << device_type_name << std::endl;
 
-            get_char_info( CL_DEVICE_NAME, device_info->name, verbose );
-            get_char_info( CL_DEVICE_PROFILE, device_info->profile, verbose );
-            get_char_info( CL_DEVICE_VERSION, device_info->version, verbose );
-            get_char_info( CL_DEVICE_VENDOR, device_info->vendor, verbose );
-            get_char_info( CL_DRIVER_VERSION, device_info->driver_version, verbose );
-            get_char_info( CL_DEVICE_OPENCL_C_VERSION, device_info->opencl_c_version, verbose );
+            get_char_info( CL_DEVICE_NAME, device_info->name, _verbose );
+            get_char_info( CL_DEVICE_PROFILE, device_info->profile, _verbose );
+            get_char_info( CL_DEVICE_VERSION, device_info->version, _verbose );
+            get_char_info( CL_DEVICE_VENDOR, device_info->vendor, _verbose );
+            get_char_info( CL_DRIVER_VERSION, device_info->driver_version, _verbose );
+            get_char_info( CL_DEVICE_OPENCL_C_VERSION, device_info->opencl_c_version, _verbose );
             //get_char_info( CL_DEVICE_BUILT_IN_KERNELS );
-            get_char_info( CL_DEVICE_EXTENSIONS, device_info->extensions, verbose );
+            get_char_info( CL_DEVICE_EXTENSIONS, device_info->extensions, _verbose );
 
-            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, device_info->native_vector_width_char, verbose );
-            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, device_info->native_vector_width_short, verbose );
-            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, device_info->native_vector_width_int, verbose );
-            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, device_info->native_vector_width_long, verbose );
-            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, device_info->native_vector_width_float, verbose );
-            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, device_info->native_vector_width_double, verbose );
-            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, device_info->native_vector_width_half, verbose );
+            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, device_info->native_vector_width_char, _verbose );
+            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, device_info->native_vector_width_short, _verbose );
+            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, device_info->native_vector_width_int, _verbose );
+            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, device_info->native_vector_width_long, _verbose );
+            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, device_info->native_vector_width_float, _verbose );
+            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, device_info->native_vector_width_double, _verbose );
+            get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, device_info->native_vector_width_half, _verbose );
 
-            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, device_info->preferred_vector_width_char, verbose );
-            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, device_info->preferred_vector_width_short, verbose );
-            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, device_info->preferred_vector_width_int, verbose );
-            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, device_info->preferred_vector_width_long, verbose );
-            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, device_info->preferred_vector_width_float, verbose );
-            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, device_info->preferred_vector_width_double, verbose );
-            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, device_info->preferred_vector_width_half, verbose );
+            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, device_info->preferred_vector_width_char, _verbose );
+            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, device_info->preferred_vector_width_short, _verbose );
+            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, device_info->preferred_vector_width_int, _verbose );
+            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, device_info->preferred_vector_width_long, _verbose );
+            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, device_info->preferred_vector_width_float, _verbose );
+            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, device_info->preferred_vector_width_double, _verbose );
+            get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, device_info->preferred_vector_width_half, _verbose );
 
-            get_info( CL_DEVICE_MAX_COMPUTE_UNITS, device_info->max_compute_units, verbose );
-            get_info( CL_DEVICE_MAX_CLOCK_FREQUENCY, device_info->max_clock_frequency, verbose );
+            get_info( CL_DEVICE_MAX_COMPUTE_UNITS, device_info->max_compute_units, _verbose );
+            get_info( CL_DEVICE_MAX_CLOCK_FREQUENCY, device_info->max_clock_frequency, _verbose );
 
-            get_info( CL_DEVICE_MAX_WORK_GROUP_SIZE, device_info->max_work_group_size, verbose );
+            get_info( CL_DEVICE_MAX_WORK_GROUP_SIZE, device_info->max_work_group_size, _verbose );
 
-            get_info( CL_DEVICE_GLOBAL_MEM_SIZE, device_info->global_mem_size, verbose );
-            get_info( CL_DEVICE_MAX_MEM_ALLOC_SIZE, device_info->max_mem_alloc_size, verbose );
-            get_info( CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, device_info->global_mem_cacheline_size, verbose );
-            get_info( CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, device_info->global_mem_cache_size, verbose );
+            get_info( CL_DEVICE_GLOBAL_MEM_SIZE, device_info->global_mem_size, _verbose );
+            get_info( CL_DEVICE_MAX_MEM_ALLOC_SIZE, device_info->max_mem_alloc_size, _verbose );
+            get_info( CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, device_info->global_mem_cacheline_size, _verbose );
+            get_info( CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, device_info->global_mem_cache_size, _verbose );
 
-            get_info( CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, device_info->global_mem_cache_type, verbose);
-            if (verbose)
+            get_info( CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, device_info->global_mem_cache_type, _verbose);
+            if (_verbose)
             {
                 std::cout << "\t" << "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE = ";
                 if (device_info->global_mem_cache_type == CL_NONE)
@@ -816,19 +827,19 @@ namespace opencl_solvers {
                      std::cout << "CL_READ_WRITE_CACHE" << std::endl;
             }
 
-            get_info( CL_DEVICE_LOCAL_MEM_SIZE, device_info->local_mem_size, verbose );
-            get_info( CL_DEVICE_LOCAL_MEM_TYPE, device_info->local_mem_type, verbose );
-            if (verbose)
+            get_info( CL_DEVICE_LOCAL_MEM_SIZE, device_info->local_mem_size, _verbose );
+            get_info( CL_DEVICE_LOCAL_MEM_TYPE, device_info->local_mem_type, _verbose );
+            if (_verbose)
             {
                 std::cout << "\t" << "CL_DEVICE_LOCAL_MEM_TYPE = " <<
                           ((device_info->local_mem_type == CL_LOCAL) ? "LOCAL" : "GLOBAL") <<
                           std::endl;
             }
 
-            get_info( CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, device_info->max_constant_buffer_size, verbose );
-            get_info( CL_DEVICE_MAX_CONSTANT_ARGS, device_info->max_constant_args, verbose );
+            get_info( CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, device_info->max_constant_buffer_size, _verbose );
+            get_info( CL_DEVICE_MAX_CONSTANT_ARGS, device_info->max_constant_args, _verbose );
 
-            get_info( CL_DEVICE_DOUBLE_FP_CONFIG, device_info->fp_config, verbose );
+            get_info( CL_DEVICE_DOUBLE_FP_CONFIG, device_info->fp_config, _verbose );
 
             #undef get_char_info
             #undef get_info
@@ -918,7 +929,7 @@ namespace opencl_solvers {
 
             // order
             std::ostringstream sord;
-            sord << "#define order ('" << _options.order() << "')" << std::endl;
+            sord << "#define __order '" << _options.order() << "'" << std::endl;
             program_source_str << sord.str();
 
             if (data->use_queue)
@@ -974,17 +985,20 @@ namespace opencl_solvers {
             if (data->platform_info.is_nvidia)
                  build_options << " -cl-nv-verbose";
 
-            std::cout << "build_options = " << build_options.str();
+            if (_verbose)
+                std::cout << "build_options = " << build_options.str();
 
             std::string cbuild = build_options.str();
             ret = clBuildProgram(data->program, 1, &data->device_info.device_id, cbuild.c_str(), NULL, NULL);
-            std::cerr << "clBuildProgram = " << ret << std::endl;
+            if (_verbose)
+                std::cout << "clBuildProgram = " << ret << std::endl;
 
 
             cl_build_status build_status;
             CL_EXEC( clGetProgramBuildInfo (data->program, data->device_info.device_id, CL_PROGRAM_BUILD_STATUS,
                                             sizeof(cl_build_status), &build_status, NULL) );
-            std::cout << "CL_PROGRAM_BUILD_STATUS = " << build_status << std::endl;;
+            if (_verbose || ret != CL_SUCCESS)
+                std::cout << "CL_PROGRAM_BUILD_STATUS = " << build_status << std::endl;;
 
             // get the program build log size
             size_t build_log_size;
@@ -995,7 +1009,7 @@ namespace opencl_solvers {
             std::vector<char> build_log(build_log_size + 1);
             CL_EXEC( clGetProgramBuildInfo (data->program, data->device_info.device_id, CL_PROGRAM_BUILD_LOG,
                                             build_log_size, &build_log[0], &build_log_size) );
-            if (build_log_size > 0)
+            if (build_log_size > 0 && (_verbose || ret != CL_SUCCESS))
             {
                 std::string blog(build_log.begin(), build_log.end());
                 std::cout << "CL_PROGRAM_BUILD_LOG = " << blog << std::endl;
@@ -1093,13 +1107,15 @@ namespace opencl_solvers {
 
 
             std::size_t lenrwk = (_ivp.requiredMemorySize() + requiredSolverMemorySize())*data.vectorSize;
-            std::cout << "lenrwk = "<< lenrwk << std::endl;
+            if (_verbose)
+                std::cout << "lenrwk = "<< lenrwk << std::endl;
 
             size_t numThreads = data.blockSize * data.numBlocks;
-            std::cout << "NP = " << NUM << ", blockSize = " << data.blockSize <<
-                         ", vectorSize = " << data.vectorSize <<
-                         ", numBlocks = " << data.numBlocks <<
-                         ", numThreads = " << numThreads << std::endl;
+            if (_verbose)
+                std::cout << "NP = " << NUM << ", blockSize = " << data.blockSize <<
+                             ", vectorSize = " << data.vectorSize <<
+                             ", numBlocks = " << data.numBlocks <<
+                             ", numThreads = " << numThreads << std::endl;
 
             auto t_data = std::chrono::high_resolution_clock::now();
 
@@ -1123,13 +1139,15 @@ namespace opencl_solvers {
                 int queue_val = 0;
                 CL_EXEC( clEnqueueWriteBuffer(data.command_queue, buffer_queue, CL_TRUE, 0, sizeof(int),
                                                                             &queue_val, 0, NULL, NULL) )
-                std::cout << "Queue enabled" << std::endl;
+                if (_verbose)
+                    std::cout << "Queue enabled" << std::endl;
             }
 
-            std::cout << "Host->Dev + alloc = " <<
-                std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::high_resolution_clock::now() - t_data).count() <<
-                " (ms)" << std::endl;
+            if (_verbose)
+                std::cout << "Host->Dev + alloc = " <<
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::high_resolution_clock::now() - t_data).count() <<
+                    " (ms)" << std::endl;
 
             /* Set kernel argument */
             int argc = 0;
@@ -1160,9 +1178,10 @@ namespace opencl_solvers {
             /* Wait for the kernel to finish */
             clWaitForEvents(1, &ev);
             auto tk_end = std::chrono::high_resolution_clock::now();
-            std::cout << "Kernel execution = " <<
-                std::chrono::duration_cast<std::chrono::milliseconds>(tk_end - tk).count() <<
-                " (ms)" << std::endl;
+            if (_verbose)
+                std::cout << "Kernel execution = " <<
+                    std::chrono::duration_cast<std::chrono::milliseconds>(tk_end - tk).count() <<
+                    " (ms)" << std::endl;
 
 
             t_data = std::chrono::high_resolution_clock::now();
@@ -1183,7 +1202,8 @@ namespace opencl_solvers {
                 nst_ += counters[i].nsteps;
                 nit_ += counters[i].niters;
             }
-            std::cout << "nst = " << nst_ << ", nit = " << nit_ << std::endl;
+            if (_verbose)
+                std::cout << "nst = " << nst_ << ", nit = " << nit_ << std::endl;
 
             clReleaseKernel(kernel);
             clReleaseMemObject (buffer_param);
@@ -1194,6 +1214,8 @@ namespace opencl_solvers {
             clReleaseMemObject (buffer_counters);
 
             free(counters);
+            // turn off messaging after first compilation
+            _verbose = false;
         }
 
     protected:
