@@ -15,17 +15,20 @@
 #ifndef rk_lensrc
 #pragma error "Length of source-rate evaluation working buffer not defined"
 #endif
+#ifndef __ValueType
+#pragma error "Value type not defined!"
+#endif
 
 // \brief Indexing macro for _all_ arrays in RKF45 solver (all arrays are size neq)
 #define __getIndex(idx) (__getIndex1D(neq, idx))
 
 
 // Single-step function
-int FUNC_TYPE(rkf45) (const __ValueType h, const __ValueType t,
-                      __global const __ValueType* __restrict__ y,
-                      __global __ValueType* __restrict__ y_out,
-                      __global __ValueType* __restrict__ rwk,
-                      __global __ValueType* __restrict__ user_data)
+int rkf45 (const __ValueType h, const __ValueType t,
+           __global const __ValueType* __restrict__ y,
+           __global __ValueType* __restrict__ y_out,
+           __global __ValueType* __restrict__ rwk,
+           __global __ValueType const * __restrict__ user_data)
 {
     #define c20 ( 0.25)
     #define c21 ( 0.25)
@@ -209,7 +212,7 @@ int FUNC_TYPE(rkf45) (const __ValueType h, const __ValueType t,
     #undef b6
 }
 
-__ValueType FUNC_TYPE(rk_wnorm) (__global const rk_t *rk, __global const __ValueType *x, __global const __ValueType *y)
+__ValueType rk_wnorm (__global const rk_t *rk, __global const __ValueType *x, __global const __ValueType *y)
 {
     __ValueType sum = 0;
     for (int k = 0; k < neq; k++)
@@ -222,10 +225,10 @@ __ValueType FUNC_TYPE(rk_wnorm) (__global const rk_t *rk, __global const __Value
     return sqrt(sum / (__ValueType)neq);
 }
 
-int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
-                       __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
-                       __global __ValueType * __restrict__ rwk,
-                       __global __ValueType const * __restrict__ user_data)
+int rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
+            __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
+            __global __ValueType * __restrict__ rwk,
+            __global __ValueType const * __restrict__ user_data)
 {
     #define t_round ((t_end - t) * DBL_EPSILON)
     #define h_min (t_round * 100)
@@ -271,7 +274,7 @@ int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __Val
         //double t1 = hg;
 
         #ifdef __INTEL_COMPILER
-        #pragma ivdep
+        #pragma ivdep`
         #endif
         for (int k = 0; k < neq; k++)
              y1[__getIndex(k)] = y[__getIndex(k)] + hg * ydot[__getIndex(k)];
@@ -286,7 +289,7 @@ int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __Val
         for (int k = 0; k < neq; k++)
             y1[__getIndex(k)] = (ydot1[__getIndex(k)] - ydot[__getIndex(k)]) / hg;
 
-        __ValueType yddnrm = FUNC_TYPE(rk_wnorm) (rk, y1, y);
+        __ValueType yddnrm = rk_wnorm(rk, y1, y);
 
         // should we accept this?
         hnew = __select(hnew, hg, hnew_is_ok | (iter == miters));
@@ -294,12 +297,8 @@ int FUNC_TYPE(rk_hin) (__global const rk_t *rk, const __ValueType t, const __Val
             break;
 
         // Get the new value of h ...
-        //hnew = (yddnrm*hub*hub > 2.0) ? sqrt(2.0 / yddnrm) : sqrt(hg * hub);
-        {
-            __MaskType test = isgreater( yddnrm*hub*hub, 2.0);
-            hnew = __select ( sqrt(hg * hub), sqrt(2.0 / yddnrm), test);
-        }
-
+        __MaskType test = isgreater(yddnrm*hub*hub, 2.0);
+        hnew = __select(sqrt(hg * hub), sqrt(2.0 / yddnrm), test);
         // test the stopping conditions.
         __ValueType hrat = hnew / hg;
 
@@ -336,18 +335,17 @@ typedef struct
     int niters;
     __MaskType nsteps;
 }
-FUNC_SIZE(rk_counters_t);
+rk_counters_t_vec;
 
 
-__IntType FUNC_TYPE(rk_solve) (
-                             __global const rk_t * __restrict__ rk,
-                             __private __ValueType const t_start,
-                             __private __ValueType const t_end,
-                             __private __ValueType hcur,
-                             __private FUNC_SIZE(rk_counters_t) * __restrict__ counters,
-                             __global __ValueType* __restrict__ y,
-                             __global __ValueType* __restrict__ rwk,
-                             __global __ValueType* __restrict__ user_data)
+__IntType rk_solve (__global const rk_t * __restrict__ rk,
+                    __private __ValueType const t_start,
+                    __private __ValueType const t_end,
+                    __private __ValueType hcur,
+                    __private rk_counters_t_vec * __restrict__ counters,
+                    __global __ValueType* __restrict__ y,
+                    __global __ValueType* __restrict__ rwk,
+                    __global __ValueType const * __restrict__ user_data)
 {
 
     __ValueType t = t_start;
@@ -365,7 +363,7 @@ __IntType FUNC_TYPE(rk_solve) (
         __MaskType test = isless(h, h_min);
         if (__any(test))
         {
-            ierr = FUNC_TYPE(rk_hin) (rk, t, tf, &hcur, y, rwk, user_data);
+            ierr = rk_hin(rk, t, tf, &hcur, y, rwk, user_data);
         }
     }
 
@@ -379,9 +377,9 @@ __IntType FUNC_TYPE(rk_solve) (
         __global __ValueType *ytmp = rwk + __getOffset1D(neq*7);
 
         // Take a trial step over h_cur ...
-        FUNC_TYPE(rkf45) (h, t, y, ytmp, rwk, user_data);
+        rkf45(h, t, y, ytmp, rwk, user_data);
 
-        __ValueType herr = fmax(1.0e-20, FUNC_TYPE(rk_wnorm) (rk, rwk, y));
+        __ValueType herr = fmax(1e-20, rk_wnorm(rk, rwk, y));
 
         // Is there error acceptable?
         __MaskType accept = islessequal(herr, 1.0);
@@ -456,9 +454,9 @@ rkf45_driver (__global const double * __restrict__ param,
     // Thread-local pointers ...
     // Ordering is phi_woring, rkf working, RHS working
     // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType const * __restrict__ my_param = rwk + __getOffset1D(1);
+    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(1);
     __global __ValueType *__restrict__ rwk_rk = my_param + __getOffset1D(neq);
-    __private FUNC_SIZE(rk_counters_t) my_counters;
+    __private rk_counters_t_vec my_counters;
     __private __ValueType tf;
 
     for (int i = __ValueSize * get_global_id(0); i < numProblems; i += __ValueSize * get_global_size(0))
@@ -478,10 +476,10 @@ rkf45_driver (__global const double * __restrict__ param,
         for (int k = 0; k < neq; ++k)
             rwk[__getIndex(k)] = phi[i*neq+ k ];
         my_param[__getIndex1D(1, 0)] = param[i];
-        tf[__getIndex1D(1, 0)] = t_end[problem_idx];
+        tf = t_end[problem_idx];
         #endif
 
-        __IntType rkerr = FUNC_TYPE(rk_solve)(
+        __IntType rkerr = rk_solve(
                 rk, t_start, tf, 0, &my_counters, rwk, rwk_rk, my_param);
 
         #if __ValueSize > 1
@@ -537,9 +535,9 @@ rkf45_driver_queue (__global const double * __restrict__ param,
     // Thread-local pointers ...
     // Ordering is phi_woring, rkf working, RHS working
     // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType const * __restrict__ my_param = rwk + __getOffset1D(1);
+    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(1);
     __global __ValueType *__restrict__ rwk_rk = rwk + __getOffset1D(1 + neq);
-    __private FUNC_SIZE(rk_counters_t) my_counters;
+    __private rk_counters_t_vec my_counters;
     __private __ValueType tf;
     __private int problem_idx;
 
@@ -569,11 +567,11 @@ rkf45_driver_queue (__global const double * __restrict__ param,
         for (int k = 0; k < neq; ++k)
             rwk[__getIndex(k)] = phi[problem_idx * neq + k];
         my_param[__getIndex1D(1, 0)] = param[problem_idx];
-        tf[__getIndex1D(1, 0)] = t_end[problem_idx];
+        tf = t_end[problem_idx];
         #endif
 
         // determine maximum / minumum time steps for this set of problems
-        __IntType rkerr = FUNC_TYPE(rk_solve)(
+        __IntType rkerr = rk_solve(
                 rk, t_start, tf, 0, &my_counters, rwk, rwk_rk, my_param);
 
         #if __ValueSize > 1

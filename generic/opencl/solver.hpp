@@ -569,7 +569,7 @@ namespace opencl_solvers {
         }
 
 
-        std::size_t load_source_from_file (const std::string& flname, std::ostringstream& source_str)
+        void load_source_from_file (const std::string& flname, std::ostringstream& source_str)
         {
             std::ifstream ifile(flname);
             std::string content ((std::istreambuf_iterator<char>(ifile)),
@@ -579,10 +579,8 @@ namespace opencl_solvers {
                 std::ostringstream err;
                 err << "Kernel file " << flname << " not found!" << std::endl;
                 throw OpenCLException(err.str());
-            }
-            size_t sz = content.length();
+            };
             source_str << content;
-            return sz;
         }
 
         bool isPower2 (int x)
@@ -867,13 +865,13 @@ namespace opencl_solvers {
                 data->numBlocks = numWorkGroups();
             }
             data->vectorSize = _options.vectorSize();
-            if (!isPower2(data->vectorSize))
+            if (data->vectorSize > 0 && !isPower2(data->vectorSize))
             {
                 std::ostringstream err;
                 err << "Vector size: " << data->vectorSize << " is not a power of 2!";
                 throw OpenCLException(err.str());
             }
-            if (!isPower2(data->blockSize))
+            if (data->blockSize > 0 && !isPower2(data->blockSize))
             {
                 std::ostringstream err;
                 err << "Block size: " << data->blockSize << " is not a power of 2!";
@@ -886,87 +884,85 @@ namespace opencl_solvers {
             data->blockSize /= data->vectorSize;
 
             std::ostringstream program_source_str;
-            size_t program_source_size = 0;
-
-            const char *dp_header = "#if defined(cl_khr_fp64) \n"
+            std::string dp_header = "#if defined(cl_khr_fp64) \n"
                                     "#pragma OPENCL EXTENSION cl_khr_fp64 : enable  \n"
                                     "#elif defined(cl_amd_fp64) \n"
                                     "#pragma OPENCL EXTENSION cl_amd_fp64 : enable  \n"
                                     "#endif \n";
-
             program_source_str << dp_header;
-            program_source_size += std::strlen(dp_header);
 
             if (__Alignment)
             {
                 std::ostringstream align;
-                align << "#define __Alignment (" << __Alignment << ")" << std::endl;
+                align << "#define __Alignment (" << __Alignment << ") "<< std::endl;
                 program_source_str << align.str();
-                program_source_size += align.str().length();
             }
 
             std::ostringstream vsize;
             vsize << "#define __ValueSize " << data->vectorSize << std::endl;
             program_source_str << vsize.str();
-            program_source_size += vsize.str().length();
 
             std::ostringstream bsize;
             bsize << "#define __blockSize (" << data->blockSize << ")" << std::endl;
-            program_source_size += bsize.str().length();
+            program_source_str << bsize.str();
 
             // neq
             std::ostringstream sneq;
             sneq << "#define neq (" << _neq << ")" << std::endl;
             program_source_str << sneq.str();
-            program_source_size += sneq.str().length();
 
             // source rate evaluation work-size
             std::ostringstream rwk;
             rwk << "#define rk_lensrc (" << _ivp.requiredMemorySize() << ")" << std::endl;
             program_source_str << rwk.str();
-            program_source_size += rwk.str().length();
 
             // order
             std::ostringstream sord;
             sord << "#define order ('" << _options.order() << "')" << std::endl;
             program_source_str << sord.str();
-            program_source_size += sord.str().length();
 
             if (data->use_queue)
             {
                 std::ostringstream oqueue;
                 oqueue << "#define __EnableQueue" << std::endl;
                 program_source_str << oqueue.str();
-                program_source_size += oqueue.str().size();
             }
 
             // Load the common macros ...
-            program_source_size += load_source_from_file (file_relative_to_me(__FILE__, "cl_macros.h"), program_source_str);
-            program_source_size += load_source_from_file (file_relative_to_me(__FILE__, "solver.h"), program_source_str);
+            load_source_from_file (file_relative_to_me(__FILE__, "solver.h"), program_source_str);
 
             // Load the header and source files text ...
             for (const std::string& file : solverFiles())
             {
-                program_source_size += load_source_from_file (file, program_source_str);
+                load_source_from_file (file, program_source_str);
             }
 
             // load the user specified kernels last such that any macros we use there are already
             // defined
             for (const std::string& kernel : _ivp.kernelSource())
             {
-                program_source_size += load_source_from_file(kernel, program_source_str);
+                load_source_from_file(kernel, program_source_str);
             }
 
             /* Build Program */
             std::string psource_str = program_source_str.str();
             const char* psource = psource_str.c_str();
+            std::size_t psource_len = psource_str.length();
             data->program = clCreateProgramWithSource(data->context, 1,
-                                                         (const char **)&psource,
-                                                         (const size_t *)&program_source_size, &ret);
+                                                      (const char **)&psource,
+                                                      (const size_t *)&psource_len, &ret);
             if (ret != CL_SUCCESS)
             {
                 __clerror(ret, "clCreateProgramWithSource");
             }
+
+            #define DEBUG_CL_COMPILATION
+            #ifdef DEBUG_CL_COMPILATION
+            // write to file
+            std::ofstream temp("temp.cl");
+            temp << psource_str;
+            temp.close();
+            #endif
 
             std::ostringstream build_options;
             build_options << "-I" << path_of(__FILE__);
@@ -984,12 +980,6 @@ namespace opencl_solvers {
             ret = clBuildProgram(data->program, 1, &data->device_info.device_id, cbuild.c_str(), NULL, NULL);
             std::cerr << "clBuildProgram = " << ret << std::endl;
 
-            #ifdef DEBUG_CL_COMPILATION
-            // write to file
-            std::ofstream temp("temp.cl");
-            temp << psource_str;
-            temp.close();
-            #endif
 
             cl_build_status build_status;
             CL_EXEC( clGetProgramBuildInfo (data->program, data->device_info.device_id, CL_PROGRAM_BUILD_STATUS,

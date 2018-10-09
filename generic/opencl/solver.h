@@ -1,9 +1,32 @@
 #ifndef SOLVER_CLH
 #define SOLVER_CLH
 
-#include "cl_macros.h"
-
 /* OpenCL compatibility Macros */
+
+#ifndef __blockSize
+  #define __blockSize (1)
+#endif
+
+#ifndef __arrayStride
+  #define __arrayStride (__blockSize)
+#endif
+
+#define __STRINGIFY(__x) #__x
+#define STRINGIFY(__x) __STRINGIFY(__x)
+
+#define __inline inline
+
+#define VERBOSE
+#ifdef VERBOSE
+  #pragma message "__blockSize   = " STRINGIFY(__blockSize)
+  #pragma message "__getIndex    = " STRINGIFY(__getIndex(1))
+  #pragma message "__arrayStride = " STRINGIFY(__arrayStride)
+  #ifdef __Alignment
+    #pragma message "__Alignment   = " STRINGIFY(__Alignment)
+  #endif
+  #pragma message "__EnableQueue = " STRINGIFY(__EnableQueue)
+#endif
+
 
 #define __PASTE(a,b) a ## b
 #define PASTE(a,b) __PASTE(a,b)
@@ -20,14 +43,6 @@
   #define __ValueType double
   #define __IntType int
   #define __MaskType int
-#endif
-
-#if (__ValueSize > 1)
-  #define FUNC_SIZE(__a) PASTE( __a, PASTE(__, __ValueSize) )
-  #define FUNC_TYPE(__a) PASTE( __a, PASTE(__, __ValueType) )
-#else
-  #define FUNC_SIZE(__a) (__a)
-  #define FUNC_TYPE(__a) (__a)
 #endif
 
 #ifdef VERBOSE
@@ -87,8 +102,7 @@
 
   #if (__ValueSize == 1)
     //! \brief Indexer macro for F-ordered implict-SIMD
-    #define __getIndex1D(dim0, idx) (get_local_id(0) + __arrayStride * get_group_id(0) +
-                                     idx * get_num_groups(0) * __arrayStride)
+    #define __getIndex1D(dim0, idx) (get_local_id(0) + __arrayStride * get_group_id(0) + idx * get_num_groups(0) * __arrayStride)
   #else
     // using explicit SIMD -> don't need to refer to local index (identically 0)
     #define __getIndex1D(dim0, idx) (get_group_id(0) + idx * get_num_groups(0))
@@ -102,7 +116,7 @@
 
 /* shared utility functions */
 
-inline __ValueType FUNC_TYPE(__fast_powu) (__ValueType p, unsigned q)
+inline __ValueType __fast_powu(__ValueType p, unsigned q)
 {
    if      (q == 0) return 1.0;
    else if (q == 1) return p;
@@ -130,7 +144,7 @@ inline __ValueType FUNC_TYPE(__fast_powu) (__ValueType p, unsigned q)
    }
 }
 // p^q where q is an integral
-inline __ValueType FUNC_TYPE(__fast_powi) (__ValueType p, int q)
+inline __ValueType __fast_powi(__ValueType p, int q)
 {
 #if (__ValueSize == 1)
    if (p == 0.0)
@@ -143,16 +157,16 @@ inline __ValueType FUNC_TYPE(__fast_powi) (__ValueType p, int q)
          return 0.0;
    }
 #endif
-   if      (q > 0) return FUNC_TYPE(__fast_powu)(p,q);
-   else if (q < 0) return FUNC_TYPE(__fast_powu)(1.0/p,(unsigned int)(-q));
+   if      (q > 0) return __fast_powu(p,q);
+   else if (q < 0) return __fast_powu(1.0/p,(unsigned int)(-q));
    else            return 1.0;
 }
 
 //inline double pow(const double &a, const double &b) { return std::pow(a,b); }
-inline __ValueType FUNC_TYPE(__powi)(const __ValueType a, const int b) { return FUNC_TYPE(__fast_powi)(a,b); }
-inline __ValueType FUNC_TYPE(__powu)(const __ValueType a, const unsigned int b) { return FUNC_TYPE(__fast_powu)(a,b); }
+inline __ValueType __powi(const __ValueType a, const int b) { return __fast_powi(a,b); }
+inline __ValueType __powu(const __ValueType a, const unsigned int b) { return __fast_powu(a,b); }
 
-inline __ValueType FUNC_TYPE(__sqr) (const __ValueType p) { return (p*p); }
+inline __ValueType __sqr(const __ValueType p) { return (p*p); }
 
 #ifndef __any
   #if (__ValueSize == 1)

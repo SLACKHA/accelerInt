@@ -1172,7 +1172,7 @@ int cl_rk_driver(double p, double *u_in, double *u_out_ref, ckdata_t *ck, rk_t *
    {
       fprintf(stderr,"Allocation error %s %d\n", __FILE__, __LINE__);
       exit(-1);
-   } 
+   }
    CL_EXEC( clEnqueueReadBuffer(cl_data->command_queue, buffer_counters, CL_TRUE, 0, sizeof(rk_counters_t)*numProblems, counters, 0, NULL, NULL) );
 
    //if (numProblems < 16)
@@ -1342,7 +1342,7 @@ int cl_ros_driver(double p, double *u_in, double *u_out_ref, ckdata_t *ck, ros_t
    {
       fprintf(stderr,"Allocation error %s %d\n", __FILE__, __LINE__);
       exit(-1);
-   } 
+   }
    CL_EXEC( clEnqueueReadBuffer(cl_data->command_queue, buffer_counters, CL_TRUE, 0, sizeof(ros_counters_t)*numProblems, counters, 0, NULL, NULL) );
 
    printf("Dev->host %f (ms)\n", 1000*(WallClock() - _t1));
