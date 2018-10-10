@@ -52,6 +52,7 @@ def run(num, num_threads, itype, tf, options):
     if plt:
         plt.plot(t, phi[0, 0, :], label='y1')
         plt.plot(t, phi[0, 1, :], label='y2')
+        plt.ylim(np.min(phi[0, 0, :]) * 1.05, np.max(phi[0, 0, :]) * 1.05)
         plt.legend(loc=0)
         plt.title('van der Pol equation')
         plt.show()
