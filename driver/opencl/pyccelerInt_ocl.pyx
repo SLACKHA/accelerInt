@@ -173,8 +173,13 @@ cdef class PyIntegrator:
         # get phi
         deref(self.integrator.get()).getLog(self.num, &times[0], &phi[0])
         # and reshape
-        return times, np.reshape(phi, (self.num, self.neq, n_steps),
-                                 order=deref(self.integrator.get()).order())
+        order = deref(self.integrator.get()).order()
+        if order == 'C':
+            phi_o = np.reshape(phi, (self.num, n_steps, self.neq), order=order)
+            phi_o = np.swapaxes(phi_o, 1, 2)
+        else:
+            phi_o = np.reshape(phi, (self.num, self.neq, n_steps), order=order)
+        return times, phi_o
 
 
 cdef class PySolverOptions:
