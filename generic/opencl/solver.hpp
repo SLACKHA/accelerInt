@@ -1310,7 +1310,9 @@ namespace opencl_solvers {
                                           &this->getSolverStruct(), 0, NULL, NULL) );
             if (_options.useQueue())
             {
-                int queue_val = numThreads();
+                // initialize queue with: global work-size * the vectorSize, such that each work-group has at least
+                // one IVP to solve (and more importantly, we can avoid synchronization between work-groups)
+                int queue_val = numThreads() * _data.vectorSize;
                 CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_queue_index], CL_TRUE, 0, sizeof(int),
                                               &queue_val, 0, NULL, NULL) )
                 if (_verbose)

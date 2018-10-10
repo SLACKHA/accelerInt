@@ -538,7 +538,11 @@ rkf45_driver_queue (__global const double * __restrict__ param,
     __private int problem_idx;
 
     // Initial problem set and global counter.
-    problem_idx = get_global_id(0);
+    #if __ValueSize > 1
+        problem_idx = get_global_id(0) * __ValueSize;
+    #else
+        problem_idx = get_global_id(0);
+    #endif
 
     //while ((problem_idx = atomic_inc(problemCounter)) < numProblems)
     while (problem_idx < numProblems)
@@ -597,7 +601,13 @@ rkf45_driver_queue (__global const double * __restrict__ param,
             rk_counters[problem_idx].niters = rkerr;
         #endif
         // Get a new problem atomically.
-        problem_idx = atomic_inc(problemCounter);
+        #if __ValueSize > 1
+            // add a vector's worth of problem id's
+            problem_idx = atomic_add(problemCounter, __ValueSize);
+        #else
+            // add a single problem id
+            problem_idx = atomic_inc(problemCounter);
+        #endif
     }
 }
 #endif
