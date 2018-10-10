@@ -456,8 +456,8 @@ rkf45_driver (__global const double * __restrict__ param,
     // Thread-local pointers ...
     // Ordering is phi_woring, rkf working, RHS working
     // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(1);
-    __global __ValueType *__restrict__ rwk_rk = my_param + __getOffset1D(neq);
+    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(neq);
+    __global __ValueType *__restrict__ rwk_rk = rwk + __getOffset1D(1 + neq);
     __private rk_counters_t_vec my_counters;
     __private __ValueType tf;
 
@@ -537,7 +537,7 @@ rkf45_driver_queue (__global const double * __restrict__ param,
     // Thread-local pointers ...
     // Ordering is phi_woring, rkf working, RHS working
     // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(1);
+    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(neq);
     __global __ValueType *__restrict__ rwk_rk = rwk + __getOffset1D(1 + neq);
     __private rk_counters_t_vec my_counters;
     __private __ValueType tf;
