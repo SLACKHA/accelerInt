@@ -14,7 +14,7 @@ except ImportError:
     plt = None
 
 sys.path.insert(0, os.getcwd())
-import pyccelerInt_cpu as pycel
+import pyccelerInt_cpu as pycel # noqa
 np.random.seed(0)
 
 

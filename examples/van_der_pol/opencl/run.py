@@ -14,7 +14,7 @@ except ImportError:
     plt = None
 
 sys.path.insert(0, os.getcwd())
-import pyccelerInt_ocl as pycel
+import pyccelerInt_ocl as pycel  # noqa
 np.random.seed(0)
 
 
