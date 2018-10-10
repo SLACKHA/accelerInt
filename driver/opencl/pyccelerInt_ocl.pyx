@@ -61,8 +61,8 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         double atol() except+
         double rtol() except+
         bool_t logging() except+
-        double vectorSize() except+
-        double blockSize() except+
+        size_t vectorSize() except+
+        size_t blockSize() except+
         string_t order() except+
         bool_t useQueue() except+
         string_t platform() except+

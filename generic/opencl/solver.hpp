@@ -323,12 +323,12 @@ namespace opencl_solvers {
             return _logging;
         }
 
-        inline double vectorSize() const
+        inline std::size_t vectorSize() const
         {
             return _vectorSize;
         }
 
-        inline double blockSize() const
+        inline std::size_t blockSize() const
         {
             return _blockSize;
         }
@@ -936,14 +936,14 @@ namespace opencl_solvers {
             }
 
             data->use_queue = _options.useQueue();
-            data->blockSize = _options.blockSize();
+            data->blockSize = std::max(_options.blockSize(), (size_t)1);
             data->numBlocks = data->device_info.max_compute_units;
             if (numWorkGroups() > 0)
             {
                 // if user has specified the number of work groups to use
                 data->numBlocks = numWorkGroups();
             }
-            data->vectorSize = _options.vectorSize();
+            data->vectorSize = std::max(_options.vectorSize(), (size_t)1);
             if (data->vectorSize > 0 && !isPower2(data->vectorSize))
             {
                 std::ostringstream err;
