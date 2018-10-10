@@ -175,8 +175,8 @@ cdef class PyIntegrator:
         # and reshape
         order = deref(self.integrator.get()).order()
         if order == 'C':
-            phi_o = np.reshape(phi, (self.num, n_steps, self.neq), order=order)
-            phi_o = np.swapaxes(phi_o, 1, 2)
+            phi_o = np.reshape(phi, (n_steps, self.num, self.neq), order=order)
+            phi_o = np.swapaxes(phi_o, 0, 1).swapaxes(1, 2)
         else:
             phi_o = np.reshape(phi, (self.num, self.neq, n_steps), order=order)
         return times, phi_o
