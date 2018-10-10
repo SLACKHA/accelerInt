@@ -288,15 +288,13 @@ namespace opencl_solvers {
     public:
         SolverOptions(std::size_t vectorSize=1, std::size_t blockSize=1,
                       double atol=1e-10, double rtol=1e-6,
-                      bool logging=false, double h_init=1e-6,
-                      bool use_queue=true, std::string order="C",
+                      bool logging=false, bool use_queue=true, std::string order="C",
                       std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
             _atol(atol),
             _rtol(rtol),
             _logging(logging),
-            _h_init(h_init),
             _order(order),
             _use_queue(use_queue),
             _platform(platform),
@@ -323,11 +321,6 @@ namespace opencl_solvers {
         inline bool logging() const
         {
             return _logging;
-        }
-
-        inline double h_init() const
-        {
-            return _h_init;
         }
 
         inline double vectorSize() const
@@ -371,8 +364,6 @@ namespace opencl_solvers {
         const double _rtol;
         //! whether logging is enabled or not
         bool _logging;
-        //! The initial step-size
-        const double _h_init;
         //! The data-ordering
         const std::string _order;
         //! Use queue driver?
@@ -494,13 +485,6 @@ namespace opencl_solvers {
         {
             return _numWorkGroups;
         }
-
-        //! return the initial step-size
-        inline const double h_init() const
-        {
-            return _options.h_init();
-        }
-
 
         /**
          * \brief Integration driver for the CPU integrators

@@ -31,7 +31,7 @@ cdef extern from "error_codes.hpp" namespace "opencl_solvers":
 cdef extern from "rkf45_solver.hpp" namespace "opencl_solvers":
     cdef cppclass RKF45SolverOptions:
         RKF45SolverOptions(size_t, size_t, double, double,
-                           bool_t, double, bool_t, string_t, string_t, DeviceType,
+                           bool_t, bool_t, string_t, string_t, DeviceType,
                            size_t, size_t) except +
 
 cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
@@ -56,7 +56,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
 
     cdef cppclass SolverOptions:
         SolverOptions(size_t, size_t, double, double,
-                      bool_t, double, bool_t, string_t, string_t, DeviceType) except +
+                      bool_t, bool_t, string_t, string_t, DeviceType) except +
 
         double atol() except+
         double rtol() except+
@@ -195,8 +195,8 @@ cdef class PySolverOptions:
 
     def __cinit__(self, IntegratorType itype, size_t vectorSize=1,
                   size_t blockSize=1, double atol=1e-10,
-                  double rtol=1e-6, bool_t logging=False, double h_init=1e-6,
-                  bool_t use_queue=True, string_t order="C", string_t platform="",
+                  double rtol=1e-6, bool_t logging=False, bool_t use_queue=True,
+                  string_t order="C", string_t platform="",
                   DeviceType deviceType = DeviceType.DEFAULT,  size_t minIters=1,
                   size_t maxIters = 1000):
 
@@ -204,13 +204,13 @@ cdef class PySolverOptions:
         if itype in [IntegratorType.RKF45]:
             self.options.reset(
                 new RKF45SolverOptions(vectorSize, blockSize,
-                                       atol, rtol, logging, h_init, use_queue,
+                                       atol, rtol, logging, use_queue,
                                        c_order, platform, deviceType,
                                        minIters, maxIters))
         else:
             self.options.reset(new SolverOptions(
                 vectorSize, blockSize,
-                atol, rtol, logging, h_init, use_queue,
+                atol, rtol, logging, use_queue,
                 c_order, platform, deviceType))
 
     cpdef atol(self):

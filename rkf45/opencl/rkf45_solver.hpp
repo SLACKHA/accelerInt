@@ -13,12 +13,11 @@ namespace opencl_solvers
     public:
         RKF45SolverOptions(std::size_t vectorSize=1, std::size_t blockSize=1,
                            double atol=1e-10, double rtol=1e-6,
-                           bool logging=false, double h_init=1e-6,
-                           bool use_queue=true, std::string order="C",
+                           bool logging=false, bool use_queue=true, std::string order="C",
                            std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT,
                            size_t minIters = 1, size_t maxIters = 1000):
             SolverOptions(vectorSize, blockSize, atol, rtol,
-                          logging, h_init, use_queue, order, platform, deviceType),
+                          logging, use_queue, order, platform, deviceType),
                 _minIters(minIters),
                 _maxIters(maxIters),
                 _adaptionLimit(4)
