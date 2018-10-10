@@ -61,8 +61,10 @@ def run(num, num_threads, itype, tf, options):
         plt.show()
 
     # check that answers from all threads match
-    assert np.allclose(phi[:, 0], phi[0, 0]), np.where(~np.isclose(phi[:, 0], phi[0, 0]))
-    assert np.allclose(phi[:, 1], phi[0, 1]), np.where(~np.isclose(phi[:, 1], phi[0, 1]))
+    assert np.allclose(phi[:, 0], phi[0, 0]), np.where(
+        ~np.isclose(phi[:, 0], phi[0, 0]))
+    assert np.allclose(phi[:, 1], phi[0, 1]), np.where(
+        ~np.isclose(phi[:, 1], phi[0, 1]))
 
 
 def vector_width(v):
