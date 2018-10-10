@@ -54,7 +54,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
     #define a1 ( 0.11574074074074)
     #define a2 ( 0.0)
     #define a3 ( 0.54892787524366)
-    #define a4 ( 0.5353313840156)
+    #define a4 ( 0.535722994391612)
     #define a5 (-0.2)
     #define b1 ( 0.11851851851852)
     #define b2 ( 0.0)
@@ -110,7 +110,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
     __global __ValueType* ytmp = rwk + __getOffset1D(6*neq);
     // the portion of the rwk vector that's allocated for the source rate evaluation
     // y_out is at 7 * neq, hence we go to 8 for the total offset
-    __global __ValueType* rwk_dydt = rwk + __getOffset1D(8*neq);
+    __global __ValueType* rwk_dydt = rwk + __getOffset1D(7*neq);
 
     // 1)
     dydt(t, user_data, y, f1, rwk_dydt);
@@ -376,12 +376,12 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
 
     while (__any(__not(done)))
     {
-        __global __ValueType *ytmp = rwk + __getOffset1D(neq*7);
+        __global __ValueType *ytmp = rwk;
 
         // Take a trial step over h_cur ...
-        rkf45(h, t, y, ytmp, rwk, user_data);
+        rkf45(h, t, y, ytmp, rwk + __getOffset1D(neq), user_data);
 
-        __ValueType herr = fmax(1e-20, rk_wnorm(rk, rwk, y));
+        __ValueType herr = fmax(1e-20, rk_wnorm(rk, rwk + __getOffset1D(neq), y));
 
         // Is there error acceptable?
         __MaskType accept = islessequal(herr, 1.0);
