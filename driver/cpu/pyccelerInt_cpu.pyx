@@ -26,7 +26,7 @@ cdef extern from "error_codes.hpp" namespace "c_solvers":
 
 cdef extern from "exp_solver.hpp" namespace "c_solvers":
     cdef cppclass EXPSolverOptions:
-        EXPSolverOptions(double, double, bool, double, int, int) except +
+        EXPSolverOptions(double, double, bool_t, double, int, int) except +
 
 cdef extern from "solver_interface.hpp" namespace "c_solvers":
     cdef cppclass Integrator:
@@ -42,7 +42,7 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
         size_t numSteps() except +
 
     cdef cppclass SolverOptions:
-        SolverOptions(double, double, bool, double) except +
+        SolverOptions(double, double, bool_t, double) except +
 
     cdef unique_ptr[Integrator] init(IntegratorType, int, int,
                                      const SolverOptions&) except +

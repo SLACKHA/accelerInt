@@ -31,7 +31,7 @@ cdef extern from "error_codes.hpp" namespace "opencl_solvers":
 cdef extern from "rkf45_solver.hpp" namespace "opencl_solvers":
     cdef cppclass RKF45SolverOptions:
         RKF45SolverOptions(size_t, size_t, double, double,
-                           bool, double, bool, string_t, string_t, DeviceType,
+                           bool_t, double, bool_t, string_t, string_t, DeviceType,
                            size_t, size_t) except +
 
 cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
@@ -56,9 +56,17 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
 
     cdef cppclass SolverOptions:
         SolverOptions(size_t, size_t, double, double,
-                      bool, double, bool, string_t, string_t, DeviceType) except +
+                      bool_t, double, bool_t, string_t, string_t, DeviceType) except +
 
+        double atol() except+
+        double rtol() except+
+        bool_t logging() except+
+        double vectorSize() except+
+        double blockSize() except+
         string_t order() except+
+        bool_t useQueue() except+
+        string_t platform() except+
+        DeviceType deviceType() except+
 
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
                                          const IVP&, const SolverOptions&) except +
@@ -190,7 +198,7 @@ cdef class PySolverOptions:
                   double rtol=1e-6, bool_t logging=False, double h_init=1e-6,
                   bool_t use_queue=True, string_t order="C", string_t platform="",
                   DeviceType deviceType = DeviceType.DEFAULT,  size_t minIters=1,
-                  size_t maxIters = 1000,):
+                  size_t maxIters = 1000):
 
         cdef string_t c_order = _bytes(order)
         if itype in [IntegratorType.RKF45]:
@@ -205,9 +213,32 @@ cdef class PySolverOptions:
                 atol, rtol, logging, h_init, use_queue,
                 c_order, platform, deviceType))
 
+    cpdef atol(self):
+        return deref(self.options.get()).atol()
+
+    cpdef rtol(self):
+        return deref(self.options.get()).rtol()
+
+    cpdef logging(self):
+        return deref(self.options.get()).logging()
+
+    cpdef vector_size(self):
+        return deref(self.options.get()).vectorSize()
+
+    cpdef block_size(self):
+        return deref(self.options.get()).blockSize()
+
     cpdef order(self):
         return deref(self.options.get()).order()
 
+    cpdef use_queue(self):
+        return deref(self.options.get()).useQueue()
+
+    cpdef platform(self):
+        return deref(self.options.get()).platform()
+
+    cpdef device_type(self):
+        return deref(self.options.get()).deviceType()
 
 
 cdef class PyIVP:
