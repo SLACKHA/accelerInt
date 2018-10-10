@@ -470,7 +470,7 @@ rkf45_driver (__global const double * __restrict__ param,
         }
         #else
         for (int k = 0; k < neq; ++k)
-            rwk[__getIndex(k)] = phi[i*neq+ k ];
+            rwk[__getIndex(k)] = phi[__getGlobalIndex(i, k)];
         my_param[__getIndex1D(1, 0)] = param[i];
         tf = t_end[i];
         #endif
