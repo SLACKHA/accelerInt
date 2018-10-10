@@ -42,8 +42,11 @@ def run(num, num_threads, itype, tf, options):
                                     num_threads, ivp, options)
 
     # and integrate
-    time = integrator.integrate(num, 0., tf, phi.flatten(options.order()),
+    phi_c = phi.flatten(options.order())
+    time = integrator.integrate(num, 0., tf, phi_c,
                                 params.flatten(options.order()), step=1.)
+    # and get final state
+    phi = phi_c.reshape(phi.shape, order=options.order())
 
     print('Integration completed in {} (ms)'.format(time))
 
