@@ -102,12 +102,14 @@ namespace opencl_solvers
             integrator.log(NUM, t_start, phi_host);
         }
 
-        std::vector<double> times(t_end, t_end + NUM);
+        std::vector<double> times(NUM, t_start);
         // time integration loop
         while (t + EPS < t_max)
         {
             // update times
-            std::for_each(times.begin(), times.end(), [stepsize](double& d) { d+=stepsize;});
+            std::size_t index = 0;
+            std::for_each(times.begin(), times.end(), [&stepsize, &index, &t_end](double& d) {
+                d = std::fmin(d + stepsize, t_end[index++]);});
             integrator.intDriver(NUM, t, &times[0], param_host, phi_host);
             if (integrator.logging())
             {
