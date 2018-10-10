@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-v', '--vectorSize',
                         type=vector_width,
-                        default=8,
+                        default=0,
                         help='The SIMD vector-width to use [CPU].  '
                              'Exclusive with --blockSize.')
 
