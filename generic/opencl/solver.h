@@ -58,7 +58,7 @@
 #endif
 
 //! \brief Macro to determine offsets for pointer unpacking
-#define __getOffset1D(dim0) (dim0 * get_global_size(0))
+#define __getOffset1D(dim0) ((dim0) * get_global_size(0))
 
 #if (__order == 'C')
   /*!
