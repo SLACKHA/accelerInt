@@ -97,8 +97,8 @@ protected:
         //! \brief The requird size, in bytes of the RKF45 solver (per-IVP)
         std::size_t requiredSolverMemorySize()
         {
-            // 1 for parameter, 8 working vectors
-            return (1 + 8 * _neq) * sizeof(double);
+            // 1 for parameter, 9 working vectors
+            return (1 + 9 * _neq) * sizeof(double);
         }
 
         //! \brief return the list of files for this solver

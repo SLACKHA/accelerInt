@@ -687,6 +687,11 @@ namespace opencl_solvers {
                 exit(-1);
             }
 
+            // and zero memory
+            char zero = 0;
+            CL_EXEC(clEnqueueFillBuffer(_data.command_queue, buf, &zero, sizeof(char), 0,
+                                        size, 0, NULL, NULL));
+
             return buf;
         }
 
@@ -1202,6 +1207,7 @@ namespace opencl_solvers {
             cl_mem buffer_rwk = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, lenrwk*numThreads(), NULL);
             cl_mem buffer_counters = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(counter_struct)*NUM, NULL);
             _clmem.assign({buffer_param, tf, buffer_phi, buffer_solver, buffer_rwk, buffer_counters});
+
             _param_index = 0;
             _end_time_index = 1;
             _phi_index = 2;
@@ -1304,7 +1310,7 @@ namespace opencl_solvers {
                                           &this->getSolverStruct(), 0, NULL, NULL) );
             if (_options.useQueue())
             {
-                int queue_val = 0;
+                int queue_val = numThreads();
                 CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_queue_index], CL_TRUE, 0, sizeof(int),
                                               &queue_val, 0, NULL, NULL) )
                 if (_verbose)

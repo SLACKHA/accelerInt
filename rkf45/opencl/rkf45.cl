@@ -322,8 +322,6 @@ int rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_en
     *h0 = fmax(*h0, hlb);
     *h0 = fmin(*h0, hub);
 
-    //printf("h0=%e, hlb=%e, hub=%e\n", h0, hlb, hub);
-
     #undef t_round
     #undef h_min
     #undef h_max
@@ -351,53 +349,51 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
 {
 
     __ValueType t = t_start;
-    #define tf (t_end)
-    #define t_round ((tf - t) * DBL_EPSILON)
-    #define h (hcur)
+    #define t_round ((t_end - t_start) * DBL_EPSILON)
     #define h_min (t_round * 100)
-    #define h_max ((tf - t) / rk->min_iters)
+    #define h_max ((t_end - t_start) / rk->min_iters)
     #define iter (counters->niters)
     #define nst (counters->nsteps)
 
     __IntType ierr = RK_SUCCESS;
     // Estimate the initial step size ...
     {
-        __MaskType test = isless(h, h_min);
+        __MaskType test = isless(hcur, h_min);
         if (__any(test))
         {
-            ierr = rk_hin(rk, t, tf, &hcur, y, rwk, user_data);
+            ierr = rk_hin(rk, t, t_end, &hcur, y, rwk, user_data);
         }
     }
 
     nst = 0;
     iter = 0;
 
-    __MaskType done = isless(fabs(t - tf), fabs(t_round));
+    __MaskType done = isless(fabs(t - t_end), fabs(t_round));
+    __global __ValueType *ytmp = rwk;
 
     while (__any(__not(done)))
     {
-        __global __ValueType *ytmp = rwk;
 
         // Take a trial step over h_cur ...
-        rkf45(h, t, y, ytmp, rwk + __getOffset1D(neq), user_data);
+        rkf45(hcur, t, y, ytmp, rwk + __getOffset1D(neq), user_data);
 
         __ValueType herr = fmax(1e-20, rk_wnorm(rk, rwk + __getOffset1D(neq), y));
 
         // Is there error acceptable?
         __MaskType accept = islessequal(herr, 1.0);
-        accept |= islessequal(h, h_min);
+        accept |= islessequal(hcur, h_min);
         accept &= __not(done);
 
         // update solution ...
         if (__any(accept))
         {
-            t   = __select (t,   t + h  , accept);
+            t   = __select (t,   t + hcur  , accept);
             nst = __select (nst, nst + 1, accept);
 
             for (int k = 0; k < neq; k++)
                 y[__getIndex(k)] = __select(y[__getIndex(k)], ytmp[__getIndex(k)], accept);
 
-            done = isless( fabs(t - tf), fabs(t_round));
+            done = isless( fabs(t - t_end), fabs(t_round));
         }
 
         __ValueType fact = sqrt( sqrt(1.0 / herr) ) * (0.840896415);
@@ -407,17 +403,17 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         fact = fmin(fact,       rk->adaption_limit);
 
         // Apply grow/shrink factor for next step.
-        h = __select(h * fact, h, done);
+        hcur = __select(hcur * fact, hcur, done);
 
         // Limit based on the upper/lower bounds
-        h = fmin(h, h_max);
-        h = fmax(h, h_min);
+        hcur = fmin(hcur, h_max);
+        hcur = fmax(hcur, h_min);
 
         // Stretch the final step if we're really close and we didn't just fail ...
-        h = __select(h, tf - t, accept & isless(fabs((t + h) - tf), h_min));
+        hcur = __select(hcur, t_end - t, accept & isless(fabs((t + hcur) - t_end), h_min));
 
         // Don't overshoot the final time ...
-        h = __select(h, tf - t, __not(done) & isgreater((t + h), tf));
+        hcur = __select(hcur, t_end - t, __not(done) & isgreater((t + hcur), t_end));
 
         ++iter;
         if (rk->max_iters && iter > rk->max_iters) {
@@ -429,9 +425,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
 
     return ierr;
 
-    #undef tf
     #undef t_round
-    #undef h
     #undef h_min
     #undef h_max
     #undef iter
@@ -530,7 +524,7 @@ rkf45_driver_queue (__global const double * __restrict__ param,
                     __global __ValueType * __restrict__ rwk,
                     __global rk_counters_t * __restrict__ rk_counters,
                     const int numProblems,
-                    __global int *problemCounter)
+                    volatile __global int *problemCounter)
 {
     const int tid = get_global_id(0);
 
@@ -545,11 +539,6 @@ rkf45_driver_queue (__global const double * __restrict__ param,
 
     // Initial problem set and global counter.
     problem_idx = get_global_id(0);
-
-    if (get_local_id(0) == 0)
-        atomic_add( problemCounter, get_local_size(0));
-
-    barrier(CLK_GLOBAL_MEM_FENCE);
 
     //while ((problem_idx = atomic_inc(problemCounter)) < numProblems)
     while (problem_idx < numProblems)
@@ -585,7 +574,7 @@ rkf45_driver_queue (__global const double * __restrict__ param,
             if (problem_id < numProblems)
             {
                 for (int k = 0; k < neq; ++k)
-                    __read_from(rwk[__getIndex(k)], lane, phi[__globalIndex1D(problem_id, neq, k)]);
+                    __read_from(rwk[__getIndex(k)], lane, phi[__getGlobalIndex(problem_id, k)]);
 
                 __read_from(my_counters.nsteps, lane, rk_counters[problem_id].nsteps);
                 // Each lane has the same value ...
