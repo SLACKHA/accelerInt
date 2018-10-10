@@ -50,6 +50,10 @@ def run(num, num_threads, itype, tf, options):
 
     print('Integration completed in {} (ms)'.format(time))
 
+    # check that answers from all threads match
+    assert np.allclose(phi[:, 0], phi[0, 0])
+    assert np.allclose(phi[:, 1], phi[0, 1])
+
     # get output
     t, phi = integrator.state()
     if plt:
