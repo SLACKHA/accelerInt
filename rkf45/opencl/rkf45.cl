@@ -472,7 +472,7 @@ rkf45_driver (__global const double * __restrict__ param,
         for (int k = 0; k < neq; ++k)
             rwk[__getIndex(k)] = phi[i*neq+ k ];
         my_param[__getIndex1D(1, 0)] = param[i];
-        tf = t_end[problem_idx];
+        tf = t_end[i];
         #endif
 
         __IntType rkerr = rk_solve(
