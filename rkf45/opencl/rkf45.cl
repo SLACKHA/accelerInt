@@ -118,7 +118,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
     for (int k = 0; k < neq; k++)
     {
         //f1[k] = h * ydot[k];
-        f1[k] *= h;
+        f1[__getIndex(k)] *= h;
         ytmp[__getIndex(k)] = y[__getIndex(k)] + c21 * f1[__getIndex(k)];
     }
 
@@ -505,7 +505,7 @@ rkf45_driver (__global const double * __restrict__ param,
         #else
         for (int k = 0; k < neq; ++k)
         {
-            phi[neq * i + k] = rwk[__getIndex(k)];
+            phi[__getGlobalIndex(i, k)] = rwk[__getIndex(k)];
         }
         rk_counters[i].niters = my_counters.niters;
         rk_counters[i].nsteps = my_counters.nsteps;
