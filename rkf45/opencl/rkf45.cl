@@ -12,7 +12,7 @@
 #ifndef neq
 #pragma error "Number of equations not defined!"
 #endif
-#ifndef rk_lensrc
+#ifndef rwk_lensrc
 #pragma error "Length of source-rate evaluation working buffer not defined"
 #endif
 #ifndef __ValueType

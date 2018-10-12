@@ -1014,7 +1014,7 @@ namespace opencl_solvers {
 
             // source rate evaluation work-size
             std::ostringstream rwk;
-            rwk << "#define rk_lensrc (" << _ivp.requiredMemorySize() << ")" << std::endl;
+            rwk << "#define rwk_lensrc (" << _ivp.requiredMemorySize() << ")" << std::endl;
             program_source_str << rwk.str();
 
             // order
