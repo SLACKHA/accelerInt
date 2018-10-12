@@ -8,6 +8,7 @@ import platform
 import shutil
 import subprocess
 import textwrap
+from warnings import warn
 from distutils.version import LooseVersion
 from distutils.spawn import find_executable
 
@@ -520,8 +521,9 @@ def build_wrapper(save, platform, defines, libs, variant, multi):
     wrapper = build_lib(save, platform, defines, mech_dir, variant,
                         'accelerint_problem')
     if not wrapper:
-        raise Exception('Cannot build wrapper as problem definition not found in '
-                        '{}'.format(os.path.join(mech_dir, platform)))
+        warn('Skipping {}-wrapper as problem definition not found in '
+              '{}'.format(platform, os.path.join(mech_dir, platform)))
+        return []
 
     short_names = {'cpu': 'cpu',
                    'opencl': 'ocl'}
@@ -648,5 +650,6 @@ for p in platforms:
     defines['LIBPATH'] = [lib_dir]
     defines = add_libs_to_defines(vals, defines)
     wrapper = build_wrapper(env_save, p, defines, vals, variant, target)
-    # and wrapper
-    Alias(p + '-wrapper', wrapper)
+    if wrapper:
+        # and wrapper
+        Alias(p + '-wrapper', wrapper)

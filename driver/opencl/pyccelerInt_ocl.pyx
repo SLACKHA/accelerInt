@@ -52,7 +52,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         string_t order() except+
 
     cdef cppclass IVP:
-        IVP(const vector[string_t]&, size_t) except +
+        IVP(const vector[string_t]&, size_t, const vector[string_t]&) except +
 
     cdef cppclass SolverOptions:
         SolverOptions(size_t, size_t, double, double,
@@ -244,9 +244,10 @@ cdef class PySolverOptions:
 cdef class PyIVP:
     cdef unique_ptr[IVP] ivp # hold our ivp implementation
     cdef vector[string_t] source
+    cdef vector[string_t] includes
     cdef int mem
 
-    def __cinit__(self, kernel_source, int required_memory):
+    def __cinit__(self, kernel_source, int required_memory, includes):
         """
         Create an IVP implementation object, from:
 
@@ -264,7 +265,11 @@ cdef class PyIVP:
             assert isinstance(x, basestring), "Kernel path ({}) not string!".format(
                 x)
             self.source.push_back(_bytes(x))
+        for x in includes:
+            assert isinstance(x, basestring), "Include path ({}) not string!".format(
+                x)
+            self.includes.push_back(_bytes(x))
 
         self.mem = required_memory
 
-        self.ivp.reset(new IVP(self.source, self.mem))
+        self.ivp.reset(new IVP(self.source, self.mem, self.includes))

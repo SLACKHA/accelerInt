@@ -257,9 +257,11 @@ namespace opencl_solvers {
     {
     public:
         IVP(const std::vector<std::string>& kernelSource,
-            std::size_t requiredMemorySize):
+            std::size_t requiredMemorySize,
+            const std::vector<std::string>& includePaths=std::vector<std::string>()):
                 _kernelSource(kernelSource),
-                _requiredMemorySize(requiredMemorySize)
+                _requiredMemorySize(requiredMemorySize),
+                _includePaths(includePaths)
         {
 
         }
@@ -277,9 +279,15 @@ namespace opencl_solvers {
             return _requiredMemorySize;
         }
 
+        const std::vector<std::string>& includePaths() const
+        {
+            return _includePaths;
+        }
+
     protected:
         std::vector<std::string> _kernelSource;
         std::size_t _requiredMemorySize;
+        std::vector<std::string> _includePaths;
 
     };
 
@@ -1050,11 +1058,16 @@ namespace opencl_solvers {
                 build_options << " -I" << ipath;
             }
 
+            for (const std::string& ipath : _ivp.includePaths())
+            {
+                build_options << " -I" << ipath;
+            }
+
             if (data->platform_info.is_nvidia)
                  build_options << " -cl-nv-verbose";
 
             if (_verbose)
-                std::cout << "build_options = " << build_options.str();
+                std::cout << "build_options = " << build_options.str() << std::endl;;
 
             std::string cbuild = build_options.str();
             ret = clBuildProgram(data->program, 1, &data->device_info.device_id, cbuild.c_str(), NULL, NULL);
