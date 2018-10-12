@@ -239,8 +239,9 @@ int rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_en
     __global __ValueType * __restrict__ ydot  = rwk;
     __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(neq);
     __global __ValueType * __restrict__ ydot1 = y1 + __getOffset1D(neq);
-    // portion of the rwk vector used by source rate evaluation
-    __global __ValueType * __restrict__ rwk_dydt = rwk + __getOffset1D(2 * neq);
+     // the portion of the rwk vector that's allocated for the source rate evaluation
+    // y_out is at 7 * neq, hence we go to 8 for the total offset
+    __global __ValueType* rwk_dydt = rwk + __getOffset1D(7*neq);
 
     __ValueType hlb = h_min;
     __ValueType hub = h_max;
@@ -276,10 +277,12 @@ int rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_en
         //double t1 = hg;
 
         #ifdef __INTEL_COMPILER
-        #pragma ivdep`
+        #pragma ivdep
         #endif
         for (int k = 0; k < neq; k++)
-             y1[__getIndex(k)] = y[__getIndex(k)] + hg * ydot[__getIndex(k)];
+        {
+            y1[__getIndex(k)] = y[__getIndex(k)] + hg * ydot[__getIndex(k)];
+        }
 
         // compute y' at t1
         dydt(t, user_data, y1, ydot1, rwk_dydt);
@@ -361,7 +364,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         __MaskType test = isless(hcur, h_min);
         if (__any(test))
         {
-            ierr = rk_hin(rk, t, t_end, &hcur, y, rwk, user_data);
+            ierr = rk_hin(rk, t, t_end, &hcur, y, rwk + __getOffset1D(neq), user_data);
         }
     }
 
