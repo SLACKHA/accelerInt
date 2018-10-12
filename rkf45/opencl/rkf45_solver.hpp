@@ -69,7 +69,7 @@ public:
             static_assert(ErrorCode::SUCCESS == RK_SUCCESS, "Enum mismatch");
             static_assert(ErrorCode::TOO_MUCH_WORK == RK_TOO_MUCH_WORK, "Enum mismatch");
             static_assert(ErrorCode::TDIST_TOO_SMALL == RK_TDIST_TOO_SMALL, "Enum mismatch");
-            static_assert(ErrorCode::MAX_STEPS_EXCEEDED == RK_HIN_MAX_ITERS, "Enum mismatch");
+            //static_assert(ErrorCode::MAX_STEPS_EXCEEDED == RK_HIN_MAX_ITERS, "Enum mismatch");
 
             // init the rk struct
             rk_vals.max_iters = options.maxIters();

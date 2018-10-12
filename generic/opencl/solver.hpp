@@ -455,7 +455,21 @@ namespace opencl_solvers {
         */
         void checkError(int tid, ErrorCode code) const
         {
-            throw std::runtime_error("not implemented");
+            switch(code)
+            {
+                case ErrorCode::TOO_MUCH_WORK:
+                    std::cerr << "During integration of ODE#" << tid <<
+                        ", the maximum number of allowed iterations was exceeded..."
+                        << std::endl;
+                    exit(code);
+                case ErrorCode::TDIST_TOO_SMALL:
+                    std::cerr << "During integration of ODE#" << tid <<
+                        ", the requested integration duration was smaller than allowed "
+                        "by machine precision, exiting..." << std::endl;
+                    exit(code);
+                default:
+                    break;
+            }
         }
 
         //! return the absolute tolerance
@@ -1358,6 +1372,7 @@ namespace opencl_solvers {
             int nst_ = 0, nit_ = 0;
             for (int i = 0; i < NUM; ++i)
             {
+                checkError(i, (ErrorCode)counters[i].niters);
                 nst_ += counters[i].nsteps;
                 nit_ += counters[i].niters;
             }

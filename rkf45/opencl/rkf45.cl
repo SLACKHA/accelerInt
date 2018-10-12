@@ -227,14 +227,20 @@ __ValueType rk_wnorm (__global const rk_t *rk, __global const __ValueType *x, __
     return sqrt(sum / (__ValueType)neq);
 }
 
-int rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
-            __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
-            __global __ValueType * __restrict__ rwk,
-            __global __ValueType const * __restrict__ user_data)
+__ValueType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
+                    __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
+                    __global __ValueType * __restrict__ rwk,
+                    __global __ValueType const * __restrict__ user_data)
 {
     #define t_round ((t_end - t) * DBL_EPSILON)
     #define h_min (t_round * 100)
     #define h_max ((t_end - t) / rk->min_iters)
+
+    if (__any((t_end - t) < 2 * t_round))
+    {
+        // requested time-step is smaller than roundoff
+        return RK_TDIST_TOO_SMALL;
+    }
 
     __global __ValueType * __restrict__ ydot  = rwk;
     __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(neq);
