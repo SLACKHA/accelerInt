@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-tf', '--end_time',
                         type=float,
-                        default=1e-3,  # 1ms
+                        default=None,  # 1ms
                         help='The simulation end-time.')
 
     parser.add_argument('-r', '--reuse',
@@ -128,6 +128,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     assert not (args.vectorSize and args.blockSize), (
         'Cannot specify vectorSize and blockSize concurrently')
+
+    end_time = args.end_time
+    if not end_time:
+        end_time = 2000 if args.case == 'vdp' else 1e-3
 
     # create the options
     options = pycel.PySolverOptions(args.int_type,
@@ -147,5 +151,5 @@ if __name__ == '__main__':
 
     print('Integrating {} IVPs with method {}, and {} threads...'.format(
         args.num_ivp, args.int_type, args.num_threads))
-    run(pycel, args.num_ivp, args.num_threads, args.int_type, args.end_time,
+    run(pycel, args.num_ivp, args.num_threads, args.int_type, end_time,
         options, reuse=args.reuse, plt=plt)
