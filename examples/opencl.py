@@ -7,64 +7,22 @@ import sys
 import multiprocessing
 import os
 import argparse
+
 try:
     import matplotlib.pyplot as plt
 except ImportError:
     print('Matplotlib not found, not plotting...')
     plt = None
 
+# add runtime path to find the pycelerrint module
 sys.path.insert(0, os.getcwd())
 import pyccelerInt_ocl as pycel  # noqa
+
+# and add the path to this directory to get the pyjac module
+path = os.path.dirname(__file__)
+sys.path.insert(1, path)
+
 np.random.seed(0)
-
-
-def run(num, num_threads, itype, tf, options):
-    # number of equations
-    neq = 2
-
-    # create state vectors
-    phi = 2 * np.zeros((num, 2), dtype=np.float64)
-    phi[:, 0] = 2
-    phi[:, 1] = 0
-
-    # set parameters
-    params = np.zeros(num, dtype=np.float64)
-    params[:] = 1000
-
-    # create ivp
-    # Note: we need to pass the full paths to the PyIVP such that accelerInt
-    # can find our kernel files
-    path = os.path.dirname(__file__)
-    ivp = pycel.PyIVP([os.path.join(path, 'dydt.cl')], 0)
-
-    # create the integrator
-    integrator = pycel.PyIntegrator(itype, neq,
-                                    num_threads, ivp, options)
-
-    # and integrate
-    phi_c = phi.flatten(options.order())
-    time = integrator.integrate(num, 0., tf, phi_c,
-                                params.flatten(options.order()), step=1.)
-    # and get final state
-    phi = phi_c.reshape(phi.shape, order=options.order())
-
-    print('Integration completed in {} (ms)'.format(time))
-
-    # get output
-    t, phip = integrator.state()
-    if plt:
-        plt.plot(t, phip[0, 0, :], label='y1')
-        plt.plot(t, phip[0, 1, :], label='y2')
-        plt.ylim(np.min(phip[0, 0, :]) * 1.05, np.max(phip[0, 0, :]) * 1.05)
-        plt.legend(loc=0)
-        plt.title('van der Pol equation')
-        plt.show()
-
-    # check that answers from all threads match
-    assert np.allclose(phi[:, 0], phi[0, 0]), np.where(
-        ~np.isclose(phi[:, 0], phi[0, 0]))
-    assert np.allclose(phi[:, 1], phi[0, 1]), np.where(
-        ~np.isclose(phi[:, 1], phi[0, 1]))
 
 
 def vector_width(v):
@@ -95,8 +53,11 @@ def block_size(b):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser('example.py - run the van der Pol accelerInt '
-                                     'example')
+    parser = argparse.ArgumentParser('example.py - run the OpenCL examples')
+    parser.add_argument('-c', '--case',
+                        choices=['vdp', 'pyjac'],
+                        help='The example to run, currently only the van der Pol '
+                             'problem and pyJac are implemented.')
     parser.add_argument('-ni', '--num_ivp',
                         type=int,
                         default=100,
@@ -145,7 +106,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-p', '--platform',
                         type=str,
-                        default='',
+                        required=True,
                         help='The OpenCL platform to use, (e.g., Intel, NVIDIA, '
                              'etc.)')
 
@@ -156,8 +117,13 @@ if __name__ == '__main__':
 
     parser.add_argument('-tf', '--end_time',
                         type=float,
-                        default=2000.,
+                        default=1e-3,  # 1ms
                         help='The simulation end-time.')
+
+    parser.add_argument('-r', '--reuse',
+                        action='store_true',
+                        default=False,
+                        help='Reuse the previously generated pyJac code / library.')
 
     args = parser.parse_args()
     assert not (args.vectorSize and args.blockSize), (
@@ -174,6 +140,12 @@ if __name__ == '__main__':
                                     atol=1e-10, rtol=1e-6, logging=True,
                                     maxIters=1e6)
 
+    if args.case == 'vdp':
+        from examples.van_der_pol.opencl import run
+    else:
+        from examples.pyJac.opencl import run
+
     print('Integrating {} IVPs with method {}, and {} threads...'.format(
         args.num_ivp, args.int_type, args.num_threads))
-    run(args.num_ivp, args.num_threads, args.int_type, args.end_time, options)
+    run(pycel, args.num_ivp, args.num_threads, args.int_type, args.end_time,
+        options, reuse=args.reuse, plt=plt)
