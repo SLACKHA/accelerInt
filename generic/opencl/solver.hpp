@@ -589,14 +589,6 @@ namespace opencl_solvers {
         bool _initialized;
 
 
-        /*
-         * \brief Return the required memory size in bytes (per-IVP)
-         */
-        virtual std::size_t requiredSolverMemorySize() = 0;
-
-        //! \brief return the base kernel name
-        virtual const char* solverName() const = 0;
-
         //! \brief an initialization function for the kernel, to be called from
         //!        the final derived integrator class's constructor
         void initialize_kernel()
@@ -608,9 +600,8 @@ namespace opencl_solvers {
 
             /* get the kernel name */
             std::ostringstream kernel_name;
-            kernel_name << this->solverName();
             // all named driver
-            kernel_name << "_driver";
+            kernel_name << "driver";
             // and queue
             if (_options.useQueue())
             {
@@ -1022,6 +1013,25 @@ namespace opencl_solvers {
             sord << "#define __order '" << _options.order() << "'" << std::endl;
             program_source_str << sord.str();
 
+            // counter type
+            std::ostringstream scounter;
+            scounter << "#define counter_type " << getCounterStructName() << std::endl;
+            program_source_str << scounter.str();
+
+            // and vector counter name
+            std::ostringstream scounterv;
+            scounterv << "#define counter_type " << getCounterStructName() << "_vec" << std::endl;
+            program_source_str << scounterv.str();
+
+            // solver type
+            std::ostringstream solver_type;
+            solver_type << "#define solver_type " << getSolverFunctionName() << std::endl;
+            program_source_str << scounterv.str();
+
+            // and finally, the solver functin name
+            setd::ostringstream solver_func;
+            solver_func << "#define solver_function " << getSolver
+
             if (data->use_queue)
             {
                 std::ostringstream oqueue;
@@ -1031,6 +1041,10 @@ namespace opencl_solvers {
 
             // Load the common macros ...
             load_source_from_file (file_relative_to_me(__FILE__, "solver.h"), program_source_str);
+            // load error codes
+            load_source_from_file (file_relative_to_me(__FILE__, "error_codes.h"), program_source_str);
+            // load the drivers
+            load_source_from_file (file_relative_to_me(__FILE__, "drivers.cl"), program_source_str);
 
             // Load the header and source files text ...
             for (const std::string& file : solverFiles())
@@ -1387,6 +1401,24 @@ namespace opencl_solvers {
     protected:
         //! \brief return a reference to the initialized solver_struct
         virtual const solver_struct& getSolverStruct() const = 0;
+
+        //! \brief return the counter type's name
+        virtual const std::string& getCounterStructName() const = 0;
+
+        //! \brief return the solver struct's type name
+        virtual const std::string& getSolverStructName() const = 0;
+
+        //! \brief return the solver function name
+        virtual const std::string& getSolverFunctionName() const = 0;
+
+        /**
+         * \brief Return the required memory size in bytes (per-IVP)
+         */
+        virtual std::size_t requiredSolverMemorySize()
+        {
+            // 1 for the parameter, and a single working vector
+            return (1 + _neq) * sizeof(double);
+        }
 
     };
 

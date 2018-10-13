@@ -21,8 +21,6 @@
 
 // \brief Indexing macro for _all_ arrays in RKF45 solver (all arrays are size neq)
 #define __getIndex(idx) (__getIndex1D(neq, idx))
-// \brief Indexing macro for _all_ global arrays in RKF45 solver (all arrays are size neq)
-#define __getGlobalIndex(pid, idx) (__globalIndex1D(numProblems, neq, pid, idx))
 
 
 // Single-step function
@@ -180,7 +178,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
         y_out[__getIndex(k)] = y[__getIndex(k)] + r5; // Local extrapolation
     }
 
-    return RK_SUCCESS;
+    return SUCCESS;
 
     #undef c20
     #undef c21
@@ -239,7 +237,7 @@ __ValueType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueT
     if (__any((t_end - t) < 2 * t_round))
     {
         // requested time-step is smaller than roundoff
-        return RK_TDIST_TOO_SMALL;
+        return TDIST_TOO_SMALL;
     }
 
     __global __ValueType * __restrict__ ydot  = rwk;
@@ -261,7 +259,7 @@ __ValueType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueT
     if (__all(hub < hlb))
     {
         *h0 = __select(hg, *h0, done);
-        return RK_SUCCESS;
+        return SUCCESS;
     }
 
     // Start iteration to find solution to ... {WRMS norm of (h0^2 y'' / 2)} = 1
@@ -270,7 +268,7 @@ __ValueType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueT
     __ValueType hnew = hg;
     const int miters = 10;
     int iter = 0;
-    int ierr = RK_SUCCESS;
+    int ierr = SUCCESS;
 
     // compute ydot at t=t0
     dydt(t, user_data, y, ydot, rwk_dydt);
@@ -364,7 +362,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     #define iter (counters->niters)
     #define nst (counters->nsteps)
 
-    __IntType ierr = RK_SUCCESS;
+    __IntType ierr = SUCCESS;
     // Estimate the initial step size ...
     {
         __MaskType test = isless(hcur, h_min);
@@ -426,7 +424,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
 
         ++iter;
         if (rk->max_iters && iter > rk->max_iters) {
-            ierr = RK_TOO_MUCH_WORK;
+            ierr = TOO_MUCH_WORK;
             //printf("(iter > max_iters)\n");
             break;
         }
@@ -440,183 +438,3 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     #undef iter
     #undef nst
 }
-
-#ifdef __EnableQueue
-#warning 'Skipping rkf45_driver kernel'
-#else
-
-void __kernel
-__attribute__((reqd_work_group_size(__blockSize, 1, 1)))
-rkf45_driver (__global const double * __restrict__ param,
-              const double t_start,
-              __global const double * __restrict__ t_end,
-              __global double * __restrict__ phi,
-              __global const rk_t * __restrict__ rk,
-              __global __ValueType * __restrict__ rwk,
-              __global rk_counters_t * __restrict__ rk_counters,
-              const int numProblems)
-{
-    // Thread-local pointers ...
-    // Ordering is phi_woring, rkf working, RHS working
-    // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(neq);
-    __global __ValueType *__restrict__ rwk_rk = rwk + __getOffset1D(1 + neq);
-    __private rk_counters_t_vec my_counters;
-    __private __ValueType tf;
-
-    for (int i = __ValueSize * get_global_id(0); i < numProblems; i += __ValueSize * get_global_size(0))
-    {
-        #if __ValueSize > 1
-        for (int k = 0; k < neq; ++k)
-        {
-            for (int lane = 0; lane < __ValueSize; ++lane)
-            {
-                const int problem_id = min(i + lane, numProblems-1);
-                __write_to(phi[__getGlobalIndex(problem_id, k)], lane, rwk[__getIndex(k)]);
-                __write_to(param[problem_id], lane, my_param[__getIndex1D(1, 0)]);
-                __write_to(t_end[problem_id], lane, tf);
-            }
-        }
-        #else
-        for (int k = 0; k < neq; ++k)
-            rwk[__getIndex(k)] = phi[__getGlobalIndex(i, k)];
-        my_param[__getIndex1D(1, 0)] = param[i];
-        tf = t_end[i];
-        #endif
-
-        __IntType rkerr = rk_solve(
-                rk, t_start, tf, 0, &my_counters, rwk, rwk_rk, my_param);
-
-        #if __ValueSize > 1
-        for (int lane = 0; lane < __ValueSize; ++lane)
-        {
-            const int problem_id = i + lane;
-            if (problem_id < numProblems)
-            {
-                for (int k = 0; k < neq; ++k)
-                    __read_from(rwk[__getIndex(k)], lane, phi[__getGlobalIndex(problem_id, k)]);
-
-                __read_from(my_counters.nsteps, lane, rk_counters[problem_id].nsteps);
-                // Each lane has the same value ...
-                rk_counters[problem_id].niters = my_counters.niters;
-                if (__any(rkerr != RK_SUCCESS))
-                {
-                    __read_from(rkerr, lane, rk_counters[problem_id].niters);
-                }
-            }
-        }
-        #else
-        for (int k = 0; k < neq; ++k)
-        {
-            phi[__getGlobalIndex(i, k)] = rwk[__getIndex(k)];
-        }
-        rk_counters[i].niters = my_counters.niters;
-        rk_counters[i].nsteps = my_counters.nsteps;
-        if (rkerr != RK_SUCCESS)
-            rk_counters[i].niters = rkerr;
-        #endif
-    }
-}
-#endif
-
-#ifndef __EnableQueue
-#warning 'Skipping rkf45_driver_queue kernel'
-#else
-
-void __kernel
-__attribute__((reqd_work_group_size(__blockSize, 1, 1)))
-rkf45_driver_queue (__global const double * __restrict__ param,
-                    const double t_start,
-                    __global const double * __restrict__ t_end,
-                    __global double * __restrict__ phi,
-                    __global const rk_t * __restrict__ rk,
-                    __global __ValueType * __restrict__ rwk,
-                    __global rk_counters_t * __restrict__ rk_counters,
-                    const int numProblems,
-                    volatile __global int *problemCounter)
-{
-    const int tid = get_global_id(0);
-
-    // Thread-local pointers ...
-    // Ordering is phi_woring, rkf working, RHS working
-    // such that we can 'peel' off working data easily in subcalls
-    __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(neq);
-    __global __ValueType *__restrict__ rwk_rk = rwk + __getOffset1D(1 + neq);
-    __private rk_counters_t_vec my_counters;
-    __private __ValueType tf;
-    __private int problem_idx;
-
-    // Initial problem set and global counter.
-    #if __ValueSize > 1
-        problem_idx = get_global_id(0) * __ValueSize;
-    #else
-        problem_idx = get_global_id(0);
-    #endif
-
-    //while ((problem_idx = atomic_inc(problemCounter)) < numProblems)
-    while (problem_idx < numProblems)
-    {
-        #if __ValueSize > 1
-        for (int k = 0; k < neq; ++k)
-        {
-            for (int lane = 0; lane < __ValueSize; ++lane)
-            {
-                const int problem_id = min(problem_idx + lane, numProblems-1);
-                __write_to(phi[__getGlobalIndex(problem_id, k)], lane, rwk[__getIndex(k)]);
-                __write_to(param[problem_id], lane, my_param[__getIndex1D(1, 0)]);
-                __write_to(t_end[problem_id], lane, tf);
-            }
-        }
-        #else
-        for (int k = 0; k < neq; ++k)
-        {
-            rwk[__getIndex(k)] = phi[__getGlobalIndex(problem_idx, k)];
-        }
-        my_param[__getIndex1D(1, 0)] = param[problem_idx];
-        tf = t_end[problem_idx];
-        #endif
-
-        // determine maximum / minumum time steps for this set of problems
-        __IntType rkerr = rk_solve(
-                rk, t_start, tf, 0, &my_counters, rwk, rwk_rk, my_param);
-
-        #if __ValueSize > 1
-        for (int lane = 0; lane < __ValueSize; ++lane)
-        {
-            const int problem_id = problem_idx + lane;
-            if (problem_id < numProblems)
-            {
-                for (int k = 0; k < neq; ++k)
-                    __read_from(rwk[__getIndex(k)], lane, phi[__getGlobalIndex(problem_id, k)]);
-
-                __read_from(my_counters.nsteps, lane, rk_counters[problem_id].nsteps);
-                // Each lane has the same value ...
-                // Each lane has the same value ...
-                rk_counters[problem_id].niters = my_counters.niters;
-                if (__any(rkerr != RK_SUCCESS))
-                {
-                    __read_from(rkerr, lane, rk_counters[problem_id].niters);
-                }
-            }
-        }
-        #else
-        for (int k = 0; k < neq; ++k)
-        {
-            phi[__getGlobalIndex(problem_idx, k)] = rwk[__getIndex(k)];
-        }
-        rk_counters[problem_idx].niters = my_counters.niters;
-        rk_counters[problem_idx].nsteps = my_counters.nsteps;
-        if (rkerr != RK_SUCCESS)
-            rk_counters[problem_idx].niters = rkerr;
-        #endif
-        // Get a new problem atomically.
-        #if __ValueSize > 1
-            // add a vector's worth of problem id's
-            problem_idx = atomic_add(problemCounter, __ValueSize);
-        #else
-            // add a single problem id
-            problem_idx = atomic_inc(problemCounter);
-        #endif
-    }
-}
-#endif

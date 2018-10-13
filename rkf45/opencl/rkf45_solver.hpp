@@ -83,9 +83,11 @@ public:
         }
 
 protected:
-        const char* solverName() const
+
+        static constexpr std::string _solver_function = "rk_solve";
+        const std::string& getSolverFunctionName() const
         {
-            return "rkf45";
+            return _solver_function;
         }
 
         const rk_t& getSolverStruct() const
@@ -93,11 +95,23 @@ protected:
             return rk_vals;
         }
 
+        static constexpr std::string _solver_struct = "rk_t";
+        const std::string& getSolverStructName() const
+        {
+            return _solver_struct;
+        }
+
+        static constexpr std::string _counter_struct = "rk_t";
+        const std::string& getCounterStructName() const
+        {
+            return _counter_struct;
+        }
+
         //! \brief The requird size, in bytes of the RKF45 solver (per-IVP)
         std::size_t requiredSolverMemorySize()
         {
-            // 1 for parameter, 9 working vectors
-            return (1 + 9 * _neq) * sizeof(double);
+            // 8 working vectors solely for rkf45
+            return IntegratorBase::requiredSolverMemorySize() + (8 * _neq) * sizeof(double);
         }
 
         //! \brief return the list of files for this solver
