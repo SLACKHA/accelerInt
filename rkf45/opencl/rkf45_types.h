@@ -40,8 +40,9 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
                     __private __ValueType hcur,
                     __private rk_counters_t_vec * __restrict__ counters,
                     __global __ValueType* __restrict__ y,
-                    __global __ValueType* __restrict__ rwk,
-                    __global __ValueType const * __restrict__ user_data);
+                    __global __ValueType* rwk,
+                    __global __ValueType const * __restrict__ user_data,
+                    const int driver_offset);
 
 #define solver_function rk_solve
 #endif
