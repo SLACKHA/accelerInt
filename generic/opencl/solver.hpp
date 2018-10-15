@@ -1001,6 +1001,10 @@ namespace opencl_solvers {
             rwk << "#define rwk_lensrc (" << _ivp.requiredMemorySize() << ")" << std::endl;
             program_source_str << rwk.str();
 
+            std::ostringstream rwks;
+            rwks << "#define rwk_lensol (" << requiredSolverMemorySize() / sizeof(double) << ")" << std::endl;
+            program_source_str << rwks.str();
+
             // order
             std::ostringstream sord;
             sord << "#define __order '" << _options.order() << "'" << std::endl;

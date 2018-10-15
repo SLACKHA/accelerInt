@@ -9,6 +9,9 @@
 #ifndef rwk_lensrc
 #pragma error "Length of source-rate evaluation working buffer not defined"
 #endif
+#ifndef rwk_lensol
+#pragma error "Length of solution working buffer not defined."
+#endif
 #ifndef __ValueType
 #pragma error "Value type not defined!"
 #endif
@@ -49,8 +52,9 @@ __ValueType get_wnorm (__global const solver_type* __restrict__ solver, __global
 
 __IntType get_hin (__global const solver_type *solver, const __ValueType t, const __ValueType t_end,
                    __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
-                   __global __ValueType * __restrict__ rwk,
-                   __global __ValueType const * __restrict__ user_data)
+                   __global __ValueType * rwk,
+                   __global __ValueType const * __restrict__ user_data,
+                   const int offset)
 {
     #define t_round ((t_end - t) * DBL_EPSILON)
     #define h_min (t_round * 100)
@@ -62,13 +66,11 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
         return TDIST_TOO_SMALL;
     }
 
-    __global __ValueType * __restrict__ ydot  = rwk;
-    __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(neq);
-    __global __ValueType * __restrict__ ydot1 = y1 + __getOffset1D(neq);
+    __global __ValueType * __restrict__ ydot  = rwk + __getOffset1D(offset);
+    __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(offset + neq);
+    __global __ValueType * __restrict__ ydot1 = y1 + __getOffset1D(offset + neq);
     // the portion of the rwk vector that's allocated for the source rate evaluation
-    // y_out is at 7 * neq, hence we go to 8 for the total offset
-    // TODO: specialize this per solver
-    __global __ValueType* rwk_dydt = rwk + __getOffset1D(7*neq);
+    __global __ValueType* rwk_dydt = rwk + __getOffset1D(rwk_lensol);
 
     __ValueType hlb = h_min;
     __ValueType hub = h_max;
@@ -153,6 +155,8 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
 }
 
 
+// the size of working memory required for the drivers
+#define driver_offset (1 + neq)
 
 #ifdef __EnableQueue
 #warning 'Skipping driver kernel'
@@ -173,7 +177,6 @@ driver (__global const double * __restrict__ param,
     // Ordering is phi / param_working, solver working, RHS working
     // such that we can 'peel' off working data easily in subcalls
     __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(neq);
-    __global __ValueType *__restrict__ rwk_solver = rwk + __getOffset1D(1 + neq);
     __private counter_type_vec my_counters;
     __private __ValueType tf;
 
@@ -198,7 +201,8 @@ driver (__global const double * __restrict__ param,
         #endif
 
         __IntType err = solver_function(
-                solver, t_start, tf, 0, &my_counters, rwk, rwk_solver, my_param);
+                solver, t_start, tf, 0, &my_counters, rwk, rwk, my_param,
+                driver_offset);
 
         #if __ValueSize > 1
         for (int lane = 0; lane < __ValueSize; ++lane)
@@ -291,7 +295,8 @@ driver_queue (__global const double * __restrict__ param,
 
         // determine maximum / minumum time steps for this set of problems
         __IntType err = solver_function(
-                solver, t_start, tf, 0, &my_counters, rwk, rwk_solver, my_param);
+                solver, t_start, tf, 0, &my_counters, rwk, rwk, my_param,
+                driver_offset);
 
         #if __ValueSize > 1
         for (int lane = 0; lane < __ValueSize; ++lane)
@@ -335,5 +340,6 @@ driver_queue (__global const double * __restrict__ param,
 #endif
 
 
+#undef driver_offset
 #undef __getGlobalIndex
 #undef __getIndex

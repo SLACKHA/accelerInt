@@ -15,6 +15,9 @@
 #ifndef rwk_lensrc
 #pragma error "Length of source-rate evaluation working buffer not defined"
 #endif
+#ifndef rwk_lensol
+#pragma error "Length of solver working buffer not defined"
+#endif
 #ifndef __ValueType
 #pragma error "Value type not defined!"
 #endif
@@ -27,8 +30,10 @@
 int rkf45 (const __ValueType h, const __ValueType t,
            __global const __ValueType* __restrict__ y,
            __global __ValueType* __restrict__ y_out,
-           __global __ValueType* __restrict__ rwk,
-           __global __ValueType const * __restrict__ user_data)
+           __global __ValueType* __restrict__ trunc_err,
+           __global __ValueType* rwk,
+           __global __ValueType const * __restrict__ user_data,
+           const int solver_offset)
 {
     #define c20 ( 0.25)
     #define c21 ( 0.25)
@@ -99,16 +104,16 @@ int rkf45 (const __ValueType h, const __ValueType t,
                             b6 = 0.036363636363636;*/
 
     // local dependent variables (5 total)
-    __global __ValueType* f1   = rwk ;
-    __global __ValueType* f2   = rwk + __getOffset1D(neq);
-    __global __ValueType* f3   = rwk + __getOffset1D(2*neq);
-    __global __ValueType* f4   = rwk + __getOffset1D(3*neq);
-    __global __ValueType* f5   = rwk + __getOffset1D(4*neq);
-    __global __ValueType* f6   = rwk + __getOffset1D(5*neq);
-    __global __ValueType* ytmp = rwk + __getOffset1D(6*neq);
+    __global __ValueType* __restrict__ f1   = rwk + __getOffset1D(solver_offset);
+    __global __ValueType* __restrict__ f2   = rwk + __getOffset1D(solver_offset + neq);
+    __global __ValueType* __restrict__ f3   = rwk + __getOffset1D(solver_offset + 2*neq);
+    __global __ValueType* __restrict__ f4   = rwk + __getOffset1D(solver_offset + 3*neq);
+    __global __ValueType* __restrict__ f5   = rwk + __getOffset1D(solver_offset + 4*neq);
+    __global __ValueType* __restrict__ f6   = rwk + __getOffset1D(solver_offset + 5*neq);
+    __global __ValueType* __restrict__ ytmp = rwk + __getOffset1D(solver_offset + 6*neq);
     // the portion of the rwk vector that's allocated for the source rate evaluation
     // y_out is at 7 * neq, hence we go to 8 for the total offset
-    __global __ValueType* rwk_dydt = rwk + __getOffset1D(7*neq);
+    __global __ValueType* __restrict__ rwk_dydt = rwk + __getOffset1D(rwk_lensol);
 
     // 1)
     dydt(t, user_data, y, f1, rwk_dydt);
@@ -172,7 +177,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
         const __ValueType r4 = a1*f1[__getIndex(k)] + a3*f3[__getIndex(k)] + a4*f4[__getIndex(k)] + a5*f5[__getIndex(k)];
 
         // Trucation error: difference between 4th and 5th-order RK values.
-        rwk[__getIndex(k)] = fabs(r5 - r4);
+        trunc_err[__getIndex(k)] = fabs(r5 - r4);
 
         // Update solution.
         y_out[__getIndex(k)] = y[__getIndex(k)] + r5; // Local extrapolation
@@ -218,10 +223,10 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
                     __private __ValueType hcur,
                     __private rk_counters_t_vec * __restrict__ counters,
                     __global __ValueType* __restrict__ y,
-                    __global __ValueType* __restrict__ rwk,
-                    __global __ValueType const * __restrict__ user_data)
+                    __global __ValueType* rwk,
+                    __global __ValueType const * __restrict__ user_data,
+                    const int driver_offset)
 {
-
     __ValueType t = t_start;
     #define t_round ((t_end - t_start) * DBL_EPSILON)
     #define h_min (t_round * 100)
@@ -235,7 +240,8 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         __MaskType test = isless(hcur, h_min);
         if (__any(test))
         {
-            ierr = get_hin(rk, t, t_end, &hcur, y, rwk + __getOffset1D(neq), user_data);
+            ierr = get_hin(rk, t, t_end, &hcur, y, rwk, user_data,
+                           driver_offset);
         }
     }
 
@@ -243,15 +249,16 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     iter = 0;
 
     __MaskType done = isless(fabs(t - t_end), fabs(t_round));
-    __global __ValueType *ytmp = rwk;
+    __global __ValueType * __restrict__ ytmp = rwk + __getOffset1D(driver_offset);
+    __global __ValueType * __restrict__ trunc_err = rwk + __getOffset1D(driver_offset + neq);
 
     while (__any(__not(done)))
     {
 
         // Take a trial step over h_cur ...
-        rkf45(hcur, t, y, ytmp, rwk + __getOffset1D(neq), user_data);
+        rkf45(hcur, t, y, ytmp, trunc_err, rwk, user_data, driver_offset + 2 * neq);
 
-        __ValueType herr = fmax(1e-20, get_wnorm(rk, rwk + __getOffset1D(neq), y));
+        __ValueType herr = fmax(1e-20, get_wnorm(rk, trunc_err, y));
 
         // Is there error acceptable?
         __MaskType accept = islessequal(herr, 1.0);

@@ -94,7 +94,7 @@ protected:
         std::size_t requiredSolverMemorySize()
         {
             // 8 working vectors solely for rkf45
-            return IntegratorBase::requiredSolverMemorySize() + (8 * _neq) * sizeof(double);
+            return IntegratorBase::requiredSolverMemorySize() + (9 * _neq) * sizeof(double);
         }
 
         //! \brief return the list of files for this solver
