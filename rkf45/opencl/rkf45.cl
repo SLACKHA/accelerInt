@@ -212,130 +212,6 @@ int rkf45 (const __ValueType h, const __ValueType t,
     #undef b6
 }
 
-__ValueType rk_wnorm (__global const rk_t *rk, __global const __ValueType *x, __global const __ValueType *y)
-{
-    __ValueType sum = 0;
-    for (int k = 0; k < neq; k++)
-    {
-        __ValueType ewt = (rk->s_rtol * fabs(y[__getIndex(k)])) + rk->s_atol;
-        __ValueType prod = x[__getIndex(k)] / ewt;
-        sum += (prod*prod);
-    }
-
-    return sqrt(sum / (__ValueType)neq);
-}
-
-__IntType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
-                  __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
-                  __global __ValueType * __restrict__ rwk,
-                  __global __ValueType const * __restrict__ user_data)
-{
-    #define t_round ((t_end - t) * DBL_EPSILON)
-    #define h_min (t_round * 100)
-    #define h_max ((t_end - t) / rk->min_iters)
-
-    if (__any((t_end - t) < 2 * t_round))
-    {
-        // requested time-step is smaller than roundoff
-        return TDIST_TOO_SMALL;
-    }
-
-    __global __ValueType * __restrict__ ydot  = rwk;
-    __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(neq);
-    __global __ValueType * __restrict__ ydot1 = y1 + __getOffset1D(neq);
-     // the portion of the rwk vector that's allocated for the source rate evaluation
-    // y_out is at 7 * neq, hence we go to 8 for the total offset
-    __global __ValueType* rwk_dydt = rwk + __getOffset1D(7*neq);
-
-    __ValueType hlb = h_min;
-    __ValueType hub = h_max;
-    //double hlb = h_min;
-    //double hub = h_max;
-
-    // Already done ...
-    __MaskType done = isgreaterequal(*h0, h_min);
-    __ValueType hg = sqrt(hlb*hub);
-
-    if (__all(hub < hlb))
-    {
-        *h0 = __select(hg, *h0, done);
-        return SUCCESS;
-    }
-
-    // Start iteration to find solution to ... {WRMS norm of (h0^2 y'' / 2)} = 1
-
-    __MaskType hnew_is_ok = 0;
-    __ValueType hnew = hg;
-    const int miters = 10;
-    int iter = 0;
-    int ierr = SUCCESS;
-
-    // compute ydot at t=t0
-    dydt(t, user_data, y, ydot, rwk_dydt);
-
-    // maximum of 2 iterations
-    #define MAX_HINIT_ITERS (1)
-    for(; iter < MAX_HINIT_ITERS; ++iter)
-    {
-        // Estimate y'' with finite-difference ...
-        //double t1 = hg;
-
-        #ifdef __INTEL_COMPILER
-        #pragma ivdep
-        #endif
-        for (int k = 0; k < neq; k++)
-        {
-            y1[__getIndex(k)] = y[__getIndex(k)] + hg * ydot[__getIndex(k)];
-        }
-
-        // compute y' at t1
-        dydt(t, user_data, y1, ydot1, rwk_dydt);
-
-        // Compute WRMS norm of y''
-        #ifdef __INTEL_COMPILER
-        #pragma ivdep
-        #endif
-        for (int k = 0; k < neq; k++)
-            y1[__getIndex(k)] = (ydot1[__getIndex(k)] - ydot[__getIndex(k)]) / hg;
-
-        __ValueType yddnrm = rk_wnorm(rk, y1, y);
-
-        // should we accept this?
-        hnew = __select(hnew, hg, hnew_is_ok | (iter == miters));
-        if (__all(hnew_is_ok) || (iter == miters))
-            break;
-
-        // Get the new value of h ...
-        __MaskType test = isgreater(yddnrm*hub*hub, 2.0);
-        hnew = __select(sqrt(hg * hub), sqrt(2.0 / yddnrm), test);
-        // test the stopping conditions.
-        __ValueType hrat = hnew / hg;
-
-        // Accept this value ... the bias factor should bring it within range.
-        hnew_is_ok = isgreater(hrat, 0.5) & isless(hrat, 2.0);
-
-        // If y'' is still bad after a few iterations, just accept h and give up.
-        if (iter > 1)
-        {
-            hnew_is_ok = isgreater(hrat, 2.0);
-            hnew = __select (hnew, hg, hnew_is_ok);
-        }
-
-        hg = hnew;
-    }
-
-    // bound and bias estimate
-    *h0 = hnew * 0.5;
-    *h0 = fmax(*h0, hlb);
-    *h0 = fmin(*h0, hub);
-
-    #undef t_round
-    #undef h_min
-    #undef h_max
-
-    return ierr;
-}
-
 __IntType rk_solve (__global const rk_t * __restrict__ rk,
                     __private __ValueType const t_start,
                     __private __ValueType const t_end,
@@ -359,7 +235,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         __MaskType test = isless(hcur, h_min);
         if (__any(test))
         {
-            ierr = rk_hin(rk, t, t_end, &hcur, y, rwk + __getOffset1D(neq), user_data);
+            ierr = get_hin(rk, t, t_end, &hcur, y, rwk + __getOffset1D(neq), user_data);
         }
     }
 
@@ -375,7 +251,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         // Take a trial step over h_cur ...
         rkf45(hcur, t, y, ytmp, rwk + __getOffset1D(neq), user_data);
 
-        __ValueType herr = fmax(1e-20, rk_wnorm(rk, rwk + __getOffset1D(neq), y));
+        __ValueType herr = fmax(1e-20, get_wnorm(rk, rwk + __getOffset1D(neq), y));
 
         // Is there error acceptable?
         __MaskType accept = islessequal(herr, 1.0);
