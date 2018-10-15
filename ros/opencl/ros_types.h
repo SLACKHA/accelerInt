@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-typedef enum { Ros3, Ros4, Rodas3, Rodas4 } ros_solverTags;
+typedef enum { Ros3, Ros4, Rodas3, Rodas4 } solver_tags;
 enum { ros_maxStages = 6 };
 
 typedef struct
@@ -25,7 +25,6 @@ typedef struct
    double t_round;
    double t_stop;
 
-   ros_solverTags solverTag;
    int numStages;
    int ELO;
    double A[ros_maxStages*(ros_maxStages-1)/2];

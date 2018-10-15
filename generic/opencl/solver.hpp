@@ -297,7 +297,8 @@ namespace opencl_solvers {
         SolverOptions(std::size_t vectorSize=1, std::size_t blockSize=1,
                       double atol=1e-10, double rtol=1e-6,
                       bool logging=false, bool use_queue=true, std::string order="C",
-                      std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT):
+                      std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT,
+                      size_t minIters = 1, size_t maxIters = 1000):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
             _atol(atol),
@@ -306,7 +307,9 @@ namespace opencl_solvers {
             _order(order),
             _use_queue(use_queue),
             _platform(platform),
-            _deviceType(deviceType)
+            _deviceType(deviceType),
+            _minIters(minIters),
+            _maxIters(maxIters)
         {
             if (order.compare("C") && order.compare("F"))
             {
@@ -361,6 +364,16 @@ namespace opencl_solvers {
             return _deviceType;
         }
 
+        inline const std::size_t minIters() const
+        {
+            return _minIters;
+        }
+
+        inline const std::size_t maxIters() const
+        {
+            return _maxIters;
+        }
+
     protected:
         //! vector size
         std::size_t _vectorSize;
@@ -380,6 +393,10 @@ namespace opencl_solvers {
         const std::string _platform;
         //! The OpenCL device type to use
         const DeviceType _deviceType;
+        //! The minimum number of iterations allowed
+        const std::size_t _minIters;
+        //! The maximum number of iterations allowed
+        const std::size_t _maxIters;
     };
 
 

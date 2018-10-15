@@ -28,12 +28,6 @@ cdef extern from "error_codes.hpp" namespace "opencl_solvers":
         TDIST_TOO_SMALL,
         MAX_STEPS_EXCEEDED
 
-cdef extern from "rkf45_solver.hpp" namespace "opencl_solvers":
-    cdef cppclass RKF45SolverOptions:
-        RKF45SolverOptions(size_t, size_t, double, double,
-                           bool_t, bool_t, string_t, string_t, DeviceType,
-                           size_t, size_t) except +
-
 cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
     cpdef enum DeviceType:
         CPU,
@@ -201,17 +195,11 @@ cdef class PySolverOptions:
                   size_t maxIters = 1000):
 
         cdef string_t c_order = _bytes(order)
-        if itype in [IntegratorType.RKF45]:
-            self.options.reset(
-                new RKF45SolverOptions(vectorSize, blockSize,
-                                       atol, rtol, logging, use_queue,
-                                       c_order, platform, deviceType,
-                                       minIters, maxIters))
-        else:
-            self.options.reset(new SolverOptions(
-                vectorSize, blockSize,
-                atol, rtol, logging, use_queue,
-                c_order, platform, deviceType))
+        self.options.reset(new SolverOptions(
+            vectorSize, blockSize,
+            atol, rtol, logging, use_queue,
+            c_order, platform, deviceType,
+            minIters, maxIters))
 
     cpdef atol(self):
         return deref(self.options.get()).atol()
@@ -239,6 +227,12 @@ cdef class PySolverOptions:
 
     cpdef device_type(self):
         return deref(self.options.get()).deviceType()
+
+    cpdef min_iters(self):
+        return deref(self.options.get()).minIters()
+
+    cpdef max_iters(self):
+        return deref(self.options.get()).maxIters()
 
 
 cdef class PyIVP:

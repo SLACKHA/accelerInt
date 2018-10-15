@@ -15,10 +15,16 @@ namespace opencl_solvers
 {
     enum IntegratorType : int
     {
-        //! 4th order linearly-implicit Rosenbrock integrator
-        ROSENBROCK = 0,
         //! 4th order Runge-Kutta-Feldberg
-        RKF45 = 1
+        RKF45 = 0,
+        //! 3rd order linearly-implicit Rosenbrock integrator
+        ROS3 = 1,
+        //! 3rd order linearly-implicit RODAS integrator
+        RODAS3 = 2,
+        //! 4th order linearly-implicit Rosenbrock integrator
+        ROS4 = 3,
+        //! 4th order linearly-implicit RODAS integrator
+        RODAS4 = 4
     };
 }
 
