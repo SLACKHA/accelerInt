@@ -63,7 +63,7 @@ inline void ros_daxpy(const __ValueType alpha, const __global __ValueType __rest
 
 __IntType ros_ludec (__global __ValueType * __restrict__ A, __global __IntType * __restrict__ ipiv)
 {
-    __IntType ierr = SUCCESS;
+    __IntType ierr = CL_SUCCESS;
 
     const int nelems = vec_step(__ValueType);
 
@@ -244,7 +244,7 @@ __IntType ros_solve(__global const ros_t * __restrict__ ros, __ValueType * __res
                                         __global __ValueType __restrict__* rwk[],
                                         __global __ValueType const * __restrict__ user_data)
 {
-    __IntType ierr = SUCCESS;
+    __IntType ierr = CL_SUCCESS;
 
     #define nst (counters->nsteps)
     #define nfe (counters->nfe)

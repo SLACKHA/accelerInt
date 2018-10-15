@@ -63,7 +63,7 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
     if (__any((t_end - t) < 2 * t_round))
     {
         // requested time-step is smaller than roundoff
-        return TDIST_TOO_SMALL;
+        return CL_TDIST_TOO_SMALL;
     }
 
     __global __ValueType * __restrict__ ydot  = rwk + __getOffset1D(offset);
@@ -84,7 +84,7 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
     if (__all(hub < hlb))
     {
         *h0 = __select(hg, *h0, done);
-        return SUCCESS;
+        return CL_SUCCESS;
     }
 
     // Start iteration to find solution to ... {WRMS norm of (h0^2 y'' / 2)} = 1
@@ -93,7 +93,7 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
     __ValueType hnew = hg;
     const int miters = 10;
     int iter = 0;
-    int ierr = SUCCESS;
+    int ierr = CL_SUCCESS;
 
     // compute ydot at t=t0
     dydt(t, user_data, y, ydot, rwk_dydt);
@@ -216,7 +216,7 @@ driver (__global const double * __restrict__ param,
                 __read_from(my_counters.nsteps, lane, counters[problem_id].nsteps);
                 // Each lane has the same value ...
                 counters[problem_id].niters = my_counters.niters;
-                if (__any(err != SUCCESS))
+                if (__any(err != CL_SUCCESS))
                 {
                     __read_from(err, lane, counters[problem_id].niters);
                 }
@@ -229,7 +229,7 @@ driver (__global const double * __restrict__ param,
         }
         counters[i].niters = my_counters.niters;
         counters[i].nsteps = my_counters.nsteps;
-        if (err != SUCCESS)
+        if (err != CL_SUCCESS)
             counters[i].niters = err;
         #endif
     }
@@ -252,8 +252,6 @@ driver_queue (__global const double * __restrict__ param,
               const int numProblems,
               volatile __global int *problemCounter)
 {
-    const int tid = get_global_id(0);
-
     // Thread-local pointers ...
     // Ordering is phi_woring, solver working, RHS working
     // such that we can 'peel' off working data easily in subcalls
@@ -311,7 +309,7 @@ driver_queue (__global const double * __restrict__ param,
                 // Each lane has the same value ...
                 // Each lane has the same value ...
                 counters[problem_id].niters = my_counters.niters;
-                if (__any(err != SUCCESS))
+                if (__any(err != CL_SUCCESS))
                 {
                     __read_from(err, lane, counters[problem_id].niters);
                 }
@@ -324,7 +322,7 @@ driver_queue (__global const double * __restrict__ param,
         }
         counters[problem_idx].niters = my_counters.niters;
         counters[problem_idx].nsteps = my_counters.nsteps;
-        if (err != SUCCESS)
+        if (err != CL_SUCCESS)
             counters[problem_idx].niters = err;
         #endif
         // Get a new problem atomically.

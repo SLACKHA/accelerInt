@@ -1,7 +1,6 @@
 #ifndef RKF45_HPP
 #define RKF45_HPP
 
-#include "error_codes.h"
 #include "solver.hpp"
 #include "rkf45_types.h"
 
@@ -25,12 +24,6 @@ public:
             _includes({"rkf45_types.h"}),
             _paths({path_of(__FILE__)})
         {
-            // ensure our internal error code match the enum-types
-            static_assert(ErrorCode::SUCCESS == SUCCESS, "Enum mismatch");
-            static_assert(ErrorCode::TOO_MUCH_WORK == TOO_MUCH_WORK, "Enum mismatch");
-            static_assert(ErrorCode::TDIST_TOO_SMALL == TDIST_TOO_SMALL, "Enum mismatch");
-            //static_assert(ErrorCode::MAX_STEPS_EXCEEDED == RK_HIN_MAX_ITERS, "Enum mismatch");
-
             // init the rk struct
             rk_vals.max_iters = options.maxIters();
             rk_vals.min_iters = options.minIters();

@@ -317,6 +317,13 @@ namespace opencl_solvers {
                 err << "Order " << order << " not recognized";
                 throw OpenCLException(err.str());
             }
+
+            // ensure our internal error code match the enum-types
+            #include "error_codes.h"
+            static_assert(ErrorCode::SUCCESS == CL_SUCCESS, "Enum mismatch");
+            static_assert(ErrorCode::TOO_MUCH_WORK == CL_TOO_MUCH_WORK, "Enum mismatch");
+            static_assert(ErrorCode::TDIST_TOO_SMALL == CL_TDIST_TOO_SMALL, "Enum mismatch");
+            //static_assert(ErrorCode::MAX_STEPS_EXCEEDED == RK_HIN_MAX_ITERS, "Enum mismatch");
         }
 
         inline double atol() const

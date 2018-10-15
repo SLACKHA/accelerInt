@@ -52,6 +52,16 @@ def block_size(b):
         __raise()
 
 
+def integrator_type(it):
+    int_type = next((x for x in pycel.IntegratorType if it in str(x)),
+                    None)
+    if int_type is None:
+        raise argparse.ArgumentError(
+            'Integrator type: {} is invalid, possible choices {{{}}}'.format(
+                int_type, ', '.join([str(x) for x in pycel.IntegratorType])))
+    return int_type
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('example.py - run the OpenCL examples')
     parser.add_argument('-c', '--case',
@@ -70,8 +80,8 @@ if __name__ == '__main__':
                              '[default: # of logical cores].')
 
     parser.add_argument('-it', '--int_type',
-                        type=pycel.IntegratorType,
-                        default=pycel.IntegratorType.RKF45,
+                        type=integrator_type,
+                        default='RKF45',
                         help='The integrator type to use [default RKF45]')
 
     parser.add_argument('-v', '--vectorSize',

@@ -10,6 +10,7 @@ libdir = os.path.join(topdir, 'lib')
 includes = [os.path.join(topdir, 'generic', 'opencl'),
             os.path.join(topdir, 'interface', 'opencl'),
             os.path.join(topdir, 'rkf45', 'opencl'),
+            os.path.join(topdir, 'ros', 'opencl'),
             os.path.join(topdir, 'paths')]
 
 ext_module = Extension('pyccelerInt_ocl',

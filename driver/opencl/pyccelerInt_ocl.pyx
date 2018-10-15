@@ -18,7 +18,10 @@ cdef unicode _bytes(s):
 
 cdef extern from "solver_types.hpp" namespace "opencl_solvers":
     cpdef enum IntegratorType:
-        ROSENBROCK,
+        ROS3,
+        ROS4,
+        RODAS3,
+        RODAS4,
         RKF45
 
 cdef extern from "error_codes.hpp" namespace "opencl_solvers":
@@ -50,7 +53,8 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
 
     cdef cppclass SolverOptions:
         SolverOptions(size_t, size_t, double, double,
-                      bool_t, bool_t, string_t, string_t, DeviceType) except +
+                      bool_t, bool_t, string_t, string_t, DeviceType,
+                      size_t, size_t) except +
 
         double atol() except+
         double rtol() except+
@@ -61,6 +65,8 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         bool_t useQueue() except+
         string_t platform() except+
         DeviceType deviceType() except+
+        size_t minIters() except+
+        size_t maxIters() except+
 
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
                                          const IVP&, const SolverOptions&) except +

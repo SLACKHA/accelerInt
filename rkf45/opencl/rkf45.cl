@@ -183,7 +183,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
         y_out[__getIndex(k)] = y[__getIndex(k)] + r5; // Local extrapolation
     }
 
-    return SUCCESS;
+    return CL_SUCCESS;
 
     #undef c20
     #undef c21
@@ -234,7 +234,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     #define iter (counters->niters)
     #define nst (counters->nsteps)
 
-    __IntType ierr = SUCCESS;
+    __IntType ierr = CL_SUCCESS;
     // Estimate the initial step size ...
     {
         __MaskType test = isless(hcur, h_min);
