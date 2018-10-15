@@ -168,7 +168,7 @@ driver_queue (__global const double * __restrict__ param,
         #endif
 
         // determine maximum / minumum time steps for this set of problems
-        __IntType err = solver_type(
+        __IntType err = solver_function(
                 solver, t_start, tf, 0, &my_counters, rwk, rwk_solver, my_param);
 
         #if __ValueSize > 1
@@ -180,13 +180,13 @@ driver_queue (__global const double * __restrict__ param,
                 for (int k = 0; k < neq; ++k)
                     __read_from(rwk[__getIndex(k)], lane, phi[__getGlobalIndex(problem_id, k)]);
 
-                __read_from(my_counters.nsteps, lane, counter_type[problem_id].nsteps);
+                __read_from(my_counters.nsteps, lane, counters[problem_id].nsteps);
                 // Each lane has the same value ...
                 // Each lane has the same value ...
-                counter_type[problem_id].niters = my_counters.niters;
+                counters[problem_id].niters = my_counters.niters;
                 if (__any(err != SUCCESS))
                 {
-                    __read_from(err, lane, counter_type[problem_id].niters);
+                    __read_from(err, lane, counters[problem_id].niters);
                 }
             }
         }
@@ -195,10 +195,10 @@ driver_queue (__global const double * __restrict__ param,
         {
             phi[__getGlobalIndex(problem_idx, k)] = rwk[__getIndex(k)];
         }
-        counter_type[problem_idx].niters = my_counters.niters;
-        counter_type[problem_idx].nsteps = my_counters.nsteps;
+        counters[problem_idx].niters = my_counters.niters;
+        counters[problem_idx].nsteps = my_counters.nsteps;
         if (err != SUCCESS)
-            counter_type[problem_idx].niters = err;
+            counters[problem_idx].niters = err;
         #endif
         // Get a new problem atomically.
         #if __ValueSize > 1

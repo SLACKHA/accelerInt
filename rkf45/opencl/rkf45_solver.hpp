@@ -55,14 +55,15 @@ namespace opencl_solvers
 private:
         rk_t rk_vals;
         std::vector<std::string> _files;
+        std::vector<std::string> _includes;
         std::vector<std::string> _paths;
 
 public:
         RKF45Integrator(int neq, std::size_t numWorkGroups, const IVP& ivp, const RKF45SolverOptions& options) :
             Integrator(neq, numWorkGroups, ivp, options),
             rk_vals(),
-            _files({//file_relative_to_me(__FILE__, "rk_types.h"),
-                    file_relative_to_me(__FILE__, "rkf45.cl")}),
+            _files({file_relative_to_me(__FILE__, "rkf45.cl")}),
+            _includes({"rkf45_types.h"}),
             _paths({path_of(__FILE__)})
         {
             // ensure our internal error code match the enum-types
@@ -84,27 +85,9 @@ public:
 
 protected:
 
-        static constexpr std::string _solver_function = "rk_solve";
-        const std::string& getSolverFunctionName() const
-        {
-            return _solver_function;
-        }
-
         const rk_t& getSolverStruct() const
         {
             return rk_vals;
-        }
-
-        static constexpr std::string _solver_struct = "rk_t";
-        const std::string& getSolverStructName() const
-        {
-            return _solver_struct;
-        }
-
-        static constexpr std::string _counter_struct = "rk_t";
-        const std::string& getCounterStructName() const
-        {
-            return _counter_struct;
         }
 
         //! \brief The requird size, in bytes of the RKF45 solver (per-IVP)
@@ -118,6 +101,11 @@ protected:
         const std::vector<std::string>& solverFiles() const
         {
             return _files;
+        }
+
+        const std::vector<std::string>& solverIncludes() const
+        {
+            return _includes;
         }
 
         //! \brief return the list of include paths for this solver

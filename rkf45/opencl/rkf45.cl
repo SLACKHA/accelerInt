@@ -225,10 +225,10 @@ __ValueType rk_wnorm (__global const rk_t *rk, __global const __ValueType *x, __
     return sqrt(sum / (__ValueType)neq);
 }
 
-__ValueType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
-                    __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
-                    __global __ValueType * __restrict__ rwk,
-                    __global __ValueType const * __restrict__ user_data)
+__IntType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueType t_end,
+                  __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
+                  __global __ValueType * __restrict__ rwk,
+                  __global __ValueType const * __restrict__ user_data)
 {
     #define t_round ((t_end - t) * DBL_EPSILON)
     #define h_min (t_round * 100)
@@ -335,15 +335,6 @@ __ValueType rk_hin (__global const rk_t *rk, const __ValueType t, const __ValueT
 
     return ierr;
 }
-
-//! \brief struct containing information on steps / iterations
-typedef struct
-{
-    int niters;
-    __MaskType nsteps;
-}
-rk_counters_t_vec;
-
 
 __IntType rk_solve (__global const rk_t * __restrict__ rk,
                     __private __ValueType const t_start,
