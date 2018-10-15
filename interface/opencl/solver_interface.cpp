@@ -41,19 +41,19 @@ namespace opencl_solvers
         {
             case IntegratorType::RKF45:
                 return std::unique_ptr<RKF45Integrator>(new RKF45Integrator(
-                    neq, numThreads, ivp, static_cast<const RKF45SolverOptions&>(options)));
+                    neq, numThreads, ivp, options));
             case IntegratorType::ROS3:
                 return std::unique_ptr<ROS3Integrator>(new ROS3Integrator(
-                    neq, numThreads, ivp, static_cast<const ROS3Integrator&>(options)));
+                    neq, numThreads, ivp, options));
             case IntegratorType::ROS4:
                 return std::unique_ptr<ROS4Integrator>(new ROS4Integrator(
-                    neq, numThreads, ivp, static_cast<const ROS4Integrator&>(options)));
+                    neq, numThreads, ivp, options));
             case IntegratorType::RODAS3:
                 return std::unique_ptr<RODAS3Integrator>(new RODAS3Integrator(
-                    neq, numThreads, ivp, static_cast<const RODAS3Integrator&>(options)));
+                    neq, numThreads, ivp, options));
             case IntegratorType::RODAS4:
                 return std::unique_ptr<RODAS4Integrator>(new RODAS4Integrator(
-                    neq, numThreads, ivp, static_cast<const RODAS4Integrator&>(options)));
+                    neq, numThreads, ivp, options));
             default:
                 std::ostringstream ss;
                 ss << "Integrator type: " << type << " not implemented for OpenCL!" << std::endl;
@@ -74,7 +74,7 @@ namespace opencl_solvers
         switch(type)
         {
             case IntegratorType::RKF45:
-                return init(type, neq, numThreads, ivp, RKF45SolverOptions());
+                return init(type, neq, numThreads, ivp, SolverOptions());
             default:
                 std::ostringstream ss;
                 ss << "Integrator type: " << type << " not implemented for OpenCL!" << std::endl;

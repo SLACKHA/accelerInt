@@ -13,7 +13,6 @@ typedef struct
     double adaption_limit;
 } rk_t;
 
-#define solver_type rk_t
 
 typedef struct
 {
@@ -21,7 +20,6 @@ typedef struct
     int nsteps;
 } rk_counters_t;
 
-#define counter_type rk_counters_t
 
 #ifdef __OPENCL_VERSION__
 //! \brief struct containing information on steps / iterations
@@ -29,9 +27,10 @@ typedef struct
 {
     int niters;
     __MaskType nsteps;
-}
-rk_counters_t_vec;
+} rk_counters_t_vec;
 
+#define solver_type rk_t
+#define counter_type rk_counters_t
 #define counter_type_vec rk_counters_t_vec
 
 __IntType rk_solve (__global const rk_t * __restrict__ rk,

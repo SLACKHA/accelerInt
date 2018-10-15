@@ -18,7 +18,7 @@ private:
         std::vector<std::string> _paths;
 
 public:
-        RKF45Integrator(int neq, std::size_t numWorkGroups, const IVP& ivp, const RKF45SolverOptions& options) :
+        RKF45Integrator(int neq, std::size_t numWorkGroups, const IVP& ivp, const SolverOptions& options) :
             Integrator(neq, numWorkGroups, ivp, options),
             rk_vals(),
             _files({file_relative_to_me(__FILE__, "rkf45.cl")}),
@@ -34,7 +34,7 @@ public:
             // init the rk struct
             rk_vals.max_iters = options.maxIters();
             rk_vals.min_iters = options.minIters();
-            rk_vals.adaption_limit = options.adaptionLimit();
+            rk_vals.adaption_limit = 4;
             rk_vals.s_rtol = options.rtol();
             rk_vals.s_atol = options.atol();
 

@@ -1,12 +1,11 @@
-#ifndef RK_TYPES_H
-#define RK_TYPES_H
+#ifndef ROS_TYPES_H
+#define ROS_TYPES_H
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-typedef enum { Ros3, Ros4, Rodas3, Rodas4 } solver_tags;
 enum { ros_maxStages = 6 };
 
 typedef struct
@@ -34,35 +33,33 @@ typedef struct
    double M[ros_maxStages];
    double alpha[ros_maxStages];
    double gamma[ros_maxStages];
-}
-ros_t;
+} ros_t;
 
-#define solver_type ros_t
 
 typedef struct
 {
    int niters;
+   int nsteps;
    int nst;
    int nfe;
    int nje;
    int nlu;
-}
-ros_counters_t;
-
-#define counter_type ros_counters_t
+} ros_counters_t;
 
 #ifdef __OPENCL_VERSION__
 //! \brief struct containing information on steps / iterations
 typedef struct
 {
     int niters;
+    int nsteps;
     __MaskType nst;
     __MaskType nfe;
     __MaskType nje;
     __MaskType nlu;
-}
-ros_counters_t_vec;
+} ros_counters_t_vec;
 
+#define solver_type ros_t
+#define counter_type ros_counters_t
 #define counter_type_vec ros_counters_t_vec
 
 __IntType ros_solve (__global const rk_t * __restrict__ rk,
@@ -78,9 +75,8 @@ __IntType ros_solve (__global const rk_t * __restrict__ rk,
 #endif
 
 
-#ifndef RK_TYPES_H
-#define RK_TYPES_H
-
 #ifdef __cplusplus
 }
+#endif
+
 #endif

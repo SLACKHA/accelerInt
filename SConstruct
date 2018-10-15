@@ -290,6 +290,7 @@ linalg_dir = os.path.join(home, 'linear_algebra')
 generic_dir = os.path.join(home, 'generic')
 radau2a_dir = os.path.join(home, 'radau2a')
 rkf45_dir = os.path.join(home, 'rkf45')
+ros_dir = os.path.join(home, 'ros')
 exp_int_dir = os.path.join(home, 'exponential_integrators')
 exp4_int_dir = os.path.join(home, 'exponential_integrators', 'exp4')
 exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
@@ -522,7 +523,7 @@ def build_wrapper(save, platform, defines, libs, variant, multi):
                         'accelerint_problem')
     if not wrapper:
         warn('Skipping {}-wrapper as problem definition not found in '
-              '{}'.format(platform, os.path.join(mech_dir, platform)))
+             '{}'.format(platform, os.path.join(mech_dir, platform)))
         return []
 
     short_names = {'cpu': 'cpu',
@@ -620,10 +621,14 @@ for p in platforms:
     rkf45 = build_lib(env_save, p, new_defines, rkf45_dir, variant,
                       'rkf45', extra_libs=core)
 
+    new_defines = get_includes(p,  [generic_dir, ros_dir])
+    ros = build_lib(env_save, p, new_defines, ros_dir, variant,
+                    'ros', extra_libs=core)
+
     # add interface / problem definition
     new_defines = get_includes(p,  [generic_dir, radau2a_dir, rk78_dir, rkc_dir,
                                     exp4_int_dir, exprb43_int_dir, exp_int_dir,
-                                    cvodes_dir, rkf45_dir])
+                                    cvodes_dir, rkf45_dir, ros_dir])
     new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
     new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
     new_defines['RPATH'] = [lib_dir]
@@ -634,7 +639,7 @@ for p in platforms:
         new_defines['LIBS'] += ['OpenCL']
 
     # filter out non-existant
-    vals = [rkc, rk78, radau, exp4, exprb43, cvodes, exp, linalg, core, rkf45]
+    vals = [rkc, rk78, radau, exp4, exprb43, cvodes, exp, linalg, core, rkf45, ros]
     vals = [x for x in vals if x]
     vals = [y for x in vals for y in x]
 
