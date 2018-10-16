@@ -20,13 +20,8 @@
 // \brief Indexing macro for neq sized arrays in ROS solvers
 #define __getIndex(idx) (__getIndex1D(neq, idx))
 #define __getIndexJac(row, col) (__getIndex2D(neq, neq, row, col))
-#ifdef __order == 'C'
 // ktmp is shaped (nstages, neq)
 #define __getIndexKtmp(ns, row, col) (__getIndex2D(ns, neq, row, col))
-#else
-// ktmp is shaped (nstages, neq)
-#define __getIndexKtmp(ns, row, col) (__getIndex2D(ns, neq, row, col))
-#endif
 
 /*
 #define print(prefix, size, arr) \
