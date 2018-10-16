@@ -258,9 +258,11 @@ namespace opencl_solvers {
     public:
         IVP(const std::vector<std::string>& kernelSource,
             std::size_t requiredMemorySize,
+            std::size_t requiredIntegerMemorySize=0,
             const std::vector<std::string>& includePaths=std::vector<std::string>()):
                 _kernelSource(kernelSource),
                 _requiredMemorySize(requiredMemorySize),
+                _requiredIntegerMemorySize(requiredIntegerMemorySize),
                 _includePaths(includePaths)
         {
 
@@ -273,10 +275,18 @@ namespace opencl_solvers {
             return _kernelSource;
         }
 
-        //! \brief Return the (unvectorized) memory-size required by the IVP kernels
+        //! \brief Return the required amount of (unvectorized) double-precision memory
+        //         required by the IVP kernels [in bytes]
         std::size_t requiredMemorySize() const
         {
             return _requiredMemorySize;
+        }
+
+        //! \brief Return the required amount of (unvectorized) integer memory
+        //         required by the IVP kernels [in bytes]
+        std::size_t requiredIntegerMemorySize() const
+        {
+            return _requiredIntegerMemorySize;
         }
 
         const std::vector<std::string>& includePaths() const
@@ -287,6 +297,7 @@ namespace opencl_solvers {
     protected:
         std::vector<std::string> _kernelSource;
         std::size_t _requiredMemorySize;
+        std::size_t _requiredIntegerMemorySize;
         std::vector<std::string> _includePaths;
 
     };
@@ -1103,7 +1114,7 @@ namespace opencl_solvers {
                  build_options << " -cl-nv-verbose";
 
             if (_verbose)
-                std::cout << "build_options = " << build_options.str() << std::endl;;
+                std::cout << "build_options = " << build_options.str() << std::endl;
 
             std::string cbuild = build_options.str();
             ret = clBuildProgram(data->program, 1, &data->device_info.device_id, cbuild.c_str(), NULL, NULL);
@@ -1190,12 +1201,20 @@ namespace opencl_solvers {
         virtual const std::vector<std::string>& solverIncludePaths() const = 0;
 
         /**
-         * \brief Return the required memory size in bytes (per-IVP)
+         * \brief Return the size of double precision working memory in bytes (per-IVP)
          */
         virtual std::size_t requiredSolverMemorySize()
         {
             // 1 for the parameter, and a single working vector
             return (1 + _neq) * sizeof(double);
+        }
+
+        /**
+         * \brief Return the size of integer working memory in bytes (per-IVP)
+         */
+        virtual std::size_t requiredSolverIntegerMemorySize()
+        {
+            return 0;
         }
 
 
@@ -1238,6 +1257,17 @@ namespace opencl_solvers {
 
     protected:
 
+        std::size_t indexof(const std::vector<cl_mem>::const_iterator begin, const std::vector<cl_mem>::const_iterator end,
+                            const cl_mem& buffer)
+        {
+            auto it = std::find(begin, end, buffer);
+            if (it == end)
+            {
+                throw std::runtime_error("buffer not found!");
+            }
+            return std::distance(begin, it);
+        }
+
         void resize(const int NUM)
         {
             // create memory
@@ -1245,32 +1275,38 @@ namespace opencl_solvers {
             if (_verbose)
                 std::cout << "lenrwk = "<< lenrwk << std::endl;
 
+            std::size_t leniwk = (_ivp.requiredIntegerMemorySize() + requiredSolverIntegerMemorySize()) * _data.vectorSize;
+            if (_verbose)
+                std::cout << "leniwk = "<< leniwk << std::endl;
+
             if (_verbose)
                 std::cout << "NP = " << NUM << ", blockSize = " << _data.blockSize <<
                              ", vectorSize = " << _data.vectorSize <<
                              ", numBlocks = " << _data.numBlocks <<
                              ", numThreads = " << numThreads() << std::endl;
 
+
             cl_mem buffer_param = CreateBuffer (&_data.context, CL_MEM_READ_ONLY, sizeof(double)*NUM, NULL);
             cl_mem tf = CreateBuffer (&_data.context, CL_MEM_READ_ONLY, sizeof(double)*NUM, NULL);
             cl_mem buffer_phi = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(double)*_neq*NUM, NULL);
             cl_mem buffer_solver = CreateBuffer (&_data.context, CL_MEM_READ_ONLY, sizeof(solver_struct), NULL);
             cl_mem buffer_rwk = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, lenrwk*numThreads(), NULL);
+            cl_mem buffer_iwk = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, leniwk*numThreads(), NULL);
             cl_mem buffer_counters = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(counter_struct)*NUM, NULL);
-            _clmem.assign({buffer_param, tf, buffer_phi, buffer_solver, buffer_rwk, buffer_counters});
+            _clmem.assign({buffer_param, tf, buffer_phi, buffer_solver, buffer_rwk, buffer_iwk, buffer_counters});
 
-            _param_index = 0;
-            _end_time_index = 1;
-            _phi_index = 2;
-            _solver_index = 3;
-            _counter_index = 5;
+            _param_index = indexof(_clmem.begin(), _clmem.end(), buffer_param);
+            _end_time_index = indexof(_clmem.begin(), _clmem.end(), tf);
+            _phi_index = indexof(_clmem.begin(), _clmem.end(), buffer_phi);
+            _solver_index = indexof(_clmem.begin(), _clmem.end(), buffer_solver);
+            _counter_index = indexof(_clmem.begin(), _clmem.end(), buffer_counters);
 
             cl_mem buffer_queue;
             if (_options.useQueue())
             {
                 buffer_queue = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(int), NULL);
                 _clmem.push_back(buffer_queue);
-                _queue_index = 6;
+                _queue_index = indexof(_clmem.begin(), _clmem.end(), buffer_queue);;
             }
 
             /* Set kernel arguments */
@@ -1284,6 +1320,7 @@ namespace opencl_solvers {
             CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_phi) );
             CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_solver) );
             CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_rwk) );
+            CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_iwk) );
             CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_counters) );
             CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(int), &NUM) );
             if (_options.useQueue())

@@ -23,11 +23,11 @@ def run(pycel, num, num_threads, itype, tf, options, reuse, plt):
     # Note: we need to pass the full paths to the PyIVP such that accelerInt
     # can find our kernel files
     path = os.path.dirname(__file__)
-    ivp = pycel.PyIVP([os.path.join(path, 'dydt.cl')], 0, [])
+    ivp = pycel.PyIVP([os.path.join(path, 'dydt.cl'),
+                       os.path.join(path, 'jacob.cl')], 0)
 
     # create the integrator
-    integrator = pycel.PyIntegrator(itype, neq,
-                                    num_threads, ivp, options)
+    integrator = pycel.PyIntegrator(itype, neq, num_threads, ivp, options)
 
     # and integrate
     phi_c = phi.flatten(options.order())

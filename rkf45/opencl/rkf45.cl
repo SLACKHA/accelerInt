@@ -224,9 +224,12 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
                     __private rk_counters_t_vec * __restrict__ counters,
                     __global __ValueType* __restrict__ y,
                     __global __ValueType* rwk,
+                    __global __IntType* __restrict__ iwk,
                     __global __ValueType const * __restrict__ user_data,
                     const int driver_offset)
 {
+    UNUSED(iwk);
+
     __ValueType t = t_start;
     #define t_round ((t_end - t_start) * DBL_EPSILON)
     #define h_min (t_round * 100)

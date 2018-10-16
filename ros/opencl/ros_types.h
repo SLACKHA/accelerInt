@@ -10,8 +10,6 @@ enum { ros_maxStages = 6 };
 
 typedef struct
 {
-   int neq;
-
    int itol;
    double s_rtol, s_atol;
    //double v_rtol[__ros_max_neq], v_atol[__ros_max_neq];
@@ -51,7 +49,7 @@ typedef struct
 typedef struct
 {
     int niters;
-    int nsteps;
+    __MaskType nsteps;
     __MaskType nst;
     __MaskType nfe;
     __MaskType nje;
@@ -62,14 +60,16 @@ typedef struct
 #define counter_type ros_counters_t
 #define counter_type_vec ros_counters_t_vec
 
-__IntType ros_solve (__global const rk_t * __restrict__ rk,
+__IntType ros_solve (__global const ros_t * __restrict__ rk,
                      __private __ValueType const t_start,
                      __private __ValueType const t_end,
                      __private __ValueType hcur,
-                     __private rk_counters_t_vec * __restrict__ counters,
+                     __private ros_counters_t_vec * __restrict__ counters,
                      __global __ValueType* __restrict__ y,
                      __global __ValueType* __restrict__ rwk,
-                     __global __ValueType const * __restrict__ user_data);
+                     __global __IntType* __restrict__ iwk,
+                     __global __ValueType const * __restrict__ user_data,
+                     const int driver_offset);
 
 #define solver_function ros_solve
 #endif

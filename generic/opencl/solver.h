@@ -85,6 +85,13 @@
     #define __getIndex1D(dim0, idx) (get_group_id(0) * (dim0) + (idx))
   #endif
 
+  /*! \brief Row-major indexing macro for 2D working buffer arrays
+
+      The array is shaped as (get_num_groups(0), dim0, dim1, vec_size), where vec_size is either
+      __arrayStrude or __valueSize as described above.
+
+    */
+  #define __getIndex2D(dim0, dim1, row, col) (__getIndex1D((dim0), (col) * (dim1)  + (row)))
   /*! \brief Row-major indexing macro for global arrays
 
       The array is shaped as (nprob, dim0), while the index arguements correspond to:
@@ -118,6 +125,14 @@
     #define __getIndex1D(dim0, idx) (get_group_id(0) + (idx) * get_num_groups(0))
   #endif
 
+  /*! \brief Column-major indexing macro for 2D working buffer arrays
+
+      The array is shaped as (get_num_groups(0), dim0, dim1, vec_size), where vec_size is either
+      __arrayStrude or __valueSize as described above.
+
+    */
+  #define __getIndex2D(dim0, dim1, row, col) (__getIndex1D((dim1), (row) * (dim0)  + (col)))
+
   /*! \brief Column-major indexing macro for global arrays
 
       The array is shaped as (nprob, dim0), while the index arguements correspond to:
@@ -129,6 +144,9 @@
 #else
 #pragma error "Order " STRINGIFY(__order) " not recognized"
 #endif
+
+//! \brief unused parameter macro
+#define UNUSED(x) (void)(x)
 
 // ensure we have the number of equations and
 

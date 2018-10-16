@@ -49,7 +49,8 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         string_t order() except+
 
     cdef cppclass IVP:
-        IVP(const vector[string_t]&, size_t, const vector[string_t]&) except +
+        IVP(const vector[string_t]&, size_t, size_t,
+            const vector[string_t]&) except +
 
     cdef cppclass SolverOptions:
         SolverOptions(size_t, size_t, double, double,
@@ -246,8 +247,10 @@ cdef class PyIVP:
     cdef vector[string_t] source
     cdef vector[string_t] includes
     cdef int mem
+    cdef int imem
 
-    def __cinit__(self, kernel_source, int required_memory, includes):
+    def __cinit__(self, kernel_source, int required_memory,
+                  int required_int_memory=0, include_paths=[]):
         """
         Create an IVP implementation object, from:
 
@@ -256,20 +259,27 @@ cdef class PyIVP:
         kernel_source: iterable of str
             The paths to the kernel source files to use
         required_memory: int
-            The amount of memory (measured in double-precision floating-point values)
+            The amount of double-precision floating-point memory (in bytes)
             required per-IVP.  Note: this should _not_ include any vectorization
             considerations.
+        required_int_memory: int
+            The amount of integer memory (measured in bytes)
+            required per-IVP.  Note: this should _not_ include any vectorization
+            considerations.
+        include_paths: iterable of str
+            The necessary include paths for this kernel
         """
 
         for x in kernel_source:
             assert isinstance(x, basestring), "Kernel path ({}) not string!".format(
                 x)
             self.source.push_back(_bytes(x))
-        for x in includes:
+        for x in include_paths:
             assert isinstance(x, basestring), "Include path ({}) not string!".format(
                 x)
             self.includes.push_back(_bytes(x))
 
         self.mem = required_memory
+        self.imem = required_int_memory
 
-        self.ivp.reset(new IVP(self.source, self.mem, self.includes))
+        self.ivp.reset(new IVP(self.source, self.mem, self.imem, self.includes))

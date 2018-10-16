@@ -170,6 +170,7 @@ driver (__global const double * __restrict__ param,
         __global double * __restrict__ phi,
         __global const solver_type * __restrict__ solver,
         __global __ValueType * __restrict__ rwk,
+        __global __IntType* __restrict__ iwk,
         __global counter_type * __restrict__ counters,
         const int numProblems)
 {
@@ -201,7 +202,7 @@ driver (__global const double * __restrict__ param,
         #endif
 
         __IntType err = solver_function(
-                solver, t_start, tf, 0, &my_counters, rwk, rwk, my_param,
+                solver, t_start, tf, 0, &my_counters, rwk, rwk, iwk, my_param,
                 driver_offset);
 
         #if __ValueSize > 1
@@ -248,6 +249,7 @@ driver_queue (__global const double * __restrict__ param,
               __global double * __restrict__ phi,
               __global const solver_type * __restrict__ solver,
               __global __ValueType * __restrict__ rwk,
+              __global __IntType* __restrict__ iwk,
               __global counter_type * __restrict__ counters,
               const int numProblems,
               volatile __global int *problemCounter)
@@ -293,7 +295,7 @@ driver_queue (__global const double * __restrict__ param,
 
         // determine maximum / minumum time steps for this set of problems
         __IntType err = solver_function(
-                solver, t_start, tf, 0, &my_counters, rwk, rwk, my_param,
+                solver, t_start, tf, 0, &my_counters, rwk, rwk, iwk, my_param,
                 driver_offset);
 
         #if __ValueSize > 1

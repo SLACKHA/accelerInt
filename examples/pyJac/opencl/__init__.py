@@ -102,12 +102,12 @@ def run(pycel, num, num_threads, itype, tf, options, reuse, plt):
     # can find our kernel files
     ivp = pycel.PyIVP([os.path.join(src_path, 'species_rates.ocl'),
                        os.path.join(src_path, 'chem_utils.ocl'),
-                       os.path.join(src_path, 'dydt.cl')], rwk_size, [
-                       src_path])
+                       os.path.join(src_path, 'dydt.cl')],
+                      rwk_size,
+                      include_paths=[src_path])
 
     # create the integrator
-    integrator = pycel.PyIntegrator(itype, neq,
-                                    num_threads, ivp, options)
+    integrator = pycel.PyIntegrator(itype, neq, num_threads, ivp, options)
 
     # and integrate
     phi_c = phi.flatten(options.order())
