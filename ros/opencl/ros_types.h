@@ -18,10 +18,6 @@ typedef struct
 
    double adaption_limit;
 
-   double h_min, h_max;
-   double t_round;
-   double t_stop;
-
    int numStages;
    int ELO;
    double A[ros_maxStages*(ros_maxStages-1)/2];

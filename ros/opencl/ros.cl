@@ -20,8 +20,41 @@
 // \brief Indexing macro for neq sized arrays in ROS solvers
 #define __getIndex(idx) (__getIndex1D(neq, idx))
 #define __getIndexJac(row, col) (__getIndex2D(neq, neq, row, col))
-// ktmp is shaped (nstates, neq)
+#ifdef __order == 'C'
+// ktmp is shaped (nstages, neq)
 #define __getIndexKtmp(ns, row, col) (__getIndex2D(ns, neq, row, col))
+#else
+// ktmp is shaped (nstages, neq)
+#define __getIndexKtmp(ns, row, col) (__getIndex2D(ns, neq, row, col))
+#endif
+
+/*
+#define print(prefix, size, arr) \
+{ \
+    printf("%s={", prefix); \
+    for (int i = 0; i < size; ++i) \
+    { \
+        if (i) printf(", "); \
+        printf("%e", arr[i]); \
+    } \
+    printf("}\n"); \
+}
+
+#define printi(prefix, size, arr) \
+{ \
+    printf("%s={", prefix); \
+    for (int i = 0; i < size; ++i) \
+    { \
+        if (i) printf(", "); \
+        printf("%d", arr[i]); \
+    } \
+    printf("}\n"); \
+}
+
+#define printv(prefix, val) \
+{ \
+    printf("%s={%e}\n", prefix, val); \
+}*/
 
 // ROS internal routines ...
 inline __ValueType ros_getewt(__global const ros_t * __restrict__ ros, const int k, __global const __ValueType * __restrict__  y)
@@ -46,7 +79,7 @@ inline void ros_dcopy1(const __global __ValueType * __restrict__ src, __global _
                        const int dst_col, const int dest_stride)
 {
     for (int k = 0; k < neq; ++k)
-        dst[__getIndexKtmp(dest_stride, k, dst_col)] = src[__getIndex(k)];
+        dst[__getIndexKtmp(dest_stride, dst_col, k)] = src[__getIndex(k)];
 }
 /*inline void dcopy_if (const int len, const MaskType &mask, const __global __ValueType src[], __global __ValueType dst[])
 {
@@ -61,17 +94,17 @@ inline void ros_daxpy1(const double alpha, const __global __ValueType * __restri
     if (alpha == 1.0)
     {
         for (int k = 0; k < neq; ++k)
-            y[__getIndex(k)] += x[__getIndexKtmp(x_stride, k, x_col)];
+            y[__getIndex(k)] += x[__getIndexKtmp(x_stride, x_col, k)];
     }
     else if (alpha == -1.0)
     {
         for (int k = 0; k < neq; ++k)
-            y[__getIndex(k)] -= x[__getIndexKtmp(x_stride, k, x_col)];
+            y[__getIndex(k)] -= x[__getIndexKtmp(x_stride, x_col, k)];
     }
     else if (alpha != 0.0)
     {
         for (int k = 0; k < neq; ++k)
-            y[__getIndex(k)] += alpha * x[__getIndexKtmp(x_stride, k, x_col)];
+            y[__getIndex(k)] += alpha * x[__getIndexKtmp(x_stride, x_col, k)];
     }
 }
 inline void ros_daxpy(const __ValueType alpha, const __global __ValueType * __restrict__ x, __global __ValueType * __restrict__ y,
@@ -79,7 +112,7 @@ inline void ros_daxpy(const __ValueType alpha, const __global __ValueType * __re
 {
      // Alpha is vector type ... tedious to switch.
      for (int k = 0; k < neq; ++k)
-            y[__getIndexKtmp(stride, k, y_col)] += alpha * x[__getIndexKtmp(stride, k, x_col)];
+            y[__getIndexKtmp(stride, y_col, k)] += alpha * x[__getIndexKtmp(stride, x_col, k)];
 }
 
 __IntType ros_ludec (__global __ValueType * __restrict__ A, __global __IntType * __restrict__ ipiv)
@@ -138,6 +171,8 @@ __IntType ros_ludec (__global __ValueType * __restrict__ A, __global __IntType *
 
         } // End scalar section
 
+        //print("A-pivoted", 4, A);
+
         ipiv[__getIndex(k)] = __vload(0, all_pivk);
 
         /* Scale the elements below the diagonal in
@@ -149,6 +184,8 @@ __IntType ros_ludec (__global __ValueType * __restrict__ A, __global __IntType *
         const __ValueType mult = 1.0 / A[__getIndexJac(k, k)];
         for (int i = k+1; i < neq; ++i)
             A[__getIndexJac(i, k)] *= mult;
+
+        //print("A-scaled", 4, A);
 
         /* row_i = row_i - [a(i,k)/a(k,k)] row_k, i=k+1, ..., m-1 */
         /* row k is the pivot row after swapping with row l.      */
@@ -166,6 +203,8 @@ __IntType ros_ludec (__global __ValueType * __restrict__ A, __global __IntType *
             }
             //}
         }
+
+        //print("A-backsub'd", 4, A);
     }
 
     return ierr;
@@ -192,8 +231,8 @@ void ros_lusol(__global __ValueType * __restrict__ A, __global __IntType * __res
                     double bk, bp;
                     //const double bk = __read_from(b[__getIndex(k)], el);
                     //const double bp = __read_from(b[__getIndex(pivk)], el);
-                    __read_from(b[__getIndexKtmp(b_stride, k, b_col)], el, bk);
-                    __read_from(b[__getIndexKtmp(b_stride, k, b_col)], el, bp);
+                    __read_from(b[__getIndexKtmp(b_stride, b_col, k)], el, bk);
+                    __read_from(b[__getIndexKtmp(b_stride, b_col, k)], el, bp);
                     __write_to( bp, el, b[__getIndex(k)]);
                     __write_to( bk, el, b[__getIndex(pivk)]);
                 }
@@ -204,19 +243,19 @@ void ros_lusol(__global __ValueType * __restrict__ A, __global __IntType * __res
     /* Solve Ly = b, store solution y in b */
     for (int k = 0; k < neq-1; ++k)
     {
-        const __ValueType bk = b[__getIndex(k)];
+        const __ValueType bk = b[__getIndexKtmp(b_stride, b_col, k)];
         for (int i = k+1; i < neq; ++i)
-            b[__getIndex(i)] -= A[__getIndexJac(i, k)] * bk;
+            b[__getIndexKtmp(b_stride, b_col, i)] -= A[__getIndexJac(i, k)] * bk;
     }
     /* Solve Ux = y, store solution x in b */
     for (int k = neq-1; k > 0; --k)
     {
-        b[__getIndex(k)] /= A[__getIndexJac(k, k)];
-        const __ValueType bk = b[__getIndex(k)];
+        b[__getIndexKtmp(b_stride, b_col, k)] /= A[__getIndexJac(k, k)];
+        const __ValueType bk = b[__getIndexKtmp(b_stride, b_col, k)];
         for (int i = 0; i < k; ++i)
-                b[__getIndex(i)] -= A[__getIndexJac(i, k)] * bk;
+            b[__getIndexKtmp(b_stride, b_col, i)] -= A[__getIndexJac(i, k)] * bk;
     }
-    b[__getIndex(0)] /= A[__getIndex(0)];
+    b[__getIndexKtmp(b_stride, b_col, 0)] /= A[__getIndexJac(0, 0)];
 }
 
 /*
@@ -251,7 +290,6 @@ void ros_fdjac(__global const ros_t *ros, const __ValueType tcur, const __ValueT
     }
 }*/
 
-
 __IntType ros_solve (__global const ros_t * __restrict__ ros,
                      __private __ValueType const t_start,
                      __private __ValueType const t_end,
@@ -265,6 +303,9 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 {
     __IntType ierr = OCL_SUCCESS;
     __ValueType t = t_start;
+    #define t_round ((t_end - t_start) * DBL_EPSILON)
+    #define h_min (t_round * 100)
+    #define h_max ((t_end - t_start) / ros->min_iters)
     #define nst (counters->nsteps)
     #define nfe (counters->nfe)
     #define nje (counters->nje)
@@ -274,10 +315,13 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
     #define A(_i,_j) (ros->A[ (((_i)-1)*(_i))/2 + (_j) ] )
     #define C(_i,_j) (ros->C[ (((_i)-1)*(_i))/2 + (_j) ] )
 
+    //printv("t", t);
+    //print("y0", 2, y);
+
         //printf("h = %e %e %e %f\n", h, ros->h_min, ros->h_max, y[__getIndex(neq-1)]);
     // Estimate the initial step size ...
     {
-        __MaskType test = isless(h, ros->h_min);
+        __MaskType test = isless(h, h_min);
         if (__any(test))
         {
             ierr = get_hin(ros, t, t_end,
@@ -286,6 +330,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             //if (ierr != RK_SUCCESS)
             //   return ierr;
         }
+        //printv("h", hcur);
         #if 0
         #if (__ValueSize == 1)
                     printf("hin = %e %e %e\n", h, ros->h_min, ros->h_max);
@@ -312,8 +357,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
     __global __ValueType *yerr = ynew;
     //__global double *ewt  = &Jy[neq*neq];
 
-    __MaskType done = isless( fabs(t - ros->t_stop), ros->t_round);
-    //while (fabs(t - ros->t_stop) > ros->t_round)
+    __MaskType done = isless( fabs(t - t_end), t_round);
     while (__any(__not(done)))
     {
         // Set the error weight array.
@@ -321,11 +365,14 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 
         // Compute the RHS and Jacobian matrix.
         dydt(t, user_data, y, fy, rwk_jac);
+        //print("y", 2, y);
+        //print("dy", 2, fy);
         //nfe++;
 
         //if (jac == NULL)
         {
             jacobian(t, user_data, y, Jy, rwk_jac);
+            //print("J", 4, Jy);
          //nfe += neq;
         }
         //else
@@ -348,16 +395,23 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             }
         }
 
+        //print("Jiter", 4, Jy);
+
         // Factorization J'
         ros_ludec(Jy, iwk);
+
+        //print("Jlu", 4, Jy);
+        //printi("ipiv", 2, iwk);
         //nlu++;
 
         for (int s = 0; s < ros->numStages; s++)
         {
+            //printf("stage: %d\n", s);
             // Compute the function at this stage ...
             if (s > 0 && ros->newFunc[s])
             {
                 ros_dcopy(y, ynew);
+                //print("ynew", 2, ynew);
 
                 for (int j = 0; j < s; ++j)
                 {
@@ -366,19 +420,20 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
                     {
                         //printf("Asj = %f %d %d\n", Asj, s, j);
                         ros_daxpy1(Asj, ktmp, ynew, j, ros->numStages);
+                        //print("ynew-iter", 2, ynew);
                     }
                 }
 
-                dydt(t, user_data, y, fy, rwk);
+                dydt(t, user_data, ynew, fy, rwk);
+                //print("y-eval", 2, ynew);
                 //nfe++;
             }
 
-            //printf("stage=%d\n", s);
-            //for (int k = 0; k < neq; ++k)
-            //   printf("fy[%d] = %e\n", k, fy[k]);
-
             // Build the sub-space vector K
+            //print("fy", neq, fy);
+            //print("ktmp-precopy", ros->numStages * neq, ktmp);
             ros_dcopy1(fy, ktmp, s, ros->numStages);
+            //print("ktmp", ros->numStages * neq, ktmp);
 
             for (int j = 0; j < s; j++)
             {
@@ -391,16 +446,12 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
                 }
             }
 
-            //printf("k before=%d\n", s);
-            //for (int k = 0; k < neq; ++k)
-            //   printf("k[%d] = %e\n", k, ks[k]);
+            //print("ktmp-Cupdate", ros->numStages * neq, ktmp);
 
             // Solve the current stage ..
             ros_lusol (Jy, iwk, ktmp, s, ros->numStages);
 
-             //printf("k after=%d\n", s);
-             //for (int k = 0; k < neq; ++k)
-             //   printf("k[%d] = %e\n", k, ks[k]);
+            //print("ktmp-lusol", ros->numStages * neq, ktmp);
         }
 
         // Compute the error estimation of the trial solution
@@ -413,13 +464,15 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
                 ros_daxpy1(ros->E[j], ktmp, yerr, j, ros->numStages);
             }
         }
+        //print("yerr", 2, yerr);
 
         __ValueType herr = fmax(1.0e-20, get_wnorm(ros, yerr, y));
+        //printv("herr", herr);
 
         // Is there error acceptable?
         //int accept = (herr <= 1.0) || (h <= ros->h_min);
         __MaskType accept = islessequal(herr, 1.0);
-        accept |= islessequal(h, ros->h_min);
+        accept |= islessequal(h, h_min);
         accept &= __not(done);
 
         if (__any(accept))
@@ -429,20 +482,25 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             t   = __select (t,   t + h  , accept);
             nst = __select (nst, nst + 1, accept);
 
-            done = isless( fabs(t - ros->t_stop), ros->t_round);
+            done = isless( fabs(t - t_end), t_round);
 
             // Need to actually compute the new solution since it was delayed from above.
             ros_dcopy(y, ynew);
+            //print("ynew", 2, ynew)
             for (int j = 0; j < ros->numStages; ++j)
             {
+                //printf("iter-stage:%d\n", j);
                 //if (ros->M[j] != 0.0)
                 {
                     ros_daxpy1 (ros->M[j], ktmp, ynew, j, ros->numStages);
                 }
+                //print("ynew-iter", 2, ynew)
             }
 
             for (int k = 0; k < neq; k++)
                 y[__getIndex(k)] = __select(y[__getIndex(k)], ynew[__getIndex(k)], accept);
+
+            //print("ynew-final", 2, y)
         }
 
         __ValueType fact = 0.9 * pow( 1.0 / herr, (1.0/ros->ELO));
@@ -452,7 +510,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         fact = fmin(fact,       ros->adaption_limit);
 
         #if 0
-                    //if (iter % 100 == 0)
+            //if (iter % 100 == 0)
                     {
             #if (__ValueSize == 1)
                          printf("iter = %d: accept=%d, done=%d t=%e, fact=%f %f %e\n", iter, accept, done, t, fact, y[neq-1], h);
@@ -466,14 +524,14 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         h = __select(h * fact, h, done);
 
         // Limit based on the upper/lower bounds
-        h = fmin(h, ros->h_max);
-        h = fmax(h, ros->h_min);
+        h = fmin(h, h_max);
+        h = fmax(h, h_min);
 
         // Stretch the final step if we're really close and we didn't just fail ...
-        h = __select(h, ros->t_stop - t, accept & isless(fabs((t + h) - ros->t_stop), ros->h_min));
+        h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
 
         // Don't overshoot the final time ...
-        h = __select(h, ros->t_stop - t, __not(done) & isgreater((t + h),  ros->t_stop));
+        h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
 
         ++iter;
         if (ros->max_iters && iter > ros->max_iters) {

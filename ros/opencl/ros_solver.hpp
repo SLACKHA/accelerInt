@@ -21,12 +21,8 @@ namespace opencl_solvers
         int ros_create (ros_t *ros, const SolverOptions& options)
         {
 
-            ros->max_iters = 0;
-            ros->min_iters = 1;
-
-            //ros->h = 0.;
-            ros->h_max = 0.;
-            ros->h_min = 0.;
+            ros->max_iters = options.maxIters();
+            ros->min_iters = options.minIters();
 
             ros->adaption_limit = 5;
 
