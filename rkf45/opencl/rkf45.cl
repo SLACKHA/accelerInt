@@ -183,7 +183,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
         y_out[__getIndex(k)] = y[__getIndex(k)] + r5; // Local extrapolation
     }
 
-    return CL_SUCCESS;
+    return OCL_SUCCESS;
 
     #undef c20
     #undef c21
@@ -234,7 +234,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     #define iter (counters->niters)
     #define nst (counters->nsteps)
 
-    __IntType ierr = CL_SUCCESS;
+    __IntType ierr = OCL_SUCCESS;
     // Estimate the initial step size ...
     {
         __MaskType test = isless(hcur, h_min);
@@ -298,7 +298,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
 
         ++iter;
         if (rk->max_iters && iter > rk->max_iters) {
-            ierr = TOO_MUCH_WORK;
+            ierr = OCL_TOO_MUCH_WORK;
             //printf("(iter > max_iters)\n");
             break;
         }
