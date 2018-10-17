@@ -60,3 +60,7 @@ compile_commands.json
 
 # ignore the compiled cython files
 pyccelerInt_*.cpp
+
+# ignore pyjac subfolders
+examples/pyJac/opencl/obj/
+examples/pyJac/opencl/src
