@@ -20,11 +20,8 @@
 // \brief Indexing macro for neq sized arrays in ROS solvers
 #define __getIndex(idx) (__getIndex1D(neq, idx))
 #define __getIndexJac(row, col) (__getIndex2D(neq, neq, row, col))
-// ktmp is shaped (nstages, neq)
-#define __getIndexKtmp(ns, row, col) (__getIndex2D(ns, neq, row, col))
 
-/*
-#define print(prefix, size, arr) \
+/*#define print(prefix, size, arr) \
 { \
     printf("%s={", prefix); \
     for (int i = 0; i < size; ++i) \
@@ -70,11 +67,10 @@ inline void ros_dcopy(const __global __ValueType * __restrict__ src, __global __
 }
 
 //! \brief copy for ktmp
-inline void ros_dcopy1(const __global __ValueType * __restrict__ src, __global __ValueType * __restrict__ dst,
-                       const int dst_col, const int dest_stride)
+inline void ros_dcopy1(const __global __ValueType * __restrict__ src, __global __ValueType * __restrict__ dst)
 {
     for (int k = 0; k < neq; ++k)
-        dst[__getIndexKtmp(dest_stride, dst_col, k)] = src[__getIndex(k)];
+        dst[__getIndex(k)] = src[__getIndex(k)];
 }
 /*inline void dcopy_if (const int len, const MaskType &mask, const __global __ValueType src[], __global __ValueType dst[])
 {
@@ -82,32 +78,30 @@ inline void ros_dcopy1(const __global __ValueType * __restrict__ src, __global _
             dst[k] = if_then_else (mask, src[k], dst[k]);
 }*/
 
-inline void ros_daxpy1(const double alpha, const __global __ValueType * __restrict__ x, __global __ValueType * __restrict__ y,
-                       const int x_col, const int x_stride)
+inline void ros_daxpy1(const double alpha, const __global __ValueType * __restrict__ x, __global __ValueType * __restrict__ y)
 {
     // Alpha is scalar type ... and can be easily checked.
     if (alpha == 1.0)
     {
         for (int k = 0; k < neq; ++k)
-            y[__getIndex(k)] += x[__getIndexKtmp(x_stride, x_col, k)];
+            y[__getIndex(k)] += x[__getIndex(k)];
     }
     else if (alpha == -1.0)
     {
         for (int k = 0; k < neq; ++k)
-            y[__getIndex(k)] -= x[__getIndexKtmp(x_stride, x_col, k)];
+            y[__getIndex(k)] -= x[__getIndex(k)];
     }
     else if (alpha != 0.0)
     {
         for (int k = 0; k < neq; ++k)
-            y[__getIndex(k)] += alpha * x[__getIndexKtmp(x_stride, x_col, k)];
+            y[__getIndex(k)] += alpha * x[__getIndex(k)];
     }
 }
-inline void ros_daxpy(const __ValueType alpha, const __global __ValueType * __restrict__ x, __global __ValueType * __restrict__ y,
-                      const int x_col, const int y_col, const int stride)
+inline void ros_daxpy(const __ValueType alpha, const __global __ValueType * __restrict__ x, __global __ValueType * __restrict__ y)
 {
-     // Alpha is vector type ... tedious to switch.
-     for (int k = 0; k < neq; ++k)
-            y[__getIndexKtmp(stride, y_col, k)] += alpha * x[__getIndexKtmp(stride, x_col, k)];
+    // Alpha is vector type ... tedious to switch.
+    for (int k = 0; k < neq; ++k)
+        y[__getIndex(k)] += alpha * x[__getIndex(k)];
 }
 
 __IntType ros_ludec (__global __ValueType * __restrict__ A, __global __IntType * __restrict__ ipiv)
@@ -206,7 +200,7 @@ __IntType ros_ludec (__global __ValueType * __restrict__ A, __global __IntType *
 }
 
 void ros_lusol(__global __ValueType * __restrict__ A, __global __IntType * __restrict__ ipiv,
-               __global __ValueType * __restrict__ b, const int b_col, const int b_stride)
+               __global __ValueType * __restrict__ b)
 {
     /* Permute b, based on pivot information in p */
     for (int k = 0; k < neq; ++k)
@@ -226,8 +220,8 @@ void ros_lusol(__global __ValueType * __restrict__ A, __global __IntType * __res
                     double bk, bp;
                     //const double bk = __read_from(b[__getIndex(k)], el);
                     //const double bp = __read_from(b[__getIndex(pivk)], el);
-                    __read_from(b[__getIndexKtmp(b_stride, b_col, k)], el, bk);
-                    __read_from(b[__getIndexKtmp(b_stride, b_col, k)], el, bp);
+                    __read_from(b[__getIndex(k)], el, bk);
+                    __read_from(b[__getIndex(pivk)], el, bp);
                     __write_to( bp, el, b[__getIndex(k)]);
                     __write_to( bk, el, b[__getIndex(pivk)]);
                 }
@@ -238,19 +232,19 @@ void ros_lusol(__global __ValueType * __restrict__ A, __global __IntType * __res
     /* Solve Ly = b, store solution y in b */
     for (int k = 0; k < neq-1; ++k)
     {
-        const __ValueType bk = b[__getIndexKtmp(b_stride, b_col, k)];
+        const __ValueType bk = b[__getIndex(k)];
         for (int i = k+1; i < neq; ++i)
-            b[__getIndexKtmp(b_stride, b_col, i)] -= A[__getIndexJac(i, k)] * bk;
+            b[__getIndex(i)] -= A[__getIndexJac(i, k)] * bk;
     }
     /* Solve Ux = y, store solution x in b */
     for (int k = neq-1; k > 0; --k)
     {
-        b[__getIndexKtmp(b_stride, b_col, k)] /= A[__getIndexJac(k, k)];
-        const __ValueType bk = b[__getIndexKtmp(b_stride, b_col, k)];
+        b[__getIndex(k)] /= A[__getIndexJac(k, k)];
+        const __ValueType bk = b[__getIndex(k)];
         for (int i = 0; i < k; ++i)
-            b[__getIndexKtmp(b_stride, b_col, i)] -= A[__getIndexJac(i, k)] * bk;
+            b[__getIndex(i)] -= A[__getIndexJac(i, k)] * bk;
     }
-    b[__getIndexKtmp(b_stride, b_col, 0)] /= A[__getIndexJac(0, 0)];
+    b[__getIndex(0)] /= A[__getIndexJac(0, 0)];
 }
 
 /*
@@ -347,6 +341,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
     __global __ValueType *fy   = rwk + __getOffset1D(driver_offset);
     __global __ValueType *ynew = rwk + __getOffset1D(driver_offset + neq);
     __global __ValueType *Jy   = rwk + __getOffset1D(driver_offset + 2 * neq);
+    // ktmp is ros->numStages number of separate vectors each sized neq
     __global __ValueType *ktmp = rwk + __getOffset1D(driver_offset + 3 * neq + neq*neq);
     __global __ValueType *rwk_jac = rwk + __getOffset1D(rwk_lensol);
     __global __ValueType *yerr = ynew;
@@ -362,6 +357,8 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         dydt(t, user_data, y, fy, rwk_jac);
         //print("y", 2, y);
         //print("dy", 2, fy);
+        //printv("t_iter", t);
+        //printv("h_iter", hcur);
         //nfe++;
 
         //if (jac == NULL)
@@ -414,7 +411,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
                     //if (Asj != 0.0)
                     {
                         //printf("Asj = %f %d %d\n", Asj, s, j);
-                        ros_daxpy1(Asj, ktmp, ynew, j, ros->numStages);
+                        ros_daxpy1(Asj, ktmp + __getOffset1D(j * neq), ynew);
                         //print("ynew-iter", 2, ynew);
                     }
                 }
@@ -427,7 +424,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             // Build the sub-space vector K
             //print("fy", neq, fy);
             //print("ktmp-precopy", ros->numStages * neq, ktmp);
-            ros_dcopy1(fy, ktmp, s, ros->numStages);
+            ros_dcopy1(fy, ktmp + __getOffset1D(s * neq));
             //print("ktmp", ros->numStages * neq, ktmp);
 
             for (int j = 0; j < s; j++)
@@ -437,14 +434,14 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
                     const __ValueType hCsj = C(s,j) / h;
                     //printf("C/h = %f %d %d\n", hCsj, s, j);
 
-                    ros_daxpy(hCsj, ktmp, ktmp, j, s, ros->numStages);
+                    ros_daxpy(hCsj, ktmp + __getOffset1D(j * neq), ktmp + __getOffset1D(s * neq));
                 }
             }
 
             //print("ktmp-Cupdate", ros->numStages * neq, ktmp);
 
             // Solve the current stage ..
-            ros_lusol (Jy, iwk, ktmp, s, ros->numStages);
+            ros_lusol (Jy, iwk, ktmp + __getOffset1D(s * neq));
 
             //print("ktmp-lusol", ros->numStages * neq, ktmp);
         }
@@ -456,7 +453,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         {
             //if (ros->E[j] != 0.0)
             {
-                ros_daxpy1(ros->E[j], ktmp, yerr, j, ros->numStages);
+                ros_daxpy1(ros->E[j], ktmp + __getOffset1D(j * neq), yerr);
             }
         }
         //print("yerr", 2, yerr);
@@ -487,7 +484,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
                 //printf("iter-stage:%d\n", j);
                 //if (ros->M[j] != 0.0)
                 {
-                    ros_daxpy1 (ros->M[j], ktmp, ynew, j, ros->numStages);
+                    ros_daxpy1 (ros->M[j], ktmp + __getOffset1D(j * neq), ynew);
                 }
                 //print("ynew-iter", 2, ynew)
             }
