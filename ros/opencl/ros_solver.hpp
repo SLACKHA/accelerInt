@@ -42,8 +42,11 @@ namespace opencl_solvers
         std::size_t requiredSolverMemorySize()
         {
             // 2 working buffers for Rosenbrock solvers + Jacobian + ktmp (nstate, neq)
-            return IntegratorBase::requiredSolverMemorySize() + (
-                2 * _neq + _neq*_neq + _neq * ros_vals.numStages) * sizeof(double);
+            std::size_t mem = IntegratorBase::requiredSolverMemorySize();
+            long our_mem = (2 * _neq + _neq*_neq + _neq * ros_vals.numStages) * sizeof(double);
+            our_mem -= reusableSolverMemorySize();
+            our_mem = std::max(our_mem , 0L);
+            return mem + our_mem;
         }
 
         /**

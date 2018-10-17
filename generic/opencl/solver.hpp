@@ -1205,8 +1205,22 @@ namespace opencl_solvers {
          */
         virtual std::size_t requiredSolverMemorySize()
         {
-            // 1 for the parameter, and a single working vector
-            return (1 + _neq) * sizeof(double);
+            // 1 for the parameter, and four working vectors
+            //      1. local copy of state vector
+            //      2. ydot  for get_hin
+            //      3. y1    for get_hin
+            //      4. ydot1 for get_hin
+            return (1 + 4 * _neq) * sizeof(double);
+        }
+
+        /**
+         * \brief Return the amount of the requiredSolverMemory that may be safely
+         *        reused by the solver
+         */
+        std::size_t reusableSolverMemorySize()
+        {
+            // the three working vectors for get_hin
+            return (3 * _neq) * sizeof(double);
         }
 
         /**

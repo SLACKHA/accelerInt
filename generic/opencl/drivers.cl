@@ -67,8 +67,8 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
     }
 
     __global __ValueType * __restrict__ ydot  = rwk + __getOffset1D(offset);
-    __global __ValueType * __restrict__ y1    = ydot + __getOffset1D(offset + neq);
-    __global __ValueType * __restrict__ ydot1 = y1 + __getOffset1D(offset + neq);
+    __global __ValueType * __restrict__ y1    = rwk + __getOffset1D(offset + neq);
+    __global __ValueType * __restrict__ ydot1 = rwk + __getOffset1D(offset + 2*neq);
     // the portion of the rwk vector that's allocated for the source rate evaluation
     __global __ValueType* rwk_dydt = rwk + __getOffset1D(rwk_lensol);
 

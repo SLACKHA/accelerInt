@@ -339,10 +339,15 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 
     // Set the work arrays ...
     __global __ValueType *fy   = rwk + __getOffset1D(driver_offset);
-    __global __ValueType *ynew = rwk + __getOffset1D(driver_offset + neq);
-    __global __ValueType *Jy   = rwk + __getOffset1D(driver_offset + 2 * neq);
+    __global __ValueType *ynew = fy + __getOffset1D(neq);
     // ktmp is ros->numStages number of separate vectors each sized neq
-    __global __ValueType *ktmp = rwk + __getOffset1D(driver_offset + 3 * neq + neq*neq);
+    __global __ValueType *ktmp = ynew + __getOffset1D(neq);
+    // \note IMPORTANT, Jy must be _after_ ktmp -- the reason is that `get_hin` reserves
+    //       three neq-sized vectors.  If Jy was before ktmp, the ranges of the `get_hin`
+    //       vectors and Jy would overlap, and we would end up with write-races between
+    //       the various threads.  It may be safer to just use the additional memory such
+    //       that we don't forget this in the future.
+    __global __ValueType *Jy   = ktmp + __getOffset1D(ros->numStages * neq);
     __global __ValueType *rwk_jac = rwk + __getOffset1D(rwk_lensol);
     __global __ValueType *yerr = ynew;
     //__global double *ewt  = &Jy[neq*neq];
