@@ -91,7 +91,7 @@
       __arrayStride or __valueSize as described above.
 
     */
-  #define __getIndex2D(dim0, dim1, row, col) (__getIndex1D((dim0), (row) * (dim1)  + (col)))
+  #define __getIndex2D(dim0, dim1, row, col) (__getIndex1D((dim0*dim1), (row) * (dim1)  + (col)))
   /*! \brief Row-major indexing macro for global arrays
 
       The array is shaped as (nprob, dim0), while the index arguements correspond to:
@@ -131,7 +131,7 @@
       __arrayStride or __valueSize as described above.
 
     */
-  #define __getIndex2D(dim0, dim1, row, col) (__getIndex1D((dim1), (col) * (dim0)  + (row)))
+  #define __getIndex2D(dim0, dim1, row, col) (__getIndex1D((dim0*dim1), (col) * (dim0)  + (row)))
 
   /*! \brief Column-major indexing macro for global arrays
 
