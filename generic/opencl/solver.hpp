@@ -1203,7 +1203,7 @@ namespace opencl_solvers {
         /**
          * \brief Return the size of double precision working memory in bytes (per-IVP)
          */
-        virtual std::size_t requiredSolverMemorySize()
+        virtual std::size_t requiredSolverMemorySize() const
         {
             // 1 for the parameter, and four working vectors
             //      1. local copy of state vector
@@ -1217,7 +1217,7 @@ namespace opencl_solvers {
          * \brief Return the amount of the requiredSolverMemory that may be safely
          *        reused by the solver
          */
-        std::size_t reusableSolverMemorySize()
+        std::size_t reusableSolverMemorySize() const
         {
             // the three working vectors for get_hin
             return (3 * _neq) * sizeof(double);
@@ -1226,7 +1226,7 @@ namespace opencl_solvers {
         /**
          * \brief Return the size of integer working memory in bytes (per-IVP)
          */
-        virtual std::size_t requiredSolverIntegerMemorySize()
+        virtual std::size_t requiredSolverIntegerMemorySize() const
         {
             return 0;
         }

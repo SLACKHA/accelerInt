@@ -39,7 +39,7 @@ namespace opencl_solvers
         }
 
         //! \brief The requird size, in bytes of the RKF45 solver (per-IVP)
-        std::size_t requiredSolverMemorySize()
+        std::size_t requiredSolverMemorySize() const
         {
             // 2 working buffers for Rosenbrock solvers + Jacobian + ktmp (nstate, neq)
             std::size_t mem = IntegratorBase::requiredSolverMemorySize();
@@ -54,7 +54,7 @@ namespace opencl_solvers
          */
         std::size_t requiredSolverIntegerMemorySize() const
         {
-            return _neq * sizeof(int);
+            return IntegratorBase::requiredSolverIntegerMemorySize() + _neq * sizeof(int);
         }
 
         //! \brief return the list of files for this solver

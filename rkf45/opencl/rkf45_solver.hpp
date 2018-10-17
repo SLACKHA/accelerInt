@@ -43,7 +43,7 @@ protected:
         }
 
         //! \brief The requird size, in bytes of the RKF45 solver (per-IVP)
-        std::size_t requiredSolverMemorySize()
+        std::size_t requiredSolverMemorySize() const
         {
             // 8 working vectors solely for rkf45
             return IntegratorBase::requiredSolverMemorySize() + (9 * _neq) * sizeof(double);
