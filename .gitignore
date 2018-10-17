@@ -57,3 +57,6 @@ SConscript
 
 # ignore command compile for linting
 compile_commands.json
+
+# ignore the compiled cython files
+pyccelerInt_*.cpp
