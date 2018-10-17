@@ -21,9 +21,9 @@
  *  @see solver_generic.c
  *
  */
-void jacobian (__private __ValueType const t, __global __ValueType const * __restrict__ mu,
-               __global __ValueType const * __restrict__ y, __global __ValueType * __restrict__ jac,
-               __global __ValueType* __restrict__ rwk)
+void jacob (__private __ValueType const t, __global __ValueType const * __restrict__ mu,
+            __global __ValueType const * __restrict__ y, __global __ValueType * __restrict__ jac,
+            __global __ValueType* __restrict__ rwk)
 {
     //! \note To get the value at index [i, j] of the Jacobian,
     //! we multiply `j` by NSP, the size of the first dimension of Jacobian

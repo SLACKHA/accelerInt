@@ -24,22 +24,27 @@ def run(pycel, num, num_threads, itype, tf, options, reuse, plt):
 
     src_path = os.path.join(path, 'src')
     obj_path = os.path.join(path, 'obj')
+    ktype = KernelType.species_rates if itype == pycel.IntegratorType.RKF45 else \
+        KernelType.jacobian
     if not reuse:
         create_jacobian('opencl',
                         mech_name=os.path.join(path, os.path.pardir, 'h2.cti'),
                         width=width, build_path=src_path, last_spec=None,
-                        kernel_type=KernelType.species_rates,
+                        kernel_type=ktype,
                         platform=options.platform(),
                         data_order=options.order(),
                         explicit_simd=not options.block_size() and width)
         # and compile to get the kernel object
         pywrap('opencl', src_path, obj_path, path, obj_path,
-               options.platform(), ktype=KernelType.species_rates)
+               options.platform(), ktype=ktype)
 
     # create initial state
     import pyjac_ocl as pyjac
     # create a kernel
-    knl = pyjac.PySpecies_RatesKernel(num, num_threads)
+    if ktype == KernelType.species_rates:
+        knl = pyjac.PySpecies_RatesKernel(num, num_threads)
+    else:
+        knl = pyjac.PyJacobianKernel(num, num_threads)
 
     # equations are T, V, N_{0}... N_{nsp-1}
     neq = knl.num_species() + 1
@@ -91,18 +96,37 @@ def run(pycel, num, num_threads, itype, tf, options, reuse, plt):
                        __global __ValueType const * __restrict__ param,
                        __global __ValueType const * __restrict__ y,
                        __global __ValueType * __restrict__ dy,
-                       __global __ValueType* __restrict__ rwk)
+                       __global __ValueType * __restrict__ rwk)
            {
               species_rates(0, param, y, dy, rwk);
            }
            """)
+    with open(os.path.join(src_path, 'jac.cl'), 'w') as file:
+        file.write(
+            """
+            #include "jacobian.oclh"
+            void jacob (__private __ValueType const t,
+                        __global __ValueType const * __restrict__ param,
+                        __global __ValueType const * __restrict__ y,
+                        __global __ValueType * __restrict__ jac,
+                        __global __ValueType * __restrict__ rwk)
+           {
+              jacobian(0, param, y, jac, rwk);
+           }
+           """)
+
+    files = [os.path.join(src_path, 'species_rates.ocl'),
+             os.path.join(src_path, 'chem_utils.ocl'),
+             os.path.join(src_path, 'dydt.cl')]
+
+    if ktype == KernelType.jacobian:
+        files += [os.path.join(src_path, 'jac.cl'),
+                  os.path.join(src_path, 'jacobian.ocl')]
 
     # create ivp
     # Note: we need to pass the full paths to the PyIVP such that accelerInt
     # can find our kernel files
-    ivp = pycel.PyIVP([os.path.join(src_path, 'species_rates.ocl'),
-                       os.path.join(src_path, 'chem_utils.ocl'),
-                       os.path.join(src_path, 'dydt.cl')],
+    ivp = pycel.PyIVP(files,
                       rwk_size,
                       include_paths=[src_path])
 
