@@ -6,7 +6,7 @@
 // include the source rate evaluation header
 #include "dydt.h"
 // inclue the jacobian header
-#include "jacobian.h"
+#include "jacob.h"
 // and the struct types
 #include "ros_types.h"
 
@@ -540,13 +540,15 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 
     return ierr;
 
+    #undef t_round
+    #undef h_min
+    #undef h_max
     #undef nst
     #undef nfe
     #undef nje
     #undef nlu
     #undef iter
     #undef h
-    #undef t
     #undef A
     #undef C
 }
