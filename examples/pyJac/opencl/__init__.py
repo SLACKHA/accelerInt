@@ -4,7 +4,7 @@ import sys
 import cantera as ct
 import numpy as np
 from pyjac import __version_info__, create_jacobian
-from pyjac.core.enum_types import KernelType
+from pyjac.core.enum_types import KernelType, JacobianFormat
 from pyjac.pywrap import pywrap
 assert(__version_info__[0] >= 2), 'Only pyJac-V2+ supports OpenCL execution.'
 
@@ -33,6 +33,7 @@ def run(pycel, num, num_threads, itype, tf, options, reuse, plt):
                         kernel_type=ktype,
                         platform=options.platform(),
                         data_order=options.order(),
+                        jac_format=JacobianFormat.full,
                         explicit_simd=not options.block_size() and width)
         # and compile to get the kernel object
         pywrap('opencl', src_path, obj_path, path, obj_path,
