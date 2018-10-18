@@ -368,8 +368,8 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 
         //if (jac == NULL)
         {
-            jacobian(t, user_data, y, Jy, rwk_jac);
             //print("J", 4, Jy);
+            jacob(t, user_data, y, Jy, rwk_jac);
          //nfe += neq;
         }
         //else
@@ -421,8 +421,8 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
                     }
                 }
 
-                dydt(t, user_data, ynew, fy, rwk);
                 //print("y-eval", 2, ynew);
+                dydt(t, user_data, ynew, fy, rwk_jac);
                 //nfe++;
             }
 
