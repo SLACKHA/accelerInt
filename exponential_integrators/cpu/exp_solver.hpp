@@ -76,8 +76,9 @@ namespace c_solvers
          * \brief a shared base-class for the exponential integrators
          */
         ExponentialIntegrator(int neq, int numThreads, int order,
+                              const IVP& ivp,
                               const EXPSolverOptions& options) :
-            Integrator(neq, numThreads, options),
+            Integrator(neq, numThreads, ivp, options),
             poles(options.num_rational_approximants(), 0),
             res(options.num_rational_approximants(), 0),
             STRIDE(options.krylov_subspace_size(neq) + order)

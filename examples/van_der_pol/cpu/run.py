@@ -35,9 +35,10 @@ def run(num, num_threads, itype):
     options = pycel.PySolverOptions(itype, atol=1e-10,
                                     rtol=1e-6, logging=True, h_init=1e-3)
 
+    ivp = pycel.PyIVP(0)
+
     # create the integrator
-    integrator = pycel.PyIntegrator(itype, neq,
-                                    num_threads, options)
+    integrator = pycel.PyIntegrator(itype, neq, num_threads, ivp, options)
 
     # and integrate
     time = integrator.integrate(num, 0., 2000., phi.flatten('F'),

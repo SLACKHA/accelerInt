@@ -27,23 +27,12 @@ namespace opencl_solvers
      * \param[in]       neq                 The number of equations to solve for each IVP
      * \param[in]       numThreads          The number of OpenMP threads to use
      * \param[in]       options             The SolverOptions to use
-     * \param[in]       ivp                 The SolverIVP object describing the initial value problem to solve
+     * \param[in]       ivp                 The IVP object describing the initial value problem to solve
      * \param[out]      solver              The initialized solver
      */
     std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads,
                                          const IVP& ivp,
                                          const SolverOptions& options);
-
-    /**
-     * \brief Initializes the solver
-     * \param[in]       type                The type of solver to use
-     * \param[in]       neq                 The number of equations to solve for each IVP
-     * \param[in]       numThreads          The number of OpenMP threads to use
-     * \param[in]       ivp                 The SolverIVP object describing the initial value problem to solve
-     * \param[out]      solver              The initialized solver
-     */
-    std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads,
-                                         const IVP& ivp);
 
     /**
      * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`

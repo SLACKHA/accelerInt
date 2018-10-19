@@ -44,9 +44,12 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
     cdef cppclass SolverOptions:
         SolverOptions(double, double, bool_t, double) except +
 
+    cdef cppclass IVP:
+        IVP(size_t, bool) except +
+
     cdef unique_ptr[Integrator] init(IntegratorType, int, int,
+                                     const IVP&,
                                      const SolverOptions&) except +
-    cdef unique_ptr[Integrator] init(IntegratorType, int, int) except +
 
     cdef double integrate(Integrator&, const int, const double, const double,
                           const double, double * __restrict__,
@@ -58,16 +61,19 @@ cdef extern from "<utility>" namespace "std" nogil:
 
 cdef class PyIntegrator:
     cdef unique_ptr[Integrator] integrator  # hold our integrator
+    cdef PySolverOptions options # options, if not user specified
     cdef num # number of IVPs
     cdef neq # number of equations
 
     def __cinit__(self, IntegratorType itype, int neq, size_t numThreads,
-                  PySolverOptions options=None):
-        if options is not None:
-            self.integrator = move(init(itype, neq, numThreads,
-                                            deref(options.options.get())))
-        else:
-            self.integrator = move(init(itype, neq, numThreads))
+                  PyIVP ivp, PySolverOptions options=None):
+        if options is None:
+            self.options = PySolverOptions(itype)
+            options = self.options
+
+        self.integrator = move(init(itype, neq, numThreads,
+                                    deref(ivp.ivp.get()),
+                                    deref(options.options.get())))
         self.num = -1
         self.neq = neq
 
@@ -116,3 +122,33 @@ cdef class PySolverOptions:
                                      max_krylov_subspace_dimension))
         else:
             self.options.reset(new SolverOptions(atol, rtol, logging, h_init))
+
+cdef class PyIVP:
+    cdef unique_ptr[IVP] ivp # hold IVP
+
+    def __cinit__(self, size_t required_memory_size,
+                  bool_t pass_entire_working_buffer=False):
+        """
+        Initialize the IVP object
+
+        Parameters
+        ----------
+        required_memory_size: int
+            The size of double-precision working memory (in bytes)
+            required to evaluate the source terms and Jacobian
+
+        pass_entire_working_buffer: bool [False]
+            If True, pass the source term / Jacobian working memory buffer without
+            offset to the user-functions.  If False, pass a pre-offset version --
+            this option closely correponds to using stack-based memory, e.g.:
+
+                const int work_size = 10;
+                dydt()
+                {
+                    double rwk[work_size];
+                    rwk[0] = 0;
+                    ...
+                }
+        """
+
+        self.ivp.reset(new IVP(required_memory_size, pass_entire_working_buffer))

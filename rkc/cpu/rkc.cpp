@@ -256,7 +256,7 @@ namespace c_solvers
             // estimate Jacobian spectral radius
             // only if 25 steps passed
             if ((nstep % 25) == 0) {
-                work[3] = rkc_spec_rad (t, pr, hmax, y_n, F_n, &work[4], temp_arr2);
+                work[3] = rkc_spec_rad (t, pr, hmax, y_n, F_n, &work[4], temp_arr2, rwk);
             }
 
             // first step, estimate step size
@@ -302,7 +302,7 @@ namespace c_solvers
             hmin = TEN * UROUND * std::fmax(std::fabs(t), std::fabs(t + work[2]));
 
             // perform tentative time step
-            rkc_step (t, pr, work[2], y_n, F_n, m, y, y_jm1, y_jm2);
+            rkc_step (t, pr, work[2], y_n, F_n, m, y, y_jm1, y_jm2, rwk);
 
             // calculate F_np1 with tenative y_np1
             dydt (t + work[2], pr, y, temp_arr, rwk);
@@ -323,7 +323,7 @@ namespace c_solvers
                 work[2] = P8 * work[2] / (std::pow(err, ONE3RD));
 
                 // reevaluate spectral radius
-                work[3] = rkc_spec_rad (t, pr, hmax, y_n, F_n, &work[4], temp_arr2);
+                work[3] = rkc_spec_rad (t, pr, hmax, y_n, F_n, &work[4], temp_arr2, rwk);
             } else {
                 // step accepted
                 t += work[2];

@@ -62,27 +62,6 @@ namespace opencl_solvers
     }
 
     /**
-     * \brief Initializes the solver
-     * \param[in]       type                The type of solver to use
-     * \param[in]       neq                 The number of equations to solve for each IVP
-     * \param[in]       numThreads          The number of OpenMP threads to use
-     * \param[in]       ivp                 The SolverIVP object describing the initial value problem to solve
-     * \param[out]      solver              The initialized solver
-     */
-    std::unique_ptr<IntegratorBase> init(IntegratorType type, int neq, int numThreads, const IVP& ivp)
-    {
-        switch(type)
-        {
-            case IntegratorType::RKF45:
-                return init(type, neq, numThreads, ivp, SolverOptions());
-            default:
-                std::ostringstream ss;
-                ss << "Integrator type: " << type << " not implemented for OpenCL!" << std::endl;
-                throw std::invalid_argument(ss.str());
-        }
-    }
-
-    /**
      * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
      *
      * \param[in]           NUM             The number of ODEs to integrate.

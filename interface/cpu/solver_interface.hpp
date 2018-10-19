@@ -25,20 +25,12 @@ namespace c_solvers
      * \param[in]       neq                 The number of equations to solve for each IVP
      * \param[in]       numThreads          The number of OpenMP threads to use
      * \param[in]       options             The SolverOptions to use
+     * \param[in]       ivp                 The IVP object describing the initial value problem to solve
      *
      * \param[out]      solver              The initialized solver
      */
-    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads, const SolverOptions& options);
-
-    /**
-     * \brief Initializes the solver
-     * \param[in]       type                The type of solver to use
-     * \param[in]       neq                 The number of equations to solve for each IVP
-     * \param[in]       numThreads          The number of OpenMP threads to use
-     *
-     * \param[out]      solver              The initialized solver
-     */
-    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads);
+    std::unique_ptr<Integrator> init(IntegratorType type, int neq, int numThreads,
+                                     const IVP& ivp, const SolverOptions& options);
 
 
     /**

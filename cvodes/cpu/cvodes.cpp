@@ -49,7 +49,7 @@ namespace c_solvers {
         CVODEErrorCheck(CVodeReInit(integrators[tid].get(), t_start, fill));
 
         //set user data
-        CVUserData* _user_data = &this->user_data[i];
+        CVUserData* _user_data = &this->user_data[tid];
         _user_data->param = pr;
         _user_data->rwk = this->rwk(tid);
         CVODEErrorCheck(CVodeSetUserData(integrators[tid].get(), (void*)_user_data));

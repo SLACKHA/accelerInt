@@ -35,7 +35,7 @@ namespace c_solvers
     class RK78 {
     private:
         double m_statevar;
-        double* const __restrict__ rwk;
+        double* __restrict__ rwk;
     public:
         RK78() :
             m_statevar(0),
@@ -74,8 +74,8 @@ namespace c_solvers
 
     public:
 
-        RK78Integrator(int neq, int numThreads, const SolverOptions& options) :
-            Integrator(neq, numThreads, options)
+        RK78Integrator(int neq, int numThreads, const IVP& ivp, const SolverOptions& options) :
+            Integrator(neq, numThreads, ivp, options)
         {
             this->reinitialize(numThreads);
         }

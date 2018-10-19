@@ -85,38 +85,42 @@ namespace c_solvers
         /**
          * \brief Function to estimate spectral radius.
          *
-         * \param[in] t     the time.
-         * \param[in] pr    A parameter used for pressure or density to pass to the derivative function.
-         * \param[in] hmax  Max time step size.
-         * \param[in] y     Array of dependent variable.
-         * \param[in] F     Derivative evaluated at current state
-         * \param[in,out] v Array for eigenvectors
-         * \param[out] Fv   Array for derivative evaluations
+         * \param[in]     t    The time.
+         * \param[in]     pr   A parameter used for pressure or density to pass to the derivative function.
+         * \param[in]     hmax Max time step size.
+         * \param[in]     y    Array of dependent variable.
+         * \param[in]     F    Derivative evaluated at current state
+         * \param[in,out] v    Array for eigenvectors
+         * \param[out]    Fv   Array for derivative evaluations
+         * \param[in]     rwk  Working buffer for evaluation of source rates
          */
         double rkc_spec_rad (const double t, const double pr, const double hmax,
                              const double* __restrict__ y, const double* __restrict__ F,
-                             double* __restrict__ v, double* __restrict__ Fv);
+                             double* __restrict__ v, double* __restrict__ Fv,
+                             double* __restrict__ rwk);
 
         /**
          * \brief Function to take a single RKC integration step
          *
-         * \param[in] t    the starting time.
-         * \param[in] pr   A parameter used for pressure or density to pass to the derivative function.
-         * \param[in] h    Time-step size.
-         * \param[in] y_0  Initial conditions.
-         * \param[in] F_0  Derivative function at initial conditions.
-         * \param[in] s    number of steps.
+         * \param[in]  t    the starting time.
+         * \param[in]  pr   A parameter used for pressure or density to pass to the derivative function.
+         * \param[in]  h    Time-step size.
+         * \param[in]  y_0  Initial conditions.
+         * \param[in]  F_0  Derivative function at initial conditions.
+         * \param[in]  s    number of steps.
          * \param[out] y_j  Integrated variables.
+         * \param[in]  rwk  Working buffer for evaluation of source rates
          */
         void rkc_step (const double t, const double pr, const double h,
                        const double* y_0, const double* F_0, const int s,
                        double* __restrict__ y_j, double* __restrict__ y_jm1,
-                       double* __restrict__ y_jm2);
+                       double* __restrict__ y_jm2,
+                       double* __restrict__ rwk);
 
     public:
 
-        RKCIntegrator(int neq, int numThreads, const SolverOptions& options) :
-            Integrator(neq, numThreads, options)
+        RKCIntegrator(int neq, int numThreads, const IVP& ivp, const SolverOptions& options) :
+            Integrator(neq, numThreads, ivp, options)
         {
             _ourMemSize = this->setOffsets();
             this->reinitialize(numThreads);

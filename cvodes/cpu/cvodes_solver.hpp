@@ -111,8 +111,8 @@ namespace c_solvers
 
     public:
 
-        CVODEIntegrator(int neq, int numThreads, const SolverOptions& options) :
-            Integrator(neq, numThreads, options),
+        CVODEIntegrator(int neq, int numThreads, const IVP& ivp, const SolverOptions& options) :
+            Integrator(neq, numThreads, ivp, options),
             user_data(numThreads)
         {
             _ourMemSize = this->setOffsets();

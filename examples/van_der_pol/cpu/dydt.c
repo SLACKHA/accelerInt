@@ -6,12 +6,7 @@
  *
  */
 
-#include "header.h"
-
-#ifdef GENERATE_DOCS
-//put this in the van der Pol namespace for documentation
-namespace van_der_pol {
-#endif
+#include "dydt.h"
 
 /**
  * The `y` and `dy` vectors supplied here are local versions of the global state vectors.
@@ -19,7 +14,8 @@ namespace van_der_pol {
  * Hence the vector accesses can be done in a simple manner below, i.e. y[0] -> \f$y_1\f$, y[1] -> \f$y_2\f$, etc.
  * @see solver_generic.c
  */
-void dydt (const double t, const double mu, const double * __restrict__ y, double * __restrict__ dy) {
+void dydt (const double t, const double mu, const double * __restrict__ y, double * __restrict__ dy,
+           double* __restrict__ rwk) {
 
   // y1' = y2
   dy[0] = y[1];
@@ -27,8 +23,3 @@ void dydt (const double t, const double mu, const double * __restrict__ y, doubl
   dy[1] = mu * (1 - y[0] * y[0]) * y[1] - y[0];
 
 } // end dydt
-
-
-#ifdef GENERATE_DOCS
-}
-#endif

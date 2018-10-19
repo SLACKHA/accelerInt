@@ -71,8 +71,6 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
 
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
                                          const IVP&, const SolverOptions&) except +
-    cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
-                                         const IVP&) except +
 
     cdef double integrate(IntegratorBase&, const int, const double, const double,
                           const double, double * __restrict__,
@@ -88,18 +86,20 @@ cdef extern from "<utility>" namespace "std" nogil:
 
 cdef class PyIntegrator:
     cdef unique_ptr[IntegratorBase] integrator  # hold our integrator
+    cdef PySolverOptions options # options, if not user specified
     cdef num # number of IVPs
     cdef neq # number of equations
 
     def __cinit__(self, IntegratorType itype, int neq, size_t numThreads,
                   PyIVP ivp, PySolverOptions options=None):
-        if options is not None:
-            self.integrator = move(
-                init(itype, neq, numThreads, deref(ivp.ivp.get()),
-                     deref(options.options.get())))
-        else:
-            self.integrator = move(
-                init(itype, neq, numThreads, deref(ivp.ivp.get())))
+
+        if options is None:
+            self.options = PySolverOptions(itype)
+            options = self.options
+
+        self.integrator = move(
+            init(itype, neq, numThreads, deref(ivp.ivp.get()),
+                 deref(options.options.get())))
         self.num = -1
         self.neq = neq
 

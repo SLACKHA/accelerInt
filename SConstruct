@@ -650,11 +650,11 @@ for p in platforms:
     Alias(p, target)
 
     # and finally build wrapper
-    defines = {}
-    defines['RPATH'] = [lib_dir]
-    defines['LIBPATH'] = [lib_dir]
-    defines = add_libs_to_defines(vals, defines)
-    wrapper = build_wrapper(env_save, p, defines, vals, variant, target)
+    new_defines = get_includes(p, [generic_dir])
+    new_defines['RPATH'] = [lib_dir]
+    new_defines['LIBPATH'] = [lib_dir]
+    new_defines = add_libs_to_defines(vals, new_defines)
+    wrapper = build_wrapper(env_save, p, new_defines, vals, variant, target)
     if wrapper:
         # and wrapper
         Alias(p + '-wrapper', wrapper)

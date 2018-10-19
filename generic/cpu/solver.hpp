@@ -299,8 +299,11 @@ namespace c_solvers {
         const IVP& _ivp;
         //! solver options
         const SolverOptions& _options;
+
         //! \brief the offset to the memory allocated for the IVP in the working buffer
-        const std::size_t _ivp_working;
+        std::size_t _ivp_working;
+        //! \brief the offset to the memory allocated for a local copy of the state vector
+        std::size_t _phi;
 
 
         //! Return unique memory access

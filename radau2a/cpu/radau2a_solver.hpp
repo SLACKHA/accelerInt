@@ -185,8 +185,8 @@ namespace c_solvers
 
     public:
 
-        RadauIntegrator(int neq, int numThreads, const SolverOptions& options) :
-            Integrator(neq, numThreads, options),
+        RadauIntegrator(int neq, int numThreads, const IVP& ivp, const SolverOptions& options) :
+            Integrator(neq, numThreads, ivp, options),
             ARRSIZE(neq),
             STRIDE(neq)
         {
@@ -420,7 +420,8 @@ namespace c_solvers
         inline void RK_PrepareRHS(const double t, const  double pr, const  double H,
                                   const double* __restrict__ Y, const double* __restrict__ Z1,
                                   const double* __restrict__ Z2, const double* __restrict__ Z3,
-                                  double* __restrict__ R1, double* __restrict__ R2, double* __restrict__ R3);
+                                  double* __restrict__ R1, double* __restrict__ R2, double* __restrict__ R3,
+                                  double* __restrict__ TMP, double* __restrict__ F1);
 
         /**
          * \brief Solves for the RHS values in the Newton iteration

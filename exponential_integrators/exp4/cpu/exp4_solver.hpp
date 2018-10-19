@@ -137,8 +137,8 @@ namespace c_solvers
         static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
 
 
-        EXP4Integrator(int neq, int numThreads, const EXPSolverOptions& options) :
-            ExponentialIntegrator(neq, numThreads, P, options)
+        EXP4Integrator(int neq, int numThreads, const IVP& ivp, const EXPSolverOptions& options) :
+            ExponentialIntegrator(neq, numThreads, P, ivp, options)
         {
             _ourMemSize = this->setOffsets();
             this->reinitialize(numThreads);

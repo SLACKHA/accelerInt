@@ -10,11 +10,11 @@ extern "C" {
 #endif
 
 
-struct CVUserData
+typedef struct CVUserData_t
 {
     double param;
     double* __restrict__ rwk;
-};
+} CVUserData;
 
 #ifdef __cplusplus
 }

@@ -120,8 +120,8 @@ namespace c_solvers
         //! Number of consecutive errors on internal integration steps allowed before exit
         static constexpr int MAX_CONSECUTIVE_ERRORS = 5;
 
-        EXPRB43Integrator(int neq, int numThreads, const EXPSolverOptions& options) :
-            ExponentialIntegrator(neq, numThreads, P, options)
+        EXPRB43Integrator(int neq, int numThreads, const IVP& ivp, const EXPSolverOptions& options) :
+            ExponentialIntegrator(neq, numThreads, P, ivp, options)
         {
             _ourMemSize = this->setOffsets();
             this->reinitialize(numThreads);
