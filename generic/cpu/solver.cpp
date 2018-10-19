@@ -32,7 +32,7 @@ namespace c_solvers {
         for (ivp_index = 0; ivp_index < NUM; ++ivp_index) {
 
             // local array with initial values
-            double* __restrict__ phi = this->_unique<double>(_phi, omp_get_thread_num());
+            double* __restrict__ phi = this->_unique<double>(omp_get_thread_num(), _phi);
             double pr_local = pr_global[ivp_index];
 
             // load local array with initial values from global array

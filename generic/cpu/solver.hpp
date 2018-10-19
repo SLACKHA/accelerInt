@@ -138,7 +138,7 @@ namespace c_solvers {
             _log(),
             _ivp(ivp),
             _options(options),
-            _ourMemSize(_neq * sizeof(double) + ivp.requiredMemorySize())
+            _ourMemSize(setOffsets())
         {
             setOffsets();
         }
@@ -339,7 +339,7 @@ namespace c_solvers {
             _ivp_working = offset;
             offset += _ivp.requiredMemorySize();
             _phi = offset;
-            return offset + _neq;
+            return offset + _neq * sizeof(double);
         }
 
     };
