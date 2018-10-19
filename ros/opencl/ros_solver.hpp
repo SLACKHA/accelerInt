@@ -77,10 +77,10 @@ namespace opencl_solvers
     public:
         ROSIntegrator(int neq, std::size_t numWorkGroups, const IVP& ivp, const SolverOptions& options) :
             Integrator(neq, numWorkGroups, ivp, options),
-            ros_vals(),
             _files({file_relative_to_me(__FILE__, "ros.cl")}),
             _includes({"ros_types.h"}),
-            _paths({path_of(__FILE__)})
+            _paths({path_of(__FILE__)}),
+            ros_vals()
         {
 
         }
