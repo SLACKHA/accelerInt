@@ -45,7 +45,7 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
         SolverOptions(double, double, bool_t, double) except +
 
     cdef cppclass IVP:
-        IVP(size_t, bool) except +
+        IVP(size_t, bool_t) except +
 
     cdef unique_ptr[Integrator] init(IntegratorType, int, int,
                                      const IVP&,
