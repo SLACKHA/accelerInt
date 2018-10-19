@@ -43,6 +43,41 @@ namespace c_solvers {
     /*! Smallest representable double */
     #define SMALL DBL_MIN
 
+    //! \brief Implementation of a initial value problem
+    class IVP
+    {
+    public:
+        IVP(std::size_t requiredMemorySize,
+            bool pass_entire_working=false):
+            _requiredMemorySize(requiredMemorySize),
+            _pass_entire_working(pass_entire_working)
+        {
+
+        }
+
+        //! \brief Return the required amount of double-precision working memory
+        //         required by the IVP functions [in bytes]
+        std::size_t requiredMemorySize() const
+        {
+            return _requiredMemorySize;
+        }
+
+        //! \brief If true, pass the entire working buffer allocated for the IVP to
+        //         the source term and jacobian evaluation functions.  Note that this
+        //         requires the IVP functions to implement the correct indexing of
+        //         the working buffer.
+        bool passEntireWorkingBufferToIVP() const
+        {
+            return _pass_entire_working;
+        }
+
+
+    protected:
+        std::size_t _requiredMemorySize;
+        bool _pass_entire_working;
+
+    };
+
     class SolverOptions
     {
     public:
@@ -96,14 +131,16 @@ namespace c_solvers {
         static constexpr double small = SMALL;
 
         Integrator(int neq, int numThreads,
+                   const IVP& ivp,
                    const SolverOptions& options) :
             _numThreads(numThreads),
             _neq(neq),
             _log(),
+            _ivp(ivp),
             _options(options),
-            _ourMemSize(_neq * sizeof(double))
+            _ourMemSize(_neq * sizeof(double) + ivp.requiredMemorySize())
         {
-
+            setOffsets();
         }
 
         ~Integrator()
@@ -246,9 +283,9 @@ namespace c_solvers {
                         double* __restrict__ y_global);
 
     protected:
-        //! return reference to the beginning of the working memory
-        //! for this thread `tid`
-        double* phi(int tid);
+        //! return reference to the working memory allocated for the jacobian and source
+        //! rates
+        double* rwk(int tid);
 
         //! the number of OpenMP threads to use
         int _numThreads;
@@ -258,8 +295,12 @@ namespace c_solvers {
         std::unique_ptr<char[]> working_buffer;
         //! log of state vectors / times
         std::vector<std::unique_ptr<double[]>> _log;
+        //! IVP implementation
+        const IVP& _ivp;
         //! solver options
         const SolverOptions& _options;
+        //! \brief the offset to the memory allocated for the IVP in the working buffer
+        const std::size_t _ivp_working;
 
 
         //! Return unique memory access
@@ -284,6 +325,19 @@ namespace c_solvers {
 
         //! The required memory size of this integrator in bytes.
         std::size_t _ourMemSize;
+
+        /**
+         * \brief Determines offsets for memory access from #working_buffer in
+         *        the integrator
+         */
+        std::size_t setOffsets()
+        {
+            std::size_t offset = 0;
+            _ivp_working = offset;
+            offset += _ivp.requiredMemorySize();
+            _phi = offset;
+            return offset + _neq;
+        }
 
     };
 

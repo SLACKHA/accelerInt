@@ -56,29 +56,31 @@ namespace c_solvers {
 
 		double beta = 0;
 		// source vector
-		double* fy = _unique<double>(tid, _fy);
+		double* __restrict__ fy = _unique<double>(tid, _fy);
 		// Jacobian matrix
-		double* A = _unique<double>(tid, _A);
+		double* __restrict__ A = _unique<double>(tid, _A);
 		std::memset(A, 0, _neq * _neq * sizeof(double));
 
 		// temporary arrays
-		double* temp = _unique<double>(tid, _temp);
-		double* f_temp = _unique<double>(tid, _ftemp);
-		double* y1 = _unique<double>(tid, _y1);
-		double* Hm = _unique<double>(tid, _Hm);
+		double* __restrict__ temp = _unique<double>(tid, _temp);
+		double* __restrict__ f_temp = _unique<double>(tid, _ftemp);
+		double* __restrict__ y1 = _unique<double>(tid, _y1);
+		double* __restrict__ Hm = _unique<double>(tid, _Hm);
 		std::memset(Hm, 0, STRIDE * STRIDE * sizeof(double));
-		double* Vm = _unique<double>(tid, _Vm);
-		double* phiHm = _unique<double>(tid, _phiHm);
-		double err;
+		double* __restrict__ Vm = _unique<double>(tid, _Vm);
+		double* __restrict__ phiHm = _unique<double>(tid, _phiHm);
 
 		// i-vectors
-		double* k1 = _unique<double>(tid, _k1);
-		double* k2 = _unique<double>(tid, _k2);
-		double* k3 = _unique<double>(tid, _k3);
-		double* k4 = _unique<double>(tid, _k4);
-		double* k5 = _unique<double>(tid, _k5);
-		double* k6 = _unique<double>(tid, _k6);
-		double* k7 = _unique<double>(tid, _k7);
+		double* __restrict__ k1 = _unique<double>(tid, _k1);
+		double* __restrict__ k2 = _unique<double>(tid, _k2);
+		double* __restrict__ k3 = _unique<double>(tid, _k3);
+		double* __restrict__ k4 = _unique<double>(tid, _k4);
+		double* __restrict__ k5 = _unique<double>(tid, _k5);
+		double* __restrict__ k6 = _unique<double>(tid, _k6);
+		double* __restrict__ k7 = _unique<double>(tid, _k7);
+
+		// and finally get the rwk vector
+		double* __restrict__ rwk = this->rwk(tid);
 		//initial krylov subspace sizes
 		while ((t < t_end) && (t + h > t)) {
 
@@ -97,8 +99,8 @@ namespace c_solvers {
 			}
 
 			if (!reject) {
-				dydt (t, pr, y, fy);
-				eval_jacob (t, pr, y, A);
+				dydt (t, pr, y, fy, rwk);
+				eval_jacob (t, pr, y, A, rwk);
 			}
 
 			//do arnoldi
@@ -138,7 +140,7 @@ namespace c_solvers {
 				k4[i] = y[i] + f_temp[i];
 			}
 
-			dydt (t, pr, k4, temp);
+			dydt (t, pr, k4, temp, rwk);
 			sparse_multiplier (A, f_temp, k4);
 
 
@@ -181,7 +183,7 @@ namespace c_solvers {
 				k7[i] = y[i] + f_temp[i];
 			}
 
-			dydt (t, pr, k7, temp);
+			dydt (t, pr, k7, temp, rwk);
 			sparse_multiplier (A, f_temp, k7);
 
 
@@ -219,7 +221,7 @@ namespace c_solvers {
 			for (int i = 0; i < _neq; ++i) {
 				temp[i] = k3[i] - (2.0 / 3.0) * k5[i] + 0.5 * (k6[i] + k7[i] - k4[i]) - (y1[i] - y[i]) / h;
 			}
-			err = h * sc_norm(temp, f_temp);
+			double err = h * sc_norm(temp, f_temp);
 
 			// error of embedded W method
 

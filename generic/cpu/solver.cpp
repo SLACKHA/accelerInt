@@ -32,7 +32,7 @@ namespace c_solvers {
         for (ivp_index = 0; ivp_index < NUM; ++ivp_index) {
 
             // local array with initial values
-            double* __restrict__ phi = this->phi(omp_get_thread_num());
+            double* __restrict__ phi = this->_unique<double>(_phi, omp_get_thread_num());
             double pr_local = pr_global[ivp_index];
 
             // load local array with initial values from global array
@@ -62,11 +62,19 @@ namespace c_solvers {
     template int* Integrator::_unique(int tid, std::size_t offset);
     template std::complex<double>* Integrator::_unique(int tid, std::size_t offset);
 
-    //! return reference to the beginning of the working memory
-    //! for this thread `tid`
-    double* Integrator::phi(int tid)
+    //! return reference to the working memory allocated for the jacobian and source
+    //! rates
+    double* Integrator::rwk(int tid)
     {
-        return _unique<double>(tid, std::size_t(0));
+        if (_ivp.passEntireWorkingBufferToIVP())
+        {
+            // pass whole working buffer
+            return _unique<double>(0, _ivp_working);
+        }
+        else
+        {
+            return _unique<double>(tid, _ivp_working);
+        }
     }
 
 }

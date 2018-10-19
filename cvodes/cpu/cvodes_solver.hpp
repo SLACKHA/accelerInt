@@ -12,6 +12,7 @@
 #include "solver.hpp"
 extern "C"
 {
+    #include "cv_user_data.h"
     #include "cvodes_dydt.h"
 
     #ifndef FINITE_DIFFERENCE
@@ -85,11 +86,12 @@ namespace c_solvers
     protected:
         std::vector<std::unique_ptr<void, void(*)(void *)>> y_locals;
         std::vector<std::unique_ptr<void, void(*)(void *)>> integrators;
+        std::vector<CVUserData> user_data;
 
         //! the offset to the CVODEs state vectors
         std::size_t _phi_cvodes;
 
-        /*
+        /**
          * \brief Determines offsets for memory access from #working_buffer in integrator
          */
         std::size_t setOffsets()
@@ -98,7 +100,7 @@ namespace c_solvers
             return _phi_cvodes + _neq * sizeof(double);
         }
 
-        /*
+        /**
          * \brief Return the required memory size (per-thread) in bytes
          */
         virtual std::size_t requiredSolverMemorySize()
@@ -110,7 +112,8 @@ namespace c_solvers
     public:
 
         CVODEIntegrator(int neq, int numThreads, const SolverOptions& options) :
-            Integrator(neq, numThreads, options)
+            Integrator(neq, numThreads, options),
+            user_data(numThreads)
         {
             _ourMemSize = this->setOffsets();
             this->reinitialize(numThreads);

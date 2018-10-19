@@ -13,7 +13,9 @@
  * \param[in]        param     The system parameter
  * \param[in]        y         The state vector
  * \param[out]       dy        The output RHS (dydt) vector
+ * \param[in]        rwk       The working buffer for the source term evaluation of the IVP
  */
-void dydt (const double t, const double param, const double * __restrict__ y, double * __restrict__ dy);
+void dydt (const double t, const double param, const double * __restrict__ y, double * __restrict__ dy,
+           double* __restrict__ rwk);
 
 #endif

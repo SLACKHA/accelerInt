@@ -78,6 +78,9 @@ namespace c_solvers {
 		double err = 0.0;
 		double* __restrict__ savedActions = _unique<double>(tid, _savedActions);
 		int numSteps = 0;
+
+		// and rwk vector
+		double* __restrict__ rwk = this->rwk(tid);
 		while ((t < t_end) && (t + h > t)) {
 
 			//error checking
@@ -95,8 +98,8 @@ namespace c_solvers {
 			}
 
 			if (!reject) {
-				dydt (t, pr, y, fy);
-				eval_jacob (t, pr, y, A);
+				dydt (t, pr, y, fy, rwk);
+				eval_jacob (t, pr, y, A, rwk);
 				//gy = fy - A * y
 				sparse_multiplier(A, y, gy);
 
@@ -132,7 +135,7 @@ namespace c_solvers {
 			//next compute Dn2
 			//Dn2 = (F(Un2) - Jn * Un2) - gy
 
-			dydt(t, pr, temp, &savedActions[_neq]);
+			dydt(t, pr, temp, &savedActions[_neq], rwk);
 			sparse_multiplier(A, temp, f_temp);
 
 
@@ -167,7 +170,7 @@ namespace c_solvers {
 
 			//next compute Dn3
 			//Dn3 = F(Un3) - A * Un3 - gy
-			dydt(t, pr, temp, &savedActions[3 * _neq]);
+			dydt(t, pr, temp, &savedActions[3 * _neq], rwk);
 			sparse_multiplier(A, temp, f_temp);
 
 

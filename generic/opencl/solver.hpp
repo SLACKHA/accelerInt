@@ -578,10 +578,6 @@ namespace opencl_solvers {
 
 
     protected:
-        //! return reference to the beginning of the working memory
-        //! for this thread `tid`
-        double* phi(int tid);
-
         //! the number of OpenCL work-groups to launch
         int _numWorkGroups;
         //! the number of equations to solver per-IVP

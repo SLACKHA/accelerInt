@@ -33,7 +33,7 @@ namespace c_solvers {
         int index = omp_get_thread_num();
 
         // copy parameter into into evaluator
-        evaluators[index]->set_state_var(pr);
+        evaluators[index]->set_state(pr, this->rwk(index));
 
         // copy into state vector
         std::memcpy(&state_vectors[index][0], y, _neq * sizeof(double));

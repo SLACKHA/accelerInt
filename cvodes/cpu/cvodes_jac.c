@@ -21,6 +21,8 @@ int eval_jacob_cvodes(long int N, double t, N_Vector y, N_Vector ydot, DlsMat ja
     (void)tmp3;
 
 	double* local_y = NV_DATA_S(y);
-	eval_jacob((double)t, *(double*)f, local_y, (double*)jac->data);
+    // unpack user data
+    CVUserData* ud = (CVUserData*)f;
+	eval_jacob((double)t, ud->param, local_y, (double*)jac->data, ud->rwk);
 	return 0;
 }

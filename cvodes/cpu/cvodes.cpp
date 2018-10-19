@@ -14,6 +14,7 @@
 /* CVODES INCLUDES */
 extern "C"
 {
+    #include "cv_user_data.h"
     #include "sundials/sundials_types.h"
     #include "sundials/sundials_math.h"
     #include "sundials/sundials_nvector.h"
@@ -47,9 +48,11 @@ namespace c_solvers {
         //reinit this integrator for time t, w/ updated state
         CVODEErrorCheck(CVodeReInit(integrators[tid].get(), t_start, fill));
 
-        //set user data to Pr
-        double pr_local = pr;
-        CVODEErrorCheck(CVodeSetUserData(integrators[tid].get(), &pr_local));
+        //set user data
+        CVUserData* _user_data = &this->user_data[i];
+        _user_data->param = pr;
+        _user_data->rwk = this->rwk(tid);
+        CVODEErrorCheck(CVodeSetUserData(integrators[tid].get(), (void*)_user_data));
 
         //set end time
         CVODEErrorCheck(CVodeSetStopTime(integrators[tid].get(), t_end));

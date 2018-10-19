@@ -30,17 +30,19 @@ namespace c_solvers
     /**
      * \brief Function to estimate spectral radius.
      *
-     * \param[in] t     the time.
-     * \param[in] pr    A parameter used for pressure or density to pass to the derivative function.
-     * \param[in] hmax  Max time step size.
-     * \param[in] y     Array of dependent variable.
-     * \param[in] F     Derivative evaluated at current state
-     * \param[in,out] v Array for eigenvectors
-     * \param[out] Fv   Array for derivative evaluations
+     * \param[in]     t     the time.
+     * \param[in]     pr    A parameter used for pressure or density to pass to the derivative function.
+     * \param[in]     hmax  Max time step size.
+     * \param[in]     y     Array of dependent variable.
+     * \param[in]     F     Derivative evaluated at current state
+     * \param[in,out] v     Array for eigenvectors
+     * \param[out]    Fv    Array for derivative evaluations
+     * \param[in]     rwk   Working buffer for evaluation of source rates
      */
     double RKCIntegrator::rkc_spec_rad (const double t, const double pr, const double hmax,
                                         const double* __restrict__ y, const double* __restrict__ F,
-                                        double* __restrict__ v, double* __restrict__ Fv) {
+                                        double* __restrict__ v, double* __restrict__ Fv,
+                                        double* __restrict__ rwk) {
 
         const int itmax = 50;
         double small = ONE / hmax;
@@ -81,7 +83,7 @@ namespace c_solvers
         double sigma = ZERO;
         for (int iter = 1; iter <= itmax; ++iter) {
 
-            dydt (t, pr, v, Fv);
+            dydt (t, pr, v, Fv, rwk);
 
             nrm1 = ZERO;
             for (int i = 0; i < _neq; ++i) {
@@ -115,18 +117,20 @@ namespace c_solvers
     /**
      * \brief Function to take a single RKC integration step
      *
-     * \param[in] t    the starting time.
-     * \param[in] pr   A parameter used for pressure or density to pass to the derivative function.
-     * \param[in] h    Time-step size.
-     * \param[in] y_0  Initial conditions.
-     * \param[in] F_0  Derivative function at initial conditions.
-     * \param[in] s    number of steps.
+     * \param[in]  t    the starting time.
+     * \param[in]  pr   A parameter used for pressure or density to pass to the derivative function.
+     * \param[in]  h    Time-step size.
+     * \param[in]  y_0  Initial conditions.
+     * \param[in]  F_0  Derivative function at initial conditions.
+     * \param[in]  s    number of steps.
      * \param[out] y_j  Integrated variables.
+     * \param[in]  rwk  Working buffer for evaluation of source rates
      */
     void RKCIntegrator::rkc_step (const double t, const double pr, const double h,
                                   const double* y_0, const double* F_0, const int s,
                                   double* __restrict__ y_j, double* __restrict__ y_jm1,
-                                  double* __restrict__ y_jm2) {
+                                  double* __restrict__ y_jm2,
+                                  double* __restrict__ rwk) {
 
         const double w0 = ONE + TWO / (13.0 * (double)(s * s));
         double temp1 = (w0 * w0) - ONE;
@@ -166,7 +170,7 @@ namespace c_solvers
             mu_t = mu * w1 / w0;
 
               // calculate derivative, use y array for temporary storage
-            dydt (t + (h * c_jm1), pr, y_jm1, y_j);
+            dydt (t + (h * c_jm1), pr, y_jm1, y_j, rwk);
 
             for (int i = 0; i < _neq; ++i) {
                 y_j[i] = (ONE - mu - nu) * y_0[i] + (mu * y_jm1[i]) + (nu * y_jm2[i])
@@ -210,6 +214,7 @@ namespace c_solvers
         int nstep = 0;
         int tid = omp_get_thread_num();
 
+        double* __restrict__ rwk = this->rwk(tid);
         double* __restrict__ work = _unique<double>(tid, _work);
         std::memset(work, 0, (4 + _neq) * sizeof(double));
 
@@ -226,7 +231,7 @@ namespace c_solvers
 
         // calculate F_n for initial y
         double* __restrict__ F_n = _unique<double>(tid, _F_n);
-        dydt (t, pr, y_n, F_n);
+        dydt (t, pr, y_n, F_n, rwk);
 
         // load initial estimate for eigenvector
         if (work[2] < UROUND) {
@@ -265,7 +270,7 @@ namespace c_solvers
                 for (int i = 0; i < _neq; ++i) {
                     temp_arr[i] = y_n[i] + (work[2] * F_n[i]);
                 }
-                dydt (t + work[2], pr, temp_arr, temp_arr2);
+                dydt (t + work[2], pr, temp_arr, temp_arr2, rwk);
 
                 err = ZERO;
                 for (int i = 0; i < _neq; ++i) {
@@ -300,7 +305,7 @@ namespace c_solvers
             rkc_step (t, pr, work[2], y_n, F_n, m, y, y_jm1, y_jm2);
 
             // calculate F_np1 with tenative y_np1
-            dydt (t + work[2], pr, y, temp_arr);
+            dydt (t + work[2], pr, y, temp_arr, rwk);
 
             // estimate error
             err = ZERO;

@@ -33,21 +33,26 @@ namespace c_solvers
        stores the state variable, and provides to dydt
     */
     class RK78 {
+    private:
         double m_statevar;
+        double* const __restrict__ rwk;
     public:
-        RK78() {
-            this->m_statevar = -1;
+        RK78() :
+            m_statevar(0),
+            rwk(0)
+        {
         }
 
-        void set_state_var(const double state_var)
+        void set_state(const double state_var, double* const __restrict__ rwk)
         {
             this->m_statevar = state_var;
+            this->rwk = rwk;
         }
 
         //wrapper for the pyJac RHS fn
         void operator() (const state_type& y , state_type& fy , const double t) const
         {
-            dydt(t, this->m_statevar, &y[0], &fy[0]);
+            dydt(t, this->m_statevar, &y[0], &fy[0], rwk);
         }
     };
 

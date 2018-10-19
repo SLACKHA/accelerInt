@@ -167,31 +167,30 @@ namespace c_solvers
     inline void RadauIntegrator::RK_PrepareRHS(const double t, const  double pr, const  double H,
                                                const double* __restrict__ Y, const double* __restrict__ Z1,
                                                const double* __restrict__ Z2, const double* __restrict__ Z3,
-                                               double* __restrict__ R1, double* __restrict__ R2, double* __restrict__ R3) {
-        double TMP[_neq];
-        double F[_neq];
-
+                                               double* __restrict__ R1, double* __restrict__ R2, double* __restrict__ R3,
+                                               double* __restrict__ TMP, double* __restrict__ F) {
         for (int i = 0; i < _neq; i++) {
             R1[i] = Z1[i];
             R2[i] = Z2[i];
             R3[i] = Z3[i];
         }
 
+        double* __restrict__ rwk = this->rwk(omp_get_thread_num());
         // TMP = Y + Z1
         WADD(Y, Z1, TMP);
-        dydt(t + rkC[0] * H, pr, TMP, F);
+        dydt(t + rkC[0] * H, pr, TMP, F, rwk);
         //R[:] -= -h * rkA[:][0] * F[:]
         DAXPY3(-H * rkA[0][0], -H * rkA[1][0], -H * rkA[2][0], F, R1, R2, R3);
 
         // TMP = Y + Z2
         WADD(Y, Z2, TMP);
-        dydt(t + rkC[1] * H, pr, TMP, F);
+        dydt(t + rkC[1] * H, pr, TMP, F, rwk);
         //R[:] -= -h * rkA[:][1] * F[:]
         DAXPY3(-H * rkA[0][1], -H * rkA[1][1], -H * rkA[2][1], F, R1, R2, R3);
 
         // TMP = Y + Z3
         WADD(Y, Z3, TMP);
-        dydt(t + rkC[2] * H, pr, TMP, F);
+        dydt(t + rkC[2] * H, pr, TMP, F, rwk);
         //R[:] -= -h * rkA[:][2] * F[:]
         DAXPY3(-H * rkA[0][2], -H * rkA[1][2], -H * rkA[2][2], F, R1, R2, R3);
     }
@@ -297,12 +296,13 @@ namespace c_solvers
         }
     #endif
         double Err = RK_ErrorNorm(scale, TMP);
+        double* __restrict__ rwk = this->rwk(omp_get_thread_num());
         if (Err >= 1.0 && (FirstStep || Reject)) {
 
             for (int i = 0; i < _neq; i++) {
                 TMP[i] += Y[i];
             }
-            dydt(t, pr, TMP, F1);
+            dydt(t, pr, TMP, F1, rwk);
 
             for (int i = 0; i < _neq; i++) {
                 TMP[i] = F1[i] + F2[i];
@@ -375,6 +375,7 @@ namespace c_solvers
         double* F1 = _unique<double>(tid, _F1);
         double* F2 = _unique<double>(tid, _F2);
         double* TMP = _unique<double>(tid, _TMP);
+        double* __restrict__ rwk = this->rwk(omp_get_thread_num());
 
 
         int info = 0;
@@ -384,12 +385,12 @@ namespace c_solvers
 
         while (t + Roundoff < t_end) {
             if (!Reject) {
-                dydt (t, pr, y, F0);
+                dydt (t, pr, y, F0, rwk);
             }
             if (!SkipLU) {
                 //need to update Jac/LU
                 if (!SkipJac) {
-                    eval_jacob (t, pr, y, A);
+                    eval_jacob (t, pr, y, A, rwk);
                 }
                 RK_Decomp(H, E1, E2, A, ipiv1, ipiv2, &info);
                 if (info != 0) {
@@ -433,7 +434,7 @@ namespace c_solvers
             NewtonRate = std::pow(std::fmax(NewtonRate, EPS), 0.8);
 
             for (; NewtonIter < NewtonMaxit; NewtonIter++) {
-                RK_PrepareRHS(t, pr, H, y, Z1, Z2, Z3, DZ1, DZ2, DZ3);
+                RK_PrepareRHS(t, pr, H, y, Z1, Z2, Z3, DZ1, DZ2, DZ3, TMP, F1);
                 RK_Solve(H, E1, E2, DZ1, DZ2, DZ3, ipiv1, ipiv2);
                 double d1 = RK_ErrorNorm(sc, DZ1);
                 double d2 = RK_ErrorNorm(sc, DZ2);

@@ -10,6 +10,7 @@
 #include "sundials/sundials_nvector.h"
 #include "sundials/sundials_direct.h"
 #include "nvector/nvector_serial.h"
+#include "cv_user_data.h"
 #include "jacob.h"
 
 /*!
