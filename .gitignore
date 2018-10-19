@@ -64,3 +64,6 @@ pyccelerInt_*.cpp
 # ignore pyjac subfolders
 examples/pyJac/opencl/obj/
 examples/pyJac/opencl/src
+
+# shared object files
+*.os
