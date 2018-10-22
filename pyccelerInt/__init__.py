@@ -60,7 +60,7 @@ class Problem(object):
 
     available_platforms = ['c', 'opencl']
 
-    def __init__(self, platform, code_directory):
+    def __init__(self, platform, options, code_directory, reuse=False):
         """
         Initialize the problem.
 
@@ -68,36 +68,49 @@ class Problem(object):
         ----------
         platform: ['opencl', 'c']
             The runtime platform to use for the problem
+        options: :class:`pyccelerint/PySolverOptions`
+            The solver options to use
         code_directory: str
             The path to the user implementation of the source term
             and jacobian files
+        reuse: bool [False]
+            If true, reuse any previously generated code / modules
         """
 
         if platform not in Problem.available_platforms:
             raise Exception('Unknown platform: {}!'.format(platform))
         self.platform = platform
         self.dir = os.path.abspath(code_directory)
-        self.init = False
+        self.options = options
+        self.reuse = reuse
+
+        # build problem
         self.built = False
+        self.build()
+
+        # mark not initialized
+        self.init = False
 
     def build(self):
         """
         Compile / construct the problem files
         """
 
-        platform_map = {'opencl': 'opencl',
-                        'c': 'cpu'}
-        try:
-            out = subprocess.check_call([scons, platform_map[self.platform]
-                                         + '-wrapper',
-                                         'mechanism_dir={}'.format(self.dir),
-                                         '-j', str(multiprocessing.cpu_count())])
-        except subprocess.CalledProcessError as e:
-            logging.getLogger(__name__).error(out)
-            raise Exception('Error building {}-wrapper for problem in '
-                            'directory {}'.format(self.platform, self.dir))
+        if not self.built:
+            platform_map = {'opencl': 'opencl',
+                            'c': 'cpu'}
+            try:
+                out = subprocess.check_call([scons, platform_map[self.platform]
+                                             + '-wrapper',
+                                             'mechanism_dir={}'.format(self.dir),
+                                             '-j', str(multiprocessing.cpu_count())])
+            except subprocess.CalledProcessError as e:
+                logging.getLogger(__name__).error(out)
+                raise Exception('Error building {}-wrapper for problem in '
+                                'directory {}'.format(self.platform, self.dir))
+        self.built = True
 
-    def setup(self, num):
+    def setup(self, num, options):
         """
         Do any setup work required for this problem, initialize input arrays,
         generate code, etc.
@@ -106,6 +119,10 @@ class Problem(object):
         ----------
         num: int
             The number of individual IVPs to integrate
+        options: :class:`pyccelerInt.PySolverOptions`
+            The integration options to use
+        reuse: bool [False]
+            If true, reuse any previously generated code / modules
         """
         raise NotImplementedError
 
@@ -190,11 +207,7 @@ class Problem(object):
         """
 
         if not self.init:
-            self.setup(num)
-            self.init = True
-        if not self.built:
-            self.build()
-            self.built = True
+            self.setup(num, self.options)
 
         phi_i, ud_i = self.get_initial_conditions()
         # flatten

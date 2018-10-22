@@ -178,10 +178,10 @@ if __name__ == '__main__':
     if args.case == 'vdp':
         from pyccelerInt.examples.van_der_pol import VDP as case
     else:
-        from pyccelerInt.examples.pyJac import pyJac as case
+        from pyccelerInt.examples.pyJac import Ignition as case
 
     # create problem
-    problem = case(args.language)
+    problem = case(args.language, options, reuse=args.reuse)
 
     end_time = args.end_time
     if not end_time:

@@ -13,7 +13,7 @@ class VDP(Problem):
     An implementation of the van der Pol problem for pyccelerInt
     """
 
-    def __init__(self, platform):
+    def __init__(self, platform, options, reuse=False):
         """
         Initialize the problem.
 
@@ -21,12 +21,16 @@ class VDP(Problem):
         ----------
         platform: ['opencl', 'c']
             The runtime platform to use for the problem
+        options: :class:`pyccelerint/PySolverOptions`
+            The solver options to use
+        reuse: bool [False]
+            If true, reuse any previously generated code / modules
         """
 
         path = os.path.abspath(os.path.dirname(__file__))
-        super(VDP, self).__init__(platform, path)
+        super(VDP, self).__init__(platform, options, path, reuse=reuse)
 
-    def setup(self, num):
+    def setup(self, num, options):
         """
         Do any setup work required for this problem, initialize input arrays,
         generate code, etc.
@@ -35,6 +39,8 @@ class VDP(Problem):
         ----------
         num: int
             The number of individual IVPs to integrate
+        options: :class:`pyccelerInt.PySolverOptions`
+            The integration options to use
         """
 
         # number of equations
@@ -48,6 +54,7 @@ class VDP(Problem):
         # set parameters
         self.params = np.zeros(num, dtype=np.float64)
         self.params[:] = 1000
+        self.init = True
 
     def get_ivp(self):
         """
