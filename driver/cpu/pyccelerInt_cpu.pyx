@@ -128,6 +128,9 @@ cdef class PySolverOptions:
         else:
             self.options.reset(new SolverOptions(atol, rtol, logging, h_init))
 
+    def order(self):
+        return 'F'
+
 cdef class PyIVP:
     cdef unique_ptr[IVP] ivp # hold IVP
 
