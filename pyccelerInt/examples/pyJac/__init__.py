@@ -10,25 +10,25 @@ from pyjac import __version_info__, create_jacobian
 from pyjac.core.enum_types import KernelType, JacobianFormat
 from pyjac.pywrap import pywrap
 
-from pyccelerInt import Problem, get_plotter, platform_map
+from pyccelerInt import Problem, get_plotter, lang_map
 
 assert(__version_info__[0] >= 2), 'Only pyJac-V2+ supports OpenCL execution.'
 
 
-def import_pyjac(platform):
+def import_pyjac(lang):
     try:
-        if platform == 'opencl':
+        if lang == 'opencl':
             import pyjac_ocl as pj  # noqa
             return pj
-        elif platform == 'c':
+        elif lang == 'c':
             import pyjac_c as pj  # noqa
             return pj
         else:
-            raise Exception('Language {} not recognized!'.format(platform))
+            raise Exception('Language {} not recognized!'.format(lang))
     except ImportError:
-        raise Exception('pyccelerInt wrapper for platform: {} could not be '
+        raise Exception('pyccelerInt wrapper for language: {} could not be '
                         'imported (using path {})'.format(
-                            platform, os.getcwd()))
+                            lang, os.getcwd()))
 
 
 class Ignition(Problem):
@@ -37,7 +37,116 @@ class Ignition(Problem):
     for pyccelerInt, utilizing source rates and Jacobian's from pyJac.
     """
 
-    def __init__(self, platform, options, reuse=False, conp=True):
+    @classmethod
+    def path(cls):
+        """
+        Returns the path
+        """
+        return cls._src_path()
+
+    @classmethod
+    def data_path(cls):
+        return os.path.abspath(os.path.dirname(__file__))
+
+    @classmethod
+    def generate(cls, lang, vector_size=None, block_size=None, platform='',
+                 order='C', reuse=False):
+        """
+        Generate any code that must be run _before_ building
+        """
+
+        # build pyjac module
+        # set OpenCL specific options
+        platform = None
+        width = None
+        explicit_simd = False
+        if lang == 'opencl':
+            width = vector_size if vector_size else block_size
+            if width <= 1:
+                width = None
+            platform = platform
+            explicit_simd = not block_size and width
+
+        out_path = cls._src_path(lang)
+
+        # create source-rate evaluation
+        obj_path = os.path.join(out_path, 'obj')
+        ktype = KernelType.jacobian
+        if not reuse:
+            create_jacobian(lang,
+                            mech_name=os.path.join(cls.data_path(), 'h2.cti'),
+                            width=width, build_path=out_path, last_spec=None,
+                            kernel_type=ktype,
+                            platform=platform,
+                            data_order=order,
+                            jac_format=JacobianFormat.full,
+                            explicit_simd=explicit_simd)
+
+            # and compile to get the kernel object
+            pywrap(lang, out_path, obj_path, os.getcwd(), obj_path,
+                   platform, ktype=ktype)
+
+            # create a simple wrapper to join
+            if lang == 'opencl':
+                with open(os.path.join(out_path, 'dydt.cl'), 'w') as file:
+                    file.write(
+                        """
+                        #include "species_rates.oclh"
+                        void dydt (__private __ValueType const t,
+                                   __global __ValueType const * __restrict__ param,
+                                   __global __ValueType const * __restrict__ y,
+                                   __global __ValueType * __restrict__ dy,
+                                   __global __ValueType * __restrict__ rwk)
+                       {
+                          species_rates(0, param, y, dy, rwk);
+                       }
+                       """)
+                with open(os.path.join(out_path, 'jac.cl'), 'w') as file:
+                    file.write(
+                        """
+                        #include "jacobian.oclh"
+                        void jacob (__private __ValueType const t,
+                                    __global __ValueType const * __restrict__ param,
+                                    __global __ValueType const * __restrict__ y,
+                                    __global __ValueType * __restrict__ jac,
+                                    __global __ValueType * __restrict__ rwk)
+                       {
+                          jacobian(0, param, y, jac, rwk);
+                       }
+                       """)
+            elif lang == 'c':
+                with open(os.path.join(out_path, 'dydt.cpp'), 'w') as file:
+                    file.write(
+                        """
+                        #include "species_rates.hpp"
+                        extern "C" {
+                            void dydt (const double t,
+                                       const double param,
+                                       const double * __restrict__ y,
+                                       double * __restrict__ dy,
+                                       double* __restrict__ rwk)
+                           {
+                              species_rates(0, &param, y, dy, rwk);
+                           }
+                       }
+                       """)
+                with open(os.path.join(out_path, 'jac.cpp'), 'w') as file:
+                    file.write(
+                        """
+                        #include "jacobian.hpp"
+                        extern "C" {
+                            void eval_jacob (const double t,
+                                             const double param,
+                                             const double * __restrict__ y,
+                                             double * __restrict__ jac,
+                                             double * __restrict__ rwk)
+                           {
+                              jacobian(0, &param, y, jac, rwk);
+                           }
+                        }
+                       """)
+
+    def __init__(self, platform, options, conp=True):
         """
         Initialize the problem.
 
@@ -54,70 +163,10 @@ class Ignition(Problem):
         """
 
         self.conp = conp
-        path = self._src_path()
-        self.data_path = os.path.abspath(os.path.dirname(__file__))
-        super(Ignition, self).__init__(platform, options, path, reuse=reuse)
-
-        # build pyjac module
-        # set OpenCL specific options
-        platform = None
-        width = None
-        explicit_simd = False
-        if self.platform == 'opencl':
-            width = options.vector_size() if options.vector_size() else \
-                options.block_size()
-            if width <= 1:
-                width = None
-            platform = options.platform()
-            explicit_simd = not options.block_size() and width
-
-        # create source-rate evaluation
-        obj_path = os.path.join(self.src_path, 'obj')
-        ktype = KernelType.jacobian
-        if not self.reuse:
-            create_jacobian(self.platform,
-                            mech_name=os.path.join(self.data_path, 'h2.cti'),
-                            width=width, build_path=self.src_path, last_spec=None,
-                            kernel_type=ktype,
-                            platform=platform,
-                            data_order=options.order(),
-                            jac_format=JacobianFormat.full,
-                            explicit_simd=explicit_simd)
-            # and compile to get the kernel object
-            pywrap(self.platform, self.src_path, obj_path, os.getcwd(), obj_path,
-                   platform, ktype=ktype)
-
-            # create a simple wrapper to join
-            if platform == 'opencl':
-                with open(os.path.join(self.src_path, 'dydt.cl'), 'w') as file:
-                    file.write(
-                        """
-                        #include "species_rates.oclh"
-                        void dydt (__private __ValueType const t,
-                                   __global __ValueType const * __restrict__ param,
-                                   __global __ValueType const * __restrict__ y,
-                                   __global __ValueType * __restrict__ dy,
-                                   __global __ValueType * __restrict__ rwk)
-                       {
-                          species_rates(0, param, y, dy, rwk);
-                       }
-                       """)
-                with open(os.path.join(self.src_path, 'jac.cl'), 'w') as file:
-                    file.write(
-                        """
-                        #include "jacobian.oclh"
-                        void jacob (__private __ValueType const t,
-                                    __global __ValueType const * __restrict__ param,
-                                    __global __ValueType const * __restrict__ y,
-                                    __global __ValueType * __restrict__ jac,
-                                    __global __ValueType * __restrict__ rwk)
-                       {
-                          jacobian(0, param, y, jac, rwk);
-                       }
-                       """)
+        super(Ignition, self).__init__(platform, options)
 
         # create initial state
-        pj = import_pyjac(self.platform)
+        pj = import_pyjac(self.lang)
         # create a kernel -- note that we supply 1 IVP / 1 thread here such that we
         # can properly scale the required memory
         self.knl = pj.PyJacobianKernel(1, 1)
@@ -127,20 +176,24 @@ class Ignition(Problem):
 
         # get the working memory
         self.rwk_size = self.knl.required_working_memory()
-        if self.platform == 'opencl' and (options.vector_size()
-                                          or options.block_size()):
+        if self.lang == 'opencl' and (options.vector_size()
+                                      or options.block_size()):
             # pyJac returns the complete (vectorized) memory req's, but we need
             # to pass in the unvectorized size
             vw = options.vector_size() if options.vector_size() else \
                 options.block_size()
             self.rwk_size /= vw
 
-    def _src_path(self):
-        return os.path.join(os.getcwd(), 'examples_working')
+    @classmethod
+    def _src_path(cls, lang=''):
+        path = os.path.join(os.getcwd(), 'examples_working')
+        if lang:
+            path = os.path.join(path, lang_map[lang])
+        return path
 
     @property
     def src_path(self):
-        return os.path.join(self._src_path(), platform_map[self.platform])
+        return self._src_path(self.lang)
 
     def setup(self, num, options):
         """
@@ -190,7 +243,7 @@ class Ignition(Problem):
         Return the IVP for the VDP problem
         """
 
-        if self.platform == 'opencl':
+        if self.lang == 'opencl':
             # create ivp
             # Note: we need to pass the full paths to the PyIVP such that accelerInt
             # can find our kernel files
@@ -201,7 +254,7 @@ class Ignition(Problem):
                      os.path.join(self.src_path, 'jacobian.ocl')]
             return self.get_wrapper().PyIVP(files, self.rwk_size,
                                             include_paths=[self.src_path])
-        elif self.platform == 'c':
+        elif self.lang == 'c':
             return self.get_wrapper().PyIVP(self.rwk_size, True)
 
     def get_initial_conditions(self):
@@ -241,7 +294,7 @@ class Ignition(Problem):
         plt.title('H2 Ignition')
 
         # plot same problem in CT for comparison
-        gas = ct.Solution(os.path.join(self.data_path, 'h2.cti'))
+        gas = ct.Solution(os.path.join(self.data_path(), 'h2.cti'))
         gas.TPX = 1000, 101325, 'H2:2, O2:1, N2:3.76'
         reac = ct.IdealGasConstPressureReactor(gas)
         net = ct.ReactorNet([reac])

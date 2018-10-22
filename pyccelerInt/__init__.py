@@ -13,8 +13,8 @@ scons = which('scons').strip()
 # add runtime path to find the pyccelerint module
 sys.path.insert(0, os.getcwd())
 
-platform_map = {'opencl': 'opencl',
-                'c': 'cpu'}
+lang_map = {'opencl': 'opencl',
+            'c': 'cpu'}
 
 
 def import_wrapper(platform):
@@ -61,54 +61,62 @@ class Problem(object):
     An abstract base class to define problems for pyccelerInt
     """
 
-    available_platforms = ['c', 'opencl']
+    available_languages = ['c', 'opencl']
 
-    def __init__(self, platform, options, code_directory, reuse=False):
+    @classmethod
+    def path(cls):
+        """
+        Returns the path
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def build(cls, lang):
+        """
+        Compile / construct the problem files for this problem
+        """
+
+        try:
+            path = cls.path()
+            subprocess.check_output([scons,
+                                     lang_map[lang] + '-wrapper',
+                                     'mechanism_dir={}'.format(path),
+                                     '-j', str(multiprocessing.cpu_count())])
+        except subprocess.CalledProcessError as e:
+            logging.getLogger(__name__).error(e.output.decode())
+            raise Exception('Error building {}-wrapper for problem in '
+                            'directory {}'.format(lang, path))
+
+    @classmethod
+    def generate(cls, reuse=False, **kwargs):
+        """
+        Generate any code that must be run _before_ building
+        """
+        raise NotImplementedError
+
+    def __init__(self, lang, options, reuse=False):
         """
         Initialize the problem.
 
         Parameters
         ----------
-        platform: ['opencl', 'c']
-            The runtime platform to use for the problem
+        lang: ['opencl', 'c']
+            The runtime language to use for the problem
         options: :class:`pyccelerint/PySolverOptions`
             The solver options to use
-        code_directory: str
-            The path to the user implementation of the source term
-            and jacobian files
         reuse: bool [False]
             If true, reuse any previously generated code / modules
         """
 
-        if platform not in Problem.available_platforms:
-            raise Exception('Unknown platform: {}!'.format(platform))
-        self.platform = platform
-        self.dir = os.path.abspath(code_directory)
+        if lang not in Problem.available_languages:
+            raise Exception('Unknown platform: {}!'.format(lang))
+        self.lang = lang
+        self.dir = os.path.abspath(self.path())
         self.options = options
         self.reuse = reuse
 
-        # build problem
-        self.built = False
-
         # mark not initialized
         self.init = False
-
-    def build(self):
-        """
-        Compile / construct the problem files
-        """
-
-        if not self.built:
-            try:
-                subprocess.check_output([scons,
-                                         platform_map[self.platform] + '-wrapper',
-                                         'mechanism_dir={}'.format(self.dir),
-                                         '-j', str(multiprocessing.cpu_count())])
-            except subprocess.CalledProcessError as e:
-                logging.getLogger(__name__).error(e.output.decode())
-                raise Exception('Error building {}-wrapper for problem in '
-                                'directory {}'.format(self.platform, self.dir))
-        self.built = True
 
     def setup(self, num, options):
         """
@@ -166,7 +174,7 @@ class Problem(object):
             The imported pyccelerInt wrapper for this :attr:`platform`, used for
             creation of the integrator / IVP / solver options / etc.
         """
-        return import_wrapper(self.platform)
+        return import_wrapper(self.lang)
 
     @property
     def num_equations(self):
@@ -206,9 +214,6 @@ class Problem(object):
             If :param:`return_state` is True, the final state vector is returned
         """
 
-        if not self.built:
-            self.build()
-
         if not self.init:
             self.setup(num, self.options)
 
@@ -241,6 +246,26 @@ class Problem(object):
             e.g., via :func:`integrator.state()`
         """
         raise NotImplementedError
+
+
+def setup_example(case, args):
+    """
+    Generate / build the case
+
+    Parameters
+    ----------
+    case: :class:`Problem`
+        The case to setup
+    args: :class:`ArgumentParser`
+        The parsed (un post-validated) args
+    """
+    case.generate(lang=args.language,
+                  reuse=args.reuse,
+                  vector_size=args.vector_size,
+                  block_size=args.block_size,
+                  platform=args.platform,
+                  order=args.order)
+    case.build(args.language)
 
 
 def get_solver_options(lang, integrator_type,
@@ -284,7 +309,7 @@ def create_integrator(problem, integrator_type, options, num_threads):
     integrator: :class:`PyIntegrator`
         The initialized integrator class
     """
-    pycel = import_wrapper(problem.platform)
+    pycel = import_wrapper(problem.lang)
     # get ivp
     ivp = problem.get_ivp()
 

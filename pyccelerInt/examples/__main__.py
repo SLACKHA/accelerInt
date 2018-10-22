@@ -4,7 +4,7 @@ import argparse
 import multiprocessing
 
 from pyccelerInt import import_wrapper, get_solver_options, create_integrator, \
-    have_plotter
+    have_plotter, setup_example
 
 
 def vector_width(v):
@@ -164,6 +164,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.case == 'vdp':
+        from pyccelerInt.examples.van_der_pol import VDP as case
+    else:
+        from pyccelerInt.examples.pyJac import Ignition as case
+
+    # setup / build rwapper
+    setup_example(case, args)
+
     # get wrapper
     pycel = import_wrapper(args.language)
     args = post_validate(pycel, args, parser)
@@ -175,13 +183,8 @@ if __name__ == '__main__':
                                  platform=args.platform, device_type=args.device_type
                                  )
 
-    if args.case == 'vdp':
-        from pyccelerInt.examples.van_der_pol import VDP as case
-    else:
-        from pyccelerInt.examples.pyJac import Ignition as case
-
     # create problem
-    problem = case(args.language, options, reuse=args.reuse)
+    problem = case(args.language, options)
 
     end_time = args.end_time
     if not end_time:

@@ -13,7 +13,21 @@ class VDP(Problem):
     An implementation of the van der Pol problem for pyccelerInt
     """
 
-    def __init__(self, platform, options, reuse=False):
+    @classmethod
+    def path(cls):
+        """
+        Returns the path
+        """
+        return os.path.abspath(os.path.dirname(__file__))
+
+    @classmethod
+    def generate(cls, reuse=False, **kwargs):
+        """
+        Generate any code that must be run _before_ building
+        """
+        pass
+
+    def __init__(self, platform, options):
         """
         Initialize the problem.
 
@@ -23,12 +37,9 @@ class VDP(Problem):
             The runtime platform to use for the problem
         options: :class:`pyccelerint/PySolverOptions`
             The solver options to use
-        reuse: bool [False]
-            If true, reuse any previously generated code / modules
         """
 
-        path = os.path.abspath(os.path.dirname(__file__))
-        super(VDP, self).__init__(platform, options, path, reuse=reuse)
+        super(VDP, self).__init__(platform, options)
 
     def setup(self, num, options):
         """
@@ -60,15 +71,14 @@ class VDP(Problem):
         """
         Return the IVP for the VDP problem
         """
-        if self.platform == 'opencl':
+        if self.lang == 'opencl':
             # create ivp
             # Note: we need to pass the full paths to the PyIVP such that accelerInt
             # can find our kernel files
-            path = os.path.dirname(__file__)
             return self.get_wrapper().PyIVP([
-                os.path.join(path, 'opencl', 'dydt.cl'),
-                os.path.join(path, 'opencl', 'jacob.cl')], 0)
-        elif self.platform == 'c':
+                os.path.join(self.path, 'opencl', 'dydt.cl'),
+                os.path.join(self.path, 'opencl', 'jacob.cl')], 0)
+        elif self.lang == 'c':
             return self.get_wrapper().PyIVP(0)
 
     def get_initial_conditions(self):
