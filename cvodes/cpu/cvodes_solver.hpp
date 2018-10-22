@@ -130,11 +130,7 @@ namespace c_solvers
            \brief Returns a descriptive solver name
         */
         const char* solverName() const {
-            #ifdef SUNDIALS_ANALYTIC_JACOBIAN
-                const char* name = "cvodes-analytic-int";
-            #else
-                const char* name = "cvodes-int";
-            #endif
+            const char* name = "cvodes-int";
             return name;
         }
 
