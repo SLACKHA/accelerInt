@@ -75,8 +75,8 @@
 #define printv(prefix, val) \
 { \
     printf("%s={%e}\n", prefix, val); \
-}*/
-#endif
+}
+#endif*/
 
 // ROS internal routines ...
 inline __ValueType ros_getewt(__global const ros_t * __restrict__ ros, const int k, __global const __ValueType * __restrict__  y)
