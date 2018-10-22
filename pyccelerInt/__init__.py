@@ -13,6 +13,9 @@ scons = which('scons').strip()
 # add runtime path to find the pyccelerint module
 sys.path.insert(0, os.getcwd())
 
+platform_map = {'opencl': 'opencl',
+                'c': 'cpu'}
+
 
 def import_wrapper(platform):
     try:
@@ -86,7 +89,6 @@ class Problem(object):
 
         # build problem
         self.built = False
-        self.build()
 
         # mark not initialized
         self.init = False
@@ -97,15 +99,13 @@ class Problem(object):
         """
 
         if not self.built:
-            platform_map = {'opencl': 'opencl',
-                            'c': 'cpu'}
             try:
-                out = subprocess.check_call([scons, platform_map[self.platform]
-                                             + '-wrapper',
-                                             'mechanism_dir={}'.format(self.dir),
-                                             '-j', str(multiprocessing.cpu_count())])
+                subprocess.check_output([scons,
+                                         platform_map[self.platform] + '-wrapper',
+                                         'mechanism_dir={}'.format(self.dir),
+                                         '-j', str(multiprocessing.cpu_count())])
             except subprocess.CalledProcessError as e:
-                logging.getLogger(__name__).error(out)
+                logging.getLogger(__name__).error(e.output.decode())
                 raise Exception('Error building {}-wrapper for problem in '
                                 'directory {}'.format(self.platform, self.dir))
         self.built = True
@@ -205,6 +205,9 @@ class Problem(object):
         state: :class:`numpy.ndarray`
             If :param:`return_state` is True, the final state vector is returned
         """
+
+        if not self.built:
+            self.build()
 
         if not self.init:
             self.setup(num, self.options)

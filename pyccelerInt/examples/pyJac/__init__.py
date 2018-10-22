@@ -10,7 +10,7 @@ from pyjac import __version_info__, create_jacobian
 from pyjac.core.enum_types import KernelType, JacobianFormat
 from pyjac.pywrap import pywrap
 
-from pyccelerInt import Problem, get_plotter
+from pyccelerInt import Problem, get_plotter, platform_map
 
 assert(__version_info__[0] >= 2), 'Only pyJac-V2+ supports OpenCL execution.'
 
@@ -21,7 +21,7 @@ def import_pyjac(platform):
             import pyjac_ocl as pj  # noqa
             return pj
         elif platform == 'c':
-            import pyjac_cpu as pj  # noqa
+            import pyjac_c as pj  # noqa
             return pj
         else:
             raise Exception('Language {} not recognized!'.format(platform))
@@ -54,30 +54,38 @@ class Ignition(Problem):
         """
 
         self.conp = conp
-        path = os.path.abspath(os.path.dirname(__file__))
+        path = self._src_path()
+        self.data_path = os.path.abspath(os.path.dirname(__file__))
         super(Ignition, self).__init__(platform, options, path, reuse=reuse)
 
         # build pyjac module
-        # create source-rate evaluation
-        width = options.vector_size() if options.vector_size() else \
-            options.block_size()
-        if width <= 1:
-            width = None
+        # set OpenCL specific options
+        platform = None
+        width = None
+        explicit_simd = False
+        if self.platform == 'opencl':
+            width = options.vector_size() if options.vector_size() else \
+                options.block_size()
+            if width <= 1:
+                width = None
+            platform = options.platform()
+            explicit_simd = not options.block_size() and width
 
-        obj_path = os.path.join(self.dir, 'obj')
+        # create source-rate evaluation
+        obj_path = os.path.join(self.src_path, 'obj')
         ktype = KernelType.jacobian
         if not self.reuse:
             create_jacobian(self.platform,
-                            mech_name=os.path.join(self.dir, 'h2.cti'),
+                            mech_name=os.path.join(self.data_path, 'h2.cti'),
                             width=width, build_path=self.src_path, last_spec=None,
                             kernel_type=ktype,
-                            platform=options.platform(),
+                            platform=platform,
                             data_order=options.order(),
                             jac_format=JacobianFormat.full,
-                            explicit_simd=not options.block_size() and width)
+                            explicit_simd=explicit_simd)
             # and compile to get the kernel object
             pywrap(self.platform, self.src_path, obj_path, os.getcwd(), obj_path,
-                   options.platform(), ktype=ktype)
+                   platform, ktype=ktype)
 
             # create a simple wrapper to join
             if platform == 'opencl':
@@ -119,16 +127,20 @@ class Ignition(Problem):
 
         # get the working memory
         self.rwk_size = self.knl.required_working_memory()
-        if options.vector_size() or options.block_size():
+        if self.platform == 'opencl' and (options.vector_size()
+                                          or options.block_size()):
             # pyJac returns the complete (vectorized) memory req's, but we need
             # to pass in the unvectorized size
             vw = options.vector_size() if options.vector_size() else \
                 options.block_size()
             self.rwk_size /= vw
 
+    def _src_path(self):
+        return os.path.join(os.getcwd(), 'examples_working')
+
     @property
     def src_path(self):
-        return os.path.join(os.getcwd(), 'examples_working')
+        return os.path.join(self._src_path(), platform_map[self.platform])
 
     def setup(self, num, options):
         """
@@ -229,7 +241,7 @@ class Ignition(Problem):
         plt.title('H2 Ignition')
 
         # plot same problem in CT for comparison
-        gas = ct.Solution(os.path.join(self.dir, 'h2.cti'))
+        gas = ct.Solution(os.path.join(self.data_path, 'h2.cti'))
         gas.TPX = 1000, 101325, 'H2:2, O2:1, N2:3.76'
         reac = ct.IdealGasConstPressureReactor(gas)
         net = ct.ReactorNet([reac])
