@@ -14,17 +14,6 @@
 #include "solver.hpp"
 #include "rational_approximant.hpp"
 
-#define HAVE_SPARSE_MULTIPLIER
-#ifdef HAVE_SPARSE_MULTIPLIER
-extern "C"
-{
-    void sparse_multiplier(const double * A, const double * Vm, double* w);
-}
-#else
-#warning ("This isn't correct.")
-#define sparse_multiplier(A, v, o) (matvec_m_by_m(_neq, (A), (v), (o)))
-#endif
-
 namespace c_solvers
 {
 
@@ -139,6 +128,23 @@ namespace c_solvers
         std::size_t _w;
         //! working vector for getComplexInverseHessenbergLU
         std::size_t _work;
+
+        #ifndef HAVE_SPARSE_MULTIPLIER
+        //! Lapack - non-transpose
+        const char TRANS = 'N';
+        //! Lapack - Increment for Vm in dgemv
+        const int XINC = 1;
+        //! Lapack - alpha factor for dgemv
+        const double ALPHA = 1.0;
+        //! Lapack - alpha factor for dgemv
+        const double BETA = 0.0;
+        #endif
+
+        /** \brief Compute the matrix-vector multiplication A * Vm -> w
+         *         potentially using a user-specified sparse matrix multiplier
+         */
+        void gemv(const double * __restrict__ A, const double * __restrict__ Vm, double * __restrict__ w);
+
 
         /** \brief Compute the correct order Phi (exponential) matrix function.
          *         This is dependent on the exponential solver type, and hence must be

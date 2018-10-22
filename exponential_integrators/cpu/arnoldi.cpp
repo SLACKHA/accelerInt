@@ -58,7 +58,7 @@ namespace c_solvers
 		    double store = 0;
 			for (; j < index_list[index] && j + p < STRIDE; j++)
 			{
-				sparse_multiplier(A, &Vm[j * _neq], w);
+				gemv(A, &Vm[j * _neq], w);
 				for (int i = 0; i <= j; i++)
 				{
 					Hm[j * STRIDE + i] = dotproduct(w, &Vm[i * _neq]);

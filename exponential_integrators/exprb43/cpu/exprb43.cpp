@@ -101,7 +101,7 @@ namespace c_solvers {
 				dydt (t, pr, y, fy, rwk);
 				eval_jacob (t, pr, y, A, rwk);
 				//gy = fy - A * y
-				sparse_multiplier(A, y, gy);
+				gemv(A, y, gy);
 
 				for (int i = 0; i < _neq; ++i) {
 					gy[i] = fy[i] - gy[i];
@@ -136,7 +136,7 @@ namespace c_solvers {
 			//Dn2 = (F(Un2) - Jn * Un2) - gy
 
 			dydt(t, pr, temp, &savedActions[_neq], rwk);
-			sparse_multiplier(A, temp, f_temp);
+			gemv(A, temp, f_temp);
 
 
 			for (int i = 0; i < _neq; ++i) {
@@ -171,7 +171,7 @@ namespace c_solvers {
 			//next compute Dn3
 			//Dn3 = F(Un3) - A * Un3 - gy
 			dydt(t, pr, temp, &savedActions[3 * _neq], rwk);
-			sparse_multiplier(A, temp, f_temp);
+			gemv(A, temp, f_temp);
 
 
 			for (int i = 0; i < _neq; ++i) {

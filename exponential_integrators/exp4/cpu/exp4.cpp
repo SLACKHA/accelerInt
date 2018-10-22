@@ -141,7 +141,7 @@ namespace c_solvers {
 			}
 
 			dydt (t, pr, k4, temp, rwk);
-			sparse_multiplier (A, f_temp, k4);
+			gemv (A, f_temp, k4);
 
 
 			for (int i = 0; i < _neq; ++i) {
@@ -184,7 +184,7 @@ namespace c_solvers {
 			}
 
 			dydt (t, pr, k7, temp, rwk);
-			sparse_multiplier (A, f_temp, k7);
+			gemv (A, f_temp, k7);
 
 
 			for (int i = 0; i < _neq; ++i) {

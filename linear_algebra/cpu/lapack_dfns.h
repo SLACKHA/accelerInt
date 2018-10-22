@@ -15,6 +15,7 @@ extern void zgetrf_ (const int* m, const int* n, std::complex<double>* A, const 
 extern void dgetrs_ (const char* trans, const int* n, const int* nrhs, double* A, const int* LDA, int* ipiv, double* B, const int* LDB, int* info);
 extern void zgetrs_ (const char* trans, const int* n, const int* nrhs, std::complex<double>* A, const int* LDA, int* ipiv, std::complex<double>* B, const int* LDB, int* info);
 extern void zgetri_ (const int* n, std::complex<double>* A, const int* LDA, int* ipiv, std::complex<double>* work, const int* LDB, int* info);
+extern void dgemv_ (const char* trans, const int* m, const int* n, const double* alpha, const double* a, const int* lda, const double* x, const int* incx, const double* beta, const double* y, const int* incy);
 }
 
 #endif
