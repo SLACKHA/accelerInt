@@ -5,7 +5,7 @@
 import numpy as np
 import os
 
-from pyccelerInt import Problem
+from pyccelerInt import Problem, get_plotter
 
 
 class VDP(Problem):
@@ -94,7 +94,7 @@ class VDP(Problem):
             e.g., via :func:`integrator.state()`
         """
 
-        plt = self.get_plotter()
+        plt = get_plotter()
         plt.plot(times, solution[ivp_index, 0, :], label='y1')
         plt.plot(times, solution[ivp_index, 1, :], label='y2')
         plt.ylim(np.min(solution[ivp_index, 0, :]) * 1.05,

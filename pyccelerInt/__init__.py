@@ -30,19 +30,19 @@ def import_wrapper(platform):
                             platform, os.getcwd()))
 
 
-def get_plotter(self):
+def get_plotter():
     """
     Returns the matplotlib plotting module, if available
     """
 
     try:
-        from matplotlib.pyplot import plt
+        from matplotlib import pyplot as plt
         return plt
     except ImportError:
         raise Exception('Plotting not available!')
 
 
-def have_plotter(self):
+def have_plotter():
     """
     Return True if we have matplotlib available for plotting
     """
@@ -85,11 +85,14 @@ class Problem(object):
         Compile / construct the problem files
         """
 
+        platform_map = {'opencl': 'opencl',
+                        'c': 'cpu'}
         try:
-            out = subprocess.check_call([scons, self.platform + '-wrapper',
+            out = subprocess.check_call([scons, platform_map[self.platform]
+                                         + '-wrapper',
                                          'mechanism_dir={}'.format(self.dir),
-                                         '-j', multiprocessing.cpu_count()])
-        except subprocess.ProcessCalledError as e:
+                                         '-j', str(multiprocessing.cpu_count())])
+        except subprocess.CalledProcessError as e:
             logging.getLogger(__name__).error(out)
             raise Exception('Error building {}-wrapper for problem in '
                             'directory {}'.format(self.platform, self.dir))
@@ -202,7 +205,7 @@ class Problem(object):
 
         if return_state:
             # reshape
-            phi = phi.reshape(phi_i.shape, integrator.order())
+            phi = phi.reshape(phi_i.shape, order=integrator.order())
             ret = (ret, phi)
 
         return ret
@@ -269,5 +272,5 @@ def create_integrator(problem, integrator_type, options, num_threads):
     # get ivp
     ivp = problem.get_ivp()
 
-    return pycel.PyIntegrator(integrator_type, int(problem.num_equations),
-                              int(num_threads), ivp, options)
+    return ivp, pycel.PyIntegrator(integrator_type, problem.num_equations,
+                                   num_threads, ivp, options)

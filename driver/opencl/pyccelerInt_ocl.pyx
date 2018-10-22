@@ -46,7 +46,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         const double neq() except +
         void getLog(const int, double*, double*) except +
         size_t numSteps() except +
-        string_t order() except+
+        const string_t& order() except+
 
     cdef cppclass IVP:
         IVP(const vector[string_t]&, size_t, size_t,
@@ -189,6 +189,9 @@ cdef class PyIntegrator:
         else:
             phi_o = np.reshape(phi, (self.num, self.neq, n_steps), order=order)
         return times, phi_o
+
+    def order(self):
+        return deref(self.integrator.get()).order()
 
 
 cdef class PySolverOptions:

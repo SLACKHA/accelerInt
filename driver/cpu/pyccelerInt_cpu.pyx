@@ -4,6 +4,7 @@ import cython
 import numpy as np
 cimport numpy as np
 from libcpp cimport bool as bool_t  # noqa
+from libcpp.string cimport string as string_t  # noqa
 from libcpp.memory cimport unique_ptr
 from cython.operator cimport dereference as deref
 
@@ -38,6 +39,7 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
         const double neq() except +
         const double h_init() except +
         const double numThreads() except +
+        const string_t& order() except +
         void getLog(const int, double*, double*) except +
         size_t numSteps() except +
 
@@ -106,6 +108,9 @@ cdef class PyIntegrator:
         deref(self.integrator.get()).getLog(self.num, &times[0], &phi[0])
         # and reshape
         return times, np.reshape(phi, (self.num, self.neq, n_steps), order='F')
+
+    def order(self):
+        return 'F'
 
 
 cdef class PySolverOptions:

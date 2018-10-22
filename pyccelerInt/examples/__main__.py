@@ -60,7 +60,7 @@ def device_type(pycel, choice, parser):
     return check_enum(choice, pycel.DeviceType, 'Device type', parser)
 
 
-def post_validate(pycel, args):
+def post_validate(pycel, args, parser):
     """
     Validate any parser arguments the depend on the selected language
     """
@@ -73,10 +73,12 @@ def post_validate(pycel, args):
             'Cannot specify vectorSize and blockSize concurrently')
         # check platform
         args.device_type = device_type(pycel, args.device_type, parser)
+        if args.platform is None:
+            parser.error('OpenCL platform name must be specified!')
     if args.language == 'c':
-        if args.order == 'F':
-            raise argparse.ArgumentError('Currently only F-ordering is implemented '
-                                         'for the cpu-solvers.')
+        if args.order == 'C':
+            raise parser.error('Currently only F-ordering is implemented '
+                               'for the cpu-solvers.')
 
     return args
 
@@ -85,6 +87,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('Run the pyccelerInt examples.')
     parser.add_argument('-c', '--case',
                         choices=['vdp', 'pyjac'],
+                        required=True,
                         help='The example to run, currently only the van der Pol '
                              'problem and pyJac are implemented.')
     parser.add_argument('-l', '--language',
@@ -163,7 +166,7 @@ if __name__ == '__main__':
 
     # get wrapper
     pycel = import_wrapper(args.language)
-    args = post_validate(pycel, args)
+    args = post_validate(pycel, args, parser)
 
     options = get_solver_options(args.language, args.int_type,
                                  logging=True, vector_size=args.vector_size,
@@ -185,7 +188,7 @@ if __name__ == '__main__':
         end_time = problem.get_default_endtime()
 
     # get IVP and integrator
-    ivp, integrator = create_integrator(problem, integrator_type, options,
+    ivp, integrator = create_integrator(problem, args.int_type, options,
                                         args.num_threads)
 
     print('Integrating {} IVPs with method {}, and {} threads...'.format(
@@ -194,6 +197,8 @@ if __name__ == '__main__':
     # run problem
     time, phi = problem.run(integrator, args.num_ivp, end_time, t_start=0,
                             t_step=problem.get_default_stepsize(), return_state=True)
+
+    print('Integration finished in {} (s)'.format(time / 1000.))
 
     if have_plotter():
         t, phi = integrator.state()
