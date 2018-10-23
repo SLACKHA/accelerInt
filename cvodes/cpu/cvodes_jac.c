@@ -18,7 +18,9 @@ int eval_jacob_cvodes(
                       void* f, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
     // 'use' parameters to silence gcc warnings
+    #ifdef have_problem_size
     (void)N;
+    #endif
     (void)ydot;
     (void)tmp1;
     (void)tmp2;
@@ -27,6 +29,11 @@ int eval_jacob_cvodes(
 	double* local_y = NV_DATA_S(y);
     // unpack user data
     CVUserData* ud = (CVUserData*)f;
-	eval_jacob((double)t, ud->param, local_y, (double*)jac->data, ud->rwk);
+    #if NEW_SUNDIALS
+    double* data = (double*)SM_CONTENT_D(jac)->data;
+    #else
+    double* data = (double*)jac->data;
+    #endif
+	eval_jacob((double)t, ud->param, local_y, data, ud->rwk);
 	return 0;
 }

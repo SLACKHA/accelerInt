@@ -13,9 +13,6 @@
 extern "C"
 {
     #include "cvodes_includes.h"
-    #if SUNDIALS_VERSION_MAJOR >= 3
-        #define NEW_SUNDIALS
-    #endif
     #include "cvodes_dydt.h"
     #ifndef FINITE_DIFFERENCE
         #include "cvodes_jac.h"

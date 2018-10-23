@@ -360,6 +360,7 @@ env['LIBS'] = Libs
 env['NVCCFLAGS'] = NVCCFlags
 env['NVCCLINKFLAGS'] = NVCCLinkFlags
 env['NVCCLIBS'] = NVCCLibs
+env['CPPDEFINES'] = []
 
 variant = 'release' if not env['DEBUG'] else 'debug'
 env['variant'] = variant
@@ -432,6 +433,7 @@ print('Using Sundials version {}'.format(env['SUNDIALS_VERSION']))
 if LooseVersion(env['SUNDIALS_VERSION']) > LooseVersion('3.0'):
     cvodes_libs = ['sundials_cvodes', 'sundials_nvecserial',
                    'sundials_sunlinsollapackdense']
+    env['CPPDEFINES'] += ['NEW_SUNDIALS']
 else:
     cvodes_libs = ['sundials_cvodes', 'sundials_nvecserial']
 
