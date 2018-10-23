@@ -11,18 +11,6 @@
 #include <cstdlib>
 #include <cstring>
 
-/* CVODES INCLUDES */
-extern "C"
-{
-    #include "cv_user_data.h"
-    #include "sundials/sundials_types.h"
-    #include "sundials/sundials_math.h"
-    #include "sundials/sundials_nvector.h"
-    #include "nvector/nvector_serial.h"
-    #include "cvodes/cvodes.h"
-    #include "cvodes/cvodes_lapack.h"
-}
-
 namespace c_solvers {
 
     /**

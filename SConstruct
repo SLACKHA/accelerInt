@@ -544,10 +544,12 @@ def build_wrapper(save, platform, defines, libs, variant, multi):
     return wrapper_py
 
 
-def get_includes(platform, includes):
+def get_includes(platform, includes, exact_includes=[]):
     ndef = {}
     # include platform in path
     includes = [os.path.join(x, platform) for x in includes]
+    if exact_includes:
+        includes.extend(exact_includes)
     if platform in ['cpu', 'opencl']:
         ndef['CPPPATH'] = includes[:]
         if platform == 'opencl':
@@ -604,8 +606,8 @@ for p in platforms:
     rkc = build_lib(env_save, p, new_defines, rkc_dir,
                     variant, 'rkc', extra_libs=core)
     # cvodes
-    new_defines = get_includes(p,  [generic_dir, cvodes_dir,
-                                    env['sundials_inc_dir']])
+    new_defines = get_includes(p,  [generic_dir, cvodes_dir], exact_includes=[
+        env['sundials_inc_dir']])
     new_defines['LIBPATH'] = [env['sundials_lib_dir']]
     new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
     cvodes = build_lib(env_save, p, new_defines, cvodes_dir,

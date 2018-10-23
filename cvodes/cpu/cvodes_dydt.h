@@ -6,9 +6,7 @@
 #ifndef DYDT_HEAD_CVODES
 #define DYDT_HEAD_CVODES
 
-#include "sundials/sundials_nvector.h"
-#include "nvector/nvector_serial.h"
-#include "cv_user_data.h"
+#include "cvodes_includes.h"
 
 
 /*! \fn int dydt_cvodes(double t, N_Vector y, N_Vector ydot, void* f)

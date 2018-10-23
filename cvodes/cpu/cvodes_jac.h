@@ -7,11 +7,16 @@
 #ifndef JAC_HEAD_CVODES
 #define JAC_HEAD_CVODES
 
-#include "sundials/sundials_nvector.h"
-#include "sundials/sundials_direct.h"
-#include "nvector/nvector_serial.h"
-#include "cv_user_data.h"
 #include "jacob.h"
+#include "cvodes_includes.h"
+
+
+#if SUNDIALS_MAJOR_VERSION >= 3
+#define jac_type SUNMatrix
+#else
+#define jac_type DlsMat
+#define have_problem_size
+#endif
 
 /*!
    \brief The CVODEs Jacobian interface for a direct dense Jacobian
@@ -27,6 +32,10 @@
    \return cvode_return_code The CVODE output constant returned (see sec B.2 of CVODE documentation), currently always returns CV_SUCCESS
 */
 
-int eval_jacob_cvodes(long int N, double t, N_Vector y, N_Vector ydot, DlsMat Jac, void* f, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+int eval_jacob_cvodes(
+   #ifdef have_problem_size
+   long int N,
+   #endif
+   double t, N_Vector y, N_Vector ydot, jac_type Jac, void* f, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
 #endif

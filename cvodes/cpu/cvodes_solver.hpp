@@ -18,18 +18,21 @@ extern "C"
     #ifndef FINITE_DIFFERENCE
         #include "cvodes_jac.h"
     #endif
-
-    /* CVODES INCLUDES */
-    #include "sundials/sundials_types.h"
-    #include "sundials/sundials_math.h"
-    #include "sundials/sundials_nvector.h"
-    #include "nvector/nvector_serial.h"
-    #include "cvodes/cvodes.h"
-    #include "cvodes/cvodes_lapack.h"
+    #include "cvodes_includes.h"
 }
 
 
 //! unique_ptr deleter support for CVODE integrator
+#if SUNDIALS_VERSION_MAJOR >= 3
+void delete_sunlinsol(void* linsol)
+{
+    SUNLinSolFree((SUNLinearSolver)linsol);
+}
+void delete_sunmat(void* mat)
+{
+    SUNMatDestroy((SUNMatrix) mat);
+}
+#endif
 void delete_integrator(void* integrator)
 {
     CVodeFree(&integrator);
@@ -86,6 +89,10 @@ namespace c_solvers
     protected:
         std::vector<std::unique_ptr<void, void(*)(void *)>> y_locals;
         std::vector<std::unique_ptr<void, void(*)(void *)>> integrators;
+        #if SUNDIALS_VERSION_MAJOR >= 3
+        std::vector<std::unique_ptr<void, void(*)(void *)>> linsols;
+        std::vector<std::unique_ptr<void, void(*)(void *)>> mats;
+        #endif
         std::vector<CVUserData> user_data;
 
         //! the offset to the CVODEs state vectors
@@ -154,6 +161,18 @@ namespace c_solvers
                     std::unique_ptr<void, void(*)(void*)>(
                         (void*)N_VMake_Serial(_neq, phi),
                         delete_nvector));
+                #if SUNDIALS_VERSION_MAJOR >= 3
+                // create linear solver and matrix
+                mats.push_back(
+                     std::unique_ptr<void, void(*)(void*)>(
+                        (void*)SUNDenseMatrix(_neq, _neq),
+                        delete_sunmat));
+                linsols.push_back(
+                     std::unique_ptr<void, void(*)(void*)>(
+                        (void*)SUNLapackDense((N_Vector)y_locals[i].get(),
+                                              (SUNMatrix)mats[i].get()),
+                        delete_sunmat));
+                #endif
 
                 // check
                 if (integrators[i] == NULL)
@@ -169,19 +188,27 @@ namespace c_solvers
                 CVODEErrorCheck(CVodeSStolerances(integrators[i].get(), rtol(), atol()));
 
                 //setup the solver
+                #if SUNDIALS_VERSION_MAJOR >= 3
+                CVDlsSetLinearSolver(integrators[i].get(), (SUNLinearSolver)linsols[i].get(),
+                                     (SUNMatrix)mats[i].get());
+                #else
                 CVODEErrorCheck(CVLapackDense(integrators[i].get(), _neq));
+                #endif
 
                 #ifndef FINITE_DIFFERENCE
+                    #if SUNDIALS_VERSION_MAJOR >= 3
+                    CVODEErrorCheck(CVDlsSetJacFn(integrators[i].get(), eval_jacob_cvodes));
+                    #else
                     CVODEErrorCheck(CVDlsSetDenseJacFn(integrators[i].get(), eval_jacob_cvodes));
+                    #endif
                 #endif
 
                 #ifdef CV_MAX_ORD
                     CVODEErrorCheck(CVodeSetMaxOrd(integrators[i].get(), CV_MAX_ORD));
                 #endif
 
-                #define CV_MAX_STEPS (100000)
                 #ifdef CV_MAX_STEPS
-                    CVODEErrorCheck(CVodeSetMaxNumSteps(integrators[i].get(), CV_MAX_STEPS));
+                    CVODEErrorCheck(CVodeSetMaxNumSteps(integrators[i].get(), options.maxIters()));
                 #endif
 
                 #ifdef CV_HMAX
