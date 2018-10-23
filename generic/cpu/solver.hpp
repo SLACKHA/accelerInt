@@ -82,11 +82,13 @@ namespace c_solvers {
     {
     public:
         SolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false,
-                      double h_init=1e-6):
+                      double h_init=1e-6, size_t minIters = 1, size_t maxIters = 1000):
             _atol(atol),
             _rtol(rtol),
             _logging(logging),
-            _h_init(h_init)
+            _h_init(h_init),
+            _minIters(minIters),
+            _maxIters(maxIters)
         {
 
         }
@@ -111,6 +113,16 @@ namespace c_solvers {
             return _h_init;
         }
 
+        inline std::size_t minIters() const
+        {
+            return _minIters;
+        }
+
+        inline std::size_t maxIters() const
+        {
+            return _maxIters;
+        }
+
     protected:
         //! the absolute tolerance for this integrator
         const double _atol;
@@ -120,6 +132,10 @@ namespace c_solvers {
         bool _logging;
         //! The initial step-size
         const double _h_init;
+        //! The minimum allowed internal integration steps
+        const size_t _minIters;
+        //! The maxiumum allowed internal integration steps
+        const size_t _maxIters;
     };
 
     // skeleton of the c-solver
