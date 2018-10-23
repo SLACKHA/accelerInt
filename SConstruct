@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 # A SConstruct file for accerlerInt, heavily adapted from Cantera
 
 from __future__ import print_function
@@ -214,6 +215,8 @@ config_options = [
     BoolVariable(
         'FAST_MATH', 'Compile with Fast Math.', False),
     BoolVariable(
+        'VERBOSE', 'More verbose debugging statements.', False),
+    BoolVariable(
         'FINITE_DIFFERENCE', 'Use a finite difference Jacobian (not recommended)',
         False),
     ('DIVERGENCE_WARPS', 'If specified, measure divergence in that many warps', '0'),
@@ -372,6 +375,32 @@ env['OCL_INC_DIR'] = listify(env['opencl_inc_dir'])
 env['OCL_LIB_DIR'] = listify(env['opencl_lib_dir'])
 
 
+def config_error(message):
+    print('ERROR:', message)
+    if env['VERBOSE']:
+        print('*' * 25, 'Contents of config.log:', '*' * 25)
+        print(open('config.log').read())
+        print('*' * 28, 'End of config.log', '*' * 28)
+    else:
+        print("See 'config.log' for details.")
+    sys.exit(1)
+
+
+def get_expression_value(includes, expression):
+    s = ['#include ' + i for i in includes]
+    s.extend(('#define Q(x) #x',
+              '#define QUOTE(x) Q(x)',
+              '#include <iostream>',
+              '#ifndef SUNDIALS_PACKAGE_VERSION',  # name change in Sundials >= 3.0
+              '#define SUNDIALS_PACKAGE_VERSION SUNDIALS_VERSION',
+              '#endif',
+              'int main(int argc, char** argv) {',
+              '    std::cout << %s << std::endl;' % expression,
+              '    return 0;',
+              '}\n'))
+    return '\n'.join(s)
+
+
 def get_env(save, defines):
     env = save.Clone()
 
@@ -382,6 +411,29 @@ def get_env(save, defines):
         env[key].extend(listify(value))
 
     return env
+
+######################
+#    Configuration   #
+######################
+
+# determine sundials version
+
+sun_env = Environment(tools=['default'])
+sun_env['CCFLAGS'] = ['-I{}'.format(env['sundials_inc_dir'])]
+conf = Configure(sun_env)
+ret, env['SUNDIALS_VERSION'] = conf.TryRun(
+    get_expression_value(['"sundials/sundials_config.h"'],
+                         'QUOTE(SUNDIALS_PACKAGE_VERSION)'), '.cpp')
+if ret == 0:
+    config_error('Could not determine sundials version!')
+print('Using Sundials version {}'.format(env['SUNDIALS_VERSION']))
+
+# determine version
+if LooseVersion(env['SUNDIALS_VERSION']) > LooseVersion('3.0'):
+    cvodes_libs = ['sundials_cvodes', 'sundials_nvecserial',
+                   'sundials_sunlinsollapackdense']
+else:
+    cvodes_libs = ['sundials_cvodes', 'sundials_nvecserial']
 
 
 platforms = ['cpu']
@@ -610,7 +662,7 @@ for p in platforms:
     new_defines = get_includes(p,  [generic_dir, cvodes_dir], exact_includes=[
         env['sundials_inc_dir']])
     new_defines['LIBPATH'] = [env['sundials_lib_dir']]
-    new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial']
+    new_defines['LIBS'] = cvodes_libs[:]
     cvodes = build_lib(env_save, p, new_defines, cvodes_dir,
                        variant, 'cvodes', extra_libs=core)
 
@@ -635,8 +687,8 @@ for p in platforms:
                                     cvodes_dir, rkf45_dir, ros_dir],
                                exact_includes=[env['sundials_inc_dir']])
     new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
-    new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
-    new_defines['RPATH'] = [lib_dir]
+    new_defines['LIBS'] = cvodes_libs[:] + ['fftw3']
+    new_defines['RPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
 
     if p == 'opencl':
         new_defines['LIBPATH'] += env['OCL_LIB_DIR']
