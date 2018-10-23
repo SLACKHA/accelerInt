@@ -3,7 +3,6 @@
  * \brief CVODEs Wrapper for the RHS function
  */
 
-#include "dydt.h"
 #include "cvodes_dydt.h"
 
 /*!

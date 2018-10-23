@@ -12,18 +12,19 @@
 #include "solver.hpp"
 extern "C"
 {
-    #include "cv_user_data.h"
+    #include "cvodes_includes.h"
+    #if SUNDIALS_VERSION_MAJOR >= 3
+        #define NEW_SUNDIALS
+    #endif
     #include "cvodes_dydt.h"
-
     #ifndef FINITE_DIFFERENCE
         #include "cvodes_jac.h"
     #endif
-    #include "cvodes_includes.h"
 }
 
 
 //! unique_ptr deleter support for CVODE integrator
-#if SUNDIALS_VERSION_MAJOR >= 3
+#ifdef NEW_SUNDIALS
 void delete_sunlinsol(void* linsol)
 {
     SUNLinSolFree((SUNLinearSolver)linsol);
@@ -89,7 +90,7 @@ namespace c_solvers
     protected:
         std::vector<std::unique_ptr<void, void(*)(void *)>> y_locals;
         std::vector<std::unique_ptr<void, void(*)(void *)>> integrators;
-        #if SUNDIALS_VERSION_MAJOR >= 3
+        #ifdef NEW_SUNDIALS
         std::vector<std::unique_ptr<void, void(*)(void *)>> linsols;
         std::vector<std::unique_ptr<void, void(*)(void *)>> mats;
         #endif
@@ -161,7 +162,7 @@ namespace c_solvers
                     std::unique_ptr<void, void(*)(void*)>(
                         (void*)N_VMake_Serial(_neq, phi),
                         delete_nvector));
-                #if SUNDIALS_VERSION_MAJOR >= 3
+                #ifdef NEW_SUNDIALS
                 // create linear solver and matrix
                 mats.push_back(
                      std::unique_ptr<void, void(*)(void*)>(
@@ -188,7 +189,7 @@ namespace c_solvers
                 CVODEErrorCheck(CVodeSStolerances(integrators[i].get(), rtol(), atol()));
 
                 //setup the solver
-                #if SUNDIALS_VERSION_MAJOR >= 3
+                #ifdef NEW_SUNDIALS
                 CVDlsSetLinearSolver(integrators[i].get(), (SUNLinearSolver)linsols[i].get(),
                                      (SUNMatrix)mats[i].get());
                 #else
@@ -196,7 +197,7 @@ namespace c_solvers
                 #endif
 
                 #ifndef FINITE_DIFFERENCE
-                    #if SUNDIALS_VERSION_MAJOR >= 3
+                    #ifdef NEW_SUNDIALS
                     CVODEErrorCheck(CVDlsSetJacFn(integrators[i].get(), eval_jacob_cvodes));
                     #else
                     CVODEErrorCheck(CVDlsSetDenseJacFn(integrators[i].get(), eval_jacob_cvodes));

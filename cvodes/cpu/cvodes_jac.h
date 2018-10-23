@@ -10,8 +10,7 @@
 #include "jacob.h"
 #include "cvodes_includes.h"
 
-
-#if SUNDIALS_MAJOR_VERSION >= 3
+#ifdef NEW_SUNDIALS
 #define jac_type SUNMatrix
 #else
 #define jac_type DlsMat

@@ -14,5 +14,6 @@
 #include "sundials/sundials_nvector.h"
 #include "nvector/nvector_serial.h"
 #include "cvodes/cvodes.h"
+#include "cv_user_data.h"
 
 #endif

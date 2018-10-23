@@ -6,6 +6,7 @@
 #ifndef DYDT_HEAD_CVODES
 #define DYDT_HEAD_CVODES
 
+#include "dydt.h"
 #include "cvodes_includes.h"
 
 

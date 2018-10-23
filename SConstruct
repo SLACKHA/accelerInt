@@ -579,8 +579,9 @@ for p in platforms:
 
     # exponentials
     shared = os.path.join(exp_int_dir, 'shared')
-    new_defines = get_includes(p, [generic_dir, env['fftw3_inc_dir'], exp_int_dir,
-                                   linalg_dir, shared])
+    new_defines = get_includes(p, [generic_dir, exp_int_dir,
+                                   linalg_dir, shared], exact_includes=[
+                                   env['fftw3_inc_dir']])
     new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
     new_defines['LIBS'] = ['fftw3']
     exp = build_lib(env_save, p, new_defines, exp_int_dir,
@@ -614,7 +615,8 @@ for p in platforms:
                        variant, 'cvodes', extra_libs=core)
 
     # rk78
-    new_defines = get_includes(p,  [generic_dir, rk78_dir, env['boost_inc_dir']])
+    new_defines = get_includes(p,  [generic_dir, rk78_dir],
+                               exact_includes=[env['boost_inc_dir']])
     rk78 = build_lib(env_save, p, new_defines, rk78_dir, variant,
                      'rk78', extra_libs=core)
 
@@ -630,7 +632,8 @@ for p in platforms:
     # add interface / problem definition
     new_defines = get_includes(p,  [generic_dir, radau2a_dir, rk78_dir, rkc_dir,
                                     exp4_int_dir, exprb43_int_dir, exp_int_dir,
-                                    cvodes_dir, rkf45_dir, ros_dir])
+                                    cvodes_dir, rkf45_dir, ros_dir],
+                               exact_includes=[env['sundials_inc_dir']])
     new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
     new_defines['LIBS'] = ['sundials_cvodes', 'sundials_nvecserial', 'fftw3']
     new_defines['RPATH'] = [lib_dir]
