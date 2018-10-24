@@ -157,10 +157,20 @@ if __name__ == '__main__':
                         default=None,  # 1ms
                         help='The simulation end-time.')
 
-    parser.add_argument('-r', '--reuse',
+    parser.add_argument('-ru', '--reuse',
                         action='store_true',
                         default=False,
                         help='Reuse the previously generated pyJac code / library.')
+
+    parser.add_argument('-rtol', '--relative_tolerance',
+                        type=float,
+                        default=1e-06,
+                        help='The relative tolerance for the solvers.')
+
+    parser.add_argument('-atol', '--absolute_tolerance',
+                        type=float,
+                        default=1e-10,
+                        help='The absolute tolerance for the solvers.')
 
     args = parser.parse_args()
 
@@ -177,11 +187,15 @@ if __name__ == '__main__':
     args = post_validate(pycel, args, parser)
 
     options = get_solver_options(args.language, args.int_type,
-                                 logging=True, vector_size=args.vector_size,
+                                 logging=True,
+                                 vector_size=args.vector_size,
                                  block_size=args.block_size,
-                                 use_queue=args.use_queue, order=args.order,
-                                 platform=args.platform, device_type=args.device_type
-                                 )
+                                 use_queue=args.use_queue,
+                                 order=args.order,
+                                 platform=args.platform,
+                                 device_type=args.device_type,
+                                 rtol=args.relative_tolerance,
+                                 atol=args.absolute_tolerance)
 
     # create problem
     problem = case(args.language, options)

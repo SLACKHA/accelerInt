@@ -80,7 +80,8 @@ class Ignition(Problem):
                             platform=platform,
                             data_order=order,
                             jac_format=JacobianFormat.full,
-                            explicit_simd=explicit_simd)
+                            explicit_simd=explicit_simd,
+                            unique_pointers=lang == 'c')
 
             # and compile to get the kernel object
             pywrap(lang, out_path, obj_path, os.getcwd(), obj_path,
@@ -216,6 +217,10 @@ class Ignition(Problem):
         self.phi[:, 0] = T0
         self.phi[:, 1] = V0
 
+        # store tolerances
+        self.rtol = options.rtol()
+        self.atol = options.atol()
+
         # get species names
         species = self.knl.species_names()
 
@@ -255,7 +260,7 @@ class Ignition(Problem):
             return self.get_wrapper().PyIVP(files, self.rwk_size,
                                             include_paths=[self.src_path])
         elif self.lang == 'c':
-            return self.get_wrapper().PyIVP(self.rwk_size, True)
+            return self.get_wrapper().PyIVP(self.rwk_size)
 
     def get_initial_conditions(self):
         """
@@ -298,6 +303,7 @@ class Ignition(Problem):
         gas.TPX = 1000, 101325, 'H2:2, O2:1, N2:3.76'
         reac = ct.IdealGasConstPressureReactor(gas)
         net = ct.ReactorNet([reac])
+        net.rtol, net.atol = self.rtol, self.atol
         t = [net.time]
         T = [reac.thermo.T]
         while net.time <= times[-1]:
