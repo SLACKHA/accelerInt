@@ -21,8 +21,9 @@ namespace c_solvers
     {
     public:
         EXPSolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false,
-                         double h_init=1e-6, int N_RA=10, int M_MAX=-1):
-                SolverOptions(atol, rtol, logging, h_init),
+                         std::size_t maxIters=1, std::size_t minIters=1000,
+                         int N_RA=10, int M_MAX=-1):
+                SolverOptions(atol, rtol, logging, h_init, maxIters, minIters),
                 N_RA(N_RA),
                 M_MAX(M_MAX)
             {
