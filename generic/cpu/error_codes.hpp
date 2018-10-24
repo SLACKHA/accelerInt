@@ -24,7 +24,11 @@ namespace c_solvers
         //! Timestep reduced such that update would have no effect on simulation time
         H_PLUS_T_EQUALS_H = 3,
         //! Maximum allowed Newton Iteration steps exceeded @see #NewtonMaxit
-        MAX_NEWTON_ITER_EXCEEDED = 4
+        MAX_NEWTON_ITER_EXCEEDED = 4,
+        //! Integration timestep smaller than roundoff
+        TDIST_TOO_SMALL = 5,
+        //! Maximumum iterations of h_init reached
+        HIN_MAX_ITERS = 6
     };
 }
 

@@ -339,7 +339,8 @@ namespace c_solvers
     #ifdef CONST_TIME_STEP
         double H = t_end - t_start;
     #else
-        double H = h_init();
+        double H = 0;
+        hinit(t_start, t_end, y, pr, &H);
     #endif
         double Hnew;
         double t = t_start;

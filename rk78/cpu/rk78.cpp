@@ -39,7 +39,9 @@ namespace c_solvers {
         std::memcpy(&state_vectors[index][0], y, _neq * sizeof(double));
 
         // and integrate
-        integrate_adaptive(controllers[index], *evaluators[index], state_vectors[index], t_start, t_end, h_init());
+        double h = 0;
+        hinit(t, t_end, y, pr, &h);
+        integrate_adaptive(controllers[index], *evaluators[index], state_vectors[index], t_start, t_end, h);
 
         // copy out of state vector
         std::memcpy(y, &state_vectors[index][0], _neq * sizeof(double));

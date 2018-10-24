@@ -328,6 +328,20 @@ namespace c_solvers {
             return _ourMemSize;
         }
 
+        /*
+         * \brief Estimate the inital time-step
+         *
+         * \param[in]       t           The starting integration time
+         * \param[in]       t_end       the end integration time
+         * \param[in]       y           The initial state vector
+         * \param[in]       user_data   The user parameter
+         * \param[in,out]   h0          The calculated initial time-step
+         */
+        ErrorCode Integrator::hinit(const double t, const double t_end,
+                                    const double* __restrict__ y,
+                                    const double user_data,
+                                    double* h0)
+
     private:
         void clean()
         {
