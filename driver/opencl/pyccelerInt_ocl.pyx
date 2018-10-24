@@ -59,8 +59,9 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
 
     cdef cppclass SolverOptions:
         SolverOptions(size_t, size_t, double, double,
-                      bool_t, bool_t, string_t, string_t, DeviceType,
-                      size_t, size_t, StepperType) except +
+                      bool_t, bool_t, string_t, string_t,
+                      DeviceType, size_t, size_t,
+                      StepperType) except +
 
         double atol() except+
         double rtol() except+
@@ -207,16 +208,15 @@ cdef class PySolverOptions:
                   size_t blockSize=1, double atol=1e-10,
                   double rtol=1e-6, bool_t logging=False, bool_t use_queue=True,
                   string_t order="C", string_t platform="",
-                  DeviceType deviceType = DeviceType.DEFAULT,  size_t minIters=1,
+                  DeviceType deviceType = DeviceType.DEFAULT, size_t minIters=1,
                   size_t maxIters = 1000,
                   StepperType stepper_type = StepperType.ADAPTIVE):
 
-        cdef string_t c_order = _bytes(order)
         self.options.reset(new SolverOptions(
             vectorSize, blockSize,
             atol, rtol, logging, use_queue,
-            c_order, platform, deviceType,
-            minIters, maxIters, StepperType))
+            _bytes(order), _bytes(platform), deviceType,
+            minIters, maxIters, stepper_type))
 
     cpdef atol(self):
         return deref(self.options.get()).atol()
