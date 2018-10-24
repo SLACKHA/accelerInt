@@ -27,7 +27,7 @@ cdef extern from "error_codes.hpp" namespace "c_solvers":
 
 cdef extern from "exp_solver.hpp" namespace "c_solvers":
     cdef cppclass EXPSolverOptions:
-        EXPSolverOptions(double, double, bool_t, double, int, int) except +
+        EXPSolverOptions(double, double, bool_t, size_t, size_t, int, int) except +
 
 cdef extern from "solver_interface.hpp" namespace "c_solvers":
     cdef cppclass Integrator:
@@ -37,14 +37,13 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
         const double atol() except +
         const double rtol() except +
         const double neq() except +
-        const double h_init() except +
         const double numThreads() except +
         const string_t& order() except +
         void getLog(const int, double*, double*) except +
         size_t numSteps() except +
 
     cdef cppclass SolverOptions:
-        SolverOptions(double, double, bool_t, double) except +
+        SolverOptions(double, double, bool_t, size_t, size_t) except +
         const double atol() except +
         const double rtol() except +
         const bool_t logging() except +
@@ -120,16 +119,20 @@ cdef class PySolverOptions:
     cdef unique_ptr[SolverOptions] options # hold our options
 
     def __cinit__(self, IntegratorType itype, double atol=1e-10, double rtol=1e-6,
-                  bool_t logging=False, double h_init=1e-6,
+                  bool_t logging=False,
+                  size_t min_iters=1,
+                  size_t max_iters=1000,
                   int num_rational_approximants=10,
                   int max_krylov_subspace_dimension=-1):
         if itype in [IntegratorType.EXP4, IntegratorType.EXPRB43]:
             self.options.reset(
-                new EXPSolverOptions(atol, rtol, logging, h_init,
+                new EXPSolverOptions(atol, rtol, logging,
+                                     min_iters, max_iters,
                                      num_rational_approximants,
                                      max_krylov_subspace_dimension))
         else:
-            self.options.reset(new SolverOptions(atol, rtol, logging, h_init))
+            self.options.reset(new SolverOptions(atol, rtol, logging,
+                                                 min_iters, max_iters))
 
     def order(self):
         return 'F'

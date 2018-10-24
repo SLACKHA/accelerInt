@@ -82,11 +82,10 @@ namespace c_solvers {
     {
     public:
         SolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false,
-                      double h_init=1e-6, size_t minIters = 1, size_t maxIters = 1000):
+                      size_t minIters = 1, size_t maxIters = 1000):
             _atol(atol),
             _rtol(rtol),
             _logging(logging),
-            _h_init(h_init),
             _minIters(minIters),
             _maxIters(maxIters)
         {
@@ -108,11 +107,6 @@ namespace c_solvers {
             return _logging;
         }
 
-        inline double h_init() const
-        {
-            return _h_init;
-        }
-
         inline std::size_t minIters() const
         {
             return _minIters;
@@ -130,8 +124,6 @@ namespace c_solvers {
         const double _rtol;
         //! whether logging is enabled or not
         bool _logging;
-        //! The initial step-size
-        const double _h_init;
         //! The minimum allowed internal integration steps
         const size_t _minIters;
         //! The maxiumum allowed internal integration steps
@@ -277,12 +269,6 @@ namespace c_solvers {
             return _numThreads;
         }
 
-        //! return the initial step-size
-        inline const double h_init() const
-        {
-            return _options.h_init();
-        }
-
 
        /**
         * \brief Integration driver for the CPU integrators
@@ -320,6 +306,12 @@ namespace c_solvers {
         std::size_t _ivp_working;
         //! \brief the offset to the memory allocated for a local copy of the state vector
         std::size_t _phi;
+        //! \brief The offset to the working memory dy-vector for the initial timestep estimation
+        std::size_t _ydot_hin;
+        //! \brief The offset to the working memory y-perturbation vector for the initial timestep estimation
+        std::size_t _y1_hin;
+        //! \brief The offset to the working memory dy-vector for the initial timestep estimation
+        std::size_t _ydot1_hin;
 
 
         //! Return unique memory access
@@ -355,7 +347,14 @@ namespace c_solvers {
             _ivp_working = offset;
             offset += _ivp.requiredMemorySize();
             _phi = offset;
-            return offset + _neq * sizeof(double);
+            offset += _neq * sizeof(double);
+            _ydot_hin = offset;
+            offset += _neq * sizeof(double);
+            _y1_hin = offset;
+            offset += _neq * sizeof(double);
+            _ydot1_hin = offset;
+            offset += _neq * sizeof(double);
+            return offset;
         }
 
     };
