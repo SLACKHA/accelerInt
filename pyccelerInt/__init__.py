@@ -247,45 +247,91 @@ class Problem(object):
         """
         raise NotImplementedError
 
+############################
+# Input validation section #
+############################
 
-def setup_example(case, args):
-    """
-    Generate / build the case
 
-    Parameters
-    ----------
-    case: :class:`Problem`
-        The case to setup
-    args: :class:`ArgumentParser`
-        The parsed (un post-validated) args
-    """
-    case.generate(lang=args.language,
-                  reuse=args.reuse,
-                  vector_size=args.vector_size,
-                  block_size=args.block_size,
-                  platform=args.platform,
-                  order=args.order)
-    case.build(args.language)
+def check_vector_width(v):
+    def __raise():
+        raise Exception('Specified vector-width: {} is invalid'.format(v))
+    try:
+        v = int(v)
+        if v not in [1, 2, 3, 4, 8, 16]:
+            __raise()
+        return v
+    except ValueError:
+        __raise()
+
+
+def check_block_size(b):
+    def __raise():
+        raise Exception('Specified block size: {} is invalid'.format(b))
+    try:
+        b = int(b)
+        # ensure power of 2
+        if not (b & (b - 1)) == 0:
+            __raise()
+        return b
+    except ValueError:
+        __raise()
+
+
+def enum_str(enum_val):
+    s = str(enum_val)
+    return s[s.index('.') + 1:]
+
+
+def check_enum(choice, enum, help_str):
+    selected = next((x for x in enum if choice == enum_str(x)), None)
+    if selected is None:
+        err_str = ('{help}: {choice} is invalid, possible choices:'
+                   ' {{{choices}}}'.format(
+                                        help=help_str,
+                                        choice=choice,
+                                        choices=', '.join([
+                                            enum_str(x) for x in enum])))
+        raise Exception(err_str)
+    return selected
+
+
+def check_integrator_type(pycel, choice):
+    return check_enum(choice, pycel.IntegratorType, 'Integrator type')
+
+
+def check_device_type(pycel, choice):
+    return check_enum(choice, pycel.DeviceType, 'Device type')
 
 
 def get_solver_options(lang, integrator_type,
                        atol=1e-10, rtol=1e-6, logging=False,
-                       maximum_steps=1e6, vector_size=None,
+                       maximum_steps=int(1e6), vector_size=None,
                        block_size=None, use_queue=True, order='C',
                        platform='', device_type=None,
-                       num_ra=10, max_krylov=-1):
+                       num_ra=10, max_krylov=-1,
+                       constant_timesteps=False):
     """
     Return the constructed solver options for the given pyccelerInt runtime
     """
 
     pycel = import_wrapper(lang)
+
+    # language specific options
+    kwargs = {}
+    if constant_timesteps:
+        if lang == 'c':
+            raise NotImplementedError
+        elif lang != 'c':
+            kwargs['stepper_type'] = pycel.StepperType.CONSTANT
+
     # create the options
     if lang == 'c':
         return pycel.PySolverOptions(integrator_type,
                                      atol=atol, rtol=rtol, logging=logging,
                                      max_iters=maximum_steps,
                                      num_rational_approximants=num_ra,
-                                     max_krylov_subspace_dimension=max_krylov)
+                                     max_krylov_subspace_dimension=max_krylov,
+                                     **kwargs)
 
     elif lang == 'opencl':
         return pycel.PySolverOptions(integrator_type,
@@ -296,7 +342,104 @@ def get_solver_options(lang, integrator_type,
                                      platform=platform,
                                      deviceType=device_type,
                                      atol=atol, rtol=rtol, logging=logging,
-                                     maxIters=maximum_steps)
+                                     maxIters=maximum_steps,
+                                     **kwargs)
+
+
+def build_problem(problem_type, lang, integrator_type,
+                  reuse=True, vector_size=0, block_size=0, platform='',
+                  order='C', logging=True, use_queue=True,
+                  device_type=None, rtol=1e-06, atol=1e-10,
+                  constant_timesteps=False,
+                  maximum_steps=int(1e6)):
+    """
+    Build and return the :class:`Problem` and :class:`SolverOptions`
+
+    Parameters
+    ----------
+    problem_type: :class:`Problem`
+        The type (note: literal python type) of problem to build.
+    lang: ['c', 'opencl']
+        The language to run the problem in
+    integrator_type: :class:`IntegratorType`
+        The integrator type to use for this problem
+    reuse: bool [False]
+        If true, re-use a previously generated problem
+    vector_size: int [0]
+        The vector size to use, if zero do not use explicit-SIMD vectorization
+        [OpenCL only, exclusive with :param:`block_size`]
+    block_size: int [0]
+        The block size to use, if zero do not use implicit-SIMD vectorization
+        [OpenCL only, exclusive with :param:`vector_size`]
+    platform: str ['']
+        The OpenCL platform to use
+    order: ['C', 'F']
+        The data-ordering pattern to use
+    logging: bool [True]
+        If true, enable solution logging
+    use_queue: bool [True]
+        If true, use the queue-scheduler based solvers [OpenCL only]
+    device_type: :class:`DeviceType` [None]
+        The OpenCL device type to use.
+    rtol: float [1e-06]
+        The relative integration tolerance
+    atol: float [1e-10]
+        The absolute integration tolerance
+    constant_timesteps: bool [False]
+        If true, use constant time-stepping.
+    maximum_steps: int [1e6]
+        The maximum number of integration steps allowed per-IVP (per-global
+        time-step)
+
+
+    Returns
+    -------
+    problem: :class:`Problem`
+        The constructed problem
+    solver_options: :class:`SolverOptions`
+        The constructed solver options
+    """
+
+    # check vector / block sizes
+    if vector_size:
+        check_vector_width(vector_size)
+    if block_size:
+        check_block_size(block_size)
+
+    # setup / build wrapper
+    problem_type.generate(lang=lang,
+                          reuse=reuse,
+                          vector_size=vector_size,
+                          block_size=block_size,
+                          platform=platform,
+                          order=order)
+    problem_type.build(lang)
+
+    # get the wrapper to check the integrator / device type
+    wrapper = import_wrapper(lang)
+    integrator_type = check_integrator_type(wrapper, integrator_type)
+    if lang == 'opencl':
+        device_type = check_device_type(wrapper, device_type)
+    if lang == 'c' and order == 'C':
+        raise Exception('Currently only F-ordering is implemented '
+                        'for the cpu-solvers.')
+
+    options = get_solver_options(lang, integrator_type,
+                                 logging=logging,
+                                 vector_size=vector_size,
+                                 block_size=block_size,
+                                 use_queue=use_queue,
+                                 order=order,
+                                 platform=platform,
+                                 device_type=device_type,
+                                 rtol=rtol,
+                                 atol=atol,
+                                 maximum_steps=maximum_steps)
+
+    # create problem
+    problem = problem_type(lang, options)
+
+    return problem, options
 
 
 def create_integrator(problem, integrator_type, options, num_threads):
@@ -309,6 +452,7 @@ def create_integrator(problem, integrator_type, options, num_threads):
         The initialized integrator class
     """
     pycel = import_wrapper(problem.lang)
+    integrator_type = check_integrator_type(pycel, integrator_type)
     # get ivp
     ivp = problem.get_ivp()
 

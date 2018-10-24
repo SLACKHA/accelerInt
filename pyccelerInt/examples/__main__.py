@@ -3,84 +3,8 @@
 import argparse
 import multiprocessing
 
-from pyccelerInt import import_wrapper, get_solver_options, create_integrator, \
-    have_plotter, setup_example
-
-
-def vector_width(v):
-    def __raise():
-        raise argparse.ArgumentError('Specified vector-width: {} is invalid'.format(
-            v))
-    try:
-        v = int(v)
-        if v not in [1, 2, 3, 4, 8, 16]:
-            __raise()
-        return v
-    except ValueError:
-        __raise()
-
-
-def block_size(b):
-    def __raise():
-        raise argparse.ArgumentError('Specified block size: {} is invalid'.format(
-            b))
-    try:
-        b = int(b)
-        # ensure power of 2
-        if not (b & (b - 1)) == 0:
-            __raise()
-        return b
-    except ValueError:
-        __raise()
-
-
-def enum_str(enum_val):
-    s = str(enum_val)
-    return s[s.index('.') + 1:]
-
-
-def check_enum(choice, enum, help_str, parser):
-    selected = next((x for x in enum if choice == enum_str(x)), None)
-    if selected is None:
-        err_str = ('{help}: {choice} is invalid, possible choices:'
-                   ' {{{choices}}}'.format(
-                                        help=help_str,
-                                        choice=choice,
-                                        choices=', '.join([
-                                            enum_str(x) for x in enum])))
-        raise parser.error(err_str)
-    return selected
-
-
-def integrator_type(pycel, choice, parser):
-    return check_enum(choice, pycel.IntegratorType, 'Integrator type', parser)
-
-
-def device_type(pycel, choice, parser):
-    return check_enum(choice, pycel.DeviceType, 'Device type', parser)
-
-
-def post_validate(pycel, args, parser):
-    """
-    Validate any parser arguments the depend on the selected language
-    """
-
-    # check integrator type
-    args.int_type = integrator_type(pycel, args.int_type, parser)
-
-    if args.language == 'opencl':
-        assert not (args.vector_size and args.block_size), (
-            'Cannot specify vectorSize and blockSize concurrently')
-        # check platform
-        args.device_type = device_type(pycel, args.device_type, parser)
-        if args.platform is None:
-            parser.error('OpenCL platform name must be specified!')
-    if args.language == 'c':
-        if args.order == 'C':
-            raise parser.error('Currently only F-ordering is implemented '
-                               'for the cpu-solvers.')
-
-    return args
+from pyccelerInt import create_integrator, \
+    have_plotter, build_problem, check_vector_width, check_block_size
 
 
 if __name__ == '__main__':
@@ -107,16 +31,17 @@ if __name__ == '__main__':
 
     parser.add_argument('-it', '--int_type',
                         type=str,
+                        required=True,
                         help='The integrator type to use.')
 
     parser.add_argument('-v', '--vector_size',
-                        type=vector_width,
+                        type=check_vector_width,
                         default=0,
                         help='The SIMD vector-width to use [CPU]. '
                              'Exclusive with --blockSize. Only used for OpenCL.')
 
     parser.add_argument('-b', '--block_size',
-                        type=block_size,
+                        type=check_block_size,
                         default=0,
                         help='The implicit-SIMD work-group size to use [GPU].  '
                              'Exclusive with --vectorSize. Only used for OpenCL.')
@@ -172,6 +97,12 @@ if __name__ == '__main__':
                         default=1e-10,
                         help='The absolute tolerance for the solvers.')
 
+    parser.add_argument('-m', '--max_steps',
+                        type=float,
+                        default=1e6,
+                        help='The maximum number of steps allowed per global '
+                             'integration time-step.')
+
     args = parser.parse_args()
 
     if args.case == 'vdp':
@@ -179,26 +110,19 @@ if __name__ == '__main__':
     else:
         from pyccelerInt.examples.pyJac import Ignition as case
 
-    # setup / build rwapper
-    setup_example(case, args)
-
-    # get wrapper
-    pycel = import_wrapper(args.language)
-    args = post_validate(pycel, args, parser)
-
-    options = get_solver_options(args.language, args.int_type,
-                                 logging=True,
-                                 vector_size=args.vector_size,
-                                 block_size=args.block_size,
-                                 use_queue=args.use_queue,
-                                 order=args.order,
-                                 platform=args.platform,
-                                 device_type=args.device_type,
-                                 rtol=args.relative_tolerance,
-                                 atol=args.absolute_tolerance)
-
-    # create problem
-    problem = case(args.language, options)
+    problem, options = build_problem(case, args.language, args.int_type,
+                                     reuse=args.reuse,
+                                     vector_size=args.vector_size,
+                                     block_size=args.block_size,
+                                     platform=args.platform,
+                                     order=args.order,
+                                     logging=True,
+                                     use_queue=args.use_queue,
+                                     device_type=args.device_type,
+                                     rtol=args.relative_tolerance,
+                                     atol=args.absolute_tolerance,
+                                     constant_timesteps=False,
+                                     maximum_steps=int(args.max_steps))
 
     end_time = args.end_time
     if not end_time:
