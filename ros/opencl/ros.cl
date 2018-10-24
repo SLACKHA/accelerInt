@@ -339,6 +339,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 
         //printf("h = %e %e %e %f\n", h, ros->h_min, ros->h_max, y[__getIndex(neq-1)]);
     // Estimate the initial step size ...
+    #ifndef CONSTANT_TIMESTEPS
     {
         __MaskType test = isless(h, h_min);
         if (__any(test))
@@ -358,8 +359,9 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         #endif
         #endif
     }
-        //printf("hin = %e %e %e %f\n", h, ros->h_min, ros->h_max, y[__getIndex(neq-1)]);
-
+    #else
+        h = t_end - t_start;
+    #endif
     // Zero the counters ...
     nst = 0;
     //nfe = 0;
@@ -493,6 +495,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         }
         //print("yerr", neq, yerr);
 
+        #ifndef CONSTANT_TIMESTEPS
         __ValueType herr = fmax(1.0e-20, get_wnorm(ros, yerr, y));
         //printv("herr", herr);
 
@@ -501,6 +504,9 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         __MaskType accept = islessequal(herr, 1.0);
         accept |= islessequal(h, h_min);
         accept &= __not(done);
+        #else
+        accept = 1;
+        #endif
 
         if (__any(accept))
         {
@@ -530,22 +536,12 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             //print("ynew-final", neq, y)
         }
 
+        #ifndef CONSTANT_TIMESTEPS
         __ValueType fact = 0.9 * pow( 1.0 / herr, (1.0/ros->ELO));
 
         // Restrict the rate of change in dt
         fact = fmax(fact, 1.0 / ros->adaption_limit);
         fact = fmin(fact,       ros->adaption_limit);
-
-        #if 0
-            //if (iter % 100 == 0)
-                    {
-            #if (__ValueSize == 1)
-                         printf("iter = %d: accept=%d, done=%d t=%e, fact=%f %f %e\n", iter, accept, done, t, fact, y[neq-1], h);
-            #else
-                         printf("iter = %d: accept=%v"STRINGIFY(__ValueSize)"d, done=%v"STRINGIFY(__ValueSize)"d t=%v"STRINGIFY(__ValueSize)"e, fact=%v"STRINGIFY(__ValueSize)"f %v"STRINGIFY(__ValueSize)"f %v"STRINGIFY(__ValueSize)"e\n", iter, accept, done, t, fact, y[neq-1], h);
-            #endif
-                    }
-        #endif
 
         // Apply grow/shrink factor for next step.
         h = __select(h * fact, h, done);
@@ -559,6 +555,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 
         // Don't overshoot the final time ...
         h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
+        #endif
 
         ++iter;
         if (ros->max_iters && iter > ros->max_iters) {

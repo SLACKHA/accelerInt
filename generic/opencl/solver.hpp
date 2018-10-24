@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "error_codes.hpp"
+#include "stepper_types.hpp"
 #include "../paths/path.h"
 #include "../paths/resolver.h"
 extern "C" {
@@ -309,7 +310,8 @@ namespace opencl_solvers {
                       double atol=1e-10, double rtol=1e-6,
                       bool logging=false, bool use_queue=true, std::string order="C",
                       std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT,
-                      size_t minIters = 1, size_t maxIters = 1000):
+                      size_t minIters = 1, size_t maxIters = 1000,
+                      StepperType stepperType = StepperType::ADAPTIVE):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
             _atol(atol),
@@ -320,7 +322,8 @@ namespace opencl_solvers {
             _platform(platform),
             _deviceType(deviceType),
             _minIters(minIters),
-            _maxIters(maxIters)
+            _maxIters(maxIters),
+            _stepperType(stepperType)
         {
             if (order.compare("C") && order.compare("F"))
             {
@@ -392,6 +395,11 @@ namespace opencl_solvers {
             return _maxIters;
         }
 
+        inline const StepperType stepperType() const
+        {
+            return _stepperType;
+        }
+
     protected:
         //! vector size
         std::size_t _vectorSize;
@@ -415,6 +423,8 @@ namespace opencl_solvers {
         const std::size_t _minIters;
         //! The maximum number of iterations allowed
         const std::size_t _maxIters;
+        //! The type of time-stepping to utilize constant, or adaptive
+        StepperType _stepperType;
     };
 
 
@@ -1046,6 +1056,13 @@ namespace opencl_solvers {
                 std::ostringstream oqueue;
                 oqueue << "#define __EnableQueue" << std::endl;
                 program_source_str << oqueue.str();
+            }
+
+            if (_options.stepperType() == StepperType::CONSTANT)
+            {
+                std::ostringstream stype;
+                stype << "#define CONSTANT_TIMESTEPS" << std::endl;
+                program_source_str << stype.str();
             }
 
             // Load the common macros ...
