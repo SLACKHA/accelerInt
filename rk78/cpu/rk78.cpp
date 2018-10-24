@@ -40,7 +40,7 @@ namespace c_solvers {
 
         // and integrate
         double h = 0;
-        hinit(t, t_end, y, pr, &h);
+        hinit(t_start, t_end, y, pr, &h);
         integrate_adaptive(controllers[index], *evaluators[index], state_vectors[index], t_start, t_end, h);
 
         // copy out of state vector

@@ -257,6 +257,16 @@ namespace c_solvers {
             return _options.logging();
         }
 
+        inline std::size_t minIters() const
+        {
+            return _options.minIters();
+        }
+
+        inline std::size_t maxIters() const
+        {
+            return _options.maxIters();
+        }
+
         //! return the number of equations to solve
         inline const int neq() const
         {
@@ -337,10 +347,26 @@ namespace c_solvers {
          * \param[in]       user_data   The user parameter
          * \param[in,out]   h0          The calculated initial time-step
          */
-        ErrorCode Integrator::hinit(const double t, const double t_end,
-                                    const double* __restrict__ y,
-                                    const double user_data,
-                                    double* h0)
+        ErrorCode hinit(const double t, const double t_end,
+                        const double* __restrict__ y,
+                        const double user_data,
+                        double* __restrict__ h0);
+
+        /* \brief Return the weighted error norm (WRMS) of the given inputs
+         *
+         * \param[in]       x           The potential new vector
+         * \param[in]       y           The reference vector
+         */
+        inline double get_wnorm(const double* __restrict__ x, const double* __restrict__ y)
+        {
+            double sum = 0;
+            for (int k = 0; k < _neq; k++)
+            {
+                double prod = x[k] / (rtol() * std::fabs(y[k]) + atol());
+                sum += (prod*prod);
+            }
+            return std::sqrt(sum / (double)_neq);
+        }
 
     private:
         void clean()

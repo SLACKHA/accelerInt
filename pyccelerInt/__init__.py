@@ -270,9 +270,8 @@ def setup_example(case, args):
 
 def get_solver_options(lang, integrator_type,
                        atol=1e-10, rtol=1e-6, logging=False,
-                       maximum_steps=1e6, h_init=1e-6,
-                       vector_size=None, block_size=None,
-                       use_queue=True, order='C',
+                       maximum_steps=1e6, vector_size=None,
+                       block_size=None, use_queue=True, order='C',
                        platform='', device_type=None,
                        num_ra=10, max_krylov=-1):
     """
@@ -284,7 +283,7 @@ def get_solver_options(lang, integrator_type,
     if lang == 'c':
         return pycel.PySolverOptions(integrator_type,
                                      atol=atol, rtol=rtol, logging=logging,
-                                     h_init=h_init,
+                                     max_iters=maximum_steps,
                                      num_rational_approximants=num_ra,
                                      max_krylov_subspace_dimension=max_krylov)
 

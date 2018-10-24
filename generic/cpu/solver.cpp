@@ -80,11 +80,11 @@ namespace c_solvers {
     ErrorCode Integrator::hinit(const double t, const double t_end,
                                 const double* __restrict__ y,
                                 const double user_data,
-                                double* h0)
+                                double* __restrict__ h0)
     {
         #define t_round ((t_end - t) * DBL_EPSILON)
         #define h_min (t_round * 100)
-        #define h_max ((t_end - t) / minIters())
+        #define h_max ((t_end - t) / this->minIters())
 
         if ((t_end - t) < 2 * t_round)
         {
@@ -92,6 +92,7 @@ namespace c_solvers {
             return ErrorCode::TDIST_TOO_SMALL;
         }
 
+        int tid = omp_get_thread_num();
         double* __restrict__ ydot = _unique<double>(tid, _ydot_hin);
         double* __restrict__ y1 = _unique<double>(tid, _y1_hin);
         double* __restrict__ ydot1 = _unique<double>(tid, _ydot1_hin);
@@ -126,7 +127,7 @@ namespace c_solvers {
         {
             // Estimate y'' with finite-difference ...
             //double t1 = hg;
-            for (int k = 0; k < neq; k++)
+            for (int k = 0; k < _neq; k++)
             {
                 y1[k] = y[k] + hg * ydot[k];
             }
@@ -135,10 +136,10 @@ namespace c_solvers {
             dydt(t, user_data, y1, ydot1, rwk);
 
             // Compute WRMS norm of y''
-            for (int k = 0; k < neq; k++)
+            for (int k = 0; k < _neq; k++)
                 y1[k] = (ydot1[k] - ydot[k]) / hg;
 
-            __ValueType yddnrm = get_wnorm(solver, y1, y);
+            double yddnrm = get_wnorm(y1, y);
 
             // should we accept this?
                   // should we accept this?

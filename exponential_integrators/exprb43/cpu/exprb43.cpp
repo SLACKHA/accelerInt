@@ -40,7 +40,7 @@ namespace c_solvers {
 		double h = t_end - t_start;
 	#else
 		double h = 0;
-		hinit(t, t_end, y, pr, &h);
+		hinit(t_start, t_end, y, pr, &h);
 	#endif
 		double h_new;
 

@@ -23,7 +23,7 @@ namespace c_solvers
         EXPSolverOptions(double atol=1e-10, double rtol=1e-6, bool logging=false,
                          std::size_t maxIters=1, std::size_t minIters=1000,
                          int N_RA=10, int M_MAX=-1):
-                SolverOptions(atol, rtol, logging, h_init, maxIters, minIters),
+                SolverOptions(atol, rtol, logging, maxIters, minIters),
                 N_RA(N_RA),
                 M_MAX(M_MAX)
             {
