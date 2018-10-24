@@ -45,6 +45,9 @@ cdef extern from "solver_interface.hpp" namespace "c_solvers":
 
     cdef cppclass SolverOptions:
         SolverOptions(double, double, bool_t, double) except +
+        const double atol() except +
+        const double rtol() except +
+        const bool_t logging() except +
 
     cdef cppclass IVP:
         IVP(size_t, bool_t) except +
@@ -130,6 +133,15 @@ cdef class PySolverOptions:
 
     def order(self):
         return 'F'
+
+    cpdef atol(self):
+        return deref(self.options.get()).atol()
+
+    cpdef rtol(self):
+        return deref(self.options.get()).rtol()
+
+    cpdef logging(self):
+        return deref(self.options.get()).logging()
 
 cdef class PyIVP:
     cdef unique_ptr[IVP] ivp # hold IVP
