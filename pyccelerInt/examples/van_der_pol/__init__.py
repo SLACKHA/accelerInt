@@ -76,8 +76,8 @@ class VDP(Problem):
             # Note: we need to pass the full paths to the PyIVP such that accelerInt
             # can find our kernel files
             return self.get_wrapper().PyIVP([
-                os.path.join(self.path, 'opencl', 'dydt.cl'),
-                os.path.join(self.path, 'opencl', 'jacob.cl')], 0)
+                os.path.join(self.path(), 'opencl', 'dydt.cl'),
+                os.path.join(self.path(), 'opencl', 'jacob.cl')], 0)
         elif self.lang == 'c':
             return self.get_wrapper().PyIVP(0)
 
