@@ -205,9 +205,7 @@ namespace c_solvers
                     CVODEErrorCheck(CVodeSetMaxOrd(integrators[i].get(), CV_MAX_ORD));
                 #endif
 
-                #ifdef CV_MAX_STEPS
-                    CVODEErrorCheck(CVodeSetMaxNumSteps(integrators[i].get(), options.maxIters()));
-                #endif
+                CVODEErrorCheck(CVodeSetMaxNumSteps(integrators[i].get(), _options.maxIters()));
 
                 #ifdef CV_HMAX
                     CVODEErrorCheck(CVodeSetMaxStep(integrators[i].get(), CV_HMAX));
