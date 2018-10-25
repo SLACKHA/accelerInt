@@ -9,6 +9,7 @@ import multiprocessing
 import os
 import logging
 import sys
+import argparse
 scons = which('scons').strip()
 # add runtime path to find the pyccelerint module
 sys.path.insert(0, os.getcwd())
@@ -176,12 +177,11 @@ class Problem(object):
         """
         return import_wrapper(self.lang)
 
-    @property
     def num_equations(self):
         """
         Return the number of equations to solve for this problem
         """
-        raise NotImplementedError
+        return NotImplementedError
 
     def run(self, integrator, num, t_end, t_start=0., t_step=-1.,
             return_state=False):
@@ -301,6 +301,11 @@ def check_integrator_type(pycel, choice):
 
 def check_device_type(pycel, choice):
     return check_enum(choice, pycel.DeviceType, 'Device type')
+
+
+###############################
+# Build Options / Integrators #
+###############################
 
 
 def get_solver_options(lang, integrator_type,
@@ -458,3 +463,106 @@ def create_integrator(problem, integrator_type, options, num_threads):
 
     return ivp, pycel.PyIntegrator(integrator_type, problem.num_equations,
                                    num_threads, ivp, options)
+
+
+################
+# Build Parser #
+################
+
+def build_parser(helptext='Run the pyccelerInt examples.'):
+    parser = argparse.ArgumentParser(helptext)
+    parser.add_argument('-c', '--case',
+                        choices=['vdp', 'pyjac'],
+                        required=True,
+                        help='The example to run, currently only the van der Pol '
+                             'problem and pyJac are implemented.')
+    parser.add_argument('-l', '--language',
+                        choices=['c', 'opencl'],
+                        required=True,
+                        help='The pyccelerInt platform to use')
+    parser.add_argument('-ni', '--num_ivp',
+                        type=int,
+                        default=100,
+                        help='The number of IVPs to solve [default: 100].')
+
+    parser.add_argument('-nt', '--num_threads',
+                        type=int,
+                        default=multiprocessing.cpu_count(),
+                        help='The number of threads to use during solution '
+                             '[default: # of logical cores].')
+
+    parser.add_argument('-it', '--int_type',
+                        type=str,
+                        required=True,
+                        help='The integrator type to use.')
+
+    parser.add_argument('-v', '--vector_size',
+                        type=check_vector_width,
+                        default=0,
+                        help='The SIMD vector-width to use [CPU]. '
+                             'Exclusive with --blockSize. Only used for OpenCL.')
+
+    parser.add_argument('-b', '--block_size',
+                        type=check_block_size,
+                        default=0,
+                        help='The implicit-SIMD work-group size to use [GPU].  '
+                             'Exclusive with --vectorSize. Only used for OpenCL.')
+
+    parser.add_argument('-q', '--use_queue',
+                        default=True,
+                        action='store_true',
+                        dest='use_queue',
+                        help='Use the queue-based integration drivers. '
+                             'Only used for OpenCL.')
+
+    parser.add_argument('-s', '--use_static',
+                        default=True,
+                        action='store_false',
+                        dest='use_queue',
+                        help='Use the static scheduling based integration drivers. '
+                             'Only used for OpenCL.')
+
+    parser.add_argument('-o', '--order',
+                        choices=['C', 'F'],
+                        default='F',
+                        help='The data-ordering, row-major ("C") or column-major '
+                             '("F").')
+
+    parser.add_argument('-p', '--platform',
+                        type=str,
+                        help='The OpenCL platform to use, (e.g., Intel, NVIDIA, '
+                             'etc.)')
+
+    parser.add_argument('-d', '--device_type',
+                        type=str,
+                        default='DEFAULT',
+                        help='The device type to use (e.g., CPU, GPU, ACCELERATOR). '
+                             'Only used for OpenCL.')
+
+    parser.add_argument('-tf', '--end_time',
+                        type=float,
+                        default=None,  # 1ms
+                        help='The simulation end-time.')
+
+    parser.add_argument('-ru', '--reuse',
+                        action='store_true',
+                        default=False,
+                        help='Reuse the previously generated pyJac code / library.')
+
+    parser.add_argument('-rtol', '--relative_tolerance',
+                        type=float,
+                        default=1e-06,
+                        help='The relative tolerance for the solvers.')
+
+    parser.add_argument('-atol', '--absolute_tolerance',
+                        type=float,
+                        default=1e-10,
+                        help='The absolute tolerance for the solvers.')
+
+    parser.add_argument('-m', '--max_steps',
+                        type=float,
+                        default=1e6,
+                        help='The maximum number of steps allowed per global '
+                             'integration time-step.')
+
+    return parser.parse_args()

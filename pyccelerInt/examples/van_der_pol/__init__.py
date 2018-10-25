@@ -27,20 +27,6 @@ class VDP(Problem):
         """
         pass
 
-    def __init__(self, platform, options):
-        """
-        Initialize the problem.
-
-        Parameters
-        ----------
-        platform: ['opencl', 'c']
-            The runtime platform to use for the problem
-        options: :class:`pyccelerint/PySolverOptions`
-            The solver options to use
-        """
-
-        super(VDP, self).__init__(platform, options)
-
     def setup(self, num, options):
         """
         Do any setup work required for this problem, initialize input arrays,
