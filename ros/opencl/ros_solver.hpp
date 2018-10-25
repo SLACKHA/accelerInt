@@ -138,6 +138,12 @@ namespace opencl_solvers
             // and initialize the kernel
             this->initialize_kernel();
         }
+
+        //! \brief Return the numerical order of the solver
+        virtual const size_t solverOrder() const
+        {
+            return 3;
+        }
     };
 
     class ROS4Integrator : public ROSIntegrator
@@ -210,6 +216,12 @@ namespace opencl_solvers
             // and initialize the kernel
             this->initialize_kernel();
         }
+
+        //! \brief Return the numerical order of the solver
+        virtual const size_t solverOrder() const
+        {
+            return 4;
+        }
     };
 
     class RODAS3Integrator : public ROSIntegrator
@@ -271,6 +283,12 @@ namespace opencl_solvers
             ros_create(&ros_vals, options);
             // and initialize the kernel
             this->initialize_kernel();
+        }
+
+        //! \brief Return the numerical order of the solver
+        virtual const size_t solverOrder() const
+        {
+            return 3;
         }
     };
 
@@ -361,6 +379,12 @@ namespace opencl_solvers
             ros_create(&ros_vals, options);
             // and initialize the kernel
             this->initialize_kernel();
+        }
+
+        //! \brief Return the numerical order of the solver
+        virtual const size_t solverOrder() const
+        {
+            return 4;
         }
     };
 }

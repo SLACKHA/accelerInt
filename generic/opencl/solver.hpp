@@ -562,6 +562,9 @@ namespace opencl_solvers {
             return _numWorkGroups;
         }
 
+        //! \brief Return the numerical order of the solver
+        virtual const size_t solverOrder() const = 0;
+
         /**
          * \brief Integration driver for the CPU integrators
          * \param[in]       NUM             The (non-padded) number of IVPs to integrate

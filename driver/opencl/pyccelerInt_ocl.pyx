@@ -51,6 +51,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         const double neq() except +
         void getLog(const int, double*, double*) except +
         size_t numSteps() except +
+        size_t solverOrder() except+
         const string_t& order() except+
 
     cdef cppclass IVP:
@@ -200,6 +201,12 @@ cdef class PyIntegrator:
 
     def order(self):
         return deref(self.integrator.get()).order()
+
+    def solver_order(self):
+        """
+        Return the numerical order of the solver
+        """
+        return deref(self.integrator.get()).solverOrder()
 
 
 cdef class PySolverOptions:

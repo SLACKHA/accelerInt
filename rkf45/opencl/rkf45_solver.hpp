@@ -35,6 +35,12 @@ public:
             this->initialize_kernel();
         }
 
+        //! \brief Return the numerical order of the solver
+        virtual const size_t solverOrder() const
+        {
+            return 4;
+        }
+
 protected:
 
         const rk_t& getSolverStruct() const
