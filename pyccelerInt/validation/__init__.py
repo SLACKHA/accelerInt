@@ -125,8 +125,7 @@ def build_case(problem, lang, is_reference=False,
 
 
 def run_case(num, phir, test, test_problem,
-             t_end, step_size,
-             norm_rtol=1e-6, norm_atol=1e-10,
+             t_end, norm_rtol=1e-6, norm_atol=1e-10,
              condition_norm=2,
              ivp_norm=np.inf):
     """
@@ -177,8 +176,7 @@ def run_case(num, phir, test, test_problem,
     """
 
     # run test
-    _, phit = test_problem.run(test, num, t_end, t_start=0,
-                               t_step=step_size, return_state=True)
+    _, phit = test_problem.run(test, num, t_end, t_start=0, return_state=True)
 
     # calculate condition norm
     err = np.abs(phit - phir) / (norm_atol + phir * norm_rtol)
@@ -257,8 +255,7 @@ def run_validation(num, reference, ref_problem,
 
         errs[i] = run_case(num, phir,
                            test, test_problem,
-                           t_end, steps[i],
-                           norm_rtol=norm_rtol, norm_atol=norm_atol,
+                           t_end, norm_rtol=norm_rtol, norm_atol=norm_atol,
                            condition_norm=condition_norm, ivp_norm=ivp_norm)
 
         del testivp

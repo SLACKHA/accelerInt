@@ -46,12 +46,9 @@ if __name__ == '__main__':
                                    step_end=refp.step_end)
 
     if have_plotter():
-        refp.plot(stepsize, err)
+        refp.plot(stepsize, err, end_time, label=args.int_type)
 
     # and cleanup
     del refivp
     del refp
     del refi
-    del testivp
-    del testp
-    del testi

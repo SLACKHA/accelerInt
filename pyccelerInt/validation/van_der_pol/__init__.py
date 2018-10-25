@@ -66,7 +66,7 @@ class VDP_valid(VDP, ValidationProblem):
     def step_end(self):
         return 1e-6
 
-    def plot(self, step_sizes, errors, end_time=None, label=''):
+    def plot(self, step_sizes, errors, end_time, label=''):
         """
         Plot the validation curve for this problem
 
@@ -78,15 +78,12 @@ class VDP_valid(VDP, ValidationProblem):
             The array of normalized errors to plot
         """
 
-        if not end_time:
-            end_time = self.step_end
-
         plt = get_plotter()
         # convert stepsizes to steps taken
         st = end_time / step_sizes
         plt.loglog(st, errors, label=label, linestyle='', marker='o')
-        plt.ylim(np.min(errors) * 0.95,
-                 np.max(errors) * 1.05)
+        plt.ylim(np.min(errors) * 0.8,
+                 np.max(errors) * 1.2)
         plt.legend(loc=0)
         plt.xlabel('Steps taken')
         plt.ylabel('|E|')
