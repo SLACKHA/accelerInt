@@ -55,7 +55,11 @@
   #pragma message "__MaskType   = " STRINGIFY(__MaskType)
   #pragma message "__order      = " STRINGIFY(__order)
   //#pragma message "FUNC_TYPE(func)   = " FUNC_TYPE("func")
+  #ifdef CONSTANT_TIMESTEPS
+  #pragma message "Using constant timesteps."
+  #endif
 #endif
+
 
 //! \brief Macro to determine offsets for pointer unpacking
 #define __getOffset1D(dim0) ((dim0) * get_global_size(0))

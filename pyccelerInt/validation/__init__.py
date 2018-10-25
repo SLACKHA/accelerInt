@@ -238,7 +238,6 @@ def run_validation(num, reference, ref_problem, test, test_problem,
 
     # run reference problem once
     # run validation
-    import pdb; pdb.set_trace()
     _, phir = ref_problem.run(reference, num, t_end, t_start=0, return_state=True)
 
     start = np.rint(np.log10(step_start))
