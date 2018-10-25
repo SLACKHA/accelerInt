@@ -14,9 +14,9 @@ def vdp_init(num):
 
     """
 
-    params = np.arange(num, dtype=np.float64)
+    params = np.arange(1, num + 1, dtype=np.float64)
     phi = np.zeros((num, 2), dtype=np.float64)
-    phi[:, 0] = np.arange(num)
+    phi[:, 0] = np.arange(1, num + 1, dtype=np.float64)
 
     return phi, params
 
