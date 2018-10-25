@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyccelerInt import create_integrator, build_problem
+from pyccelerInt import create_integrator, build_problem, have_plotter
 
 
 class ValidationProblem(object):
@@ -191,7 +191,7 @@ def run_case(num, phir, test, test_problem,
 def run_validation(num, reference, ref_problem,
                    t_end, test_builder, step_start=1e-3, step_end=1e-8,
                    norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
-                   ivp_norm=np.inf):
+                   ivp_norm=np.inf, label=''):
     """
     Run the validation case for the test integrator using constant time-steps ranging
     from :param:`step_start` to `step_end`
@@ -247,11 +247,15 @@ def run_validation(num, reference, ref_problem,
     end += step
     steps = np.arange(start, end, step)
     errs = np.zeros(steps.size)
+    test_order = None
 
     for i, size in enumerate(steps):
         steps[i] = np.power(10., size)
 
         testivp, test_problem, test = test_builder(steps[i])
+
+        if test_order is None:
+            test_order = test.solver_order()
 
         errs[i] = run_case(num, phir,
                            test, test_problem,
@@ -263,5 +267,9 @@ def run_validation(num, reference, ref_problem,
         del test
 
         print(steps[i], errs[i])
+
+    if have_plotter():
+        ref_problem.plot(steps, errs, t_end, label=label,
+                         order=test_order)
 
     return steps, errs

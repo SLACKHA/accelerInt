@@ -1,4 +1,4 @@
-from pyccelerInt import build_parser, have_plotter
+from pyccelerInt import build_parser
 from pyccelerInt.validation import build_case, run_validation
 
 
@@ -41,12 +41,9 @@ if __name__ == '__main__':
                           num_threads=args.num_threads,
                           constant_timestep=stepsize)
 
-    stepsize, err = run_validation(args.num_ivp, refi, refp,
-                                   end_time, builder, step_start=refp.step_start,
-                                   step_end=refp.step_end)
-
-    if have_plotter():
-        refp.plot(stepsize, err, end_time, label=args.int_type)
+    run_validation(args.num_ivp, refi, refp,
+                   end_time, builder, step_start=refp.step_start,
+                   step_end=refp.step_end, label=args.int_type)
 
     # and cleanup
     del refivp

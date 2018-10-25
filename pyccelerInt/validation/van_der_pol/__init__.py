@@ -66,7 +66,7 @@ class VDP_valid(VDP, ValidationProblem):
     def step_end(self):
         return 1e-6
 
-    def plot(self, step_sizes, errors, end_time, label=''):
+    def plot(self, step_sizes, errors, end_time, label='', order=None):
         """
         Plot the validation curve for this problem
 
@@ -82,6 +82,16 @@ class VDP_valid(VDP, ValidationProblem):
         # convert stepsizes to steps taken
         st = end_time / step_sizes
         plt.loglog(st, errors, label=label, linestyle='', marker='o')
+
+        if order is not None:
+            # plot expected order
+            expected = np.zeros_like(errors)
+            expected[0] = errors[0]
+            for i in range(1, expected.size):
+                expected[i] = expected[i - 1] / np.power(10., order)
+
+            plt.loglog(st, expected, label='order ({})'.format(order))
+
         plt.ylim(np.min(errors) * 0.8,
                  np.max(errors) * 1.2)
         plt.legend(loc=0)
