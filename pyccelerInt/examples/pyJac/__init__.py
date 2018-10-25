@@ -57,14 +57,14 @@ class Ignition(Problem):
 
         # build pyjac module
         # set OpenCL specific options
-        platform = None
+        plat = None
         width = None
         explicit_simd = False
         if lang == 'opencl':
             width = vector_size if vector_size else block_size
             if width <= 1:
                 width = None
-            platform = platform
+            plat = platform
             explicit_simd = not block_size and width
 
         out_path = cls._src_path(lang)
@@ -77,15 +77,14 @@ class Ignition(Problem):
                             mech_name=os.path.join(cls.data_path(), 'h2.cti'),
                             width=width, build_path=out_path, last_spec=None,
                             kernel_type=ktype,
-                            platform=platform,
+                            platform=plat,
                             data_order=order,
                             jac_format=JacobianFormat.full,
                             explicit_simd=explicit_simd,
                             unique_pointers=lang == 'c')
 
             # and compile to get the kernel object
-            pywrap(lang, out_path, obj_path, os.getcwd(), obj_path,
-                   platform, ktype=ktype)
+            pywrap(lang, out_path, obj_path, os.getcwd(), obj_path, ktype=ktype)
 
             # create a simple wrapper to join
             if lang == 'opencl':
@@ -115,6 +114,9 @@ class Ignition(Problem):
                           jacobian(0, param, y, jac, rwk);
                        }
                        """)
+                # and a dummy c file
+                with open(os.path.join(out_path, 'dummy.c'), 'w') as file:
+                    file.write(' ')
             elif lang == 'c':
                 with open(os.path.join(out_path, 'dydt.cpp'), 'w') as file:
                     file.write(
