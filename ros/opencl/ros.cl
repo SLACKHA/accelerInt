@@ -21,7 +21,7 @@
 #define __getIndex(idx) (__getIndex1D(neq, idx))
 #define __getIndexJac(row, col) (__getIndex2D(neq, neq, row, col))
 
-/*
+
 #if __ValueSize > 1
 #define tid (!get_group_id(0))
 #define print(prefix, size, arr) \
@@ -78,7 +78,7 @@
     printf("%s={%e}\n", prefix, val); \
 }
 #endif
-*/
+
 
 // ROS internal routines ...
 inline __ValueType ros_getewt(__global const ros_t * __restrict__ ros, const int k, __global const __ValueType * __restrict__  y)
@@ -551,13 +551,13 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         // Limit based on the upper/lower bounds
         h = fmin(h, h_max);
         h = fmax(h, h_min);
+        #endif
 
         // Stretch the final step if we're really close and we didn't just fail ...
         h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
 
         // Don't overshoot the final time ...
         h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
-        #endif
 
         ++iter;
         if (ros->max_iters && iter > ros->max_iters) {

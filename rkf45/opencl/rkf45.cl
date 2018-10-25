@@ -301,13 +301,13 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         // Limit based on the upper/lower bounds
         hcur = fmin(hcur, h_max);
         hcur = fmax(hcur, h_min);
+        #endif
 
         // Stretch the final step if we're really close and we didn't just fail ...
         hcur = __select(hcur, t_end - t, accept & isless(fabs((t + hcur) - t_end), h_min));
 
         // Don't overshoot the final time ...
         hcur = __select(hcur, t_end - t, __not(done) & isgreater((t + hcur), t_end));
-        #endif
 
         ++iter;
         if (rk->max_iters && iter > rk->max_iters) {
