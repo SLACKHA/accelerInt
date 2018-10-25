@@ -75,26 +75,6 @@ namespace opencl_solvers
         return integrate_varying(integrator, NUM, t, &tf[0], stepsize, phi_host, param_host);
     }
 
-    /**
-     * \brief integrate NUM odes from time `t` to time `t_end`, using constant stepsizes of `t_step`
-     *
-     * \param[in]           NUM             The number of ODEs to integrate.
-                                            This should be the size of the leading dimension of `y_host` and `var_host`.
-                                            @see accelerint_indx
-     * \param[in]           t_start         The system time
-     * \param[in]           t_end           The end time
-     * \param[in]           step            The integration step size.  If `step` < 0, the step size will be set to `t_end - t`
-     * \param[in,out]       phi_host        The state vectors to integrate.
-     * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
-     * \returns             timing          The wall-clock duration spent in integration in milliseconds
-     *
-     */
-    double integrate_conststep(IntegratorBase& integrator,
-                               const int NUM, const double t_start,
-                               const double* __restrict__ t_end, const double step,
-                               double * __restrict__ phi_host,
-                               const double * __restrict__ param_host);
-
 
 }
 

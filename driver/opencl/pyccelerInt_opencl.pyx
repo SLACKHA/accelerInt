@@ -88,12 +88,6 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
                           const double, double * __restrict__,
                           const double * __restrict__)
 
-    cdef double integrate_conststep(IntegratorBase&,
-                                    const int, const double,
-                                    const double* __restrict__, const double,
-                                    double * __restrict__,
-                                    const double * __restrict__);
-
 cdef extern from "<utility>" namespace "std" nogil:
     cdef unique_ptr[IntegratorBase] move(unique_ptr[IntegratorBase])
 
@@ -174,36 +168,6 @@ cdef class PyIntegrator:
         self.num = num
         return integrate_varying(deref(self.integrator.get()), num, t_start,
                                  &t_end[0], step, &phi_host[0], &param_host[0])
-
-    cpdef integrate_conststep(
-                    self, np.int32_t num, np.float64_t t_start,
-                    np.ndarray[np.float64_t] t_end,
-                    np.ndarray[np.float64_t] phi_host,
-                    np.ndarray[np.float64_t] param_host, np.float64_t step):
-        """
-        Integrate :param:`num` IVPs, with varying start (:param:`t_start`) and
-        end-times (:param:`t_end`) using constant time-steps of size :param:`step`
-
-        Parameters
-        ----------
-        num: int
-            The number of IVPs to integrate
-        t_start: double
-            The integration start time
-        t_end: array of doubles
-            The integration end times
-        phi_host: array of doubles
-            The state vectors
-        param: array of doubles
-            The constant parameter
-        step: double
-            The constant time-step to take
-        """
-
-        # store # of IVPs
-        self.num = num
-        return integrate_conststep(deref(self.integrator.get()), num, t_start,
-                                   &t_end[0], step, &phi_host[0], &param_host[0])
 
 
     def state(self):

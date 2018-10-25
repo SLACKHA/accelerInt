@@ -237,7 +237,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     #define iter (counters->niters)
     #define nst (counters->nsteps)
 
-    #ifndef CONSTANT_TIMESTEP
+    #ifndef CONSTANT_TIMESTEPS
     __IntType ierr = OCL_SUCCESS;
     // Estimate the initial step size ...
     {
@@ -249,7 +249,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         }
     }
     #else
-    h = CONSTANT_TIMESTEP;
+    h = t_end - t_start
     #endif
 
     nst = 0;
@@ -265,7 +265,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         // Take a trial step over h_cur ...
         rkf45(hcur, t, y, ytmp, trunc_err, rwk, user_data, driver_offset + 2 * neq);
 
-        #ifndef CONSTANT_TIMESTEP
+        #ifndef CONSTANT_TIMESTEPS
         __ValueType herr = fmax(1e-20, get_wnorm(rk, trunc_err, y));
 
         // Is there error acceptable?
@@ -288,7 +288,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
             done = isless( fabs(t - t_end), fabs(t_round));
         }
 
-        #ifndef CONSTANT_TIMESTEP
+        #ifndef CONSTANT_TIMESTEPS
         __ValueType fact = sqrt( sqrt(1.0 / herr) ) * (0.840896415);
 
         // Restrict the rate of change in dt

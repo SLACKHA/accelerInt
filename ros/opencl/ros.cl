@@ -341,7 +341,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
 
         //printf("h = %e %e %e %f\n", h, ros->h_min, ros->h_max, y[__getIndex(neq-1)]);
     // Estimate the initial step size ...
-    #ifndef CONSTANT_TIMESTEP
+    #ifndef CONSTANT_TIMESTEPS
     {
         __MaskType test = isless(h, h_min);
         if (__any(test))
@@ -362,7 +362,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         #endif
     }
     #else
-        h = CONSTANT_TIMESTEP;
+        h = t_end - t_start;
     #endif
     // Zero the counters ...
     nst = 0;
@@ -497,7 +497,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         }
         //print("yerr", neq, yerr);
 
-        #ifndef CONSTANT_TIMESTEP
+        #ifndef CONSTANT_TIMESTEPS
         __ValueType herr = fmax(1.0e-20, get_wnorm(ros, yerr, y));
         //printv("herr", herr);
 

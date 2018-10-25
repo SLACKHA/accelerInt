@@ -55,7 +55,7 @@
   #pragma message "__MaskType   = " STRINGIFY(__MaskType)
   #pragma message "__order      = " STRINGIFY(__order)
   //#pragma message "FUNC_TYPE(func)   = " FUNC_TYPE("func")
-  #ifdef CONSTANT_TIMESTEP
+  #ifdef CONSTANT_TIMESTEPS
   #pragma message "Using constant timesteps."
   #endif
 #endif
