@@ -237,8 +237,8 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     #define iter (counters->niters)
     #define nst (counters->nsteps)
 
-    #ifndef CONSTANT_TIMESTEP
     __IntType ierr = OCL_SUCCESS;
+    #ifndef CONSTANT_TIMESTEP
     // Estimate the initial step size ...
     {
         __MaskType test = isless(hcur, h_min);
@@ -249,7 +249,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         }
     }
     #else
-    h = t_end - t_start
+    hcur = CONSTANT_TIMESTEP;
     #endif
 
     nst = 0;
