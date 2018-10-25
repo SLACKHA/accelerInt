@@ -45,7 +45,8 @@ if __name__ == '__main__':
 
     run_validation(args.num_ivp, refi, refp,
                    end_time, builder, step_start=refp.step_start,
-                   step_end=refp.step_end, label=args.int_type)
+                   step_end=refp.step_end, label=args.int_type,
+                   plot_filename=args.plot_filename)
 
     # and cleanup
     del refivp

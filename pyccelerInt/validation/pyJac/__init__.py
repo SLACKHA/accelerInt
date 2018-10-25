@@ -38,7 +38,7 @@ def pyjac_valid(num, conp=True):
     return phi, param
 
 
-class Ignition_valid(Ignition, ValidationProblem):
+class Ignition_valid(ValidationProblem, Ignition):
     @classmethod
     def data_path(cls):
         return ''
@@ -96,7 +96,7 @@ class Ignition_valid(Ignition, ValidationProblem):
 
     @property
     def step_start(self):
-        return 1e-3
+        return 1e-5
 
     @property
     def step_end(self):

@@ -20,7 +20,7 @@ def vdp_init(num):
     return phi, params
 
 
-class VDP_valid(VDP, ValidationProblem):
+class VDP_valid(ValidationProblem, VDP):
     def __init__(self, lang, options):
         """
         Initialize the problem.

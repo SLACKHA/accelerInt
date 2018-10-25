@@ -30,7 +30,8 @@ class ValidationProblem(object):
     def plot_name(self):
         raise NotImplementedError
 
-    def plot(self, step_sizes, errors, end_time, label='', order=None):
+    def plot(self, step_sizes, errors, end_time, label='', order=None,
+             plot_filename=''):
         """
         Plot the validation curve for this problem
 
@@ -62,7 +63,10 @@ class ValidationProblem(object):
         plt.xlabel('Steps taken')
         plt.ylabel('|E|')
         plt.title(self.plot_name)
-        plt.show()
+        if not plot_filename:
+            plt.show()
+        else:
+            plt.savefig(plot_filename)
 
 
 def build_case(problem, lang, is_reference=False,
@@ -221,7 +225,7 @@ def run_case(num, phir, test, test_problem,
 def run_validation(num, reference, ref_problem,
                    t_end, test_builder, step_start=1e-3, step_end=1e-8,
                    norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
-                   ivp_norm=np.inf, label=''):
+                   ivp_norm=np.inf, label='', plot_filename=''):
     """
     Run the validation case for the test integrator using constant time-steps ranging
     from :param:`step_start` to `step_end`
@@ -256,6 +260,8 @@ def run_validation(num, reference, ref_problem,
         A Callable that takes as an argument the step-size (and an optional argument
         of the iteration to avoid re-building code if possible)
         and returns the result of :func:`build_case`
+    plot_filename: str
+        If supplied, save plot to this file
 
     Returns
     -------
@@ -309,6 +315,6 @@ def run_validation(num, reference, ref_problem,
 
     if have_plotter():
         ref_problem.plot(steps, errs, t_end, label=label,
-                         order=test_order)
+                         order=test_order, plot_filename=plot_filename)
 
     return steps, errs

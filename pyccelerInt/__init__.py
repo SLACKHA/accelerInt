@@ -566,4 +566,10 @@ def build_parser(helptext='Run the pyccelerInt examples.'):
                         help='The maximum number of steps allowed per global '
                              'integration time-step.')
 
+    parser.add_argument('-f', '--plot_filename',
+                        default=None,
+                        type=str,
+                        help='If specified, save the resulting plot to a file '
+                             'instead of showing it to the screen')
+
     return parser.parse_args()
