@@ -1,5 +1,6 @@
-import numpy as np
+import logging
 
+import numpy as np
 from pyccelerInt import create_integrator, build_problem, have_plotter
 
 
@@ -177,6 +178,11 @@ def run_case(num, phir, test, test_problem,
 
     # run test
     _, phit = test_problem.run(test, num, t_end, t_start=0, return_state=True)
+    if np.any(phit != phit):
+        logger = logging.getLogger(__name__)
+        logger.warn('NaN / Solution detected for step-size! '
+                    'Try reducing starting step-size.')
+        raise Exception()
 
     # calculate condition norm
     err = np.abs(phit - phir) / (norm_atol + phir * norm_rtol)
@@ -257,16 +263,24 @@ def run_validation(num, reference, ref_problem,
         if test_order is None:
             test_order = test.solver_order()
 
-        errs[i] = run_case(num, phir,
-                           test, test_problem,
-                           t_end, norm_rtol=norm_rtol, norm_atol=norm_atol,
-                           condition_norm=condition_norm, ivp_norm=ivp_norm)
+        try:
+            errs[i] = run_case(num, phir,
+                               test, test_problem,
+                               t_end, norm_rtol=norm_rtol, norm_atol=norm_atol,
+                               condition_norm=condition_norm, ivp_norm=ivp_norm)
+        except Exception:
+            pass
 
         del testivp
         del test_problem
         del test
 
         print(steps[i], errs[i])
+
+    # filter
+    good = np.where(errs != 0)
+    errs = errs[good]
+    steps = steps[good]
 
     if have_plotter():
         ref_problem.plot(steps, errs, t_end, label=label,
