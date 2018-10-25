@@ -439,7 +439,8 @@ def build_problem(problem_type, lang, integrator_type,
                                  device_type=device_type,
                                  rtol=rtol,
                                  atol=atol,
-                                 maximum_steps=maximum_steps)
+                                 maximum_steps=maximum_steps,
+                                 constant_timesteps=constant_timesteps)
 
     # create problem
     problem = problem_type(lang, options)

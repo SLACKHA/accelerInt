@@ -84,7 +84,7 @@ class VDP_valid(VDP, ValidationProblem):
         plt = get_plotter()
         # convert stepsizes to steps taken
         st = end_time / step_sizes
-        plt.plot(st, errors, label=label, linestyle='', marker='o')
+        plt.loglog(st, errors, label=label, linestyle='', marker='o')
         plt.ylim(np.min(errors) * 0.95,
                  np.max(errors) * 1.05)
         plt.legend(loc=0)

@@ -91,6 +91,8 @@ def build_case(problem, lang, is_reference=False,
 
     Returns
     -------
+    ivp: :class:`PyIVP`
+        The constructed IVP
     problem: :class:`Problem`
         The constructed problem
     solver_options: :class:`SolverOptions`
@@ -119,7 +121,7 @@ def build_case(problem, lang, is_reference=False,
     ivp, integrator = create_integrator(problem, integrator_type, options,
                                         num_threads)
 
-    return problem, integrator
+    return ivp, problem, integrator
 
 
 def run_case(num, phir, test, test_problem,
@@ -180,10 +182,10 @@ def run_case(num, phir, test, test_problem,
 
     # calculate condition norm
     err = np.abs(phit - phir) / (norm_atol + phir * norm_rtol)
-    err = np.linalg.norm(err, order=condition_norm, axis=1)
+    err = np.linalg.norm(err, ord=condition_norm, axis=1)
 
     # calculate ivp norm
-    err = np.linalg.norm(err, order=ivp_norm, axis=0)
+    err = np.linalg.norm(err, ord=ivp_norm, axis=0)
 
     return err
 
@@ -257,5 +259,7 @@ def run_validation(num, reference, ref_problem, test, test_problem,
                            t_end, steps[i],
                            norm_rtol=norm_rtol, norm_atol=norm_atol,
                            condition_norm=condition_norm, ivp_norm=ivp_norm)
+
+        print(steps[i], errs[i])
 
     return steps, errs

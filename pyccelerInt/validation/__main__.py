@@ -17,22 +17,23 @@ if __name__ == '__main__':
     case = get_case(args.case)
 
     # build reference solver
-    refp, refi = build_case(case, 'c', is_reference=True,
-                            integrator_type='CVODES', reuse=args.reuse,
-                            order='F', max_steps=int(args.max_steps),
-                            reference_rtol=1e-15, reference_atol=1e-20,
-                            num_threads=args.num_threads)
+    refivp, refp, refi = build_case(case, 'c', is_reference=True,
+                                    integrator_type='CVODES', reuse=args.reuse,
+                                    order='F', max_steps=int(args.max_steps),
+                                    reference_rtol=1e-15, reference_atol=1e-20,
+                                    num_threads=args.num_threads)
 
     # build test solver
-    testp, testi = build_case(case, args.language, is_reference=False,
-                              integrator_type=args.int_type, reuse=args.reuse,
-                              vector_size=args.vector_size,
-                              block_size=args.block_size,
-                              platform=args.platform, order=args.order,
-                              use_queue=args.use_queue,
-                              device_type=args.device_type,
-                              max_steps=args.max_steps,
-                              num_threads=args.num_threads)
+    test_ivp, testp, testi = build_case(case, args.language, is_reference=False,
+                                        integrator_type=args.int_type,
+                                        reuse=args.reuse,
+                                        vector_size=args.vector_size,
+                                        block_size=args.block_size,
+                                        platform=args.platform, order=args.order,
+                                        use_queue=args.use_queue,
+                                        device_type=args.device_type,
+                                        max_steps=args.max_steps,
+                                        num_threads=args.num_threads)
 
     end_time = args.end_time
     if not end_time:
@@ -46,7 +47,9 @@ if __name__ == '__main__':
         refp.plot(stepsize, err)
 
     # and cleanup
+    del refivp
     del refp
     del refi
+    del testivp
     del testp
     del testi

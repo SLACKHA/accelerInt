@@ -273,7 +273,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         accept |= islessequal(hcur, h_min);
         accept &= __not(done);
         #else
-        accept = 1;
+        __MaskType accept = TRUE;
         #endif
 
         // update solution ...

@@ -21,7 +21,8 @@
 #define __getIndex(idx) (__getIndex1D(neq, idx))
 #define __getIndexJac(row, col) (__getIndex2D(neq, neq, row, col))
 
-/*#if __ValueSize > 1
+/*
+#if __ValueSize > 1
 #define tid (!get_group_id(0))
 #define print(prefix, size, arr) \
 { \
@@ -47,7 +48,7 @@
 
 #define printv(prefix, val) \
 { \
-    if (tid) printf("%s={%e}\n", prefix, (val.s0); \
+    if (tid) printf("%s={%e}\n", prefix, val.s0); \
 }
 #else
 #define print(prefix, size, arr) \
@@ -76,7 +77,8 @@
 { \
     printf("%s={%e}\n", prefix, val); \
 }
-#endif*/
+#endif
+*/
 
 // ROS internal routines ...
 inline __ValueType ros_getewt(__global const ros_t * __restrict__ ros, const int k, __global const __ValueType * __restrict__  y)
@@ -505,7 +507,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         accept |= islessequal(h, h_min);
         accept &= __not(done);
         #else
-        accept = 1;
+        __MaskType accept = TRUE;
         #endif
 
         if (__any(accept))

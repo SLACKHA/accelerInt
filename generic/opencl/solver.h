@@ -17,16 +17,6 @@
 #define __inline inline
 
 #define VERBOSE
-#ifdef VERBOSE
-  #pragma message "__blockSize   = " STRINGIFY(__blockSize)
-  #pragma message "__getIndex    = " STRINGIFY(__getIndex(1))
-  #pragma message "__arrayStride = " STRINGIFY(__arrayStride)
-  #ifdef __Alignment
-    #pragma message "__Alignment   = " STRINGIFY(__Alignment)
-  #endif
-  #pragma message "__EnableQueue = " STRINGIFY(__EnableQueue)
-#endif
-
 
 #define __PASTE(a,b) a ## b
 #define PASTE(a,b) __PASTE(a,b)
@@ -49,7 +39,17 @@
 #define __order 'C'
 #endif
 
+//! \brief a type-safe "truth" value for OpenCL
+//         Note that a vector conditional is only considered true if the sign-bit
+//         (MSB) is set.
+#define TRUE (-1)
+
 #ifdef VERBOSE
+  #pragma message "__blockSize   = " STRINGIFY(__blockSize)
+  #pragma message "__arrayStride = " STRINGIFY(__arrayStride)
+  #ifdef __Alignment
+    #pragma message "__Alignment   = " STRINGIFY(__Alignment)
+  #endif
   #pragma message "__ValueSize  = " STRINGIFY(__ValueSize)
   #pragma message "__ValueType  = " STRINGIFY(__ValueType)
   #pragma message "__MaskType   = " STRINGIFY(__MaskType)
