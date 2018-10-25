@@ -49,6 +49,10 @@ class Ignition(Problem):
         return os.path.abspath(os.path.dirname(__file__))
 
     @classmethod
+    def model(cls):
+        return 'h2.cti'
+
+    @classmethod
     def generate(cls, lang, vector_size=None, block_size=None, platform='',
                  order='C', reuse=False):
         """
@@ -73,8 +77,11 @@ class Ignition(Problem):
         obj_path = os.path.join(out_path, 'obj')
         ktype = KernelType.jacobian
         if not reuse:
+            model = cls.model()
+            if cls.data_path():
+                model = os.path.join(cls.data_path(), model)
             create_jacobian(lang,
-                            mech_name=os.path.join(cls.data_path(), 'h2.cti'),
+                            mech_name=model,
                             width=width, build_path=out_path, last_spec=None,
                             kernel_type=ktype,
                             platform=plat,

@@ -1,7 +1,7 @@
 import logging
 
 import numpy as np
-from pyccelerInt import create_integrator, build_problem, have_plotter
+from pyccelerInt import create_integrator, build_problem, have_plotter, get_plotter
 
 
 class ValidationProblem(object):
@@ -26,7 +26,11 @@ class ValidationProblem(object):
         """
         raise NotImplementedError
 
-    def plot(self, step_sizes, errors, end_time=None, label=''):
+    @property
+    def plot_name(self):
+        raise NotImplementedError
+
+    def plot(self, step_sizes, errors, end_time, label='', order=None):
         """
         Plot the validation curve for this problem
 
@@ -38,7 +42,27 @@ class ValidationProblem(object):
             The array of normalized errors to plot
         """
 
-        raise NotImplementedError
+        plt = get_plotter()
+        # convert stepsizes to steps taken
+        st = end_time / step_sizes
+        plt.loglog(st, errors, label=label, linestyle='', marker='o')
+
+        if order is not None:
+            # plot expected order
+            expected = np.zeros_like(errors)
+            expected[0] = errors[0]
+            for i in range(1, expected.size):
+                expected[i] = expected[i - 1] / np.power(10., order)
+
+            plt.loglog(st, expected, label='order ({})'.format(order))
+
+        plt.ylim(np.min(errors) * 0.8,
+                 np.max(errors) * 1.2)
+        plt.legend(loc=0)
+        plt.xlabel('Steps taken')
+        plt.ylabel('|E|')
+        plt.title(self.plot_name)
+        plt.show()
 
 
 def build_case(problem, lang, is_reference=False,
@@ -229,8 +253,9 @@ def run_validation(num, reference, ref_problem,
         The linear algebra norm used over the :param:`condition_norm` of all IVPs,
         see IN in the equation below
     test_builder: :class:`Callable`
-        A Callable that takes as an argument and returns the result of
-        :func:`build_case`
+        A Callable that takes as an argument the step-size (and an optional argument
+        of the iteration to avoid re-building code if possible)
+        and returns the result of :func:`build_case`
 
     Returns
     -------
@@ -258,7 +283,7 @@ def run_validation(num, reference, ref_problem,
     for i, size in enumerate(steps):
         steps[i] = np.power(10., size)
 
-        testivp, test_problem, test = test_builder(steps[i])
+        testivp, test_problem, test = test_builder(steps[i], iteration=i)
 
         if test_order is None:
             test_order = test.solver_order()

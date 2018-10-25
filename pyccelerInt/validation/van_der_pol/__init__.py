@@ -1,6 +1,5 @@
 import numpy as np
 
-from pyccelerInt import get_plotter
 from pyccelerInt.examples.van_der_pol import VDP
 from pyccelerInt.validation import ValidationProblem
 
@@ -22,7 +21,7 @@ def vdp_init(num):
 
 
 class VDP_valid(VDP, ValidationProblem):
-    def __init__(self, lang, options, reuse=False):
+    def __init__(self, lang, options):
         """
         Initialize the problem.
 
@@ -32,11 +31,9 @@ class VDP_valid(VDP, ValidationProblem):
             The runtime language to use for the problem
         options: :class:`pyccelerint/PySolverOptions`
             The solver options to use
-        reuse: bool [False]
-            If true, reuse any previously generated code / modules
         """
 
-        VDP.__init__(self, lang, options, reuse=reuse)
+        VDP.__init__(self, lang, options)
 
     def setup(self, num, options, initializer=vdp_init):
         """
@@ -59,43 +56,13 @@ class VDP_valid(VDP, ValidationProblem):
         self.init = True
 
     @property
+    def plot_name(self):
+        return "van der Pol equation"
+
+    @property
     def step_start(self):
         return 1
 
     @property
     def step_end(self):
         return 1e-6
-
-    def plot(self, step_sizes, errors, end_time, label='', order=None):
-        """
-        Plot the validation curve for this problem
-
-        Parameters
-        ----------
-        step_sizes: :class:`numpy.ndarray`
-            The array of step sizes
-        errors: :class:`numpy.ndarray`
-            The array of normalized errors to plot
-        """
-
-        plt = get_plotter()
-        # convert stepsizes to steps taken
-        st = end_time / step_sizes
-        plt.loglog(st, errors, label=label, linestyle='', marker='o')
-
-        if order is not None:
-            # plot expected order
-            expected = np.zeros_like(errors)
-            expected[0] = errors[0]
-            for i in range(1, expected.size):
-                expected[i] = expected[i - 1] / np.power(10., order)
-
-            plt.loglog(st, expected, label='order ({})'.format(order))
-
-        plt.ylim(np.min(errors) * 0.8,
-                 np.max(errors) * 1.2)
-        plt.legend(loc=0)
-        plt.xlabel('Steps taken')
-        plt.ylabel('|E|')
-        plt.title('van der Pol equation')
-        plt.show()

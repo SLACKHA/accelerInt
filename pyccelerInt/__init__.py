@@ -95,7 +95,7 @@ class Problem(object):
         """
         raise NotImplementedError
 
-    def __init__(self, lang, options, reuse=False):
+    def __init__(self, lang, options):
         """
         Initialize the problem.
 
@@ -114,7 +114,6 @@ class Problem(object):
         self.lang = lang
         self.dir = os.path.abspath(self.path())
         self.options = options
-        self.reuse = reuse
 
         # mark not initialized
         self.init = False

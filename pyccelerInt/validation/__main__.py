@@ -5,6 +5,8 @@ from pyccelerInt.validation import build_case, run_validation
 def get_case(case):
     if case == 'vdp':
         from pyccelerInt.validation.van_der_pol import VDP_valid as case
+    elif case == 'pyjac':
+        from pyccelerInt.validation.pyJac import Ignition_valid as case
     else:
         raise NotImplementedError
 
@@ -27,11 +29,11 @@ if __name__ == '__main__':
     if not end_time:
         end_time = refp.get_default_endtime()
 
-    def builder(stepsize):
+    def builder(stepsize, iteration=0):
         return build_case(case, args.language,
                           is_reference=False,
                           integrator_type=args.int_type,
-                          reuse=args.reuse,
+                          reuse=args.reuse or iteration > 0,
                           vector_size=args.vector_size,
                           block_size=args.block_size,
                           platform=args.platform, order=args.order,
