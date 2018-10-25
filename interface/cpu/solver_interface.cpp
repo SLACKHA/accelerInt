@@ -94,7 +94,7 @@ namespace c_solvers
         }
 
         int numSteps = 0;
-        double t_next = t + step;
+        double t_next = t + stepsize;
         // time integration loop
         while (t + EPS < t_end)
         {
