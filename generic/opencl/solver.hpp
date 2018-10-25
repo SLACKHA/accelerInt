@@ -554,7 +554,7 @@ namespace opencl_solvers {
         }
 
         /**
-         * \brief Integration driver for the CPU integrators
+         * \brief Integration driver for the OpenCL integrators
          * \param[in]       NUM             The (non-padded) number of IVPs to integrate
          * \param[in]       t               The current system time
          * \param[in]       t_end           The IVP integration end time
@@ -572,18 +572,22 @@ namespace opencl_solvers {
         }
 
         /**
-         * \brief Integration driver for the CPU integrators
+         * \brief Integration driver for the OpenCL integrators
          * \param[in]       NUM             The (non-padded) number of IVPs to integrate
          * \param[in]       t               The (array) of current system times
          * \param[in]       t_end           The (array) of IVP integration end times
          * \param[in]       param           The system constant variable (pressures / densities)
          * \param[in,out]   phi             The system state vectors at time t.
+         * \param[in]       step            If in constant time-stepping mode, use this is as the constant time-step.
          * \returns system state vectors at time t_end
          *
          */
         virtual void intDriver (const int NUM, const double t,
                                 const double* __restrict__ t_end,
-                                const double* __restrict__ param, double* __restrict__ phi) = 0;
+                                const double* __restrict__ param,
+                                double* __restrict__ phi,
+                                double step=std::numeric_limits<double>::quiet_NaN()) = 0;
+
 
 
 
@@ -1060,8 +1064,12 @@ namespace opencl_solvers {
 
             if (_options.stepperType() == StepperType::CONSTANT)
             {
+                if (std::isnan(step))
+                {
+                    throw std::runtime_error("Must specify timestep in constant-timestepping mode!");
+                }
                 std::ostringstream stype;
-                stype << "#define CONSTANT_TIMESTEPS" << std::endl;
+                stype << "#define CONSTANT_TIMESTEP (" << step << ")" << std::endl;
                 program_source_str << stype.str();
             }
 
@@ -1393,7 +1401,8 @@ namespace opencl_solvers {
          */
         void intDriver (const int NUM, const double t,
                         const double* __restrict__ t_end,
-                        const double* __restrict__ param, double* __restrict__ phi)
+                        const double* __restrict__ param, double* __restrict__ phi,
+                        double step)
         {
 
             if (NUM < 1)

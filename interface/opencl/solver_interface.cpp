@@ -114,4 +114,44 @@ namespace opencl_solvers
         return std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
     }
 
+    /**
+     * \brief integrate NUM odes from time `t` to time `t_end`, using constant stepsizes of `t_step`
+     *
+     * \param[in]           NUM             The number of ODEs to integrate.
+                                            This should be the size of the leading dimension of `y_host` and `var_host`.
+                                            @see accelerint_indx
+     * \param[in]           t_start         The system time
+     * \param[in]           t_end           The end time
+     * \param[in]           step            The integration step size.  If `step` < 0, the step size will be set to `t_end - t`
+     * \param[in,out]       phi_host        The state vectors to integrate.
+     * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
+     * \returns             timing          The wall-clock duration spent in integration in milliseconds
+     *
+     */
+    double integrate_conststep(IntegratorBase& integrator,
+                               const int NUM, const double t_start,
+                               const double* __restrict__ t_end, const double step,
+                               double * __restrict__ phi_host,
+                               const double * __restrict__ param_host)
+    {
+
+        if (integrator.stepperType() != StepperType::CONSTANT)
+        {
+            throw std::runtime_error("Must use constant time-steps with `integrate_conststep`, use `integrate_varying` instead.");
+        }
+        if (integrator.logging())
+        {
+            throw std::runtime_error("Cannot use logging with `integrate_conststep`, use `integrate_varying` instead.");
+        }
+        if (std::signbit(step) - std::signbit(t_end - t_start))
+        {
+            throw std::runtime_error("Specified time-step sign does not match sign of integration time-duration");
+        }
+        auto t1 = std::chrono::high_resolution_clock::now();
+        integrator.intDriver(NUM, t_start, t_end, param_host, phi_host, step);
+        auto t2 = std::chrono::high_resolution_clock::now();
+
+        return std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    }
+
 }
