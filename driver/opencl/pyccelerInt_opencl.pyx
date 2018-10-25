@@ -210,13 +210,14 @@ cdef class PySolverOptions:
                   string_t order="C", string_t platform="",
                   DeviceType deviceType = DeviceType.DEFAULT, size_t minIters=1,
                   size_t maxIters = 1000,
-                  StepperType stepper_type = StepperType.ADAPTIVE):
+                  StepperType stepper_type = StepperType.ADAPTIVE,
+                  double h_const=np.nan):
 
         self.options.reset(new SolverOptions(
             vectorSize, blockSize,
             atol, rtol, logging, use_queue,
             _bytes(order), _bytes(platform), deviceType,
-            minIters, maxIters, stepper_type))
+            minIters, maxIters, stepper_type, h_const))
 
     cpdef atol(self):
         return deref(self.options.get()).atol()

@@ -46,7 +46,7 @@ def build_case(problem, lang, is_reference=False,
                platform='', order='F', use_queue=True,
                device_type='DEFAULT', max_steps=int(1e6),
                reference_rtol=1e-15, reference_atol=1e-20,
-               num_threads=1):
+               num_threads=1, constant_timestep=None):
     """
     Run validation for the given reference and test problems
 
@@ -80,8 +80,6 @@ def build_case(problem, lang, is_reference=False,
         The relative integration tolerance
     atol: float [1e-10]
         The absolute integration tolerance
-    constant_timesteps: bool [False]
-        If true, use constant time-stepping.
     maximum_steps: int [1e6]
         The maximum number of integration steps allowed per-IVP (per-global
         time-step)
@@ -103,6 +101,9 @@ def build_case(problem, lang, is_reference=False,
     if is_reference:
         kwargs['rtol'] = reference_rtol
         kwargs['atol'] = reference_atol
+    else:
+        assert constant_timestep
+        kwargs['constant_timestep'] = constant_timestep
 
     problem, options = build_problem(problem, lang, integrator_type,
                                      reuse=reuse,
@@ -112,7 +113,6 @@ def build_case(problem, lang, is_reference=False,
                                      order=order,
                                      use_queue=use_queue,
                                      device_type=device_type,
-                                     constant_timesteps=not is_reference,
                                      maximum_steps=max_steps,
                                      logging=False,
                                      **kwargs)
@@ -190,8 +190,8 @@ def run_case(num, phir, test, test_problem,
     return err
 
 
-def run_validation(num, reference, ref_problem, test, test_problem,
-                   t_end, step_start=1e-3, step_end=1e-8,
+def run_validation(num, reference, ref_problem,
+                   t_end, test_builder, step_start=1e-3, step_end=1e-8,
                    norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
                    ivp_norm=np.inf):
     """
@@ -206,10 +206,6 @@ def run_validation(num, reference, ref_problem, test, test_problem,
         The reference integrator
     ref_problem: :class:`Problem`
         The constructed problem for the reference integrator
-    test: :class:`PyIntegrator`
-        The integrator to validate
-    test_problem: :class:`Problem`
-        The constructed problem for the test integrator
     t_end: float
         The integration end time to use for all validation case
     step_start: float
@@ -228,6 +224,9 @@ def run_validation(num, reference, ref_problem, test, test_problem,
     ivp_norm: str or int
         The linear algebra norm used over the :param:`condition_norm` of all IVPs,
         see IN in the equation below
+    test_builder: :class:`Callable`
+        A Callable that takes as an argument and returns the result of
+        :func:`build_case`
 
     Returns
     -------
@@ -254,11 +253,17 @@ def run_validation(num, reference, ref_problem, test, test_problem,
     for i, size in enumerate(steps):
         steps[i] = np.power(10., size)
 
+        testivp, test_problem, test = test_builder(steps[i])
+
         errs[i] = run_case(num, phir,
                            test, test_problem,
                            t_end, steps[i],
                            norm_rtol=norm_rtol, norm_atol=norm_atol,
                            condition_norm=condition_norm, ivp_norm=ivp_norm)
+
+        del testivp
+        del test_problem
+        del test
 
         print(steps[i], errs[i])
 

@@ -311,7 +311,8 @@ namespace opencl_solvers {
                       bool logging=false, bool use_queue=true, std::string order="C",
                       std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT,
                       size_t minIters = 1, size_t maxIters = 1000,
-                      StepperType stepperType = StepperType::ADAPTIVE):
+                      StepperType stepperType = StepperType::ADAPTIVE,
+                      double h_const=std::numeric_limits<double>::quiet_NaN()):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
             _atol(atol),
@@ -323,7 +324,8 @@ namespace opencl_solvers {
             _deviceType(deviceType),
             _minIters(minIters),
             _maxIters(maxIters),
-            _stepperType(stepperType)
+            _stepperType(stepperType),
+            _h_const(h_const)
         {
             if (order.compare("C") && order.compare("F"))
             {
@@ -400,6 +402,11 @@ namespace opencl_solvers {
             return _stepperType;
         }
 
+        inline const double constantTimestep() const
+        {
+            return _h_const;
+        }
+
     protected:
         //! vector size
         std::size_t _vectorSize;
@@ -425,6 +432,8 @@ namespace opencl_solvers {
         const std::size_t _maxIters;
         //! The type of time-stepping to utilize constant, or adaptive
         StepperType _stepperType;
+        //! The constant integration step to take (if #_stepperType == StepperTypes::CONSTANT)
+        double _h_const;
     };
 
 
@@ -1061,7 +1070,11 @@ namespace opencl_solvers {
             if (_options.stepperType() == StepperType::CONSTANT)
             {
                 std::ostringstream stype;
-                stype << "#define CONSTANT_TIMESTEPS" << std::endl;
+                if (std::isnan(_options.constantTimestep()))
+                {
+                    throw std::runtime_error("Constant time-step not specified!");
+                }
+                stype << "#define CONSTANT_TIMESTEP (" << _options.constantTimestep() << ")" << std::endl;
                 program_source_str << stype.str();
             }
 

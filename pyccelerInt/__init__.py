@@ -314,7 +314,7 @@ def get_solver_options(lang, integrator_type,
                        block_size=None, use_queue=True, order='C',
                        platform='', device_type=None,
                        num_ra=10, max_krylov=-1,
-                       constant_timesteps=False):
+                       constant_timestep=None):
     """
     Return the constructed solver options for the given pyccelerInt runtime
     """
@@ -323,11 +323,12 @@ def get_solver_options(lang, integrator_type,
 
     # language specific options
     kwargs = {}
-    if constant_timesteps:
+    if constant_timestep:
         if lang == 'c':
             raise NotImplementedError
         elif lang != 'c':
             kwargs['stepper_type'] = pycel.StepperType.CONSTANT
+            kwargs['h_const'] = constant_timestep
 
     # create the options
     if lang == 'c':
@@ -355,7 +356,7 @@ def build_problem(problem_type, lang, integrator_type,
                   reuse=True, vector_size=0, block_size=0, platform='',
                   order='C', logging=True, use_queue=True,
                   device_type=None, rtol=1e-06, atol=1e-10,
-                  constant_timesteps=False,
+                  constant_timestep=None,
                   maximum_steps=int(1e6)):
     """
     Build and return the :class:`Problem` and :class:`SolverOptions`
@@ -390,8 +391,8 @@ def build_problem(problem_type, lang, integrator_type,
         The relative integration tolerance
     atol: float [1e-10]
         The absolute integration tolerance
-    constant_timesteps: bool [False]
-        If true, use constant time-stepping.
+    constant_timestep: float [None]
+        If specified, use this as a constant integration time-step
     maximum_steps: int [1e6]
         The maximum number of integration steps allowed per-IVP (per-global
         time-step)
@@ -440,7 +441,7 @@ def build_problem(problem_type, lang, integrator_type,
                                  rtol=rtol,
                                  atol=atol,
                                  maximum_steps=maximum_steps,
-                                 constant_timesteps=constant_timesteps)
+                                 constant_timestep=constant_timestep)
 
     # create problem
     problem = problem_type(lang, options)
