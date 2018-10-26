@@ -1,5 +1,4 @@
-from pyccelerInt import build_parser
-from pyccelerInt.validation import build_case, run_validation
+from pyccelerInt.validation import build_case, run_validation, build_parser
 
 
 def get_case(case):
@@ -14,7 +13,7 @@ def get_case(case):
 
 
 if __name__ == '__main__':
-    args = build_parser('Run pyccelerInt validation examples.')
+    args = build_parser()
 
     case = get_case(args.case)
 
@@ -46,7 +45,9 @@ if __name__ == '__main__':
     run_validation(args.num_ivp, refi, refp,
                    end_time, builder, step_start=refp.step_start,
                    step_end=refp.step_end, label=args.int_type,
-                   plot_filename=args.plot_filename)
+                   plot_filename=args.plot_filename,
+                   error_filename=args.error_filename,
+                   reuse=args.reuse_validation)
 
     # and cleanup
     del refivp

@@ -1,4 +1,5 @@
 import logging
+import argparse
 
 import numpy as np
 from pyccelerInt import create_integrator, build_problem, have_plotter, get_plotter
@@ -153,31 +154,28 @@ def build_case(problem, lang, is_reference=False,
     return ivp, problem, integrator
 
 
+class NanException(Exception):
+    pass
+
+
 def run_case(num, phir, test, test_problem,
              t_end, norm_rtol=1e-6, norm_atol=1e-10,
              condition_norm=2,
-             ivp_norm=np.inf):
+             ivp_norm=np.inf, results={}):
     """
-    Run the :param:`validation` and :param:`test` integrators over :param:`num`
-    problems, to end time :param:`t_end`, using constant integration
-    :param:`step_size`'s (for the test integrator)
+    Run the :param:`test` integrator over :param:`num`
+    problems, to end time :param:`t_end`, using constant integration timesteps
 
     Parameters
     ----------
     num: int
         The number of individual IVPs to execute
-    reference: :class:`PyIntegrator`
-        The reference integrator
-    ref_problem: :class:`Problem`
-        The constructed problem for the reference integrator
     test: :class:`PyIntegrator`
         The integrator to validate
     test_problem: :class:`Problem`
         The constructed problem for the test integrator
     t_end: float
         The integration end time
-    step_size: float
-        The constant integration step-size to use for the test-integrator
     norm_atol: float [1e-10]
         The absolute tolerance used in error normalization
     norm_rtol: float [1e-06]
@@ -188,6 +186,8 @@ def run_case(num, phir, test, test_problem,
     ivp_norm: str or int
         The linear algebra norm used over the :param:`condition_norm` of all IVPs,
         see IN in the equation below
+    results: dict
+        If 'true', store the test results here
 
     Returns
     -------
@@ -204,8 +204,28 @@ def run_case(num, phir, test, test_problem,
                 \right\rVert_{\text{IN}}
     """
 
+    def __store_check(key, value):
+        if not results:
+            return
+        if key not in results:
+            results[key] = np.array([value])
+        else:
+            if not np.array_equal(results[key], np.array([value])):
+                raise NanException('Mismatch in results for value {}, stored: {}, ',
+                                   'current: {}'.format(value, results[key], value))
+
+    if results:
+        # store rtol / atol / etc. if not already there
+        __store_check('norm_atol', norm_atol)
+        __store_check('norm_rtol', norm_rtol)
+        __store_check('condition_norm', condition_norm)
+        __store_check('ivp_norm', ivp_norm)
+
     # run test
     _, phit = test_problem.run(test, num, t_end, t_start=0, return_state=True)
+    if results:
+        __store_check('test_{}'.format(test.constant_timestep()), phit)
+
     if np.any(phit != phit):
         logger = logging.getLogger(__name__)
         logger.warn('NaN / Solution detected for step-size! '
@@ -219,13 +239,17 @@ def run_case(num, phir, test, test_problem,
     # calculate ivp norm
     err = np.linalg.norm(err, ord=ivp_norm, axis=0)
 
+    if results:
+        __store_check('err_{}'.format(test.constant_timestep()), err)
+
     return err
 
 
 def run_validation(num, reference, ref_problem,
                    t_end, test_builder, step_start=1e-3, step_end=1e-8,
                    norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
-                   ivp_norm=np.inf, label='', plot_filename=''):
+                   ivp_norm=np.inf, label='', plot_filename='',
+                   error_filename='', reuse=False):
     """
     Run the validation case for the test integrator using constant time-steps ranging
     from :param:`step_start` to `step_end`
@@ -262,6 +286,12 @@ def run_validation(num, reference, ref_problem,
         and returns the result of :func:`build_case`
     plot_filename: str
         If supplied, save plot to this file
+    error_filename: str
+        If supplied, save validation / test results to this .npz file for
+        post-procesisng
+    reuse: bool [False]
+        If true, attempt to reuse validation data from :param:`error_filename`.
+        Requires that :param:`error_filename` be specified.
 
     Returns
     -------
@@ -272,9 +302,22 @@ def run_validation(num, reference, ref_problem,
         step-size
     """
 
-    # run reference problem once
-    # run validation
-    _, phir = ref_problem.run(reference, num, t_end, t_start=0, return_state=True)
+    results = {}
+    if reuse:
+        if not error_filename:
+            raise Exception('Error filename must be supplied to reuse past '
+                            'validation!')
+
+        # load from npz
+        phir = np.load(error_filename)['phi_valid']
+    else:
+        # run reference problem once
+        # run validation
+        _, phir = ref_problem.run(reference, num, t_end, t_start=0,
+                                  return_state=True)
+
+    if error_filename:
+        results['phi_valid'] = phir
 
     start = np.rint(np.log10(step_start))
     end = np.rint(np.log10(step_end))
@@ -298,8 +341,9 @@ def run_validation(num, reference, ref_problem,
             errs[i] = run_case(num, phir,
                                test, test_problem,
                                t_end, norm_rtol=norm_rtol, norm_atol=norm_atol,
-                               condition_norm=condition_norm, ivp_norm=ivp_norm)
-        except Exception:
+                               condition_norm=condition_norm, ivp_norm=ivp_norm,
+                               results=results if error_filename else False)
+        except NanException:
             pass
 
         del testivp
@@ -307,6 +351,10 @@ def run_validation(num, reference, ref_problem,
         del test
 
         print(steps[i], errs[i])
+
+    if results:
+        # save to file
+        np.savez(error_filename, **results)
 
     # filter
     good = np.where(errs != 0)
@@ -318,3 +366,51 @@ def run_validation(num, reference, ref_problem,
                          order=test_order, plot_filename=plot_filename)
 
     return steps, errs
+
+
+def filetype(value, ext):
+    if not isinstance(value, str):
+        raise argparse.ArgumentError('{} must be a string!'.format(value))
+    if not value.endswith(ext):
+        raise argparse.ArgumentError('{} must be a {} file!'.format(value, ext))
+    return value
+
+
+def npz_file(value):
+    return filetype(value, '.npz')
+
+
+def pdf_file(value):
+    return filetype(value, '.pdf')
+
+
+def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=False):
+    from pyccelerInt import build_parser
+    parser = build_parser(helptext=helptext, get_parser=True)
+
+    # add validation specific options
+    parser.add_argument('-fp', '--plot_filename',
+                        default=None,
+                        type=pdf_file,
+                        help='If specified, save the resulting plot to a file '
+                             'instead of showing it to the screen')
+
+    parser.add_argument('-fe', '--error_filename',
+                        default=None,
+                        type=npz_file,
+                        help='If specified, save the error results to a file for '
+                             'later processing.')
+
+    parser.add_argument('-rv', '--reuse_validation',
+                        default=False,
+                        action='store_true',
+                        help='If supplied, attempt to reuse the validation data '
+                             'from the `error_filename`.')
+
+    # and change default max steps
+    parser.set_defaults(max_steps=float(1e9))
+
+    if get_parser:
+        return parser
+
+    return parser.parse_args()

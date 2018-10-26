@@ -1,8 +1,8 @@
 """The main interface for the pyccelerInt examples"""
 
 
-from pyccelerInt import create_integrator, have_plotter, build_problem, \
-    build_parser
+from pyccelerInt import create_integrator, have_plotter, build_problem
+from pyccelerInt.validation import build_parser
 
 
 def get_case(case):

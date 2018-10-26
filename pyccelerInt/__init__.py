@@ -470,7 +470,7 @@ def create_integrator(problem, integrator_type, options, num_threads):
 # Build Parser #
 ################
 
-def build_parser(helptext='Run the pyccelerInt examples.'):
+def build_parser(helptext='Run the pyccelerInt examples.', get_parser=False):
     parser = argparse.ArgumentParser(helptext)
     parser.add_argument('-c', '--case',
                         choices=['vdp', 'pyjac'],
@@ -566,10 +566,7 @@ def build_parser(helptext='Run the pyccelerInt examples.'):
                         help='The maximum number of steps allowed per global '
                              'integration time-step.')
 
-    parser.add_argument('-f', '--plot_filename',
-                        default=None,
-                        type=str,
-                        help='If specified, save the resulting plot to a file '
-                             'instead of showing it to the screen')
+    if get_parser:
+        return parser
 
     return parser.parse_args()

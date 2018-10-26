@@ -105,6 +105,8 @@ cdef class PyIntegrator:
         if options is None:
             self.options = PySolverOptions(itype)
             options = self.options
+        else:
+            self.options = options
 
         self.integrator = move(
             init(itype, neq, numThreads, deref(ivp.ivp.get()),
@@ -208,6 +210,9 @@ cdef class PyIntegrator:
         """
         return deref(self.integrator.get()).solverOrder()
 
+    cpdef constant_timestep(self):
+        return self.options.constant_timestep()
+
 
 cdef class PySolverOptions:
     cdef unique_ptr[SolverOptions] options # hold our options
@@ -263,7 +268,7 @@ cdef class PySolverOptions:
     cpdef stepper_type(self):
         return deref(self.options.get()).stepperType()
 
-    cpdef constantTimestep(self):
+    cpdef constant_timestep(self):
         return deref(self.options.get()).constantTimestep()
 
 
