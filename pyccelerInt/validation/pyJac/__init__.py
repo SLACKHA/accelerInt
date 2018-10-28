@@ -96,11 +96,11 @@ class Ignition_valid(ValidationProblem, Ignition):
 
     @property
     def step_start(self):
-        return 1e-5
+        return 1e-3
 
     @property
     def step_end(self):
-        return 1e-9
+        return 1e-8
 
     @property
     def plot_name(self):
