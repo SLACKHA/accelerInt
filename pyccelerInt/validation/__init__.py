@@ -319,6 +319,9 @@ def run_validation(num, reference, ref_problem,
     if error_filename:
         results['phi_valid'] = phir
 
+        # save results to file as intermediate results
+        np.savez(error_filename, **results)
+
     start = np.rint(np.log10(step_start))
     end = np.rint(np.log10(step_end))
     # determine direction of progression, and ensure that the final step-size is
@@ -345,6 +348,10 @@ def run_validation(num, reference, ref_problem,
                                results=results if error_filename else False)
         except NanException:
             pass
+
+        # save results to file as intermediate results
+        if error_filename:
+            np.savez(error_filename, **results)
 
         del testivp
         del test_problem
