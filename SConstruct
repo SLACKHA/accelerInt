@@ -596,6 +596,9 @@ def build_wrapper(save, platform, defines, libs, variant, multi):
     env.Depends(wrapper, multi)
     driver = os.path.join(driver_dir, platform, 'setup.py.in')
     with open(driver, 'r') as file:
+        kwargs = {}
+        if platform == 'opencl':
+            platform['cl_path'] == env['opencl_inc_dir']
         driver = Template(file.read()).substitute(libdir=lib_dir)
     dfile = os.path.join(driver_dir, platform, 'setup.py')
     with open(dfile, 'w') as file:

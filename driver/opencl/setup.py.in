@@ -7,11 +7,13 @@ import os
 path = os.path.dirname(__file__)
 topdir = os.path.abspath(os.path.join(path, os.pardir, os.pardir))
 libdir = "${libdir}"
+cl_path = "${cl_path}"
 includes = [os.path.join(topdir, 'generic', 'opencl'),
             os.path.join(topdir, 'interface', 'opencl'),
             os.path.join(topdir, 'rkf45', 'opencl'),
             os.path.join(topdir, 'ros', 'opencl'),
-            os.path.join(topdir, 'paths')]
+            os.path.join(topdir, 'paths'),
+            cl_path]
 
 ext_module = Extension('pyccelerInt_ocl',
                        sources=[os.path.join(path, 'pyccelerInt_ocl.pyx')],
