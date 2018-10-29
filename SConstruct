@@ -598,8 +598,8 @@ def build_wrapper(save, platform, defines, libs, variant, multi):
     with open(driver, 'r') as file:
         kwargs = {}
         if platform == 'opencl':
-            platform['cl_path'] == env['opencl_inc_dir']
-        driver = Template(file.read()).substitute(libdir=lib_dir)
+            kwargs['cl_path'] = env['opencl_inc_dir']
+        driver = Template(file.read()).substitute(libdir=lib_dir, **kwargs)
     dfile = os.path.join(driver_dir, platform, 'setup.py')
     with open(dfile, 'w') as file:
         file.write(driver)
