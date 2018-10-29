@@ -306,6 +306,7 @@ exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
 cvodes_dir = os.path.join(home, 'cvodes')
 rk78_dir = os.path.join(home, 'rk78')
 rkc_dir = os.path.join(home, 'rkc')
+path_dir = os.path.join(home, 'paths')
 install_prefix = env['prefix']
 if install_prefix:
     inc_dir = os.path.join(install_prefix, 'include')
@@ -754,6 +755,9 @@ def build_platform(env_save, platform):
             basename = os.path.join(basename, os.path.basename(idir), platform)
             source_inst += env.RecursiveInstall(basename,
                                                 os.path.join(idir, platform))
+    # paths library
+    source_inst += env.RecursiveInstall(os.path.join(
+        inc_dir, os.path.basename(path_dir)), path_dir)
 
     # add an alias
     Alias('install-' + platform, source_inst + libs)
