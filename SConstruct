@@ -430,6 +430,9 @@ conf = Configure(sun_env)
 ret, env['SUNDIALS_VERSION'] = conf.TryRun(
     get_expression_value(['"sundials/sundials_config.h"'],
                          'QUOTE(SUNDIALS_PACKAGE_VERSION)'), '.cpp')
+env['SUNDIALS_VERSION'] = env['SUNDIALS_VERSION'].strip()
+if env['SUNDIALS_VERSION'].startswith('"') and env['SUNDIALS_VERSION'].endswith('"'):
+    env['SUNDIALS_VERSION'] = env['SUNDIALS_VERSION'][1:-1]
 if ret == 0:
     config_error('Could not determine sundials version!')
 print('Using Sundials version {}'.format(env['SUNDIALS_VERSION']))
