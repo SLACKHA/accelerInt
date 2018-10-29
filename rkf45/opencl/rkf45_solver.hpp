@@ -16,7 +16,7 @@ private:
         std::vector<std::string> _includes;
         std::vector<std::string> _paths;
 
-        void init(rk_t * rk);
+        void init(rk_t* rk);
 
 public:
         RKF45Integrator(int neq, std::size_t numWorkGroups, const IVP& ivp, const SolverOptions& options) :

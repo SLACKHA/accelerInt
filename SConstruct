@@ -642,7 +642,6 @@ def get_includes(platform, includes, exact_includes=[]):
 for p in platforms:
     new_defines = get_includes(p, [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
                                    exprb43_int_dir, exp_int_dir, cvodes_dir])
-    import pdb; pdb.set_trace()
     core = build_core(env_save, p, new_defines, variant)
 
     # linear algebra
@@ -731,7 +730,6 @@ for p in platforms:
     libs = [y for x in vals for y in x[1]]
 
     source_inst = []
-    import pdb; pdb.set_trace()
     if install_prefix:
         for idir in idirs:
             basename = inc_dir

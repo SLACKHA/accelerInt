@@ -1,4 +1,5 @@
 #include "ros_solver.hpp"
+
 namespace opencl_solvers
 {
     void ROS3Integrator::init(ros_t *ros)

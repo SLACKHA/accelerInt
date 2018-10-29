@@ -19,6 +19,7 @@
 #include <sstream>
 #include <chrono>
 #include <vector>
+#include <memory>
 #include <algorithm>
 #include <stdexcept>
 #include "error_codes.hpp"

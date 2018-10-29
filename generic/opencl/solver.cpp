@@ -3,7 +3,7 @@
 namespace opencl_solvers
 {
 
-    void IntegratorBase::void initialize_kernel()
+    void IntegratorBase::initialize_kernel()
     {
         cl_int ret;
 
@@ -119,7 +119,7 @@ namespace opencl_solvers
             std::cout << "\tIs-NVIDIA = " << info->is_nvidia << std::endl;
     }
 
-    void IntegratorBase::void getDeviceInfo (
+    void IntegratorBase::getDeviceInfo (
         const cl_uint& device_type,
         deviceInfo_t *device_info,
         const platformInfo_t *platform_info)
