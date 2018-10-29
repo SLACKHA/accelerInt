@@ -387,22 +387,22 @@ namespace opencl_solvers {
             return _deviceType;
         }
 
-        inline const std::size_t minIters() const
+        inline std::size_t minIters() const
         {
             return _minIters;
         }
 
-        inline const std::size_t maxIters() const
+        inline std::size_t maxIters() const
         {
             return _maxIters;
         }
 
-        inline const StepperType stepperType() const
+        inline StepperType stepperType() const
         {
             return _stepperType;
         }
 
-        inline const double constantTimestep() const
+        inline double constantTimestep() const
         {
             return _h_const;
         }
@@ -466,7 +466,7 @@ namespace opencl_solvers {
 
         }
 
-        ~IntegratorBase()
+        virtual ~IntegratorBase()
         {
             this->clean();
         }
