@@ -527,13 +527,13 @@ namespace opencl_solvers {
         }
 
         //! return the absolute tolerance
-        inline const double atol() const
+        inline double atol() const
         {
             return _options.atol();
         }
 
         //! return the relative tolerance
-        inline const double rtol() const
+        inline double rtol() const
         {
             return _options.rtol();
         }
@@ -549,7 +549,7 @@ namespace opencl_solvers {
         }
 
         //! \brief return the number of equations to solve
-        inline const int neq() const
+        inline int neq() const
         {
             return _neq;
         }
@@ -557,13 +557,13 @@ namespace opencl_solvers {
         //! \brief Return the number of OpenCL work-groups to launch
         //         On the CPU / Accelerators this corresponds to the # of threads
         //         On the GPU, this corresponds to the # of "thread-blocks", in CUDA terminology
-        inline const int numWorkGroups() const
+        inline int numWorkGroups() const
         {
             return _numWorkGroups;
         }
 
         //! \brief Return the numerical order of the solver
-        virtual const size_t solverOrder() const = 0;
+        virtual size_t solverOrder() const = 0;
 
         /**
          * \brief Integration driver for the CPU integrators

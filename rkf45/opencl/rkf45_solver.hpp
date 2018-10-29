@@ -36,7 +36,7 @@ public:
         }
 
         //! \brief Return the numerical order of the solver
-        virtual const size_t solverOrder() const
+        virtual size_t solverOrder() const
         {
             return 4;
         }
