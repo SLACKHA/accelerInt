@@ -30,6 +30,9 @@ extern "C" {
 #include "CL/cl.h"
 }
 
+#define xstringify(s) (stringify(s))
+#define stringify(s) (#s)
+
 // #include <ros.h>
 
 const std::string getErrorString(cl_int error)
@@ -660,7 +663,7 @@ namespace opencl_solvers {
         {
             filesystem::path source_dir(path_of(owner));
             #ifdef BASE_PATH
-            source_dir = filesystem::path(BASE_PATH)/source_dir;
+            source_dir = filesystem::path(xstringify(BASE_PATH))/source_dir;
             #endif
             // get parent and return
             return (source_dir/filesystem::path(filename)).str();

@@ -431,6 +431,7 @@ def get_env(save, defines):
 
 # determine sundials version
 
+
 sun_env = Environment(tools=['default'])
 sun_env['CCFLAGS'] = ['-I{}'.format(env['sundials_inc_dir'])]
 conf = Configure(sun_env)
@@ -578,7 +579,7 @@ def run_with_our_python(env, target, source, action):
     if missing:
         print('ERROR: Could not import required packages ({}) the Python interpreter'
               ' {!r}. Did you mean to set the "python_cmd" option?"'.format(
-                ', '.join(missing), env['python_cmd']))
+                  ', '.join(missing), env['python_cmd']))
         sys.exit(1)
 
     return env.Command(target=target,
@@ -612,7 +613,7 @@ def build_wrapper(save, platform, defines, libs, variant, multi):
         file.write(driver)
     wrapper_py = run_with_our_python(env,
                                      target='pyccelerInt_{}'.format(
-                                        short_names[platform]),
+                                         short_names[platform]),
                                      source=[dfile],
                                      action='{{python}} {} build_ext --inplace'
                                      .format(dfile))
@@ -639,83 +640,95 @@ def get_includes(platform, includes, exact_includes=[]):
     return ndef
 
 
-for p in platforms:
-    new_defines = get_includes(p, [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
-                                   exprb43_int_dir, exp_int_dir, cvodes_dir])
-    core = build_core(env_save, p, new_defines, variant)
+def build_platform(env_save, platform):
+    if platform == 'opencl' and install_prefix:
+        # set the base-path
+        env_save['CPPDEFINES'] += ['BASE_PATH={}'.format(os.path.abspath(
+            install_prefix))]
+
+    new_defines = get_includes(platform, [radau2a_dir, rk78_dir, rkc_dir,
+                                          exp4_int_dir, exprb43_int_dir, exp_int_dir,
+                                          cvodes_dir])
+    core = build_core(env_save, platform, new_defines, variant)
 
     # linear algebra
-    new_defines = get_includes(p, [linalg_dir])
-    linalg = build_lib(env_save, p, new_defines, linalg_dir,
+    new_defines = get_includes(platform, [linalg_dir])
+    linalg = build_lib(env_save, platform, new_defines, linalg_dir,
                        variant, 'linalg', extra_libs=core)
 
     # radua
-    new_defines = get_includes(p, [generic_dir, radau2a_dir, linalg_dir])
-    radau = build_lib(env_save, p, new_defines, radau2a_dir,
+    new_defines = get_includes(
+        platform, [generic_dir, radau2a_dir, linalg_dir])
+    radau = build_lib(env_save, platform, new_defines, radau2a_dir,
                       variant, 'radau2a', extra_libs=core + linalg)
 
     # exponentials
     shared = os.path.join(exp_int_dir, 'shared')
-    new_defines = get_includes(p, [generic_dir, exp_int_dir,
-                                   linalg_dir, shared], exact_includes=[
-                                   env['fftw3_inc_dir']])
+    new_defines = get_includes(platform, [generic_dir, exp_int_dir,
+                                          linalg_dir, shared], exact_includes=[
+        env['fftw3_inc_dir']])
     new_defines['LIBPATH'] = [env['fftw3_lib_dir']]
     new_defines['LIBS'] = ['fftw3']
-    exp = build_lib(env_save, p, new_defines, exp_int_dir,
+    exp = build_lib(env_save, platform, new_defines, exp_int_dir,
                     variant, 'exp', extra_libs=core + linalg, extra_src=[shared])
 
     # exp4
-    new_defines = get_includes(p,  [generic_dir, exp_int_dir, exp4_int_dir])
+    new_defines = get_includes(
+        platform,  [generic_dir, exp_int_dir, exp4_int_dir])
     new_defines['CPPDEFINES'] = ['EXP4']
     new_defines['NVCCDEFINES'] = ['EXP4']
-    exp4 = build_lib(env_save, p, new_defines, exp4_int_dir,
+    exp4 = build_lib(env_save, platform, new_defines, exp4_int_dir,
                      variant, 'exp4', extra_libs=exp)
 
     # exprb43
-    new_defines = get_includes(p,  [generic_dir, exp_int_dir, exprb43_int_dir])
+    new_defines = get_includes(
+        platform,  [generic_dir, exp_int_dir, exprb43_int_dir])
     new_defines['LIBS'] = ['fftw3']
     new_defines['CPPDEFINES'] = ['RB43']
     new_defines['NVCCDEFINES'] = ['RB43']
-    exprb43 = build_lib(env_save, p, new_defines, exprb43_int_dir,
+    exprb43 = build_lib(env_save, platform, new_defines, exprb43_int_dir,
                         variant, 'exprb43', extra_libs=exp)
 
     # rkc
-    new_defines = get_includes(p,  [generic_dir, rkc_dir])
-    rkc = build_lib(env_save, p, new_defines, rkc_dir,
+    new_defines = get_includes(platform,  [generic_dir, rkc_dir])
+    rkc = build_lib(env_save, platform, new_defines, rkc_dir,
                     variant, 'rkc', extra_libs=core)
     # cvodes
-    new_defines = get_includes(p,  [generic_dir, cvodes_dir], exact_includes=[
+    new_defines = get_includes(platform,  [generic_dir, cvodes_dir], exact_includes=[
         env['sundials_inc_dir']])
     new_defines['LIBPATH'] = [env['sundials_lib_dir']]
     new_defines['LIBS'] = cvodes_libs[:]
-    cvodes = build_lib(env_save, p, new_defines, cvodes_dir,
+    cvodes = build_lib(env_save, platform, new_defines, cvodes_dir,
                        variant, 'cvodes', extra_libs=core)
 
     # rk78
-    new_defines = get_includes(p,  [generic_dir, rk78_dir],
+    new_defines = get_includes(platform,  [generic_dir, rk78_dir],
                                exact_includes=[env['boost_inc_dir']])
-    rk78 = build_lib(env_save, p, new_defines, rk78_dir, variant,
+    rk78 = build_lib(env_save, platform, new_defines, rk78_dir, variant,
                      'rk78', extra_libs=core)
 
     # rkf45
-    new_defines = get_includes(p,  [generic_dir, rkf45_dir])
-    rkf45 = build_lib(env_save, p, new_defines, rkf45_dir, variant,
+    new_defines = get_includes(platform,  [generic_dir, rkf45_dir])
+    rkf45 = build_lib(env_save, platform, new_defines, rkf45_dir, variant,
                       'rkf45', extra_libs=core)
 
-    new_defines = get_includes(p,  [generic_dir, ros_dir])
-    ros = build_lib(env_save, p, new_defines, ros_dir, variant,
+    new_defines = get_includes(platform,  [generic_dir, ros_dir])
+    ros = build_lib(env_save, platform, new_defines, ros_dir, variant,
                     'ros', extra_libs=core)
 
     # add interface / problem definition
-    new_defines = get_includes(p,  [generic_dir, radau2a_dir, rk78_dir, rkc_dir,
-                                    exp4_int_dir, exprb43_int_dir, exp_int_dir,
-                                    cvodes_dir, rkf45_dir, ros_dir],
+    new_defines = get_includes(platform,  [generic_dir, radau2a_dir, rk78_dir,
+                                           rkc_dir, exp4_int_dir, exprb43_int_dir,
+                                           exp_int_dir, cvodes_dir, rkf45_dir,
+                                           ros_dir],
                                exact_includes=[env['sundials_inc_dir']])
-    new_defines['LIBPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
+    new_defines['LIBPATH'] = [
+        env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
     new_defines['LIBS'] = cvodes_libs[:] + ['fftw3']
-    new_defines['RPATH'] = [env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
+    new_defines['RPATH'] = [env['sundials_lib_dir'],
+                            env['fftw3_lib_dir'], lib_dir]
 
-    if p == 'opencl':
+    if platform == 'opencl':
         new_defines['LIBPATH'] += env['OCL_LIB_DIR']
         new_defines['RPATH'] += env['OCL_LIB_DIR']
         new_defines['LIBS'] += ['OpenCL']
@@ -733,22 +746,28 @@ for p in platforms:
     if install_prefix:
         for idir in idirs:
             basename = inc_dir
-            basename = os.path.join(basename, os.path.basename(idir), p)
-            source_inst = env.RecursiveInstall(basename, os.path.join(idir, p))
+            basename = os.path.join(basename, os.path.basename(idir), platform)
+            source_inst += env.RecursiveInstall(basename,
+                                                os.path.join(idir, platform))
 
     # add the multitarget
-    target = build_multitarget(env_save, p, new_defines, libs, variant)
+    target = build_multitarget(env_save, platform, new_defines, libs, variant)
 
     # add an alias
-    Alias('install-' + p, source_inst + libs + target)
-    Alias(p, target)
+    Alias('install-' + platform, source_inst + libs + target)
+    Alias(platform, target)
 
     # and finally build wrapper
-    new_defines = get_includes(p, [generic_dir])
+    new_defines = get_includes(platform, [generic_dir])
     new_defines['RPATH'] = [lib_dir]
     new_defines['LIBPATH'] = [lib_dir]
     new_defines = add_libs_to_defines(libs, new_defines)
-    wrapper = build_wrapper(env_save, p, new_defines, libs, variant, target)
+    wrapper = build_wrapper(
+        env_save, platform, new_defines, libs, variant, target)
     if wrapper:
         # and wrapper
-        Alias(p + '-wrapper', wrapper)
+        Alias(platform + '-wrapper', wrapper)
+
+
+for p in platforms:
+    build_platform(env_save.Clone(), p)
