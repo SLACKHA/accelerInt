@@ -9,6 +9,7 @@ import platform
 import shutil
 import subprocess
 import textwrap
+from string import Template
 from warnings import warn
 from distutils.version import LooseVersion
 from distutils.spawn import find_executable
@@ -590,13 +591,18 @@ def build_wrapper(save, platform, defines, libs, variant, multi):
     env = get_env(save, defines)
     # add dependecy to multitarget
     env.Depends(wrapper, multi)
-    driver = os.path.join(driver_dir, platform, 'setup.py')
+    driver = os.path.join(driver_dir, platform, 'setup.py.in')
+    with open(driver, 'r') as file:
+        driver = Template(file.read()).substitute(libdir=lib_dir)
+    dfile = os.path.join(driver_dir, platform, 'setup.py')
+    with open(dfile, 'w') as file:
+        file.write(driver)
     wrapper_py = run_with_our_python(env,
                                      target='pyccelerInt_{}'.format(
                                         short_names[platform]),
-                                     source=[driver],
+                                     source=[dfile],
                                      action='{{python}} {} build_ext --inplace'
-                                     .format(driver))
+                                     .format(dfile))
 
     env.Depends(wrapper_py, wrapper)
     return wrapper_py
