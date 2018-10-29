@@ -229,6 +229,10 @@ config_options = [
         'The python interpreter to use to generate python wrappers for '
         'accelerInt.  If not specified, the python interpreter used by '
         'scons will be used.', sys.executable, PathVariable.PathAccept)
+    PathVariable(
+        'install_dir',
+        'Directory to install the compiled libraries to. If not specifed, install '
+        'to ./lib/', os.path.join(home, 'lib'), PathVariable.PathAccept)
 ]
 
 opts.AddVariables(*config_options)
@@ -300,7 +304,7 @@ exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
 cvodes_dir = os.path.join(home, 'cvodes')
 rk78_dir = os.path.join(home, 'rk78')
 rkc_dir = os.path.join(home, 'rkc')
-lib_dir = os.path.join(home, 'lib')
+lib_dir = env['install_dir']
 driver_dir = os.path.join(home, 'driver')
 
 common_dir_list = [generic_dir, mech_dir, linalg_dir]

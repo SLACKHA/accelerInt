@@ -441,8 +441,8 @@ namespace opencl_solvers {
     {
     public:
         IntegratorBase(int neq, std::size_t numWorkGroups,
-                         const IVP& ivp,
-                         const SolverOptions& options):
+                       const IVP& ivp,
+                       const SolverOptions& options):
             _numWorkGroups(numWorkGroups),
             _neq(neq),
             _log(),
