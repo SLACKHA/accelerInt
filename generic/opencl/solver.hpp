@@ -654,6 +654,9 @@ namespace opencl_solvers {
         {
             // base path
             filesystem::path thisfile = filesystem::path(owner);
+            #ifdef BASE_PATH
+            thisfile = filesystem::path(xstringify(BASE_PATH))/thisfile;
+            #endif
             thisfile.make_absolute();
             return thisfile.parent_path().str();
         }
@@ -662,9 +665,6 @@ namespace opencl_solvers {
         const std::string file_relative_to_me(const std::string& owner, const std::string& filename) const
         {
             filesystem::path source_dir(path_of(owner));
-            #ifdef BASE_PATH
-            source_dir = filesystem::path(xstringify(BASE_PATH))/source_dir;
-            #endif
             // get parent and return
             return (source_dir/filesystem::path(filename)).str();
         }
