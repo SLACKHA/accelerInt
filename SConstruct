@@ -742,6 +742,11 @@ def build_platform(env_save, platform):
     idirs = [x[0] for x in vals]
     libs = [y for x in vals for y in x[1]]
 
+    # add the multitarget
+    target = build_multitarget(env_save, platform, new_defines, libs, variant)
+    idirs += [interface_dir]
+    libs += target
+
     source_inst = []
     if install_prefix:
         for idir in idirs:
@@ -750,11 +755,8 @@ def build_platform(env_save, platform):
             source_inst += env.RecursiveInstall(basename,
                                                 os.path.join(idir, platform))
 
-    # add the multitarget
-    target = build_multitarget(env_save, platform, new_defines, libs, variant)
-
     # add an alias
-    Alias('install-' + platform, source_inst + libs + target)
+    Alias('install-' + platform, source_inst + libs)
     Alias(platform, target)
 
     # and finally build wrapper
