@@ -228,7 +228,7 @@ config_options = [
         'python_cmd',
         'The python interpreter to use to generate python wrappers for '
         'accelerInt.  If not specified, the python interpreter used by '
-        'scons will be used.', sys.executable, PathVariable.PathAccept)
+        'scons will be used.', sys.executable, PathVariable.PathAccept),
     PathVariable(
         'install_dir',
         'Directory to install the compiled libraries to. If not specifed, install '
