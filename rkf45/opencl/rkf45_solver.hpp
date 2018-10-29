@@ -16,6 +16,8 @@ private:
         std::vector<std::string> _includes;
         std::vector<std::string> _paths;
 
+        void init(rk_t * rk);
+
 public:
         RKF45Integrator(int neq, std::size_t numWorkGroups, const IVP& ivp, const SolverOptions& options) :
             Integrator(neq, numWorkGroups, ivp, options),
@@ -24,13 +26,8 @@ public:
             _includes({"rkf45_types.h"}),
             _paths({path_of(__FILE__)})
         {
-            // init the rk struct
-            rk_vals.max_iters = options.maxIters();
-            rk_vals.min_iters = options.minIters();
-            rk_vals.adaption_limit = 4;
-            rk_vals.s_rtol = options.rtol();
-            rk_vals.s_atol = options.atol();
 
+            this->init(&rk_vals);
             // and initialize the kernel
             this->initialize_kernel();
         }

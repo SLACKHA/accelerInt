@@ -17,7 +17,8 @@ from distutils.spawn import find_executable
 from buildutils import listify, formatOption, getCommandOutput
 
 
-valid_commands = ('cpu', 'opencl', 'gpu', 'cpu-wrapper', 'opencl-wrapper', 'help')
+valid_commands = ('cpu', 'opencl', 'gpu', 'cpu-wrapper', 'opencl-wrapper', 'help',
+                  'install-cpu', 'install-opencl')
 
 for command in COMMAND_LINE_TARGETS:
     if command not in valid_commands:
@@ -35,9 +36,9 @@ home = Dir('.').path
 opts = Variables('accelerInt.conf')
 build_cuda = True
 try:
-    env = Environment(tools=['default', 'cuda'])
+    env = Environment(tools=['default', 'cuda', 'recursiveInstall'])
 except Exception:
-    env = Environment(tools=['default'])
+    env = Environment(tools=['default', 'recursiveInstall'])
     print('CUDA not found, no GPU integrators will be built')
     build_cuda = False
 
@@ -231,9 +232,9 @@ config_options = [
         'accelerInt.  If not specified, the python interpreter used by '
         'scons will be used.', sys.executable, PathVariable.PathAccept),
     PathVariable(
-        'install_dir',
-        'Directory to install the compiled libraries to. If not specifed, install '
-        'to ./lib/', os.path.join(home, 'lib'), PathVariable.PathAccept)
+        'prefix',
+        'Directory to install to, if not specified do not '
+        'install.', '', PathVariable.PathAccept)
 ]
 
 opts.AddVariables(*config_options)
@@ -305,7 +306,13 @@ exprb43_int_dir = os.path.join(home, 'exponential_integrators', 'exprb43')
 cvodes_dir = os.path.join(home, 'cvodes')
 rk78_dir = os.path.join(home, 'rk78')
 rkc_dir = os.path.join(home, 'rkc')
-lib_dir = env['install_dir']
+install_prefix = env['prefix']
+if install_prefix:
+    inc_dir = os.path.join(install_prefix, 'include')
+    lib_dir = os.path.join(install_prefix, 'lib')
+else:
+    inc_dir = os.path.join('.', 'include')
+    lib_dir = os.path.join('.', 'lib')
 driver_dir = os.path.join(home, 'driver')
 
 common_dir_list = [generic_dir, mech_dir, linalg_dir]
@@ -635,6 +642,7 @@ def get_includes(platform, includes, exact_includes=[]):
 for p in platforms:
     new_defines = get_includes(p, [radau2a_dir, rk78_dir, rkc_dir, exp4_int_dir,
                                    exprb43_int_dir, exp_int_dir, cvodes_dir])
+    import pdb; pdb.set_trace()
     core = build_core(env_save, p, new_defines, variant)
 
     # linear algebra
@@ -714,22 +722,35 @@ for p in platforms:
         new_defines['LIBS'] += ['OpenCL']
 
     # filter out non-existant
-    vals = [rkc, rk78, radau, exp4, exprb43, cvodes, exp, linalg, core, rkf45, ros]
-    vals = [x for x in vals if x]
-    vals = [y for x in vals for y in x]
+    vals = [(rkc_dir, rkc), (rk78_dir, rk78), (radau2a_dir, radau),
+            (exp4_int_dir, exp4), (exprb43_int_dir, exprb43), (cvodes_dir, cvodes),
+            (exp_int_dir, exp), (linalg_dir, linalg), (generic_dir, core),
+            (rkf45_dir, rkf45), (ros_dir, ros)]
+    vals = [x for x in vals if x[1]]
+    idirs = [x[0] for x in vals]
+    libs = [y for x in vals for y in x[1]]
+
+    source_inst = []
+    import pdb; pdb.set_trace()
+    if install_prefix:
+        for idir in idirs:
+            basename = inc_dir
+            basename = os.path.join(basename, os.path.basename(idir), p)
+            source_inst = env.RecursiveInstall(basename, os.path.join(idir, p))
 
     # add the multitarget
-    target = build_multitarget(env_save, p, new_defines, vals, variant)
+    target = build_multitarget(env_save, p, new_defines, libs, variant)
 
     # add an alias
+    Alias('install-' + p, source_inst + libs + target)
     Alias(p, target)
 
     # and finally build wrapper
     new_defines = get_includes(p, [generic_dir])
     new_defines['RPATH'] = [lib_dir]
     new_defines['LIBPATH'] = [lib_dir]
-    new_defines = add_libs_to_defines(vals, new_defines)
-    wrapper = build_wrapper(env_save, p, new_defines, vals, variant, target)
+    new_defines = add_libs_to_defines(libs, new_defines)
+    wrapper = build_wrapper(env_save, p, new_defines, libs, variant, target)
     if wrapper:
         # and wrapper
         Alias(p + '-wrapper', wrapper)
