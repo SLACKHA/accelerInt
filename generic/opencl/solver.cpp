@@ -3,6 +3,17 @@
 namespace opencl_solvers
 {
 
+    const std::string IntegratorBase::path_of(const std::string& owner) const
+    {
+        // base path
+        filesystem::path thisfile = filesystem::path(owner);
+        #ifdef BASE_PATH
+        thisfile = filesystem::path(xstringify(BASE_PATH))/filesystem::path("include")/thisfile;
+        #endif
+        thisfile.make_absolute();
+        return thisfile.parent_path().str();
+    }
+
     void IntegratorBase::initialize_kernel()
     {
         cl_int ret;

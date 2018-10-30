@@ -650,17 +650,7 @@ namespace opencl_solvers {
         //!        the final derived integrator class's constructor
         void initialize_kernel();
 
-        const std::string path_of(const std::string& owner) const
-        {
-            // base path
-            filesystem::path thisfile = filesystem::path(owner);
-            #ifdef BASE_PATH
-            thisfile = filesystem::path(xstringify(BASE_PATH))/thisfile;
-            #endif
-            thisfile.make_absolute();
-            return thisfile.parent_path().str();
-        }
-
+        const std::string path_of(const std::string& owner) const;
 
         const std::string file_relative_to_me(const std::string& owner, const std::string& filename) const
         {
@@ -927,6 +917,8 @@ namespace opencl_solvers {
             {
                 CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_queue) );
             }
+
+            _storedNumProblems = NUM;
 
         }
 
