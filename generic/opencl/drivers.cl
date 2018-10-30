@@ -91,7 +91,6 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
 
     __MaskType hnew_is_ok = 0;
     __ValueType hnew = hg;
-    const int miters = 10;
     int iter = 0;
     int ierr = OCL_SUCCESS;
 
@@ -119,8 +118,8 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
         __ValueType yddnrm = get_wnorm(solver, y1, y);
 
         // should we accept this?
-        hnew = __select(hnew, hg, hnew_is_ok | (iter == miters));
-        if (__all(hnew_is_ok) || (iter == miters))
+        hnew = __select(hnew, hg, hnew_is_ok | (iter == MAX_HINIT_ITERS));
+        if (__all(hnew_is_ok) || (iter == MAX_HINIT_ITERS))
             break;
 
         // Get the new value of h ...
