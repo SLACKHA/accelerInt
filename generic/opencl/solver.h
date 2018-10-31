@@ -349,17 +349,4 @@ inline __ValueType __sqr(const __ValueType p) { return (p*p); }
   #define __vload(__offset, __ptr) ( PASTE(vload,__ValueSize)((__offset), (__ptr)) )
 #endif
 
-/**
- * \brief The expected signature of Jacobian function of the IVP
- *
- * \param[in]           t               The current system time
- * \param[in]           param           The van der Pol parameter
- * \param[in]           y               The state vector at time t
- * \param[out]          jac             The jacobian to populate
- * \param[in]           rwk             The working buffer for Jacobian evaluation
- */
-void eval_jacob(__global const __ValueType* __restrict__ t, __global const __ValueType* __restrict__ param,
-                __global const __ValueType* __restrict__ y, __global __ValueType* __restrict__ jac,
-                __global __ValueType* __restrict__ rwk);
-
 #endif
