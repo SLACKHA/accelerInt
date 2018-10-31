@@ -84,14 +84,12 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
 
     cdef double integrate(IntegratorBase&, const int, const double, const double,
                           const double, double * __restrict__,
-                          const double * __restrict__,
-                          double* __restrict__)
+                          const double * __restrict__)
 
     cdef double integrate_varying(IntegratorBase&, const int, const double,
                           const double * __restrict__,
                           const double, double * __restrict__,
-                          const double * __restrict__,
-                          double* __restrict__)
+                          const double * __restrict__)
 
 cdef extern from "<utility>" namespace "std" nogil:
     cdef unique_ptr[IntegratorBase] move(unique_ptr[IntegratorBase])
@@ -227,15 +225,13 @@ cdef class PySolverOptions:
                   DeviceType deviceType = DeviceType.DEFAULT, size_t minIters=1,
                   size_t maxIters = 1000,
                   StepperType stepper_type = StepperType.ADAPTIVE,
-                  double h_const = np.nan,
-                  bool estimate_chemistry_time=False):
+                  double h_const = np.nan):
 
         self.options.reset(new SolverOptions(
             vectorSize, blockSize,
             atol, rtol, logging, use_queue,
             _bytes(order), _bytes(platform), deviceType,
-            minIters, maxIters, stepper_type, h_const,
-            estimate_chemistry_time))
+            minIters, maxIters, stepper_type, h_const, False))
 
     cpdef atol(self):
         return deref(self.options.get()).atol()
