@@ -314,7 +314,7 @@ void ros_fdjac(__global const ros_t *ros, const __ValueType tcur, const __ValueT
 __IntType ros_solve (__global const ros_t * __restrict__ ros,
                      __private __ValueType const t_start,
                      __private __ValueType const t_end,
-                     __ValueType * __restrict__ hcur,
+                     __global __ValueType * __restrict__ hcur,
                      __private ros_counters_t_vec * __restrict__ counters,
                      __global __ValueType* __restrict__ y,
                      __global __ValueType* __restrict__ rwk,

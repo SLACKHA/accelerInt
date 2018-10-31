@@ -59,7 +59,7 @@ typedef struct
 __IntType ros_solve (__global const ros_t * __restrict__ rk,
                      __private __ValueType const t_start,
                      __private __ValueType const t_end,
-                     __ValueType* hcur,
+                     __global __ValueType* hcur,
                      __private ros_counters_t_vec * __restrict__ counters,
                      __global __ValueType* __restrict__ y,
                      __global __ValueType* __restrict__ rwk,

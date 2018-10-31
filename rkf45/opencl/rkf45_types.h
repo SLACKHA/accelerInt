@@ -36,7 +36,7 @@ typedef struct
 __IntType rk_solve (__global const rk_t * __restrict__ rk,
                     __private __ValueType const t_start,
                     __private __ValueType const t_end,
-                    __ValueType* hcur,
+                    __global __ValueType* hcur,
                     __private rk_counters_t_vec * __restrict__ counters,
                     __global __ValueType* __restrict__ y,
                     __global __ValueType* rwk,

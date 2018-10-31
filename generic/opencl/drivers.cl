@@ -155,7 +155,7 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
 
 
 // the size of working memory required for the drivers
-#define driver_offset (1 + neq)
+#define driver_offset (2 + neq)
 
 #ifdef __EnableQueue
 #warning 'Skipping driver kernel'
@@ -181,6 +181,7 @@ driver (__global const double * __restrict__ param,
     // Ordering is phi / param_working, solver working, RHS working
     // such that we can 'peel' off working data easily in subcalls
     __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(neq);
+    __global __ValueType * __restrict__ h = rwk + __getOffset1D(1 + neq);
     __private counter_type_vec my_counters;
     __private __ValueType tf;
 
@@ -204,9 +205,8 @@ driver (__global const double * __restrict__ param,
         tf = t_end[i];
         #endif
 
-        __ValueType h = 0;
         __IntType err = solver_function(
-                solver, t_start, tf, &h, &my_counters, rwk, rwk, iwk, my_param,
+                solver, t_start, tf, h, &my_counters, rwk, rwk, iwk, my_param,
                 driver_offset);
 
         #if __ValueSize > 1
@@ -272,7 +272,7 @@ driver_queue (__global const double * __restrict__ param,
     // Ordering is phi_woring, solver working, RHS working
     // such that we can 'peel' off working data easily in subcalls
     __global __ValueType * __restrict__ my_param = rwk + __getOffset1D(neq);
-    __global __ValueType *__restrict__ rwk_solver = rwk + __getOffset1D(1 + neq);
+    __global __ValueType * __restrict__ h = rwk + __getOffset1D(1 + neq);
     __private counter_type_vec my_counters;
     __private __ValueType tf;
     __private int problem_idx;
@@ -308,9 +308,8 @@ driver_queue (__global const double * __restrict__ param,
         #endif
 
         // determine maximum / minumum time steps for this set of problems
-         __ValueType h = 0;
         __IntType err = solver_function(
-                solver, t_start, tf, &h, &my_counters, rwk, rwk, iwk, my_param,
+                solver, t_start, tf, h, &my_counters, rwk, rwk, iwk, my_param,
                 driver_offset);
 
         #if __ValueSize > 1

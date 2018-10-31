@@ -798,12 +798,12 @@ namespace opencl_solvers {
          */
         virtual std::size_t requiredSolverMemorySize() const
         {
-            // 1 for the parameter, and four working vectors
+            // 1 for the parameter, 1 for the step-size, and four working vectors
             //      1. local copy of state vector
             //      2. ydot  for get_hin
             //      3. y1    for get_hin
             //      4. ydot1 for get_hin
-            return (1 + 4 * _neq) * sizeof(double);
+            return (2 + 4 * _neq) * sizeof(double);
         }
 
         /**
