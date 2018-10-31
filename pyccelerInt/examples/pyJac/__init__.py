@@ -249,7 +249,7 @@ class Ignition(Problem):
         self.phi[:, O2 + 2] = (1 / n_stoich) * n
 
         # set pressure
-        self.pressure = np.full(num, 101325, dtype=np.float64)
+        self.pressure = np.full(num, P0, dtype=np.float64)
         self.init = True
 
     def get_ivp(self):
@@ -309,7 +309,8 @@ class Ignition(Problem):
 
         # plot same problem in CT for comparison
         gas = ct.Solution(os.path.join(self.data_path(), 'h2.cti'))
-        gas.TPX = 1000, 101325, 'H2:2, O2:1, N2:3.76'
+        phi, p = self.get_initial_conditions()
+        gas.TPX = phi[0, 0], p[0], 'H2:2, O2:1, N2:3.76'
         reac = ct.IdealGasConstPressureReactor(gas)
         net = ct.ReactorNet([reac])
         net.rtol, net.atol = self.rtol, self.atol
