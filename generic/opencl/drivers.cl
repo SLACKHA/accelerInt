@@ -51,7 +51,7 @@ __ValueType get_wnorm (__global const solver_type* __restrict__ solver, __global
 
 
 __IntType get_hin (__global const solver_type *solver, const __ValueType t, const __ValueType t_end,
-                   __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
+                   __global __ValueType* __restrict__ h0, __global __ValueType* __restrict__ y,
                    __global __ValueType * rwk,
                    __global __ValueType const * __restrict__ user_data,
                    const int offset)
@@ -173,7 +173,7 @@ driver (__global const double * __restrict__ param,
         __global counter_type * __restrict__ counters,
         const int numProblems
 #ifdef __EstimateChemistryTime
-        , double* __restrict__ last_timestep
+        , __global double* __restrict__ last_timestep
 #endif
         )
 {
@@ -226,7 +226,7 @@ driver (__global const double * __restrict__ param,
                     __read_from(err, lane, counters[problem_id].niters);
                 }
                 #ifdef __EstimateChemistryTime
-                __read_from(h, lane, last_timestep[problem_id]);
+                __read_from(h[__getIndex1D(1, 0)], lane, last_timestep[problem_id]);
                 #endif
             }
         }
@@ -264,7 +264,7 @@ driver_queue (__global const double * __restrict__ param,
               const int numProblems,
               volatile __global int *problemCounter
 #ifdef __EstimateChemistryTime
-              , double* __restrict__ last_timestep
+              , __global double* __restrict__ last_timestep
 #endif
 )
 {
@@ -330,7 +330,7 @@ driver_queue (__global const double * __restrict__ param,
                     __read_from(err, lane, counters[problem_id].niters);
                 }
                 #ifdef __EstimateChemistryTime
-                __read_from(h, lane, last_timestep[problem_id]);
+                __read_from(h[__getIndex1D(1, 0)], lane, last_timestep[problem_id]);
                 #endif
             }
         }
