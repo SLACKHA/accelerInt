@@ -79,7 +79,8 @@ namespace opencl_solvers
                              const int NUM, const double t_start,
                              const double* __restrict__ t_end, const double step,
                              double * __restrict__ phi_host,
-                             const double * __restrict__ param_host)
+                             const double * __restrict__ param_host,
+                             double* __restrict__ last_stepsize)
     {
         auto t1 = std::chrono::high_resolution_clock::now();
         double t = t_start;
@@ -102,7 +103,7 @@ namespace opencl_solvers
             std::size_t index = 0;
             std::for_each(times.begin(), times.end(), [&stepsize, &index, &t_end](double& d) {
                 d = std::fmin(d + stepsize, t_end[index++]);});
-            integrator.intDriver(NUM, t, &times[0], param_host, phi_host);
+            integrator.intDriver(NUM, t, &times[0], param_host, phi_host, last_stepsize);
             if (integrator.logging())
             {
                 integrator.log(NUM, t, phi_host);
