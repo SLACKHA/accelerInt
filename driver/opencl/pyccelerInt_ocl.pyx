@@ -227,11 +227,12 @@ cdef class PySolverOptions:
                   StepperType stepper_type = StepperType.ADAPTIVE,
                   double h_const = np.nan):
 
+        cdef bool_t chem_time = 0;
         self.options.reset(new SolverOptions(
             vectorSize, blockSize,
             atol, rtol, logging, use_queue,
             _bytes(order), _bytes(platform), deviceType,
-            minIters, maxIters, stepper_type, h_const, False))
+            minIters, maxIters, stepper_type, h_const, chem_time))
 
     cpdef atol(self):
         return deref(self.options.get()).atol()
