@@ -32,7 +32,6 @@ if __name__ == '__main__':
                                      device_type=args.device_type,
                                      rtol=args.relative_tolerance,
                                      atol=args.absolute_tolerance,
-                                     constant_timesteps=False,
                                      maximum_steps=int(args.max_steps))
 
     end_time = args.end_time
