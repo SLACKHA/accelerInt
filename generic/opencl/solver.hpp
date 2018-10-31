@@ -316,7 +316,8 @@ namespace opencl_solvers {
                       std::string platform = "", DeviceType deviceType=DeviceType::DEFAULT,
                       size_t minIters = 1, size_t maxIters = 1000,
                       StepperType stepperType = StepperType::ADAPTIVE,
-                      double h_const=std::numeric_limits<double>::quiet_NaN()):
+                      double h_const=std::numeric_limits<double>::quiet_NaN(),
+                      bool estimate_chemistry_time=false):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
             _atol(atol),
@@ -329,7 +330,8 @@ namespace opencl_solvers {
             _minIters(minIters),
             _maxIters(maxIters),
             _stepperType(stepperType),
-            _h_const(h_const)
+            _h_const(h_const),
+            _estimate_chemistry_time(estimate_chemistry_time)
         {
             if (order.compare("C") && order.compare("F"))
             {
@@ -411,6 +413,11 @@ namespace opencl_solvers {
             return _h_const;
         }
 
+        inline bool estimateChemistryTime() const
+        {
+            return _estimate_chemistry_time;
+        }
+
     protected:
         //! vector size
         std::size_t _vectorSize;
@@ -438,6 +445,9 @@ namespace opencl_solvers {
         StepperType _stepperType;
         //! The constant integration step to take (if #_stepperType == StepperTypes::CONSTANT)
         double _h_const;
+        //! \brief If true, the calling code wants the last time-step taken by the integratior
+        //!        as an estimation of the chemistry time-scale
+        bool _estimate_chemistry_time;
     };
 
 
@@ -465,6 +475,7 @@ namespace opencl_solvers {
             _solver_index(-1),
             _counter_index(-1),
             _queue_index(-1),
+            _chem_time_index(-1),
             _initialized(false)
         {
 
@@ -576,15 +587,17 @@ namespace opencl_solvers {
          * \param[in]       t_end           The IVP integration end time
          * \param[in]       param           The system constant variable (pressures / densities)
          * \param[in,out]   phi             The system state vectors at time t.
+         * \param[out]      last_stepsize   If supplied, store last step-size taken by the integrator for each IVP. Useful for OpenFOAM / chemistry timescale integration
          * \returns system state vectors at time t_end
          *
          */
         void intDriver (const int NUM, const double t,
                         const double t_end, const double* __restrict__ param,
-                        double* __restrict__ phi)
+                        double* __restrict__ phi,
+                        double* __restrict__ last_stepsize=NULL)
         {
             std::vector<double> t_end_vec (t_end, NUM);
-            this->intDriver(NUM, t, &t_end_vec[0], param, phi);
+            this->intDriver(NUM, t, &t_end_vec[0], param, phi, last_stepsize);
         }
 
         /**
@@ -594,12 +607,14 @@ namespace opencl_solvers {
          * \param[in]       t_end           The (array) of IVP integration end times
          * \param[in]       param           The system constant variable (pressures / densities)
          * \param[in,out]   phi             The system state vectors at time t.
+         * \param[out]      last_stepsize   If supplied, store last step-size taken by the integrator for each IVP. Useful for OpenFOAM / chemistry timescale integration
          * \returns system state vectors at time t_end
          *
          */
         virtual void intDriver (const int NUM, const double t,
                                 const double* __restrict__ t_end,
-                                const double* __restrict__ param, double* __restrict__ phi) = 0;
+                                const double* __restrict__ param, double* __restrict__ phi,
+                                double* __restrict__ last_stepsize=NULL) = 0;
 
 
 
@@ -642,6 +657,8 @@ namespace opencl_solvers {
         int _counter_index;
         //! \brief The index of the queue buffer in #_clmem
         int _queue_index;
+        //! \brief The chemistry time index
+        int _chem_time_index;
         //! \brief simple flag to mark whether the device / context / kernel have been created
         bool _initialized;
 
@@ -896,7 +913,15 @@ namespace opencl_solvers {
             {
                 buffer_queue = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(int), NULL);
                 _clmem.push_back(buffer_queue);
-                _queue_index = indexof(_clmem.begin(), _clmem.end(), buffer_queue);;
+                _queue_index = indexof(_clmem.begin(), _clmem.end(), buffer_queue);
+            }
+
+            cl_mem chem_time;
+            if (_options.estimateChemistryTime())
+            {
+                chem_time = CreateBuffer (&_data.context, CL_MEM_READ_WRITE, sizeof(double) * NUM, NULL);
+                _clmem.push_back(chem_time);
+                _chem_time_index = indexof(_clmem.begin(), _clmem.end(), chem_time);
             }
 
             /* Set kernel arguments */
@@ -916,6 +941,10 @@ namespace opencl_solvers {
             if (_options.useQueue())
             {
                 CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &buffer_queue) );
+            }
+            if (_options.estimateChemistryTime())
+            {
+                CL_EXEC( clSetKernelArg(_kernel, argc++, sizeof(cl_mem), &chem_time) );
             }
 
             _storedNumProblems = NUM;
@@ -953,12 +982,14 @@ namespace opencl_solvers {
          * \param[in]       t_end           The (array) of IVP integration end times
          * \param[in]       param           The system constant variable (pressures / densities)
          * \param[in,out]   phi             The system state vectors at time t.
+         * \param[out]      last_stepsize   If supplied, store last step-size taken by the integrator for each IVP. Useful for OpenFOAM / chemistry timescale integration
          * \returns system state vectors at time t_end
          *
          */
         void intDriver (const int NUM, const double t,
                         const double* __restrict__ t_end,
-                        const double* __restrict__ param, double* __restrict__ phi)
+                        const double* __restrict__ param, double* __restrict__ phi,
+                        double* __restrict__ last_stepsize=NULL)
         {
             if (NUM < 1)
             {
@@ -998,6 +1029,17 @@ namespace opencl_solvers {
                     std::cout << "Queue enabled" << std::endl;
             }
 
+            if (_options.estimateChemistryTime())
+            {
+                if (last_stepsize == NULL)
+                {
+                    throw std::runtime_error("Must supply a valid `last_stepsize` buffer when estimating chemistry time!");
+                }
+                CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_chem_time_index], CL_TRUE, 0, sizeof(double)*NUM,
+                                              last_stepsize, 0, NULL, NULL) );
+
+            }
+
             if (_verbose)
                 std::cout << "Host->Dev = " <<
                     std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -1028,6 +1070,16 @@ namespace opencl_solvers {
             t_data = std::chrono::high_resolution_clock::now();
             /* copy out */
             CL_EXEC( clEnqueueReadBuffer(_data.command_queue, _clmem[_phi_index], CL_TRUE, 0, sizeof(double)*_neq*NUM, phi, 0, NULL, NULL) );
+            if (_options.estimateChemistryTime())
+            {
+                if (last_stepsize == NULL)
+                {
+                    throw std::runtime_error("Must supply a valid `last_stepsize` buffer when estimating chemistry time!");
+                }
+                CL_EXEC( clEnqueueReadBuffer(_data.command_queue, _clmem[_chem_time_index], CL_TRUE, 0, sizeof(double)*NUM,
+                                             last_stepsize, 0, NULL, NULL) );
+
+            }
 
             counter_struct* counters = (counter_struct*) malloc(sizeof(counter_struct)*NUM);
             if (counters == NULL)

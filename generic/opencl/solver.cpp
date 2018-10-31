@@ -354,6 +354,13 @@ namespace opencl_solvers
             program_source_str << oqueue.str();
         }
 
+        if (_options.estimateChemistryTime())
+        {
+            std::ostringstream oest;
+            oest << "#define __EstimateChemistryTime" << std::endl;
+            program_source_str << oest.str();
+        }
+
         if (_options.stepperType() == StepperType::CONSTANT)
         {
             std::ostringstream stype;

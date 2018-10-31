@@ -44,6 +44,7 @@ namespace opencl_solvers
      * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
      * \param[in,out]       phi_host        The state vectors to integrate.
      * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
+     * \param[out]          last_stepsize   If supplied, store last step-size taken by the integrator for each IVP. Useful for OpenFOAM / chemistry timescale integration
      * \returns             timing          The wall-clock duration spent in integration in milliseconds
      *
      */
@@ -51,7 +52,8 @@ namespace opencl_solvers
                              const int NUM, const double t_start,
                              const double* __restrict__  t_end, const double stepsize,
                              double * __restrict__ phi_host,
-                             const double * __restrict__ param_host);
+                             const double * __restrict__ param_host,
+                             double* __restrict__ last_stepsize=NULL);
 
     /**
      * \brief integrate NUM odes from time `t` to time `t_end`, using stepsizes of `t_step`
@@ -63,16 +65,18 @@ namespace opencl_solvers
      * \param[in]           stepsize        The integration step size.  If `stepsize` < 0, the step size will be set to `t_end - t`
      * \param[in,out]       phi_host        The state vectors to integrate.
      * \param[in]           param_host      The parameters to use in dydt() and eval_jacob()
+     * \param[out]          last_stepsize   If supplied, store last step-size taken by the integrator for each IVP. Useful for OpenFOAM / chemistry timescale integration
      * \returns             timing          The wall-clock duration spent in integration in milliseconds
      *
      */
     double integrate(IntegratorBase& integrator,
                      const int NUM, const double t, const double t_end,
                      const double stepsize, double * __restrict__ phi_host,
-                     const double * __restrict__ param_host)
+                     const double * __restrict__ param_host,
+                     double* __restrict__ last_stepsize=NULL)
     {
         std::vector<double> tf(NUM, t_end);
-        return integrate_varying(integrator, NUM, t, &tf[0], stepsize, phi_host, param_host);
+        return integrate_varying(integrator, NUM, t, &tf[0], stepsize, phi_host, param_host, last_stepsize);
     }
 
 

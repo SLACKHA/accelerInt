@@ -314,7 +314,7 @@ void ros_fdjac(__global const ros_t *ros, const __ValueType tcur, const __ValueT
 __IntType ros_solve (__global const ros_t * __restrict__ ros,
                      __private __ValueType const t_start,
                      __private __ValueType const t_end,
-                     __private __ValueType hcur,
+                     __private __ValueType * __restrict__ hcur,
                      __private ros_counters_t_vec * __restrict__ counters,
                      __global __ValueType* __restrict__ y,
                      __global __ValueType* __restrict__ rwk,
@@ -332,7 +332,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
     #define nje (counters->nje)
     #define nlu (counters->nlu)
     #define iter (counters->niters)
-    #define h (hcur)
+    #define h (*(hcur))
     #define A(_i,_j) (ros->A[ (((_i)-1)*(_i))/2 + (_j) ] )
     #define C(_i,_j) (ros->C[ (((_i)-1)*(_i))/2 + (_j) ] )
 
@@ -347,7 +347,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         if (__any(test))
         {
             ierr = get_hin(ros, t, t_end,
-                           &h, y, rwk, user_data,
+                           hcur, y, rwk, user_data,
                            driver_offset);
             //if (ierr != RK_SUCCESS)
             //   return ierr;

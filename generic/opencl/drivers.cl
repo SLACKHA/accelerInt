@@ -171,7 +171,11 @@ driver (__global const double * __restrict__ param,
         __global __ValueType * __restrict__ rwk,
         __global __IntType* __restrict__ iwk,
         __global counter_type * __restrict__ counters,
-        const int numProblems)
+        const int numProblems
+#ifdef __EstimateChemistryTime
+        , double* __restrict__ last_timestep
+#endif
+        )
 {
     // Thread-local pointers ...
     // Ordering is phi / param_working, solver working, RHS working
@@ -200,8 +204,9 @@ driver (__global const double * __restrict__ param,
         tf = t_end[i];
         #endif
 
+        __ValueType h = 0;
         __IntType err = solver_function(
-                solver, t_start, tf, 0, &my_counters, rwk, rwk, iwk, my_param,
+                solver, t_start, tf, &h, &my_counters, rwk, rwk, iwk, my_param,
                 driver_offset);
 
         #if __ValueSize > 1
@@ -220,6 +225,9 @@ driver (__global const double * __restrict__ param,
                 {
                     __read_from(err, lane, counters[problem_id].niters);
                 }
+                #ifdef __EstimateChemistryTime
+                __read_from(h, lane, last_timestep[problem_id]);
+                #endif
             }
         }
         #else
@@ -231,6 +239,9 @@ driver (__global const double * __restrict__ param,
         counters[i].nsteps = my_counters.nsteps;
         if (err != OCL_SUCCESS)
             counters[i].niters = err;
+        #endif
+        #ifdef __EstimateChemistryTime
+        last_timestep[i] = h;
         #endif
     }
 }
@@ -251,7 +262,11 @@ driver_queue (__global const double * __restrict__ param,
               __global __IntType* __restrict__ iwk,
               __global counter_type * __restrict__ counters,
               const int numProblems,
-              volatile __global int *problemCounter)
+              volatile __global int *problemCounter
+#ifdef __EstimateChemistryTime
+              , double* __restrict__ last_timestep
+#endif
+)
 {
     // Thread-local pointers ...
     // Ordering is phi_woring, solver working, RHS working
@@ -293,8 +308,9 @@ driver_queue (__global const double * __restrict__ param,
         #endif
 
         // determine maximum / minumum time steps for this set of problems
+         __ValueType h = 0;
         __IntType err = solver_function(
-                solver, t_start, tf, 0, &my_counters, rwk, rwk, iwk, my_param,
+                solver, t_start, tf, &h, &my_counters, rwk, rwk, iwk, my_param,
                 driver_offset);
 
         #if __ValueSize > 1
@@ -314,6 +330,9 @@ driver_queue (__global const double * __restrict__ param,
                 {
                     __read_from(err, lane, counters[problem_id].niters);
                 }
+                #ifdef __EstimateChemistryTime
+                __read_from(h, lane, last_timestep[problem_id]);
+                #endif
             }
         }
         #else
@@ -325,6 +344,9 @@ driver_queue (__global const double * __restrict__ param,
         counters[problem_idx].nsteps = my_counters.nsteps;
         if (err != OCL_SUCCESS)
             counters[problem_idx].niters = err;
+        #ifdef __EstimateChemistryTime
+        last_timestep[problem_idx] = h;
+        #endif
         #endif
         // Get a new problem atomically.
         #if __ValueSize > 1

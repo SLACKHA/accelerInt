@@ -58,6 +58,9 @@
   #ifdef CONSTANT_TIMESTEP
   #pragma message "Using constant timestep = " STRINGIFY(CONSTANT_TIMESTEP)
   #endif
+  #ifdef __EstimateChemistryTime
+  #pragma message "Estimating chemistry time via last-timestep."
+  #endif
 #endif
 
 

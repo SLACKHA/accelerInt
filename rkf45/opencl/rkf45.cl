@@ -220,7 +220,7 @@ int rkf45 (const __ValueType h, const __ValueType t,
 __IntType rk_solve (__global const rk_t * __restrict__ rk,
                     __private __ValueType const t_start,
                     __private __ValueType const t_end,
-                    __private __ValueType hcur,
+                    __private __ValueType* __restrict__ hcur,
                     __private rk_counters_t_vec * __restrict__ counters,
                     __global __ValueType* __restrict__ y,
                     __global __ValueType* rwk,
@@ -232,6 +232,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
 
     __ValueType t = t_start;
     #define t_round ((t_end - t_start) * DBL_EPSILON)
+    #define h (*hcur)
     #define h_min (t_round * 100)
     #define h_max ((t_end - t_start) / rk->min_iters)
     #define iter (counters->niters)
@@ -241,15 +242,15 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     #ifndef CONSTANT_TIMESTEP
     // Estimate the initial step size ...
     {
-        __MaskType test = isless(hcur, h_min);
+        __MaskType test = isless(h, h_min);
         if (__any(test))
         {
-            ierr = get_hin(rk, t, t_end, &hcur, y, rwk, user_data,
+            ierr = get_hin(rk, t, t_end, hcur, y, rwk, user_data,
                            driver_offset);
         }
     }
     #else
-    hcur = CONSTANT_TIMESTEP;
+    h = CONSTANT_TIMESTEP;
     #endif
 
     nst = 0;
@@ -263,14 +264,14 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     {
 
         // Take a trial step over h_cur ...
-        rkf45(hcur, t, y, ytmp, trunc_err, rwk, user_data, driver_offset + 2 * neq);
+        rkf45(h, t, y, ytmp, trunc_err, rwk, user_data, driver_offset + 2 * neq);
 
         #ifndef CONSTANT_TIMESTEP
         __ValueType herr = fmax(1e-20, get_wnorm(rk, trunc_err, y));
 
         // Is there error acceptable?
         __MaskType accept = islessequal(herr, 1.0);
-        accept |= islessequal(hcur, h_min);
+        accept |= islessequal(h, h_min);
         accept &= __not(done);
         #else
         __MaskType accept = TRUE;
@@ -279,7 +280,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         // update solution ...
         if (__any(accept))
         {
-            t   = __select (t,   t + hcur  , accept);
+            t   = __select (t,   t + h  , accept);
             nst = __select (nst, nst + 1, accept);
 
             for (int k = 0; k < neq; k++)
@@ -296,18 +297,18 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         fact = fmin(fact,       rk->adaption_limit);
 
         // Apply grow/shrink factor for next step.
-        hcur = __select(hcur * fact, hcur, done);
+        h = __select(h * fact, h, done);
 
         // Limit based on the upper/lower bounds
-        hcur = fmin(hcur, h_max);
-        hcur = fmax(hcur, h_min);
+        h = fmin(h, h_max);
+        h = fmax(h, h_min);
         #endif
 
         // Stretch the final step if we're really close and we didn't just fail ...
-        hcur = __select(hcur, t_end - t, accept & isless(fabs((t + hcur) - t_end), h_min));
+        h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
 
         // Don't overshoot the final time ...
-        hcur = __select(hcur, t_end - t, __not(done) & isgreater((t + hcur), t_end));
+        h = __select(h, t_end - t, __not(done) & isgreater((t + h), t_end));
 
         ++iter;
         if (rk->max_iters && iter > rk->max_iters) {
