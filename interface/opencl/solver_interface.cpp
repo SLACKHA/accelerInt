@@ -96,8 +96,9 @@ namespace opencl_solvers
         }
 
         std::vector<double> times(NUM, t_start);
+        double t_round = (t_max - t_start) * DBL_EPSILON;
         // time integration loop
-        while (t + EPS < t_max)
+        while (std::fabs(t_max - t) > t_round)
         {
             // update times
             std::size_t index = 0;
