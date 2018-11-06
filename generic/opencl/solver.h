@@ -233,7 +233,7 @@ inline __ValueType __sqr(const __ValueType p) { return (p*p); }
   #endif
 #endif
 #ifndef __not
-  #define __not(__val) ( !(__val) )
+  #define __not(__val) ( !((__MaskType)(__val)) )
 #endif
 
 // Scalar helper functions for the pivot operation -- need a Vector version here.
