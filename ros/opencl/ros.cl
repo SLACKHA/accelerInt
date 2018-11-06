@@ -22,6 +22,7 @@
 #define __getIndexJac(row, col) (__getIndex2D(neq, neq, row, col))
 
 
+/*
 #if __ValueSize > 1
 #define tid (!get_group_id(0))
 #define print(prefix, size, arr) \
@@ -48,7 +49,12 @@
 
 #define printv(prefix, val) \
 { \
-    if (tid) printf("%s={%e}\n", prefix, val.s0); \
+    if (tid) printf("%s={%.15e}\n", prefix, val.s0); \
+}
+
+#define printiv(prefix, val) \
+{ \
+    if (tid) printf("%s={%d}\n", prefix, val.s0); \
 }
 #else
 #define print(prefix, size, arr) \
@@ -78,6 +84,7 @@
     printf("%s={%e}\n", prefix, val); \
 }
 #endif
+*/
 
 
 // ROS internal routines ...
