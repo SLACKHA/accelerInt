@@ -314,6 +314,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     return ierr;
 
     #undef t_round
+    #undef h
     #undef h_min
     #undef h_max
     #undef iter
