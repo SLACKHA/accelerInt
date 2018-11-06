@@ -371,7 +371,7 @@ __ValueType update_timestep(__private __ValueType const t_start,
                             __private const int ELO,
                             __private const int adaption_limit,
                             __private const int min_iters,
-                            __private const float safety_fac)
+                            __private const double safety_fac)
 {
     // the update scheme here is:
     // #ifndef __EstimateChemistryTime
