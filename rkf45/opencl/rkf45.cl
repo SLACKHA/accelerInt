@@ -256,12 +256,16 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
     nst = 0;
     iter = 0;
 
+    __private __ValueType h_hold = h;
     __MaskType done = isless(fabs(t - t_end), fabs(t_round));
     __global __ValueType * __restrict__ ytmp = rwk + __getOffset1D(driver_offset);
     __global __ValueType * __restrict__ trunc_err = rwk + __getOffset1D(driver_offset + neq);
 
     while (__any(__not(done)))
     {
+
+        // store current step-size
+        h_hold = h;
 
         // Take a trial step over h_cur ...
         rkf45(h, t, y, ytmp, trunc_err, rwk, user_data, driver_offset + 2 * neq);
@@ -289,26 +293,11 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
             done = isless( fabs(t - t_end), fabs(t_round));
         }
 
-        #ifndef CONSTANT_TIMESTEP
-        __ValueType fact = sqrt( sqrt(1.0 / herr) ) * (0.840896415);
-
-        // Restrict the rate of change in dt
-        fact = fmax(fact, 1.0 / rk->adaption_limit);
-        fact = fmin(fact,       rk->adaption_limit);
-
-        // Apply grow/shrink factor for next step.
-        h = __select(h * fact, h, done);
-
-        // Limit based on the upper/lower bounds
-        h = fmin(h, h_max);
-        h = fmax(h, h_min);
-        #endif
-
-        // Stretch the final step if we're really close and we didn't just fail ...
-        h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
-
-        // Don't overshoot the final time ...
-        h = __select(h, t_end - t, __not(done) & isgreater((t + h), t_end));
+        h_hold = update_timestep(t_start, t_end, t, hcur, h_hold,
+                                herr, accept, done,
+                                iter, 4, rk->adaption_limit,
+                                rk->min_iters,
+                                0.840896415);
 
         ++iter;
         if (rk->max_iters && iter > rk->max_iters) {
@@ -318,6 +307,8 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         }
     }
 
+    // store last-timestep
+    h = h_hold;
     return ierr;
 
     #undef t_round

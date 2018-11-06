@@ -370,7 +370,8 @@ __ValueType update_timestep(__private __ValueType const t_start,
                             __private const int niters,
                             __private const int ELO,
                             __private const int adaption_limit,
-                            __private const int min_iters)
+                            __private const int min_iters,
+                            __private const float safety_fac)
 {
     // the update scheme here is:
     // #ifndef __EstimateChemistryTime
@@ -391,7 +392,7 @@ __ValueType update_timestep(__private __ValueType const t_start,
     __private __ValueType h_old2 = h;
 
     #ifndef CONSTANT_TIMESTEP
-    __ValueType fact = 0.9 * pow( 1.0 / herr, (1.0 / ELO));
+    __ValueType fact = safety_fac * pow( 1.0 / herr, (1.0 / ELO));
 
     // Restrict the rate of change in dt
     fact = fmax(fact, 1.0 / adaption_limit);

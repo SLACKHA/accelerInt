@@ -550,7 +550,8 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         h_hold = update_timestep(t_start, t_end, t, hcur, h_hold,
                                 herr, accept, done,
                                 iter, ros->ELO, ros->adaption_limit,
-                                ros->min_iters);
+                                ros->min_iters,
+                                0.9);
 
         ++iter;
         if (ros->max_iters && iter > ros->max_iters) {
@@ -560,6 +561,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         }
     }
 
+    // store last-timestep
     h = h_hold;
     return ierr;
 
