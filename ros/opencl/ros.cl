@@ -357,6 +357,8 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             //if (ierr != RK_SUCCESS)
             //   return ierr;
         }
+        h = fmin(h, hmax);
+        h = fmax(h, hmin);
         //printv("h", hcur);
         #if 0
         #if (__ValueSize == 1)
@@ -548,10 +550,8 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         }
 
         h_hold = update_timestep(t_start, t_end, t, hcur, h_hold,
-                                herr, accept, done,
-                                iter, ros->ELO, ros->adaption_limit,
-                                ros->min_iters,
-                                0.9);
+                                herr, accept, done, iter, ros->ELO,
+                                ros->adaption_limit, ros->min_iters, 0.9);
 
         ++iter;
         if (ros->max_iters && iter > ros->max_iters) {

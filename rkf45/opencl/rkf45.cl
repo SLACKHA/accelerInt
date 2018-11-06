@@ -248,6 +248,8 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
             ierr = get_hin(rk, t, t_end, hcur, y, rwk, user_data,
                            driver_offset);
         }
+        h = fmin(h, hmax);
+        h = fmax(h, hmin);
     }
     #else
     h = CONSTANT_TIMESTEP;
