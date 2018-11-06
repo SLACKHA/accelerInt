@@ -359,6 +359,87 @@ driver_queue (__global const double * __restrict__ param,
 }
 #endif
 
+__ValueType update_timestep(__private __ValueType const t_start,
+                            __private __ValueType const t_end,
+                            __private __ValueType const t,
+                            __global __ValueType * __restrict__ hcur,
+                            __private __ValueType h_old,
+                            __private __ValueType const herr,
+                            __private __MaskType const accept,
+                            __private __MaskType const done,
+                            __private const int niters,
+                            __private const int ELO,
+                            __private const int adaption_limit,
+                            __private const int min_iters)
+{
+    // the update scheme here is:
+    // #ifndef __EstimateChemistryTime
+    //      -> estimate at usual
+    // #ifdef __EstimateChemistryTime
+    //      -> if done
+    //          -> if iters > 0
+    //              use last time-step size
+    //          -> else, use unrestricted estimated time-step size
+    //      -> estimate as usual
+
+
+    #define t_round ((t_end - t_start) * DBL_EPSILON)
+    #define h_min (t_round * 100)
+    #define h_max ((t_end - t_start) / min_iters)
+    #define h (*(hcur))
+
+    __private __ValueType h_old2 = h;
+
+    #ifndef CONSTANT_TIMESTEP
+    __ValueType fact = 0.9 * pow( 1.0 / herr, (1.0 / ELO));
+
+    // Restrict the rate of change in dt
+    fact = fmax(fact, 1.0 / adaption_limit);
+    fact = fmin(fact, (double)adaption_limit);
+
+    // Apply grow/shrink factor for next step.
+    h *= fact;
+
+    h_old2 = h;
+
+    // Limit based on the upper/lower bounds
+    h = fmin(h, h_max);
+    h = fmax(h, h_min);
+    #endif
+
+    #if defined(__EstimateChemistryTime) && !defined(CONSTANT_TIMESTEP)
+
+    // use last time-step size
+    __MaskType our_done = (t + h - t_end) * (t + h - t_start) >= 0;
+    h_old = __select(h, h_old, (our_done) & (niters > 0));
+
+    // use unrestricted estimated time-step size
+    h_old = __select(h, h_old2, (our_done) & __not(niters));
+
+    // Stretch the final step if we're really close and we didn't just fail ...
+    h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
+
+    // Don't overshoot the final time ...
+    h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
+
+    #elif !defined(CONSTANT_TIMESTEP)
+
+    // Stretch the final step if we're really close and we didn't just fail ...
+    h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
+
+    // Don't overshoot the final time ...
+    h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
+
+    #endif
+
+    #undef t_round
+    #undef h_min
+    #undef h_max
+    #undef h
+
+    return h_old;
+}
+
 
 #undef driver_offset
 #undef __getGlobalIndex
