@@ -357,8 +357,8 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             //if (ierr != RK_SUCCESS)
             //   return ierr;
         }
-        h = fmin(h, hmax);
-        h = fmax(h, hmin);
+        h = fmin(h, h_max);
+        h = fmax(h, h_min);
         //printv("h", hcur);
         #if 0
         #if (__ValueSize == 1)
