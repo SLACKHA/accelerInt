@@ -353,9 +353,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         __MaskType test = isless(h, h_min);
         if (__any(test))
         {
-            ierr = get_hin(ros, t, t_end,
-                           hcur, y, rwk, user_data,
-                           driver_offset);
+            ierr = get_hin(ros, t, t_end, hcur, y, rwk, user_data, driver_offset);
             //if (ierr != RK_SUCCESS)
             //   return ierr;
         }
@@ -378,6 +376,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
     //nje = 0;
     iter = 0;
 
+    __private __ValueType h_hold = h;
     // Set the work arrays ...
     __global __ValueType *fy   = rwk + __getOffset1D(driver_offset);
     __global __ValueType *ynew = fy + __getOffset1D(neq);
@@ -398,6 +397,9 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
     {
         // Set the error weight array.
         //ros_setewt (ros, y, ewt);
+
+        // store step-size
+        h_hold = h;
 
         // Compute the RHS and Jacobian matrix.
         dydt(t, user_data, y, fy, rwk_jac);
@@ -545,26 +547,10 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
             //print("ynew-final", neq, y)
         }
 
-        #ifndef CONSTANT_TIMESTEP
-        __ValueType fact = 0.9 * pow( 1.0 / herr, (1.0/ros->ELO));
-
-        // Restrict the rate of change in dt
-        fact = fmax(fact, 1.0 / ros->adaption_limit);
-        fact = fmin(fact,       ros->adaption_limit);
-
-        // Apply grow/shrink factor for next step.
-        h = __select(h * fact, h, done);
-
-        // Limit based on the upper/lower bounds
-        h = fmin(h, h_max);
-        h = fmax(h, h_min);
-        #endif
-
-        // Stretch the final step if we're really close and we didn't just fail ...
-        h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
-
-        // Don't overshoot the final time ...
-        h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
+        h_hold = update_timestep(t_start, t_end, t, hcur, h_hold,
+                                herr, accept, done,
+                                iter, ros->ELO, ros->adaption_limit,
+                                ros->min_iters);
 
         ++iter;
         if (ros->max_iters && iter > ros->max_iters) {
@@ -574,6 +560,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         }
     }
 
+    h = h_hold;
     return ierr;
 
     #undef t_round
