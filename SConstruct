@@ -690,7 +690,6 @@ def build_platform(env_save, platform):
     # exprb43
     new_defines = get_includes(
         platform,  [generic_dir, exp_int_dir, exprb43_int_dir])
-    new_defines['LIBS'] = ['fftw3']
     new_defines['CPPDEFINES'] = ['RB43']
     new_defines['NVCCDEFINES'] = ['RB43']
     exprb43 = build_lib(env_save, platform, new_defines, exprb43_int_dir,
@@ -728,7 +727,8 @@ def build_platform(env_save, platform):
                                            rkc_dir, exp4_int_dir, exprb43_int_dir,
                                            exp_int_dir, cvodes_dir, rkf45_dir,
                                            ros_dir],
-                               exact_includes=[env['sundials_inc_dir']])
+                               exact_includes=[env['sundials_inc_dir'],
+                                               env['boost_inc_dir']])
     new_defines['LIBPATH'] = [
         env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
     new_defines['LIBS'] = cvodes_libs[:] + ['fftw3']
