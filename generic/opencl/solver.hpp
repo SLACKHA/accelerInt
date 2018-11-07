@@ -22,6 +22,7 @@
 #include <memory>
 #include <algorithm>
 #include <stdexcept>
+#include <cmath>
 #include "error_codes.hpp"
 #include "stepper_types.hpp"
 #include "../paths/path.h"
