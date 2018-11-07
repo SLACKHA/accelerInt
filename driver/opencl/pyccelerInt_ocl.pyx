@@ -62,7 +62,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         SolverOptions(size_t, size_t, double, double,
                       bool_t, bool_t, string_t, string_t,
                       DeviceType, size_t, size_t,
-                      StepperType, double, bool) except +
+                      StepperType, double, bool_t, bool_t) except +
 
         double atol() except+
         double rtol() except+
@@ -225,14 +225,15 @@ cdef class PySolverOptions:
                   DeviceType deviceType = DeviceType.DEFAULT, size_t minIters=1,
                   size_t maxIters = 1000,
                   StepperType stepper_type = StepperType.ADAPTIVE,
-                  double h_const = np.nan):
+                  double h_const = np.nan, bool_t verbose=False):
 
         cdef bool_t chem_time = 0;
         self.options.reset(new SolverOptions(
             vectorSize, blockSize,
             atol, rtol, logging, use_queue,
             _bytes(order), _bytes(platform), deviceType,
-            minIters, maxIters, stepper_type, h_const, chem_time))
+            minIters, maxIters, stepper_type, h_const, chem_time,
+            verbose))
 
     cpdef atol(self):
         return deref(self.options.get()).atol()
@@ -272,6 +273,9 @@ cdef class PySolverOptions:
 
     cpdef constant_timestep(self):
         return deref(self.options.get()).constantTimestep()
+
+    cpdef verbose(self):
+        return deref(self.options.get()).verbose()
 
 
 cdef class PyIVP:

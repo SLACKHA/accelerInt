@@ -318,7 +318,8 @@ namespace opencl_solvers {
                       size_t minIters = 1, size_t maxIters = 1000,
                       StepperType stepperType = StepperType::ADAPTIVE,
                       double h_const=std::numeric_limits<double>::quiet_NaN(),
-                      bool estimate_chemistry_time=false):
+                      bool estimate_chemistry_time=false,
+                      bool verbose=true):
             _vectorSize(vectorSize),
             _blockSize(blockSize),
             _atol(atol),
@@ -332,7 +333,8 @@ namespace opencl_solvers {
             _maxIters(maxIters),
             _stepperType(stepperType),
             _h_const(h_const),
-            _estimate_chemistry_time(estimate_chemistry_time)
+            _estimate_chemistry_time(estimate_chemistry_time),
+            _verbose(verbose)
         {
             if (order.compare("C") && order.compare("F"))
             {
@@ -419,6 +421,11 @@ namespace opencl_solvers {
             return _estimate_chemistry_time;
         }
 
+        inline bool verbose() const
+        {
+            return _verbose;
+        }
+
     protected:
         //! vector size
         std::size_t _vectorSize;
@@ -449,6 +456,8 @@ namespace opencl_solvers {
         //! \brief If true, the calling code wants the last time-step taken by the integratior
         //!        as an estimation of the chemistry time-scale
         bool _estimate_chemistry_time;
+        //! \brief If true, the solver will output information on the decvice used, kernel, etc.
+        bool _verbose;
     };
 
 
@@ -463,7 +472,6 @@ namespace opencl_solvers {
             _log(),
             _ivp(ivp),
             _options(options),
-            _verbose(true),
             _data(),
             _clmem(),
             _kernel_info(),
@@ -564,6 +572,11 @@ namespace opencl_solvers {
             return _options.order();
         }
 
+        inline bool verbose() const
+        {
+            return _options.verbose();
+        }
+
         //! \brief return the number of equations to solve
         inline int neq() const
         {
@@ -632,8 +645,6 @@ namespace opencl_solvers {
         const IVP& _ivp;
         //! \brief Solver options for OpenCL execution
         const SolverOptions& _options;
-        //! \brief Verbosity of kernel compilation
-        bool _verbose;
         //! \brief struct holding opencl context, program, etc.
         cl_data_t _data;
         //! \brief CL memory
@@ -715,7 +726,7 @@ namespace opencl_solvers {
 
         void printKernelInfo (const kernelInfo_t* info)
         {
-            if (_verbose)
+            if (verbose())
             {
                 std::cout << "Kernel Info:" << std::endl;
                 std::cout << "\t" << "function_name = " << info->function_name << std::endl;
@@ -880,14 +891,14 @@ namespace opencl_solvers {
         {
             // create memory
             std::size_t lenrwk = (_ivp.requiredMemorySize() + requiredSolverMemorySize())*_data.vectorSize;
-            if (_verbose)
+            if (verbose())
                 std::cout << "lenrwk = "<< lenrwk << std::endl;
 
             std::size_t leniwk = (_ivp.requiredIntegerMemorySize() + requiredSolverIntegerMemorySize()) * _data.vectorSize;
-            if (_verbose)
+            if (verbose())
                 std::cout << "leniwk = "<< leniwk << std::endl;
 
-            if (_verbose)
+            if (verbose())
                 std::cout << "NP = " << NUM << ", blockSize = " << _data.blockSize <<
                              ", vectorSize = " << _data.vectorSize <<
                              ", numBlocks = " << _data.numBlocks <<
@@ -1026,7 +1037,7 @@ namespace opencl_solvers {
                 int queue_val = numThreads() * _data.vectorSize;
                 CL_EXEC( clEnqueueWriteBuffer(_data.command_queue, _clmem[_queue_index], CL_TRUE, 0, sizeof(int),
                                               &queue_val, 0, NULL, NULL) )
-                if (_verbose)
+                if (verbose())
                     std::cout << "Queue enabled" << std::endl;
             }
 
@@ -1041,7 +1052,7 @@ namespace opencl_solvers {
 
             }
 
-            if (_verbose)
+            if (verbose())
                 std::cout << "Host->Dev = " <<
                     std::chrono::duration_cast<std::chrono::milliseconds>(
                             std::chrono::high_resolution_clock::now() - t_data).count() <<
@@ -1062,7 +1073,7 @@ namespace opencl_solvers {
             /* Wait for the kernel to finish */
             clWaitForEvents(1, &ev);
             auto tk_end = std::chrono::high_resolution_clock::now();
-            if (_verbose)
+            if (verbose())
                 std::cout << "Kernel execution = " <<
                     std::chrono::duration_cast<std::chrono::milliseconds>(tk_end - tk).count() <<
                     " (ms)" << std::endl;
@@ -1085,8 +1096,9 @@ namespace opencl_solvers {
             counter_struct* counters = (counter_struct*) malloc(sizeof(counter_struct)*NUM);
             if (counters == NULL)
             {
-                fprintf(stderr,"Allocation error %s %d\n", __FILE__, __LINE__);
-                exit(-1);
+                std::ostringstream err;
+                err << "Allocation error " << __FILE__ << " " << __LINE__ << nl
+                throw std::runtime_error(err.str());
             }
             CL_EXEC( clEnqueueReadBuffer(_data.command_queue, _clmem[_counter_index], CL_TRUE, 0, sizeof(counter_struct)*NUM, counters, 0, NULL, NULL) );
 
@@ -1097,12 +1109,10 @@ namespace opencl_solvers {
                 nst_ += counters[i].nsteps;
                 nit_ += counters[i].niters;
             }
-            if (_verbose)
+            if (verbose())
                 std::cout << "nst = " << nst_ << ", nit = " << nit_ << std::endl;
 
             free(counters);
-            // turn off messaging after first compilation
-            _verbose = false;
         }
 
     protected:
