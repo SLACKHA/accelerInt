@@ -78,6 +78,7 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         StepperType stepperType() except+
         double constantTimestep() except+
         bool_t estimateChemistryTime() except+
+        bool_t verbose() except+
 
     cdef unique_ptr[IntegratorBase] init(IntegratorType, int, int,
                                          const IVP&, const SolverOptions&) except +
