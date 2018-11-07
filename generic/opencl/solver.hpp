@@ -118,6 +118,7 @@ const std::string getErrorString(cl_int error)
     std::cerr << "Error executing CL cmd = " << CMD << std::endl; \
     std::cerr << "\terrcode = " << (__errcode); \
     std::cerr << ", " << getErrorString(__errcode) << std::endl; \
+    throw std::runtime_error(getErrorString(__errcode)); \
 }
 
 #define CL_EXEC(__cmd__) {\
@@ -125,7 +126,6 @@ const std::string getErrorString(cl_int error)
     if (_ret != CL_SUCCESS) \
     { \
         __clerror(_ret, __cmd__); \
-        throw std::runtime_error(); \
     } \
 }
 
@@ -864,14 +864,34 @@ namespace opencl_solvers {
         {
             // free memory
             this->release_memory();
-            // release kernel
-            CL_EXEC(clReleaseKernel(_kernel));
-            // release program
-            CL_EXEC(clReleaseProgram(_data.program));
-            // release queue
-            CL_EXEC(clReleaseCommandQueue(_data.command_queue));
-            // and context
-            CL_EXEC(clReleaseContext(_data.context));
+            try
+            {
+                // release kernel
+                CL_EXEC(clReleaseKernel(_kernel));
+            }
+            catch (std::runtime_error)
+            { }
+            try
+            {
+                // release program
+                CL_EXEC(clReleaseProgram(_data.program));
+            }
+            catch (std::runtime_error)
+            { }
+            try
+            {
+                // release queue
+                CL_EXEC(clReleaseCommandQueue(_data.command_queue));
+            }
+            catch (std::runtime_error)
+            { }
+            try
+            {
+                // and context
+                CL_EXEC(clReleaseContext(_data.context));
+            }
+            catch (std::runtime_error)
+            { }
         }
 
     protected:

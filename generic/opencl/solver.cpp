@@ -268,14 +268,12 @@ namespace opencl_solvers
         if (ret != CL_SUCCESS )
         {
             __clerror(ret, "clCreateContext");
-            throw std::runtime_error();
         }
 
         data->command_queue = clCreateCommandQueue(data->context, data->device_info.device_id, 0, &ret);
         if (ret != CL_SUCCESS )
         {
             __clerror(ret, "clCreateCommandQueue");
-            throw std::runtime_error();
         }
 
         data->use_queue = _options.useQueue();
