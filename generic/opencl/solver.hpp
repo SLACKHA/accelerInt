@@ -539,12 +539,12 @@ namespace opencl_solvers {
                     std::cerr << "During integration of ODE#" << tid <<
                         ", the maximum number of allowed iterations was exceeded..."
                         << std::endl;
-                    throw std::runtime_error(code);
+                    throw std::runtime_error("Max iterations exceeded.");
                 case ErrorCode::TDIST_TOO_SMALL:
                     std::cerr << "During integration of ODE#" << tid <<
                         ", the requested integration duration was smaller than allowed "
                         "by machine precision, exiting..." << std::endl;
-                    throw std::runtime_error(code);
+                    throw std::runtime_error("Timestep smaller than precision");
                 default:
                     break;
             }
@@ -1117,7 +1117,7 @@ namespace opencl_solvers {
             if (counters == NULL)
             {
                 std::ostringstream err;
-                err << "Allocation error " << __FILE__ << " " << __LINE__ << nl
+                err << "Allocation error " << __FILE__ << " " << __LINE__ << nl;
                 throw std::runtime_error(err.str());
             }
             CL_EXEC( clEnqueueReadBuffer(_data.command_queue, _clmem[_counter_index], CL_TRUE, 0, sizeof(counter_struct)*NUM, counters, 0, NULL, NULL) );

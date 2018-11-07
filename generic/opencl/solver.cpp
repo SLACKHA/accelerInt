@@ -38,7 +38,6 @@ namespace opencl_solvers
         {
 
             __clerror(ret, "clCreateKernel");
-            throw std::runtime_error();
         }
 
         // Query the kernel's info
@@ -55,7 +54,6 @@ namespace opencl_solvers
         if (ret != CL_SUCCESS)
         {
             __clerror(ret, "CreateBuffer");
-            throw std::runtime_error();
         }
 
         // and zero memory
@@ -73,7 +71,6 @@ namespace opencl_solvers
         if (info->num_platforms == 0)
         {
             std::cerr << "clError: num_platforms = 0" << std::endl;
-            throw std::runtime_error();
         }
 
         bool found = false;
@@ -140,7 +137,6 @@ namespace opencl_solvers
         if (device_info->num_devices == 0)
         {
             std::cerr << "clError: num_devices = 0" << std::endl;
-            throw std::runtime_error();
         }
 
         device_info->device_id = device_info->device_ids[0];
