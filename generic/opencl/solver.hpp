@@ -1117,7 +1117,7 @@ namespace opencl_solvers {
             if (counters == NULL)
             {
                 std::ostringstream err;
-                err << "Allocation error " << __FILE__ << " " << __LINE__ << nl;
+                err << "Allocation error " << __FILE__ << " " << __LINE__ << std::endl;
                 throw std::runtime_error(err.str());
             }
             CL_EXEC( clEnqueueReadBuffer(_data.command_queue, _clmem[_counter_index], CL_TRUE, 0, sizeof(counter_struct)*NUM, counters, 0, NULL, NULL) );
