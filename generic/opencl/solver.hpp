@@ -125,7 +125,7 @@ const std::string getErrorString(cl_int error)
     if (_ret != CL_SUCCESS) \
     { \
         __clerror(_ret, __cmd__); \
-        exit(-1); \
+        throw std::runtime_error(); \
     } \
 }
 
@@ -539,12 +539,12 @@ namespace opencl_solvers {
                     std::cerr << "During integration of ODE#" << tid <<
                         ", the maximum number of allowed iterations was exceeded..."
                         << std::endl;
-                    exit(code);
+                    throw std::runtime_error(code);
                 case ErrorCode::TDIST_TOO_SMALL:
                     std::cerr << "During integration of ODE#" << tid <<
                         ", the requested integration duration was smaller than allowed "
                         "by machine precision, exiting..." << std::endl;
-                    exit(code);
+                    throw std::runtime_error(code);
                 default:
                     break;
             }

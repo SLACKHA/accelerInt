@@ -38,7 +38,7 @@ namespace opencl_solvers
         {
 
             __clerror(ret, "clCreateKernel");
-            exit(-1);
+            throw std::runtime_error();
         }
 
         // Query the kernel's info
@@ -55,7 +55,7 @@ namespace opencl_solvers
         if (ret != CL_SUCCESS)
         {
             __clerror(ret, "CreateBuffer");
-            exit(-1);
+            throw std::runtime_error();
         }
 
         // and zero memory
@@ -73,7 +73,7 @@ namespace opencl_solvers
         if (info->num_platforms == 0)
         {
             std::cerr << "clError: num_platforms = 0" << std::endl;
-            exit(-1);
+            throw std::runtime_error();
         }
 
         bool found = false;
@@ -90,7 +90,7 @@ namespace opencl_solvers
                 std::transform(cname.begin(), cname.end(), cname.begin(), ::tolower);
                 if (cname.find(test) != std::string::npos)
                 {
-                    if (_verbose)
+                    if (verbose())
                         std::cout << "Found user specified platform " << _options.platform() << std::endl;
                     info->platform_id = info->platform_ids[i];
                     found = true;
@@ -103,7 +103,7 @@ namespace opencl_solvers
         {
             char name[1024] = {0};
             CL_EXEC( clGetPlatformInfo (info->platform_ids[0], CL_PLATFORM_NAME, sizeof(name), name, NULL) );
-            if (_verbose)
+            if (verbose())
                 std::cout << "User specified platform either not specified or not found, defaulting to platform: (" <<
                     name << ")" << std::endl;
             info->platform_id = info->platform_ids[0];
@@ -111,10 +111,10 @@ namespace opencl_solvers
 
         #define __getInfo( __STR, __VAR) { \
             CL_EXEC( clGetPlatformInfo (info->platform_id, (__STR), sizeof(__VAR), __VAR, NULL) ); \
-            if (_verbose)\
+            if (verbose())\
                 std::cout << "\t" << #__STR << " = " << __VAR << std::endl; }
 
-        if (_verbose)
+        if (verbose())
             std::cout << "Platform Info:" << std::endl;
         __getInfo( CL_PLATFORM_NAME,       info->name);
         __getInfo( CL_PLATFORM_VERSION,    info->version);
@@ -126,7 +126,7 @@ namespace opencl_solvers
         info->is_nvidia = 0; // Is an NVIDIA device?
         if (strstr(info->vendor, "NVIDIA") != NULL)
             info->is_nvidia = 1;
-        if (_verbose)
+        if (verbose())
             std::cout << "\tIs-NVIDIA = " << info->is_nvidia << std::endl;
     }
 
@@ -140,7 +140,7 @@ namespace opencl_solvers
         if (device_info->num_devices == 0)
         {
             std::cerr << "clError: num_devices = 0" << std::endl;
-            exit(-1);
+            throw std::runtime_error();
         }
 
         device_info->device_id = device_info->device_ids[0];
@@ -154,17 +154,17 @@ namespace opencl_solvers
             if (__verbose__) std::cout << "\t" << #__str__ << " = " << __val__ << std::endl; \
         }
 
-        if (_verbose)
+        if (verbose())
             std::cout << "Device Info:" << std::endl;
 
-        get_info( CL_DEVICE_TYPE, device_info->type, _verbose);
+        get_info( CL_DEVICE_TYPE, device_info->type, verbose());
 
         for (std::size_t i = 0; i < device_info->num_devices; ++i)
         {
             cl_device_type val;
             //get_info( CL_DEVICE_TYPE, val, 1);
             CL_EXEC( clGetDeviceInfo (device_info->device_ids[i], CL_DEVICE_TYPE, sizeof(cl_device_type), &val, NULL) );
-            if (_verbose)
+            if (verbose())
             {
                 std::cout << "\t" << "CL_DEVICE_TYPE" << " = " << val << std::endl;
             }
@@ -188,45 +188,45 @@ namespace opencl_solvers
             else if (device_info->type == CL_DEVICE_TYPE_DEFAULT)
                  device_type_name = "DEFAULT";
         }
-        if (_verbose) std::cout<< "\t" << "Type Name = " << device_type_name << std::endl;
+        if (verbose()) std::cout<< "\t" << "Type Name = " << device_type_name << std::endl;
 
-        get_char_info( CL_DEVICE_NAME, device_info->name, _verbose );
-        get_char_info( CL_DEVICE_PROFILE, device_info->profile, _verbose );
-        get_char_info( CL_DEVICE_VERSION, device_info->version, _verbose );
-        get_char_info( CL_DEVICE_VENDOR, device_info->vendor, _verbose );
-        get_char_info( CL_DRIVER_VERSION, device_info->driver_version, _verbose );
-        get_char_info( CL_DEVICE_OPENCL_C_VERSION, device_info->opencl_c_version, _verbose );
+        get_char_info( CL_DEVICE_NAME, device_info->name, verbose() );
+        get_char_info( CL_DEVICE_PROFILE, device_info->profile, verbose() );
+        get_char_info( CL_DEVICE_VERSION, device_info->version, verbose() );
+        get_char_info( CL_DEVICE_VENDOR, device_info->vendor, verbose() );
+        get_char_info( CL_DRIVER_VERSION, device_info->driver_version, verbose() );
+        get_char_info( CL_DEVICE_OPENCL_C_VERSION, device_info->opencl_c_version, verbose() );
         //get_char_info( CL_DEVICE_BUILT_IN_KERNELS );
-        get_char_info( CL_DEVICE_EXTENSIONS, device_info->extensions, _verbose );
+        get_char_info( CL_DEVICE_EXTENSIONS, device_info->extensions, verbose() );
 
-        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, device_info->native_vector_width_char, _verbose );
-        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, device_info->native_vector_width_short, _verbose );
-        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, device_info->native_vector_width_int, _verbose );
-        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, device_info->native_vector_width_long, _verbose );
-        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, device_info->native_vector_width_float, _verbose );
-        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, device_info->native_vector_width_double, _verbose );
-        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, device_info->native_vector_width_half, _verbose );
+        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, device_info->native_vector_width_char, verbose() );
+        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, device_info->native_vector_width_short, verbose() );
+        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, device_info->native_vector_width_int, verbose() );
+        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, device_info->native_vector_width_long, verbose() );
+        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, device_info->native_vector_width_float, verbose() );
+        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, device_info->native_vector_width_double, verbose() );
+        get_info( CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, device_info->native_vector_width_half, verbose() );
 
-        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, device_info->preferred_vector_width_char, _verbose );
-        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, device_info->preferred_vector_width_short, _verbose );
-        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, device_info->preferred_vector_width_int, _verbose );
-        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, device_info->preferred_vector_width_long, _verbose );
-        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, device_info->preferred_vector_width_float, _verbose );
-        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, device_info->preferred_vector_width_double, _verbose );
-        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, device_info->preferred_vector_width_half, _verbose );
+        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, device_info->preferred_vector_width_char, verbose() );
+        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, device_info->preferred_vector_width_short, verbose() );
+        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, device_info->preferred_vector_width_int, verbose() );
+        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, device_info->preferred_vector_width_long, verbose() );
+        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, device_info->preferred_vector_width_float, verbose() );
+        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, device_info->preferred_vector_width_double, verbose() );
+        get_info( CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, device_info->preferred_vector_width_half, verbose() );
 
-        get_info( CL_DEVICE_MAX_COMPUTE_UNITS, device_info->max_compute_units, _verbose );
-        get_info( CL_DEVICE_MAX_CLOCK_FREQUENCY, device_info->max_clock_frequency, _verbose );
+        get_info( CL_DEVICE_MAX_COMPUTE_UNITS, device_info->max_compute_units, verbose() );
+        get_info( CL_DEVICE_MAX_CLOCK_FREQUENCY, device_info->max_clock_frequency, verbose() );
 
-        get_info( CL_DEVICE_MAX_WORK_GROUP_SIZE, device_info->max_work_group_size, _verbose );
+        get_info( CL_DEVICE_MAX_WORK_GROUP_SIZE, device_info->max_work_group_size, verbose() );
 
-        get_info( CL_DEVICE_GLOBAL_MEM_SIZE, device_info->global_mem_size, _verbose );
-        get_info( CL_DEVICE_MAX_MEM_ALLOC_SIZE, device_info->max_mem_alloc_size, _verbose );
-        get_info( CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, device_info->global_mem_cacheline_size, _verbose );
-        get_info( CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, device_info->global_mem_cache_size, _verbose );
+        get_info( CL_DEVICE_GLOBAL_MEM_SIZE, device_info->global_mem_size, verbose() );
+        get_info( CL_DEVICE_MAX_MEM_ALLOC_SIZE, device_info->max_mem_alloc_size, verbose() );
+        get_info( CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, device_info->global_mem_cacheline_size, verbose() );
+        get_info( CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, device_info->global_mem_cache_size, verbose() );
 
-        get_info( CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, device_info->global_mem_cache_type, _verbose);
-        if (_verbose)
+        get_info( CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, device_info->global_mem_cache_type, verbose());
+        if (verbose())
         {
             std::cout << "\t" << "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE = ";
             if (device_info->global_mem_cache_type == CL_NONE)
@@ -237,19 +237,19 @@ namespace opencl_solvers
                  std::cout << "CL_READ_WRITE_CACHE" << std::endl;
         }
 
-        get_info( CL_DEVICE_LOCAL_MEM_SIZE, device_info->local_mem_size, _verbose );
-        get_info( CL_DEVICE_LOCAL_MEM_TYPE, device_info->local_mem_type, _verbose );
-        if (_verbose)
+        get_info( CL_DEVICE_LOCAL_MEM_SIZE, device_info->local_mem_size, verbose() );
+        get_info( CL_DEVICE_LOCAL_MEM_TYPE, device_info->local_mem_type, verbose() );
+        if (verbose())
         {
             std::cout << "\t" << "CL_DEVICE_LOCAL_MEM_TYPE = " <<
                       ((device_info->local_mem_type == CL_LOCAL) ? "LOCAL" : "GLOBAL") <<
                       std::endl;
         }
 
-        get_info( CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, device_info->max_constant_buffer_size, _verbose );
-        get_info( CL_DEVICE_MAX_CONSTANT_ARGS, device_info->max_constant_args, _verbose );
+        get_info( CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, device_info->max_constant_buffer_size, verbose() );
+        get_info( CL_DEVICE_MAX_CONSTANT_ARGS, device_info->max_constant_args, verbose() );
 
-        get_info( CL_DEVICE_DOUBLE_FP_CONFIG, device_info->fp_config, _verbose );
+        get_info( CL_DEVICE_DOUBLE_FP_CONFIG, device_info->fp_config, verbose() );
 
         #undef get_char_info
         #undef get_info
@@ -268,14 +268,14 @@ namespace opencl_solvers
         if (ret != CL_SUCCESS )
         {
             __clerror(ret, "clCreateContext");
-            exit(-1);
+            throw std::runtime_error();
         }
 
         data->command_queue = clCreateCommandQueue(data->context, data->device_info.device_id, 0, &ret);
         if (ret != CL_SUCCESS )
         {
             __clerror(ret, "clCreateCommandQueue");
-            exit(-1);
+            throw std::runtime_error();
         }
 
         data->use_queue = _options.useQueue();
@@ -433,19 +433,19 @@ namespace opencl_solvers
         if (data->platform_info.is_nvidia)
              build_options << " -cl-nv-verbose";
 
-        if (_verbose)
+        if (verbose())
             std::cout << "build_options = " << build_options.str() << std::endl;
 
         std::string cbuild = build_options.str();
         ret = clBuildProgram(data->program, 1, &data->device_info.device_id, cbuild.c_str(), NULL, NULL);
-        if (_verbose)
+        if (verbose())
             std::cout << "clBuildProgram = " << ret << std::endl;
 
 
         cl_build_status build_status;
         CL_EXEC( clGetProgramBuildInfo (data->program, data->device_info.device_id, CL_PROGRAM_BUILD_STATUS,
                                         sizeof(cl_build_status), &build_status, NULL) );
-        if (_verbose || ret != CL_SUCCESS)
+        if (verbose() || ret != CL_SUCCESS)
             std::cout << "CL_PROGRAM_BUILD_STATUS = " << build_status << std::endl;;
 
         // get the program build log size
@@ -457,7 +457,7 @@ namespace opencl_solvers
         std::vector<char> build_log(build_log_size + 1);
         CL_EXEC( clGetProgramBuildInfo (data->program, data->device_info.device_id, CL_PROGRAM_BUILD_LOG,
                                         build_log_size, &build_log[0], &build_log_size) );
-        if (build_log_size > 0 && (_verbose || ret != CL_SUCCESS))
+        if (build_log_size > 0 && (verbose() || ret != CL_SUCCESS))
         {
             std::string blog(build_log.begin(), build_log.end());
             std::cout << "CL_PROGRAM_BUILD_LOG = " << blog << std::endl;
