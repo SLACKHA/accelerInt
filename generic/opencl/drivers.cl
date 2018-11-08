@@ -42,7 +42,8 @@ __ValueType get_wnorm (__global const solver_type* __restrict__ solver, __global
     for (int k = 0; k < neq; k++)
     {
         __ValueType ewt = (solver->s_rtol * fabs(y[__getIndex(k)])) + solver->s_atol;
-        __ValueType prod = x[__getIndex(k)] / ewt;
+        // limit error weight to some rediculously large number to avoid SIGFPEs in the case of bad inputs
+        __ValueType prod = fmin(fabs(x[__getIndex(k)] / ewt), 1e100);
         sum += (prod*prod);
     }
 
