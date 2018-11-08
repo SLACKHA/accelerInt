@@ -233,7 +233,8 @@ def run_case(num, phir, test, test_problem,
         raise Exception()
 
     # calculate condition norm
-    err = np.abs(phit - phir) / (norm_atol + phir * norm_rtol)
+    phir_limited = np.take(phir, np.arange(num), axis=0)
+    err = np.abs(phit - phir_limited) / (norm_atol + phir_limited * norm_rtol)
     err = np.linalg.norm(err, ord=condition_norm, axis=1)
 
     # calculate ivp norm
