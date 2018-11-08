@@ -281,6 +281,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         accept &= __not(done);
         #else
         __MaskType accept = TRUE;
+        __ValueType herr = 0;
         #endif
 
         // update solution ...

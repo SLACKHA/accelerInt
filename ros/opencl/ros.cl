@@ -519,6 +519,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         accept &= __not(done);
         #else
         __MaskType accept = TRUE;
+        __ValueType herr = 0;
         #endif
 
         if (__any(accept))

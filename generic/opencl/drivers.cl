@@ -417,21 +417,13 @@ __ValueType update_timestep(__private __ValueType const t_start,
     // use unrestricted estimated time-step size
     h_old = __select(h, h_old2, (our_done) & __not(niters));
 
-    // Stretch the final step if we're really close and we didn't just fail ...
-    h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
-
-    // Don't overshoot the final time ...
-    h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
-
-    #elif !defined(CONSTANT_TIMESTEP)
-
-    // Stretch the final step if we're really close and we didn't just fail ...
-    h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
-
-    // Don't overshoot the final time ...
-    h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
-
     #endif
+
+    // Stretch the final step if we're really close and we didn't just fail ...
+    h = __select(h, t_end - t, accept & isless(fabs((t + h) - t_end), h_min));
+
+    // Don't overshoot the final time ...
+    h = __select(h, t_end - t, __not(done) & isgreater((t + h),  t_end));
 
     #undef t_round
     #undef h_min
