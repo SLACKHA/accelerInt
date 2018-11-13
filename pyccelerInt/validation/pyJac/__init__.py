@@ -31,7 +31,6 @@ def pyjac_valid(num, conp=True):
         extra = P
 
     phi = np.concatenate((np.reshape(T, (-1, 1)),
-                          np.reshape(param, (-1, 1)),
                           np.reshape(extra, (-1, 1)),
                           moles[:, :-1]), axis=1)
 
