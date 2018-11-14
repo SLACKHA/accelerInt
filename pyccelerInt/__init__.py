@@ -509,14 +509,14 @@ def build_parser(helptext='Run the pyccelerInt examples.', get_parser=False):
                         help='The implicit-SIMD work-group size to use [GPU].  '
                              'Exclusive with --vectorSize. Only used for OpenCL.')
 
-    parser.add_argument('-q', '--use_queue',
+    parser.add_argument('-qu', '--use_queue',
                         default=True,
                         action='store_true',
                         dest='use_queue',
                         help='Use the queue-based integration drivers. '
                              'Only used for OpenCL.')
 
-    parser.add_argument('-s', '--use_static',
+    parser.add_argument('-st', '--use_static',
                         default=True,
                         action='store_false',
                         dest='use_queue',
