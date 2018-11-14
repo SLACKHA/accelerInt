@@ -423,7 +423,7 @@ def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=Fal
                         type=float,
                         help='If supplied, the starting validation step-size.')
 
-    parser.add_argument('-ss', '--ending_stepsize',
+    parser.add_argument('-se', '--ending_stepsize',
                         default=None,
                         type=float,
                         help='If supplied, the final validation step-size.')
