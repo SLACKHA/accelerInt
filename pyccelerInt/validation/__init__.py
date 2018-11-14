@@ -251,7 +251,7 @@ def run_validation(num, reference, ref_problem,
                    t_end, test_builder, step_start=1e-3, step_end=1e-8,
                    norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
                    ivp_norm=np.inf, label='', plot_filename='',
-                   error_filename='', reuse=False):
+                   error_filename='', reuse=False, num_points=10):
     """
     Run the validation case for the test integrator using constant time-steps ranging
     from :param:`step_start` to `step_end`
@@ -328,7 +328,7 @@ def run_validation(num, reference, ref_problem,
     end = np.rint(np.log10(step_end))
     # determine direction of progression, and ensure that the final step-size is
     # included
-    steps = np.logspace(start, end, num=10)
+    steps = np.logspace(start, end, num=num_points)
     errs = np.zeros(steps.size)
     test_order = None
 
@@ -411,6 +411,22 @@ def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=Fal
                         action='store_true',
                         help='If supplied, attempt to reuse the validation data '
                              'from the `error_filename`.')
+
+    parser.add_argument('-nv', '--num_validation',
+                        default=10,
+                        type=int,
+                        help='The number of timesteps to use for validation between '
+                             'the start and end times.')
+
+    parser.add_argument('-ss', '--starting_stepsize',
+                        default=None,
+                        type=float,
+                        help='If supplied, the starting validation step-size.')
+
+    parser.add_argument('-ss', '--ending_stepsize',
+                        default=None,
+                        type=float,
+                        help='If supplied, the final validation step-size.')
 
     # and change default max steps
     parser.set_defaults(max_steps=float(1e9))

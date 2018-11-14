@@ -42,12 +42,19 @@ if __name__ == '__main__':
                           num_threads=args.num_threads,
                           constant_timestep=stepsize)
 
+    ss = refp.step_start if args.starting_stepsize is None else \
+        args.starting_stepsize
+    se = refp.step_end if args.ending_stepsize is None else \
+        args.ending_stepsize
     run_validation(args.num_ivp, refi, refp,
-                   end_time, builder, step_start=refp.step_start,
-                   step_end=refp.step_end, label=args.int_type,
+                   end_time, builder,
+                   step_start=ss,
+                   step_end=se,
+                   label=args.int_type,
                    plot_filename=args.plot_filename,
                    error_filename=args.error_filename,
-                   reuse=args.reuse_validation)
+                   reuse=args.reuse_validation,
+                   num_points=args.num_validation)
 
     # and cleanup
     del refivp
