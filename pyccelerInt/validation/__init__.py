@@ -230,7 +230,7 @@ def run_case(num, phir, test, test_problem,
         logger = logging.getLogger(__name__)
         logger.warn('NaN / Solution detected for step-size! '
                     'Try reducing starting step-size.')
-        raise Exception()
+        raise NanException()
 
     # calculate condition norm
     phir_limited = np.take(phir, np.arange(num), axis=0)
