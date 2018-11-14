@@ -79,27 +79,25 @@ class Ignition_valid(ValidationProblem, Ignition):
             conditions
         """
 
-        self.phi, self.params = initializer(num, self.conp)
+        if not initializer:
+            self.phi, self.pressure = super(Ignition_valid, self).setup(num, options)
+        else:
+            self.phi, self.pressure = initializer(num, self.conp)
         self.init = True
-
-    def get_initial_conditions(self):
-        """
-        Returns
-        -------
-        phi: :class:`np.ndarray`
-            A copy of this problem's initial state-vector
-        user_data: :class:`np.ndarray`
-            A copy of this problem's user data
-        """
-        return self.phi.copy(), self.params.copy()
 
     @property
     def step_start(self):
-        return 1e-3
+        return 1e-6
 
     @property
     def step_end(self):
-        return 1e-8
+        return 1e-10
+
+    def get_default_endtime(self):
+        """
+        Return the default end-time for this Problem
+        """
+        return 1e-6
 
     @property
     def plot_name(self):

@@ -234,7 +234,8 @@ def run_case(num, phir, test, test_problem,
 
     # calculate condition norm
     phir_limited = np.take(phir, np.arange(num), axis=0)
-    err = np.abs(phit - phir_limited) / (norm_atol + phir_limited * norm_rtol)
+    err = (np.abs(phit - phir_limited) / (
+        norm_atol + np.abs(phir_limited) * norm_rtol)).squeeze()
     err = np.linalg.norm(err, ord=condition_norm, axis=1)
 
     # calculate ivp norm
@@ -327,15 +328,11 @@ def run_validation(num, reference, ref_problem,
     end = np.rint(np.log10(step_end))
     # determine direction of progression, and ensure that the final step-size is
     # included
-    step = -1 if end < start else 1
-    end += step
-    steps = np.arange(start, end, step)
+    steps = np.logspace(start, end, num=10)
     errs = np.zeros(steps.size)
     test_order = None
 
     for i, size in enumerate(steps):
-        steps[i] = np.power(10., size)
-
         testivp, test_problem, test = test_builder(steps[i], iteration=i)
 
         if test_order is None:
