@@ -87,11 +87,11 @@ class Ignition_valid(ValidationProblem, Ignition):
 
     @property
     def step_start(self):
-        return 1e-6
+        return 1e-7
 
     @property
     def step_end(self):
-        return 1e-10
+        return 1e-9
 
     def get_default_endtime(self):
         """
