@@ -18,43 +18,47 @@ if __name__ == '__main__':
     case = get_case(args.case)
 
     # build reference solver
-    refivp, refp, refi = build_case(case, 'c', is_reference=True,
-                                    integrator_type='CVODES', reuse=args.reuse,
-                                    order='F', max_steps=int(args.max_steps),
-                                    reference_rtol=1e-15, reference_atol=1e-20,
-                                    num_threads=args.num_threads)
+    refivp, refp, refi = build_case(
+        case, rtol=1e-15, atol=1e-20, lang='c',
+        integrator_type='CVODES', reuse=args.reuse,
+        order='F', max_steps=int(args.max_steps),
+        num_threads=args.num_threads)
+
+    # check the integrator types
+    solvers = [x.strip() for x in args.int_type.split(',')]
 
     end_time = args.end_time
     if not end_time:
         end_time = refp.get_default_endtime()
 
-    def builder(stepsize, iteration=0):
-        return build_case(case, args.language,
-                          is_reference=False,
-                          integrator_type=args.int_type,
-                          reuse=args.reuse or iteration > 0,
-                          vector_size=args.vector_size,
-                          block_size=args.block_size,
-                          platform=args.platform, order=args.order,
-                          use_queue=args.use_queue,
-                          device_type=args.device_type,
-                          max_steps=args.max_steps,
-                          num_threads=args.num_threads,
-                          constant_timestep=stepsize)
+    def builder(rtol, atol, solver, iteration=0):
+        return build_case(
+            case, args.language,
+            integrator_type=solver,
+            reuse=args.reuse or iteration > 0,
+            vector_size=args.vector_size,
+            block_size=args.block_size,
+            platform=args.platform, order=args.order,
+            use_queue=args.use_queue,
+            device_type=args.device_type,
+            max_steps=args.max_steps,
+            num_threads=args.num_threads,
+            rtol=rtol,
+            atol=atol)
 
-    ss = refp.step_start if args.starting_stepsize is None else \
-        args.starting_stepsize
-    se = refp.step_end if args.ending_stepsize is None else \
-        args.ending_stepsize
-    run_validation(args.num_ivp, refi, refp,
-                   end_time, builder,
-                   step_start=ss,
-                   step_end=se,
-                   label=args.int_type,
-                   plot_filename=args.plot_filename,
-                   error_filename=args.error_filename,
-                   reuse=args.reuse_validation,
-                   num_points=args.num_validation)
+    ts = refp.tol_start if args.starting_tolerance is None else \
+        args.starting_tolerance
+    te = refp.tol_end if args.ending_tolerance is None else \
+        args.ending_tolerance
+    run_validation(
+        args.num_ivp, refi, refp,
+        end_time, builder, solvers,
+        tol_start=ts,
+        tol_end=te,
+        plot_filename=args.plot_filename,
+        error_filename=args.error_filename,
+        reuse=args.reuse_validation,
+        num_points=args.num_validation)
 
     # and cleanup
     del refivp

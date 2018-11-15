@@ -14,68 +14,64 @@ class ValidationProblem(object):
         pass
 
     @property
-    def step_start(self):
+    def tol_start(self):
         """
-        Return the largest validation constant step-size
+        Return the largest validation tolerance
         """
-        raise NotImplementedError
+        return 1e-4
 
     @property
-    def step_end(self):
+    def tol_end(self):
         """
-        Return the smalles validation constant step-size
+        Return the smallest validation tolerance
         """
-        raise NotImplementedError
+        return 1e-15
 
     @property
     def plot_name(self):
         raise NotImplementedError
 
-    def plot(self, step_sizes, errors, end_time, label='', order=None,
-             plot_filename=''):
+    def plot(self, runtimes, errors, label='', order=None,
+             plot_filename='', final=False):
         """
         Plot the validation curve for this problem
 
         Parameters
         ----------
-        step_sizes: :class:`numpy.ndarray`
-            The array of step sizes
+        runtimes: list of list of float
+            The array of (arrays) of runtimes for each solver / tolerance combination
         errors: :class:`numpy.ndarray`
             The array of normalized errors to plot
         """
 
         plt = get_plotter()
+        rt_dev = np.zeros(len(runtimes))
+        rt = np.zeros(len(runtimes))
+        for i in range(len(runtimes)):
+            rt_dev[i] = np.std(runtimes[i])
+            rt[i] = np.mean(runtimes[i])
         # convert stepsizes to steps taken
-        st = end_time / step_sizes
-        plt.loglog(st, errors, label=label, linestyle='', marker='o')
+        plt.errorbar(rt, errors, xerr=rt_dev, marker='.', linestyle='',
+                     label=label)
 
-        if order is not None:
-            # plot expected order
-            expected = np.zeros_like(errors)
-            expected[0] = errors[0]
-            for i in range(1, expected.size):
-                expected[i] = expected[i - 1] / np.power(10., order)
-
-            plt.loglog(st, expected, label='order ({})'.format(order))
-
-        plt.ylim(np.min(errors) * 0.8,
-                 np.max(errors) * 1.2)
-        plt.legend(loc=0)
-        plt.xlabel('Steps taken')
-        plt.ylabel('|E|')
-        plt.title(self.plot_name)
-        if not plot_filename:
-            plt.show()
-        else:
-            plt.savefig(plot_filename)
+        if final:
+            plt.xscale('log', basex=10)
+            plt.yscale('log', basey=10)
+            plt.legend(loc=0)
+            plt.ylabel('|E|')
+            plt.xlabel('CPU Time (ms)')
+            plt.title(self.plot_name)
+            if not plot_filename:
+                plt.show()
+            else:
+                plt.savefig(plot_filename)
 
 
-def build_case(problem, lang, is_reference=False,
+def build_case(problem, lang, rtol, atol,
                integrator_type='', reuse=False,
                vector_size=0, block_size=0,
                platform='', order='F', use_queue=True,
                device_type='DEFAULT', max_steps=int(1e6),
-               reference_rtol=1e-15, reference_atol=1e-20,
                num_threads=1, constant_timestep=None):
     """
     Run validation for the given reference and test problems
@@ -86,8 +82,6 @@ def build_case(problem, lang, is_reference=False,
         The problem to build
     lang: ['c', 'opencl']
         The language to run the problem in
-    is_reference: bool [False]
-        If true, this integrator will be used as the reference answer
     integrator_type: :class:`IntegratorType`
         The integrator type to use for this problem
     reuse: bool [False]
@@ -127,14 +121,6 @@ def build_case(problem, lang, is_reference=False,
         The constructed solver options
     """
 
-    kwargs = {}
-    if is_reference:
-        kwargs['rtol'] = reference_rtol
-        kwargs['atol'] = reference_atol
-    else:
-        assert constant_timestep
-        kwargs['constant_timestep'] = constant_timestep
-
     problem, options = build_problem(problem, lang, integrator_type,
                                      reuse=reuse,
                                      vector_size=vector_size,
@@ -145,7 +131,8 @@ def build_case(problem, lang, is_reference=False,
                                      device_type=device_type,
                                      maximum_steps=max_steps,
                                      logging=False,
-                                     **kwargs)
+                                     rtol=rtol,
+                                     atol=atol)
 
     # get IVP and integrator
     ivp, integrator = create_integrator(problem, integrator_type, options,
@@ -159,9 +146,9 @@ class NanException(Exception):
 
 
 def run_case(num, phir, test, test_problem,
-             t_end, norm_rtol=1e-6, norm_atol=1e-10,
-             condition_norm=2,
-             ivp_norm=np.inf, results={}):
+             t_end, name, norm_rtol=1e-6, norm_atol=1e-10,
+             condition_norm=2, ivp_norm=np.inf, results={},
+             num_repeats=5):
     """
     Run the :param:`test` integrator over :param:`num`
     problems, to end time :param:`t_end`, using constant integration timesteps
@@ -188,9 +175,14 @@ def run_case(num, phir, test, test_problem,
         see IN in the equation below
     results: dict
         If 'true', store the test results here
+    num_repeats: int
+        The number of times to run the case, in order to get more reliable runtime
+        estimations
 
     Returns
     -------
+    runtimes: list of float
+        The runtimes for the solver in milliseconds
     norm_error: :class:`np.ndarray`
         The weighted root-mean-squared error, calculate as:
 
@@ -216,15 +208,21 @@ def run_case(num, phir, test, test_problem,
 
     if results:
         # store rtol / atol / etc. if not already there
-        __store_check('norm_atol', norm_atol)
-        __store_check('norm_rtol', norm_rtol)
         __store_check('condition_norm', condition_norm)
         __store_check('ivp_norm', ivp_norm)
 
     # run test
-    _, phit = test_problem.run(test, num, t_end, t_start=0, return_state=True)
+    runtimes = []
+    print('{}/{}'.format(1, num_repeats))
+    rt, phit = test_problem.run(test, num, t_end, t_start=0, return_state=True)
+    runtimes.append(rt)
+    for i in range(1, num_repeats):
+        print('{}/{}'.format(i + 1, num_repeats))
+        rt, _ = test_problem.run(test, num, t_end, t_start=0, return_state=True)
+        runtimes.append(rt)
+
     if results:
-        __store_check('test_{}'.format(test.constant_timestep()), phit)
+        __store_check('test_{}'.format(name), phit)
 
     if np.any(phit != phit):
         logger = logging.getLogger(__name__)
@@ -235,22 +233,22 @@ def run_case(num, phir, test, test_problem,
     # calculate condition norm
     phir_limited = np.take(phir, np.arange(num), axis=0)
     err = (np.abs(phit - phir_limited) / (
-        norm_atol + np.abs(phir_limited) * norm_rtol)).squeeze()
+        norm_atol / norm_rtol + np.abs(phir_limited))).squeeze()
     err = np.linalg.norm(err, ord=condition_norm, axis=1)
 
     # calculate ivp norm
     err = np.linalg.norm(err, ord=ivp_norm, axis=0)
 
     if results:
-        __store_check('err_{}'.format(test.constant_timestep()), err)
+        __store_check('err_{}'.format(name), err)
 
-    return err
+    return runtimes, err
 
 
 def run_validation(num, reference, ref_problem,
-                   t_end, test_builder, step_start=1e-3, step_end=1e-8,
+                   t_end, test_builder, solvers, tol_start=1e-4, tol_end=1e-15,
                    norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
-                   ivp_norm=np.inf, label='', plot_filename='',
+                   ivp_norm=np.inf, plot_filename='',
                    error_filename='', reuse=False, num_points=10):
     """
     Run the validation case for the test integrator using constant time-steps ranging
@@ -266,12 +264,14 @@ def run_validation(num, reference, ref_problem,
         The constructed problem for the reference integrator
     t_end: float
         The integration end time to use for all validation case
-    step_start: float
-        The largest constant integration step-size to use for the test integrator
-        validation
-    step_end: float
-        the smallest constant integration step-size to use for the test integrator
-        validation
+    tol_start: float
+        The largest adaptive tolerance (used for RTOL & ATOL) to use in validation
+        testing
+    tol_end: float
+        The smallest adaptive tolerance (used for RTOL & ATOL) to use in validation
+        testing
+    solvers: list of solver_type's
+        If specified, run the validation case over all the solvers on the list.
     norm_atol: float [1e-10]
         The absolute tolerance used in error normalization
     norm_rtol: float [1e-06]
@@ -324,51 +324,54 @@ def run_validation(num, reference, ref_problem,
         # save results to file as intermediate results
         np.savez(error_filename, **results)
 
-    start = np.rint(np.log10(step_start))
-    end = np.rint(np.log10(step_end))
     # determine direction of progression, and ensure that the final step-size is
     # included
-    steps = np.logspace(start, end, num=num_points)
-    errs = np.zeros(steps.size)
+    tols = np.logspace(np.log10(tol_start), np.log10(tol_end), num=num_points)
+    errs = np.zeros(tols.size)
+    runtimes = [None for i in range(tols.size)]
     test_order = None
 
-    for i, size in enumerate(steps):
-        testivp, test_problem, test = test_builder(steps[i], iteration=i)
+    for j, solver in enumerate(solvers):
+        for i, tol in enumerate(tols):
+            testivp, test_problem, test = test_builder(
+                tol, tol, iteration=i, solver=solver)
 
-        if test_order is None:
-            test_order = test.solver_order()
+            if test_order is None:
+                test_order = test.solver_order()
 
-        try:
-            errs[i] = run_case(num, phir,
-                               test, test_problem,
-                               t_end, norm_rtol=norm_rtol, norm_atol=norm_atol,
-                               condition_norm=condition_norm, ivp_norm=ivp_norm,
-                               results=results if error_filename else False)
-        except NanException:
-            pass
+            try:
+                runtimes[i], errs[i] = run_case(
+                    num, phir, test, test_problem, t_end,
+                    '{}_{}'.format(solver, tol),
+                    norm_rtol=norm_rtol, norm_atol=norm_atol,
+                    condition_norm=condition_norm, ivp_norm=ivp_norm,
+                    results=results if error_filename else False)
+            except NanException:
+                pass
 
-        # save results to file as intermediate results
-        if error_filename:
+            # save results to file as intermediate results
+            if error_filename:
+                np.savez(error_filename, **results)
+
+            del testivp
+            del test_problem
+            del test
+
+            print(tols[i], errs[i])
+
+        if results:
+            # save to file
             np.savez(error_filename, **results)
 
-        del testivp
-        del test_problem
-        del test
+        # filter
+        good = np.where(errs != 0)
+        errs = errs[good]
+        steps = tols[good]
 
-        print(steps[i], errs[i])
-
-    if results:
-        # save to file
-        np.savez(error_filename, **results)
-
-    # filter
-    good = np.where(errs != 0)
-    errs = errs[good]
-    steps = steps[good]
-
-    if have_plotter():
-        ref_problem.plot(steps, errs, t_end, label=label,
-                         order=test_order, plot_filename=plot_filename)
+        if have_plotter():
+            ref_problem.plot(runtimes, errs, label=solver,
+                             order=test_order, plot_filename=plot_filename,
+                             final=j == len(solvers) - 1)
 
     return steps, errs
 
@@ -418,19 +421,24 @@ def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=Fal
                         help='The number of timesteps to use for validation between '
                              'the start and end times.')
 
-    parser.add_argument('-ss', '--starting_stepsize',
+    parser.add_argument('-ss', '--starting_tolerance',
                         default=None,
                         type=float,
-                        help='If supplied, the starting validation step-size.')
+                        help='If supplied, the starting validation tolerance.')
 
-    parser.add_argument('-se', '--ending_stepsize',
+    parser.add_argument('-se', '--ending_tolerance',
                         default=None,
                         type=float,
-                        help='If supplied, the final validation step-size.')
+                        help='If supplied, the final validation tolerance.')
 
     # and change default max steps
     parser.set_defaults(max_steps=float(1e9))
 
+    # and help text on the integrator type
+    parser.add_argument('-it', '--int_type',
+                        type=str,
+                        required=True,
+                        help='A comma separated list of integrators to validate.')
     if get_parser:
         return parser
 

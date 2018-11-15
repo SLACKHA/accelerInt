@@ -85,14 +85,6 @@ class Ignition_valid(ValidationProblem, Ignition):
             self.phi, self.pressure = initializer(num, self.conp)
         self.init = True
 
-    @property
-    def step_start(self):
-        return 1e-7
-
-    @property
-    def step_end(self):
-        return 1e-9
-
     def get_default_endtime(self):
         """
         Return the default end-time for this Problem
