@@ -471,7 +471,7 @@ def create_integrator(problem, integrator_type, options, num_threads):
 ################
 
 def build_parser(helptext='Run the pyccelerInt examples.', get_parser=False):
-    parser = argparse.ArgumentParser(helptext)
+    parser = argparse.ArgumentParser(helptext, conflict_handler='resolve')
     parser.add_argument('-c', '--case',
                         choices=['vdp', 'pyjac'],
                         required=True,

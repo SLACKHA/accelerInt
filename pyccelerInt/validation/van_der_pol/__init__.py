@@ -55,14 +55,12 @@ class VDP_valid(ValidationProblem, VDP):
         self.phi, self.params = initializer(num)
         self.init = True
 
+    def get_default_endtime(self):
+        """
+        Return the default end-time for validation
+        """
+        return 100
+
     @property
     def plot_name(self):
         return "van der Pol equation"
-
-    @property
-    def step_start(self):
-        return 1
-
-    @property
-    def step_end(self):
-        return 1e-6
