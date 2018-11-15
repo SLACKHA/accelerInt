@@ -54,7 +54,8 @@ class ValidationProblem(object):
             expected = np.zeros_like(errors)
             expected[0] = errors[0]
             for i in range(1, expected.size):
-                expected[i] = expected[i - 1] / np.power(10., order)
+                expected[i] = expected[i - 1] * np.power(
+                    step_sizes[i] / step_sizes[i - 1], order)
 
             plt.loglog(st, expected, label='order ({})'.format(order))
 
