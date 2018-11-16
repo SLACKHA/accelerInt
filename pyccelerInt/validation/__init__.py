@@ -326,7 +326,9 @@ def run_validation(num, reference, ref_problem,
 
     # determine direction of progression, and ensure that the final step-size is
     # included
-    tols = np.logspace(np.log10(tol_start), np.log10(tol_end), num=num_points)
+    tols = np.arange(np.rint(np.log10(tol_start)), np.rint(np.log10(tol_end)) - 1,
+                     step=-1)
+    tols = np.power(10., tols)
     errs = np.zeros(tols.size)
     runtimes = [None for i in range(tols.size)]
     test_order = None
