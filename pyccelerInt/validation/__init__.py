@@ -146,7 +146,7 @@ class NanException(Exception):
 
 
 def run_case(num, phir, test, test_problem,
-             t_end, name, norm_rtol=1e-6, norm_atol=1e-10,
+             t_end, solver, tolerance, norm_rtol=1e-6, norm_atol=1e-10,
              condition_norm=2, ivp_norm=np.inf, results={},
              num_repeats=5):
     """
@@ -196,20 +196,38 @@ def run_case(num, phir, test, test_problem,
                 \right\rVert_{\text{IN}}
     """
 
-    def __store_check(key, value):
+    def __store_check(keylist, value, allow_overwrite=False):
         if not results:
             return
-        if key not in results:
-            results[key] = np.array([value])
-        else:
-            if not np.array_equal(results[key], np.array([value])):
-                raise NanException('Mismatch in results for value {}, stored: {}, ',
-                                   'current: {}'.format(value, results[key], value))
+        if not isinstance(keylist, list):
+            keylist = [keylist]
+
+        whereat = results
+        for i, key in enumerate(keylist):
+            if key not in whereat:
+                # store either a new dictionary if we're not at the last key, or
+                # the value itself
+                whereat[key] = {} if (i < len(keylist) - 1) else np.array([value])
+                whereat = whereat[key]
+            else:
+                if (i < len(keylist) - 1):
+                    # go one level deeper
+                    whereat = whereat[key]
+                    continue
+                elif not np.array_equal(whereat[key], np.array([value])):
+                    msg = ('Mismatch in results for value {}, stored: {}, ',
+                           'current: {}.'.format(value, whereat[key], value))
+                    if allow_overwrite:
+                        msg += '\nOverwriting...'
+                        print(msg)
+                    else:
+                        raise NanException(msg)
 
     if results:
         # store rtol / atol / etc. if not already there
-        __store_check('condition_norm', condition_norm)
-        __store_check('ivp_norm', ivp_norm)
+        __store_check('condition_norm', condition_norm, allow_overwrite=True)
+        __store_check('ivp_norm', ivp_norm, allow_overwrite=True)
+        __store_check('num', num, allow_overwrite=True)
 
     # run test
     runtimes = []
@@ -222,7 +240,7 @@ def run_case(num, phir, test, test_problem,
         runtimes.append(rt)
 
     if results:
-        __store_check('test_{}'.format(name), phit)
+        __store_check(['test', solver, tolerance], phit)
 
     if np.any(phit != phit):
         logger = logging.getLogger(__name__)
@@ -240,7 +258,7 @@ def run_case(num, phir, test, test_problem,
     err = np.linalg.norm(err, ord=ivp_norm, axis=0)
 
     if results:
-        __store_check('err_{}'.format(name), err)
+        __store_check(['err', solver, tolerance], err)
 
     return runtimes, err
 
@@ -344,8 +362,7 @@ def run_validation(num, reference, ref_problem,
             try:
                 runtimes[i], errs[i] = run_case(
                     num, phir, test, test_problem, t_end,
-                    '{}_{}'.format(solver, tol),
-                    norm_rtol=norm_rtol, norm_atol=norm_atol,
+                    solver, tol, norm_rtol=norm_rtol, norm_atol=norm_atol,
                     condition_norm=condition_norm, ivp_norm=ivp_norm,
                     results=results if error_filename else False)
             except NanException:
