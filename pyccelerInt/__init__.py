@@ -34,16 +34,19 @@ def import_wrapper(platform):
                             platform, os.getcwd()))
 
 
-def get_plotter():
+def get_plotter(use_agg=False):
     """
     Returns the matplotlib plotting module, if available
     """
 
     try:
+        if use_agg:
+            import matplotlib as mpl
+            mpl.use('Agg')
         from matplotlib import pyplot as plt
         return plt
     except ImportError:
-        raise Exception('Plotting not available!')
+        raise
 
 
 def have_plotter():
@@ -53,7 +56,7 @@ def have_plotter():
 
     try:
         return get_plotter()
-    except Exception:
+    except ImportError:
         return False
 
 
