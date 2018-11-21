@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     print('Integration finished in {} (s)'.format(time / 1000.))
 
-    if have_plotter():
+    if have_plotter(use_agg=False):
         t, phi = integrator.state()
         problem.plot(0, t, phi)
 

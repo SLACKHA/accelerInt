@@ -97,7 +97,7 @@ class VDP(Problem):
             e.g., via :func:`integrator.state()`
         """
 
-        plt = get_plotter()
+        plt = get_plotter(use_agg=False)
         plt.plot(times, solution[ivp_index, 0, :], label='y1')
         plt.plot(times, solution[ivp_index, 1, :], label='y2')
         plt.ylim(np.min(solution[ivp_index, 0, :]) * 1.05,

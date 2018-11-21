@@ -44,7 +44,7 @@ class ValidationProblem(object):
             The array of normalized errors to plot
         """
 
-        plt = get_plotter(not plot_filename)
+        plt = get_plotter(use_agg=not plot_filename)
         rt_dev = np.zeros(len(runtimes))
         rt = np.zeros(len(runtimes))
         for i in range(len(runtimes)):

@@ -34,7 +34,7 @@ def import_wrapper(platform):
                             platform, os.getcwd()))
 
 
-def get_plotter(use_agg=False):
+def get_plotter(use_agg=True):
     """
     Returns the matplotlib plotting module, if available
     """
@@ -49,13 +49,13 @@ def get_plotter(use_agg=False):
         raise
 
 
-def have_plotter():
+def have_plotter(use_agg=True):
     """
     Return True if we have matplotlib available for plotting
     """
 
     try:
-        return get_plotter()
+        return get_plotter(use_agg=use_agg)
     except ImportError:
         return False
 

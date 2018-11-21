@@ -301,7 +301,7 @@ class Ignition(Problem):
             e.g., via :func:`integrator.state()`
         """
 
-        plt = get_plotter()
+        plt = get_plotter(use_agg=False)
         plt.plot(times, solution[ivp_index, 0, :], label='pyJac')
         plt.ylim(np.min(solution[ivp_index, 0, :]) * 0.95,
                  np.max(solution[ivp_index, 0, :]) * 1.05)
