@@ -169,9 +169,9 @@ class NanException(Exception):
 
 
 def run_case(num, phir, test, test_problem,
-             t_end, solver, tolerance, norm_rtol=1e-6, norm_atol=1e-10,
+             t_end, solver, tolerance, norm_rtol=1e-10, norm_atol=1e-15,
              condition_norm=2, ivp_norm=np.inf, results={},
-             num_repeats=5):
+             num_repeats=5, use_fatode_err=False):
     """
     Run the :param:`test` integrator over :param:`num`
     problems, to end time :param:`t_end`, using constant integration timesteps
@@ -281,10 +281,20 @@ def run_case(num, phir, test, test_problem,
     # calculate ivp norm
     err = np.linalg.norm(err, ord=ivp_norm, axis=0)
 
+    err_fatode = (np.linalg.norm(np.abs(
+        phit - phir_limited), ord=condition_norm, axis=1) / np.linalg.norm(
+        phir_limited, ord=condition_norm, axis=1)).squeeze()
+    err_fatode = np.linalg.norm(err_fatode, ord=ivp_norm, axis=0)
+
+    ret_err = err
+    if use_fatode_err:
+        ret_err = err_fatode
+
     if results:
         __store_check(['err', solver, tolerance], err)
+        __store_check(['err_fatode', solver, tolerance], err_fatode)
 
-    return runtimes, err
+    return runtimes, ret_err
 
 
 def run_validation(num, reference, ref_problem,
@@ -434,6 +444,7 @@ def run_validation(num, reference, ref_problem,
                 # the stored data doesn't match
                 __delete(['test', solver, tol])
                 __delete(['err', solver, tol])
+                __delete(['err_fatode', solver, tol])
 
             testivp, test_problem, test = test_builder(
                 tol, tol, iteration=i and built_any, solver=solver)
