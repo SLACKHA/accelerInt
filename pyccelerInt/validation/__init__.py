@@ -32,7 +32,7 @@ class ValidationProblem(object):
         raise NotImplementedError
 
     def linestyle(self, index):
-        ls = ['-', '-.', ':', '--']
+        ls = ['-.', ':', '--', '-']
         return ls[index % len(ls)]
 
     def markerstyle(self, index):
@@ -40,7 +40,8 @@ class ValidationProblem(object):
         return ms[index % len(ms)]
 
     def color(self, plt, num_solvers, index):
-        return plt.get_cmap('inferno', num_solvers + 1)(index)
+        ns = min(num_solvers, 4)
+        return plt.get_cmap('inferno', ns)(index % ns)
 
     def use_agg(self, plot_filename):
         return not plot_filename
@@ -73,10 +74,16 @@ class ValidationProblem(object):
         if index == num_solvers - 1:
             plt.xscale('log', basex=10)
             plt.yscale('log', basey=10)
-            plt.legend(loc=0)
-            plt.ylabel('|E|')
-            plt.xlabel('CPU Time (ms)')
-            plt.title(self.plot_name)
+            plt.ylabel('|E|', fontsize=16)
+            plt.xlabel('CPU Time (ms)', fontsize=16)
+            plt.legend(**{'loc': 0,
+                          'fontsize': 16,
+                          'numpoints': 1,
+                          'shadow': True,
+                          'fancybox': True})
+            plt.tick_params(axis='both', which='major', labelsize=14)
+            plt.tick_params(axis='both', which='minor', labelsize=10)
+            plt.tight_layout()
             if not plot_filename:
                 plt.show()
             else:
@@ -231,7 +238,7 @@ def run_case(num, phir, test, test_problem,
                     whereat = whereat[key]
                     continue
                 elif not np.array_equal(whereat[key], np.array([value])):
-                    msg = ('Mismatch in results for value {}, stored: {}, ',
+                    msg = ('Mismatch in results for value {}, stored: {}, '
                            'current: {}.'.format(value, whereat[key], value))
                     if allow_overwrite:
                         msg += '\nOverwriting...'
@@ -257,6 +264,7 @@ def run_case(num, phir, test, test_problem,
 
     if results:
         __store_check(['test', solver, tolerance], phit)
+        __store_check(['runtimes', solver, tolerance], runtimes)
 
     if np.any(phit != phit):
         logger = logging.getLogger(__name__)
@@ -283,7 +291,7 @@ def run_validation(num, reference, ref_problem,
                    t_end, test_builder, solvers, tol_start=1e-4, tol_end=1e-15,
                    norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
                    ivp_norm=np.inf, plot_filename='',
-                   error_filename='', reuse=False, num_points=10):
+                   error_filename='', reuse=False):
     """
     Run the validation case for the test integrator using constant time-steps ranging
     from :param:`step_start` to `step_end`
@@ -344,8 +352,23 @@ def run_validation(num, reference, ref_problem,
             raise Exception('Error filename must be supplied to reuse past '
                             'validation!')
 
+        def dictify(npz):
+            npz = dict(npz)
+            for key in npz:
+                if isinstance(npz[key], np.ndarray) and \
+                        npz[key].dtype == np.dtype(object):
+                    assert npz[key].size == 1
+                    # nested dict
+                    npz[key] = dictify(npz[key].item())
+                elif isinstance(npz[key], dict):
+                    # nested dict
+                    npz[key] = dictify(npz[key])
+                else:
+                    continue
+            return npz
+
         # load from npz
-        results = np.load(error_filename)
+        results = dictify(np.load(error_filename))
         phir = results['phi_valid']
     else:
         # run reference problem once
@@ -375,34 +398,49 @@ def run_validation(num, reference, ref_problem,
                 return False
             if i == len(keylist) - 1:
                 # run test
-                test(whereat[key])
+                return test(whereat[key])
             else:
                 whereat = whereat[key]
 
     def __delete(keylist):
         whereat = results
         for i, key in enumerate(keylist):
+            if key not in whereat:
+                return
             if i == len(keylist) - 1:
-                # run test
                 del whereat[key]
             else:
                 whereat = whereat[key]
 
+    def __load(keylist):
+        whereat = results
+        for i, key in enumerate(keylist):
+            if key not in whereat:
+                raise Exception(key + ' not in results!')
+            if i == len(keylist) - 1:
+                return whereat[key]
+            else:
+                whereat = whereat[key]
+
+    built_any = False
     for j, solver in enumerate(solvers):
         for i, tol in enumerate(tols):
-            testivp, test_problem, test = test_builder(
-                tol, tol, iteration=i, solver=solver)
-
-            if test_order is None:
-                test_order = test.solver_order()
-
-            if reuse and __check(['test', solver, tol], lambda x: x.shape[0] == num):
+            if reuse and __check(['test', solver, tol], lambda x: x.shape[1] == num):
+                runtimes[i] = __load(['runtimes', solver, tol])
+                errs[i] = __load(['err', solver, tol])
                 # we have data for this solution
                 continue
             elif reuse:
                 # the stored data doesn't match
                 __delete(['test', solver, tol])
                 __delete(['err', solver, tol])
+
+            testivp, test_problem, test = test_builder(
+                tol, tol, iteration=i and built_any, solver=solver)
+            built_any = True
+
+            if test_order is None:
+                test_order = test.solver_order()
 
             try:
                 runtimes[i], errs[i] = run_case(
@@ -479,12 +517,6 @@ def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=Fal
                         action='store_true',
                         help='If supplied, attempt to reuse the completed runs '
                              'from the `error_filename`.')
-
-    parser.add_argument('-nv', '--num_validation',
-                        default=10,
-                        type=int,
-                        help='The number of timesteps to use for validation between '
-                             'the start and end times.')
 
     parser.add_argument('-ss', '--starting_tolerance',
                         default=None,
