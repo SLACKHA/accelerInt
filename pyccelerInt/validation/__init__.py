@@ -31,8 +31,22 @@ class ValidationProblem(object):
     def plot_name(self):
         raise NotImplementedError
 
+    def linestyle(self, index):
+        ls = ['-', '-.', ':', '--']
+        return ls[index % len(ls)]
+
+    def markerstyle(self, index):
+        ms = ['.', 'v', 's', '*', 'd']
+        return ms[index % len(ms)]
+
+    def color(self, plt, num_solvers, index):
+        return plt.get_cmap('inferno', num_solvers + 1)(index)
+
+    def use_agg(self, plot_filename):
+        return not plot_filename
+
     def plot(self, runtimes, errors, label='', order=None,
-             plot_filename='', final=False):
+             plot_filename='', index=None, num_solvers=None):
         """
         Plot the validation curve for this problem
 
@@ -44,17 +58,19 @@ class ValidationProblem(object):
             The array of normalized errors to plot
         """
 
-        plt = get_plotter(use_agg=not plot_filename)
+        plt = get_plotter(use_agg=self.use_agg(plot_filename))
         rt_dev = np.zeros(len(runtimes))
         rt = np.zeros(len(runtimes))
         for i in range(len(runtimes)):
             rt_dev[i] = np.std(runtimes[i])
             rt[i] = np.mean(runtimes[i])
         # convert stepsizes to steps taken
-        plt.errorbar(rt, errors, xerr=rt_dev, marker='.', linestyle='',
-                     label=label)
+        plt.errorbar(rt, errors, xerr=rt_dev, marker=self.markerstyle(index),
+                     linestyle=self.linestyle(index), label=label,
+                     color=self.color(plt, num_solvers, index),
+                     markerfacecolor='none')
 
-        if final:
+        if index == num_solvers - 1:
             plt.xscale('log', basex=10)
             plt.yscale('log', basey=10)
             plt.legend(loc=0)
@@ -329,7 +345,8 @@ def run_validation(num, reference, ref_problem,
                             'validation!')
 
         # load from npz
-        phir = np.load(error_filename)['phi_valid']
+        results = np.load(error_filename)
+        phir = results['phi_valid']
     else:
         # run reference problem once
         # run validation
@@ -351,6 +368,26 @@ def run_validation(num, reference, ref_problem,
     runtimes = [None for i in range(tols.size)]
     test_order = None
 
+    def __check(keylist, test):
+        whereat = results
+        for i, key in enumerate(keylist):
+            if key not in whereat:
+                return False
+            if i == len(keylist) - 1:
+                # run test
+                test(whereat[key])
+            else:
+                whereat = whereat[key]
+
+    def __delete(keylist):
+        whereat = results
+        for i, key in enumerate(keylist):
+            if i == len(keylist) - 1:
+                # run test
+                del whereat[key]
+            else:
+                whereat = whereat[key]
+
     for j, solver in enumerate(solvers):
         for i, tol in enumerate(tols):
             testivp, test_problem, test = test_builder(
@@ -358,6 +395,14 @@ def run_validation(num, reference, ref_problem,
 
             if test_order is None:
                 test_order = test.solver_order()
+
+            if reuse and __check(['test', solver, tol], lambda x: x.shape[0] == num):
+                # we have data for this solution
+                continue
+            elif reuse:
+                # the stored data doesn't match
+                __delete(['test', solver, tol])
+                __delete(['err', solver, tol])
 
             try:
                 runtimes[i], errs[i] = run_case(
@@ -390,7 +435,8 @@ def run_validation(num, reference, ref_problem,
         if have_plotter():
             ref_problem.plot(runtimes, errs, label=solver,
                              order=test_order, plot_filename=plot_filename,
-                             final=j == len(solvers) - 1)
+                             num_solvers=len(solvers),
+                             index=j)
 
     return steps, errs
 
@@ -431,7 +477,7 @@ def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=Fal
     parser.add_argument('-rv', '--reuse_validation',
                         default=False,
                         action='store_true',
-                        help='If supplied, attempt to reuse the validation data '
+                        help='If supplied, attempt to reuse the completed runs '
                              'from the `error_filename`.')
 
     parser.add_argument('-nv', '--num_validation',
