@@ -40,8 +40,8 @@ class ValidationProblem(object):
         return ms[index % len(ms)]
 
     def color(self, plt, num_solvers, index):
-        ns = min(num_solvers, 4)
-        return plt.get_cmap('inferno', ns)(index % ns)
+        ns = num_solvers + 1
+        return plt.get_cmap('inferno', ns)(index)
 
     def use_agg(self, plot_filename):
         return not plot_filename
