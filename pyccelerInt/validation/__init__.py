@@ -76,17 +76,21 @@ class ValidationProblem(object):
             plt.xscale('log', basex=10)
             plt.yscale('log', basey=10)
             ylabel = '|E|'
+            legend_fontsize = 20
+            label_fontsize = 24
+            tick_size = 20
+            minor_size = 16
             if use_latex:
                 ylabel = r'$\left\lVert E\right\rVert$'
-            plt.ylabel(ylabel, fontsize=16)
-            plt.xlabel('CPU Time (ms)', fontsize=16)
+            plt.ylabel(ylabel, fontsize=label_fontsize)
+            plt.xlabel('CPU Time (ms)', fontsize=label_fontsize)
             plt.legend(**{'loc': 0,
-                          'fontsize': 16,
+                          'fontsize': legend_fontsize,
                           'numpoints': 1,
                           'shadow': True,
                           'fancybox': True})
-            plt.tick_params(axis='both', which='major', labelsize=14)
-            plt.tick_params(axis='both', which='minor', labelsize=10)
+            plt.tick_params(axis='both', which='major', labelsize=tick_size)
+            plt.tick_params(axis='both', which='minor', labelsize=minor_size)
             plt.tight_layout()
             if not plot_filename:
                 plt.show()
