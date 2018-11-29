@@ -57,7 +57,8 @@ if __name__ == '__main__':
         tol_end=te,
         plot_filename=args.plot_filename,
         error_filename=args.error_filename,
-        reuse=args.reuse_validation)
+        reuse=args.reuse_validation,
+        recalculate_error=args.recalculate_error)
 
     # and cleanup
     del refivp

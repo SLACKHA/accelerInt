@@ -168,9 +168,65 @@ class NanException(Exception):
     pass
 
 
+def __store_check(results, keylist, value, allow_overwrite=False):
+    if not results:
+        return
+    if not isinstance(keylist, list):
+        keylist = [keylist]
+
+    whereat = results
+    for i, key in enumerate(keylist):
+        if key not in whereat:
+            # store either a new dictionary if we're not at the last key, or
+            # the value itself
+            whereat[key] = {} if (i < len(keylist) - 1) else np.array([value])
+            whereat = whereat[key]
+        else:
+            if (i < len(keylist) - 1):
+                # go one level deeper
+                whereat = whereat[key]
+                continue
+            elif not np.array_equal(whereat[key], np.array([value])):
+                msg = ('Mismatch in results for value {}, stored: {}, '
+                       'current: {}.'.format(value, whereat[key], value))
+                if allow_overwrite:
+                    msg += '\nOverwriting...'
+                    print(msg)
+                    whereat[key] = np.array([value])
+                else:
+                    raise NanException(msg)
+
+
+def calc_error(solver, tolerance, phir, phit, norm_rtol, norm_atol,
+               condition_norm, ivp_norm, results={},
+               use_fatode_err=False, recalc=False):
+    # calculate condition norm
+    err = (np.abs(phit - phir) / (
+        norm_atol + norm_rtol * np.abs(phir))).squeeze()
+    err = np.linalg.norm(err, ord=condition_norm, axis=1)
+
+    # calculate ivp norm
+    err = np.linalg.norm(err, ord=ivp_norm, axis=0)
+
+    err_fatode = (np.linalg.norm(np.abs(
+        phit - phir), ord=condition_norm, axis=1) / np.linalg.norm(
+        phir, ord=condition_norm, axis=1)).squeeze()
+    err_fatode = np.linalg.norm(err_fatode, ord=ivp_norm, axis=0)
+
+    ret_err = err
+    if use_fatode_err:
+        ret_err = err_fatode
+
+    if results:
+        __store_check(results, ['err', solver, tolerance], err, recalc)
+        __store_check(results, ['err_fatode', solver, tolerance], err_fatode, recalc)
+
+    return ret_err
+
+
 def run_case(num, phir, test, test_problem,
-             t_end, solver, tolerance, norm_rtol=1e-10, norm_atol=1e-15,
-             condition_norm=2, ivp_norm=np.inf, results={},
+             t_end, solver, tolerance, norm_rtol, norm_atol,
+             condition_norm, ivp_norm, results={},
              num_repeats=5, use_fatode_err=False):
     """
     Run the :param:`test` integrator over :param:`num`
@@ -219,38 +275,12 @@ def run_case(num, phir, test, test_problem,
                 \right\rVert_{\text{IN}}
     """
 
-    def __store_check(keylist, value, allow_overwrite=False):
-        if not results:
-            return
-        if not isinstance(keylist, list):
-            keylist = [keylist]
-
-        whereat = results
-        for i, key in enumerate(keylist):
-            if key not in whereat:
-                # store either a new dictionary if we're not at the last key, or
-                # the value itself
-                whereat[key] = {} if (i < len(keylist) - 1) else np.array([value])
-                whereat = whereat[key]
-            else:
-                if (i < len(keylist) - 1):
-                    # go one level deeper
-                    whereat = whereat[key]
-                    continue
-                elif not np.array_equal(whereat[key], np.array([value])):
-                    msg = ('Mismatch in results for value {}, stored: {}, '
-                           'current: {}.'.format(value, whereat[key], value))
-                    if allow_overwrite:
-                        msg += '\nOverwriting...'
-                        print(msg)
-                    else:
-                        raise NanException(msg)
-
     if results:
         # store rtol / atol / etc. if not already there
-        __store_check('condition_norm', condition_norm, allow_overwrite=True)
-        __store_check('ivp_norm', ivp_norm, allow_overwrite=True)
-        __store_check('num', num, allow_overwrite=True)
+        __store_check(results, 'condition_norm', condition_norm,
+                      allow_overwrite=True)
+        __store_check(results, 'ivp_norm', ivp_norm, allow_overwrite=True)
+        __store_check(results, 'num', num, allow_overwrite=True)
 
     # run test
     runtimes = []
@@ -263,8 +293,8 @@ def run_case(num, phir, test, test_problem,
         runtimes.append(rt)
 
     if results:
-        __store_check(['test', solver, tolerance], phit)
-        __store_check(['runtimes', solver, tolerance], runtimes)
+        __store_check(results, ['test', solver, tolerance], phit)
+        __store_check(results, ['runtimes', solver, tolerance], runtimes)
 
     if np.any(phit != phit):
         logger = logging.getLogger(__name__)
@@ -274,34 +304,19 @@ def run_case(num, phir, test, test_problem,
 
     # calculate condition norm
     phir_limited = np.take(phir, np.arange(num), axis=0)
-    err = (np.abs(phit - phir_limited) / (
-        norm_atol / norm_rtol + np.abs(phir_limited))).squeeze()
-    err = np.linalg.norm(err, ord=condition_norm, axis=1)
+    err = calc_error(solver, tolerance, phir_limited, phit, norm_rtol=norm_rtol,
+                     norm_atol=norm_atol, condition_norm=condition_norm,
+                     ivp_norm=ivp_norm, results=results,
+                     use_fatode_err=use_fatode_err)
 
-    # calculate ivp norm
-    err = np.linalg.norm(err, ord=ivp_norm, axis=0)
-
-    err_fatode = (np.linalg.norm(np.abs(
-        phit - phir_limited), ord=condition_norm, axis=1) / np.linalg.norm(
-        phir_limited, ord=condition_norm, axis=1)).squeeze()
-    err_fatode = np.linalg.norm(err_fatode, ord=ivp_norm, axis=0)
-
-    ret_err = err
-    if use_fatode_err:
-        ret_err = err_fatode
-
-    if results:
-        __store_check(['err', solver, tolerance], err)
-        __store_check(['err_fatode', solver, tolerance], err_fatode)
-
-    return runtimes, ret_err
+    return runtimes, err
 
 
 def run_validation(num, reference, ref_problem,
                    t_end, test_builder, solvers, tol_start=1e-4, tol_end=1e-15,
-                   norm_rtol=1e-6, norm_atol=1e-10, condition_norm=2,
+                   norm_rtol=1e-06, norm_atol=1e-10, condition_norm=2,
                    ivp_norm=np.inf, plot_filename='',
-                   error_filename='', reuse=False):
+                   error_filename='', reuse=False, recalculate_error=False):
     """
     Run the validation case for the test integrator using constant time-steps ranging
     from :param:`step_start` to `step_end`
@@ -437,8 +452,17 @@ def run_validation(num, reference, ref_problem,
         for i, tol in enumerate(tols):
             if reuse and __check(['test', solver, tol], lambda x: x.shape[1] == num):
                 runtimes[i] = __load(['runtimes', solver, tol])
-                errs[i] = __load(['err', solver, tol])
                 # we have data for this solution
+                if recalculate_error:
+                    phir_limited = np.take(phir, np.arange(num), axis=0)
+                    phit = __load(['test', solver, tol]).squeeze()
+                    calc_error(solver, tol, phir_limited, phit,
+                               norm_rtol=norm_rtol, norm_atol=norm_atol,
+                               condition_norm=condition_norm,
+                               ivp_norm=ivp_norm, results=results,
+                               recalc=True)
+
+                errs[i] = __load(['err', solver, tol])
                 continue
             elif reuse:
                 # the stored data doesn't match
@@ -528,6 +552,12 @@ def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=Fal
                         action='store_true',
                         help='If supplied, attempt to reuse the completed runs '
                              'from the `error_filename`.')
+
+    parser.add_argument('-rce', '--recalculate_error',
+                        default=False,
+                        action='store_true',
+                        help='If supplied, recalculate the error stored in the '
+                             '`error_filename`, using the (potentially) new norms.')
 
     parser.add_argument('-ss', '--starting_tolerance',
                         default=None,
