@@ -36,7 +36,7 @@ class ValidationProblem(object):
         return ls[index % len(ls)]
 
     def markerstyle(self, index):
-        ms = ['.', 'v', 's', '*', 'd']
+        ms = ['.', 'v', 's', 'p']
         return ms[index % len(ms)]
 
     def color(self, plt, num_solvers, index):
@@ -67,10 +67,11 @@ class ValidationProblem(object):
             rt_dev[i] = np.std(runtimes[i])
             rt[i] = np.mean(runtimes[i])
         # convert stepsizes to steps taken
+        markersize = 10
         plt.errorbar(rt, errors, xerr=rt_dev, marker=self.markerstyle(index),
                      linestyle=self.linestyle(index), label=label,
                      color=self.color(plt, num_solvers, index),
-                     markerfacecolor='none')
+                     markerfacecolor='none', markersize=markersize)
 
         if index == num_solvers - 1:
             plt.xscale('log', basex=10)
