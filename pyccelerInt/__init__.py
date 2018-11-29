@@ -34,7 +34,7 @@ def import_wrapper(platform):
                             platform, os.getcwd()))
 
 
-def get_plotter(use_agg=True):
+def get_plotter(use_agg=True, use_latex=True):
     """
     Returns the matplotlib plotting module, if available
     """
@@ -43,6 +43,12 @@ def get_plotter(use_agg=True):
         if use_agg:
             import matplotlib as mpl
             mpl.use('Agg')
+        if use_latex:
+            import matplotlib as mpl
+            mpl.rc('text', usetex=True)
+            mpl.rc('font', family='serif')
+            mpl.rc('text.latex',
+                   preamble=r'\usepackage{amsmath}')
         from matplotlib import pyplot as plt
         return plt
     except ImportError:

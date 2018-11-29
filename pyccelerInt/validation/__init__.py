@@ -47,7 +47,8 @@ class ValidationProblem(object):
         return not plot_filename
 
     def plot(self, runtimes, errors, label='', order=None,
-             plot_filename='', index=None, num_solvers=None):
+             plot_filename='', index=None, num_solvers=None,
+             use_latex=True):
         """
         Plot the validation curve for this problem
 
@@ -59,7 +60,7 @@ class ValidationProblem(object):
             The array of normalized errors to plot
         """
 
-        plt = get_plotter(use_agg=self.use_agg(plot_filename))
+        plt = get_plotter(use_agg=self.use_agg(plot_filename), use_latex=use_latex)
         rt_dev = np.zeros(len(runtimes))
         rt = np.zeros(len(runtimes))
         for i in range(len(runtimes)):
@@ -74,7 +75,10 @@ class ValidationProblem(object):
         if index == num_solvers - 1:
             plt.xscale('log', basex=10)
             plt.yscale('log', basey=10)
-            plt.ylabel('|E|', fontsize=16)
+            ylabel = '|E|'
+            if use_latex:
+                ylabel = r'$\left\lVert E\right\rVert$'
+            plt.ylabel(ylabel, fontsize=16)
             plt.xlabel('CPU Time (ms)', fontsize=16)
             plt.legend(**{'loc': 0,
                           'fontsize': 16,
