@@ -208,27 +208,38 @@ def __store_check(results, keylist, value, allow_overwrite=False):
 
 def calc_error(solver, tolerance, phir, phit, norm_rtol, norm_atol,
                condition_norm, ivp_norm, results={},
-               use_fatode_err=False, recalc=False):
+               use_fatode_err=False, use_rel_err=False, recalc=False):
     # calculate condition norm
     err = (np.abs(phit - phir) / (
         norm_atol + norm_rtol * np.abs(phir))).squeeze()
     err = np.linalg.norm(err, ord=condition_norm, axis=1)
-
     # calculate ivp norm
     err = np.linalg.norm(err, ord=ivp_norm, axis=0)
 
+    # calculate fatode error
     err_fatode = (np.linalg.norm(np.abs(
         phit - phir), ord=condition_norm, axis=1) / np.linalg.norm(
         phir, ord=condition_norm, axis=1)).squeeze()
     err_fatode = np.linalg.norm(err_fatode, ord=ivp_norm, axis=0)
 
+    # calculate simple relative error
+    err_rel = (np.abs(phit - phir) / (
+        1e-30 + np.abs(phir))).squeeze()
+    err_rel = np.linalg.norm(err_rel, ord=condition_norm, axis=1)
+    # calculate ivp norm
+    err_rel = np.linalg.norm(err_rel, ord=ivp_norm, axis=0)
+
     ret_err = err
     if use_fatode_err:
         ret_err = err_fatode
+    if use_rel_err:
+        print('using relative error: ', err_rel)
+        ret_err = err_rel
 
     if results:
         __store_check(results, ['err', solver, tolerance], err, recalc)
         __store_check(results, ['err_fatode', solver, tolerance], err_fatode, recalc)
+        __store_check(results, ['err_rel', solver, tolerance], err_rel, recalc)
 
     return ret_err
 
@@ -465,13 +476,11 @@ def run_validation(num, reference, ref_problem,
                 if recalculate_error:
                     phir_limited = np.take(phir, np.arange(num), axis=0)
                     phit = __load(['test', solver, tol]).squeeze()
-                    calc_error(solver, tol, phir_limited, phit,
-                               norm_rtol=norm_rtol, norm_atol=norm_atol,
-                               condition_norm=condition_norm,
-                               ivp_norm=ivp_norm, results=results,
-                               recalc=True)
-
-                errs[i] = __load(['err', solver, tol])
+                    errs[i] = calc_error(solver, tol, phir_limited, phit,
+                                         norm_rtol=norm_rtol, norm_atol=norm_atol,
+                                         condition_norm=condition_norm,
+                                         ivp_norm=ivp_norm, results=results,
+                                         recalc=True)
                 continue
             elif reuse:
                 # the stored data doesn't match
