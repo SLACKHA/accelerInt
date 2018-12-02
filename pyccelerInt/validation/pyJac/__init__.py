@@ -61,6 +61,7 @@ class Ignition_valid(ValidationProblem, Ignition):
         """
 
         Ignition.__init__(self, lang, options, conp=conp)
+        self.regions = {}
 
     def setup(self, num, options, initializer=pyjac_valid):
         """
@@ -94,3 +95,18 @@ class Ignition_valid(ValidationProblem, Ignition):
     @property
     def plot_name(self):
         return "{} Ignition".format('CONP' if self.conp else 'CONV')
+
+    def plot_specialize(self, solver, runtimes, errors, tols):
+        switch_1 = np.where(tols == 1e-07)[0][0]
+        switch_2 = np.where(tols == 1e-11)[0][0]
+        if solver not in self.regions:
+            self.regions[solver] = {}
+        self.regions[solver][1e-07] = np.mean(runtimes[switch_1])
+        self.regions[solver][1e-11] = np.mean(runtimes[switch_2])
+
+    def finalize_specializaton(self, plt):
+        # draw regions
+        region_1 = np.mean([self.regions[sol][1e-07] for sol in self.regions])
+        region_2 = np.mean([self.regions[sol][1e-11] for sol in self.regions])
+        plt.axvspan(region_1, region_2, facecolor='lightgrey',
+                    alpha=0.5, zorder=0)

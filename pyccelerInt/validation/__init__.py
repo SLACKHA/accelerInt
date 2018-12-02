@@ -48,7 +48,7 @@ class ValidationProblem(object):
 
     def plot(self, runtimes, errors, label='', order=None,
              plot_filename='', index=None, num_solvers=None,
-             use_latex=True):
+             use_latex=True, tols=None):
         """
         Plot the validation curve for this problem
 
@@ -72,6 +72,7 @@ class ValidationProblem(object):
                      linestyle=self.linestyle(index), label=label,
                      color=self.color(plt, num_solvers, index),
                      markerfacecolor='none', markersize=markersize)
+        self.plot_specialize(label, runtimes, errors, tols)
 
         if index == num_solvers - 1:
             plt.xscale('log', basex=10)
@@ -93,10 +94,17 @@ class ValidationProblem(object):
             plt.tick_params(axis='both', which='major', labelsize=tick_size)
             plt.tick_params(axis='both', which='minor', labelsize=minor_size)
             plt.tight_layout()
+            self.finalize_specializaton(plt)
             if not plot_filename:
                 plt.show()
             else:
                 plt.savefig(plot_filename)
+
+    def plot_specialize(self, solver, runtimes, errors, tols):
+        pass
+
+    def finalize_specializaton(self, plt):
+        pass
 
 
 def build_case(problem, lang, rtol, atol,
@@ -469,8 +477,8 @@ def run_validation(num, reference, ref_problem,
 
     built_any = False
     for j, solver in enumerate(solvers):
+        print(solver)
         for i, tol in enumerate(tols):
-            print(solver)
             if reuse and __check(['test', solver, tol], lambda x: x.shape[1] == num):
                 runtimes[i] = __load(['runtimes', solver, tol])
                 # we have data for this solution
@@ -482,6 +490,8 @@ def run_validation(num, reference, ref_problem,
                                          condition_norm=condition_norm,
                                          ivp_norm=ivp_norm, results=results,
                                          recalc=True)
+                else:
+                    errs[i] = __load(['err', solver, tol]).squeeze()
                 continue
             elif reuse:
                 # the stored data doesn't match
@@ -528,16 +538,24 @@ def run_validation(num, reference, ref_problem,
             ref_problem.plot(runtimes, errs, label=solver,
                              order=test_order, plot_filename=plot_filename,
                              num_solvers=len(solvers),
-                             index=j)
+                             index=j, tols=tols)
 
     return steps, errs
 
 
 def filetype(value, ext):
-    if not isinstance(value, str):
-        raise argparse.ArgumentError('{} must be a string!'.format(value))
-    if not value.endswith(ext):
-        raise argparse.ArgumentError('{} must be a {} file!'.format(value, ext))
+    if not isinstance(ext, list):
+        ext = [ext]
+
+    found = False
+    for e in ext:
+        if not isinstance(value, str):
+            raise argparse.ArgumentError('{} must be a string!'.format(value))
+        if value.endswith(e):
+            found = True
+    if not found:
+        raise argparse.ArgumentError('{} must be a file of type:({})!'.format(
+            value, ', '.join(ext)))
     return value
 
 
@@ -546,7 +564,7 @@ def npz_file(value):
 
 
 def pdf_file(value):
-    return filetype(value, '.pdf')
+    return filetype(value, ['.pdf', '.eps'])
 
 
 def build_parser(helptext='Run pyccelerInt validation examples.', get_parser=False):
