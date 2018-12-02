@@ -470,6 +470,7 @@ def run_validation(num, reference, ref_problem,
     built_any = False
     for j, solver in enumerate(solvers):
         for i, tol in enumerate(tols):
+            print(solver)
             if reuse and __check(['test', solver, tol], lambda x: x.shape[1] == num):
                 runtimes[i] = __load(['runtimes', solver, tol])
                 # we have data for this solution
