@@ -106,7 +106,6 @@ class Ignition_valid(ValidationProblem, Ignition):
 
     def finalize_specializaton(self, plt):
         # draw regions
-        region_1 = np.mean([self.regions[sol][1e-07] for sol in self.regions])
-        region_2 = np.mean([self.regions[sol][1e-11] for sol in self.regions])
-        plt.axvspan(region_1, region_2, facecolor='lightgrey',
-                    alpha=0.5, zorder=0)
+        region_1 = np.min([self.regions[sol][1e-07] for sol in self.regions])
+        region_2 = np.max([self.regions[sol][1e-11] for sol in self.regions])
+        plt.axvspan(region_1, region_2, facecolor='lightgrey', zorder=0)
