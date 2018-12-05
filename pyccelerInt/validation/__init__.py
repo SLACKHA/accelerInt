@@ -1,5 +1,7 @@
 import logging
 import argparse
+import zipfile
+import sys
 
 import numpy as np
 from pyccelerInt import create_integrator, build_problem, have_plotter, get_plotter
@@ -340,6 +342,42 @@ def run_case(num, phir, test, test_problem,
     return runtimes, err
 
 
+def dictify(npz):
+    npz = dict(npz)
+    for key in npz:
+        if isinstance(npz[key], np.ndarray) and \
+                npz[key].dtype == np.dtype(object):
+            assert npz[key].size == 1
+            # nested dict
+            npz[key] = dictify(npz[key].item())
+        elif isinstance(npz[key], dict):
+            # nested dict
+            npz[key] = dictify(npz[key])
+        else:
+            continue
+    return npz
+
+
+def loadCompressed(fh):
+    try:
+        from deepdish.io import load
+        return load(fh)
+    except ImportError:
+        logger = logging.getLogger(__name__)
+        logger.warn('Package deepdish could not be imported, falling back on plain '
+                    'numpy save / loads. This may break for large validation runs.')
+        return dictify(np.load(fh))
+
+
+# https://stackoverflow.com/a/49034065/1667311
+def saveCompressed(fh, **namedict):
+    try:
+        from deepdish.io import save
+        return save(fh, namedict)
+    except ImportError:
+        return np.savez(fh, namedict)
+
+
 def run_validation(num, reference, ref_problem,
                    t_end, test_builder, solvers, tol_start=1e-4, tol_end=1e-15,
                    norm_rtol=1e-06, norm_atol=1e-10, condition_norm=2,
@@ -405,23 +443,8 @@ def run_validation(num, reference, ref_problem,
             raise Exception('Error filename must be supplied to reuse past '
                             'validation!')
 
-        def dictify(npz):
-            npz = dict(npz)
-            for key in npz:
-                if isinstance(npz[key], np.ndarray) and \
-                        npz[key].dtype == np.dtype(object):
-                    assert npz[key].size == 1
-                    # nested dict
-                    npz[key] = dictify(npz[key].item())
-                elif isinstance(npz[key], dict):
-                    # nested dict
-                    npz[key] = dictify(npz[key])
-                else:
-                    continue
-            return npz
-
         # load from npz
-        results = dictify(np.load(error_filename))
+        results = loadCompressed(error_filename)
         phir = results['phi_valid']
     else:
         # run reference problem once
@@ -433,7 +456,7 @@ def run_validation(num, reference, ref_problem,
         results['phi_valid'] = phir
 
         # save results to file as intermediate results
-        np.savez(error_filename, **results)
+        saveCompressed(error_filename, **results)
 
     # determine direction of progression, and ensure that the final step-size is
     # included
@@ -517,7 +540,7 @@ def run_validation(num, reference, ref_problem,
 
             # save results to file as intermediate results
             if error_filename:
-                np.savez(error_filename, **results)
+                saveCompressed(error_filename, **results)
 
             del testivp
             del test_problem
@@ -527,7 +550,7 @@ def run_validation(num, reference, ref_problem,
 
         if results:
             # save to file
-            np.savez(error_filename, **results)
+            saveCompressed(error_filename, **results)
 
         # filter
         good = np.where(errs != 0)
