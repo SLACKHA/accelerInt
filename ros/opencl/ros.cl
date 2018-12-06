@@ -401,7 +401,7 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         //ros_setewt (ros, y, ewt);
 
         // store step-size
-        h_hold = h;
+        // h_hold = h;
 
         // Compute the RHS and Jacobian matrix.
         dydt(t, user_data, y, fy, rwk_jac);
@@ -515,10 +515,10 @@ __IntType ros_solve (__global const ros_t * __restrict__ ros,
         // Is there error acceptable?
         //int accept = (herr <= 1.0) || (h <= ros->h_min);
         __MaskType accept = islessequal(herr, 1.0);
-        accept |= islessequal(h, h_min);
-        accept &= __not(done);
+        accept = accept || islessequal(h, h_min);
+        accept = accept && __not(done);
         #else
-        __MaskType accept = TRUE;
+        __MaskType accept = __true;
         __ValueType herr = 0;
         #endif
 

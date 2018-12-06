@@ -384,13 +384,14 @@ __ValueType update_timestep(__private __ValueType const t_start,
     //          -> else, use unrestricted estimated time-step size
     //      -> estimate as usual
 
-
     #define t_round ((t_end - t_start) * DBL_EPSILON)
     #define h_min (t_round * 100)
     #define h_max ((t_end - t_start) / min_iters)
     #define h (*(hcur))
 
-    __private __ValueType h_old2 = h;
+    // initialize the last bool to tr
+    __private __MaskType last = __false;
+    __private __ValueType h_unrestricted = h;
 
     #ifndef CONSTANT_TIMESTEP
     __ValueType fact = safety_fac * pow( 1.0 / herr, (1.0 / ELO));
@@ -402,21 +403,23 @@ __ValueType update_timestep(__private __ValueType const t_start,
     // Apply grow/shrink factor for next step.
     h *= fact;
 
-    h_old2 = h;
+    h_unrestricted = h;
 
     // Limit based on the upper/lower bounds
     h = fmin(h, h_max);
     h = fmax(h, h_min);
+
     #endif
 
-    #if defined(__EstimateChemistryTime) && !defined(CONSTANT_TIMESTEP)
+    #if defined(__EstimateChemistryTime)
 
-    // use last time-step size
-    __MaskType our_done = (t + h - t_end) * (t + h - t_start) >= 0;
-    h_old = __select(h, h_old, (our_done) & (niters > 0));
+    // check if the next step will be truncated
+    last = ((t + h - t_end) * (t + h - t_start)) > 0;
 
-    // use unrestricted estimated time-step size
-    h_old = __select(h, h_old2, (our_done) & __not(niters));
+    // if it will be the last step, and we have taken at least one step previously
+    // use the previous step-size as our chemistry time estimate
+    // else, use the unrestricted step-size
+    h_old = __select(h_unrestricted, h_old, last && (niters > 0));
 
     #endif
 

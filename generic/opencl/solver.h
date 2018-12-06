@@ -39,11 +39,6 @@
 #define __order 'C'
 #endif
 
-//! \brief a type-safe "truth" value for OpenCL
-//         Note that a vector conditional is only considered true if the sign-bit
-//         (MSB) is set.
-#define TRUE (-1)
-
 #ifdef VERBOSE
   #pragma message "__blockSize   = " STRINGIFY(__blockSize)
   #pragma message "__arrayStride = " STRINGIFY(__arrayStride)
@@ -228,8 +223,12 @@ inline __ValueType __sqr(const __ValueType p) { return (p*p); }
 #ifndef __select
   #if (__ValueSize == 1)
     #define __select(__is_false, __is_true, __cmp) ( (__cmp) ? (__is_true) : (__is_false) )
+    #define __true (1)
+    #define __false (0)
   #else
     #define __select(__is_false, __is_true, __cmp) (select((__is_false), (__is_true), (__cmp)))
+    #define __true (-1)
+    #define __false (0)
   #endif
 #endif
 #ifndef __not

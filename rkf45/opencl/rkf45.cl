@@ -280,7 +280,7 @@ __IntType rk_solve (__global const rk_t * __restrict__ rk,
         accept |= islessequal(h, h_min);
         accept &= __not(done);
         #else
-        __MaskType accept = TRUE;
+        __MaskType accept = __true;
         __ValueType herr = 0;
         #endif
 
