@@ -112,7 +112,7 @@ defaults.mechanism_dir = os.path.join(home, 'mechanism')
 # Transform lists into strings to keep accelerInt.conf clean
 for key, value in defaults.__dict__.items():
     if isinstance(value, (list, tuple)):
-        defaults.__dict__[key] = ' '.join(value)
+        setattr(defaults, key, ' '.join(value))
 
 default_lapack_dir = os.path.join('usr', 'local', 'lib')
 try:
@@ -300,7 +300,7 @@ def check_extras(lang, subdir, check_str, check_file, list_file):
                 if "#include \"{}\"".format(check_str) in line:
                     have_extras = True
                     break
-    except IOError, e:
+    except IOError as e:
         if e.errno == 2:
             pass
 
@@ -317,7 +317,7 @@ def check_extras(lang, subdir, check_str, check_file, list_file):
                             os.path.join(mech_dir, subdir, 'SConscript'))
         except shutil.Error:
             pass
-        except IOError, e:
+        except IOError as e:
             if e.errno == 2:
                 pass
 
@@ -525,7 +525,7 @@ try:
                     os.path.join(mech_dir, 'SConscript'))
 except shutil.Error:
     pass
-except IOError, e:
+except IOError as e:
     if e.errno == 2:
         pass
 
