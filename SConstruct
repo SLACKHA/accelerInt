@@ -536,7 +536,7 @@ def builder(env_save, cmech, cumech, newdict, mydir, variant,
 
     # update the env
     env = env_save.Clone()
-    for key, value in newdict.iteritems():
+    for key, value in newdict.items():
         if not isinstance(value, list):
             value = list(value)
         if key not in env:
@@ -690,7 +690,7 @@ builder(env_save, mech_c, None, new_defines,
 flat_values = []
 cpu_vals = []
 gpu_vals = []
-for key, value in target_list.iteritems():
+for key, value in target_list.items():
     flat_values.extend(value)
     if 'gpu' not in key:
         cpu_vals.extend(value)
