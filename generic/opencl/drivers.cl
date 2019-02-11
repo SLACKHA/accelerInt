@@ -125,7 +125,7 @@ __IntType get_hin (__global const solver_type *solver, const __ValueType t, cons
 
         // Get the new value of h ...
         __MaskType test = isgreater(yddnrm*hub*hub, 2.0);
-        hnew = __select(sqrt(hg * hub), sqrt(2.0 / yddnrm), test);
+        hnew = __select(sqrt(hg * hub), sqrt(2.0 / fmax(yddnrm, 1e-30)), test);
         // test the stopping conditions.
         __ValueType hrat = hnew / hg;
 
