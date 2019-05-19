@@ -732,6 +732,7 @@ def build_platform(env_save, platform):
 
     new_defines['LIBPATH'] = [lib_dir]
     new_defines['RPATH'] = [lib_dir]
+    new_defines['LIBS'] = []
 
     if platform == 'c':
         new_defines['LIBPATH'] += [
