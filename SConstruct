@@ -700,7 +700,7 @@ def build_platform(env_save, platform):
     rkc = build_lib(env_save, platform, new_defines, rkc_dir,
                     variant, 'rkc', extra_libs=core)
     # cvodes
-    new_defines = get_includes(platform,  [generic_dir, cvodes_dir], exact_includes=[
+    new_defines = get_includes(platform, [generic_dir, cvodes_dir], exact_includes=[
         env['sundials_inc_dir']])
     new_defines['LIBPATH'] = [env['sundials_lib_dir']]
     new_defines['LIBS'] = cvodes_libs[:]
@@ -729,11 +729,16 @@ def build_platform(env_save, platform):
                                            ros_dir],
                                exact_includes=[env['sundials_inc_dir'],
                                                env['boost_inc_dir']])
-    new_defines['LIBPATH'] = [
-        env['sundials_lib_dir'], env['fftw3_lib_dir'], lib_dir]
-    new_defines['LIBS'] = cvodes_libs[:] + ['fftw3']
-    new_defines['RPATH'] = [env['sundials_lib_dir'],
-                            env['fftw3_lib_dir'], lib_dir]
+
+    new_defines['LIBPATH'] = [lib_dir]
+    new_defines['RPATH'] = [lib_dir]
+
+    if platform == 'c':
+        new_defines['LIBPATH'] += [
+            env['sundials_lib_dir'], env['fftw3_lib_dir']]
+        new_defines['LIBS'] = cvodes_libs[:] + ['fftw3']
+        new_defines['RPATH'] = [env['sundials_lib_dir'],
+                                env['fftw3_lib_dir'], ]
 
     if platform == 'opencl':
         new_defines['LIBPATH'] += env['OCL_LIB_DIR']
