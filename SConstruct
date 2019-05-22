@@ -498,7 +498,7 @@ def add_libs_to_defines(libs, defines):
 
 
 def build_lib(save, platform, defines, src, variant, target_base,
-              extra_libs=[], extra_src=[]):
+              extra_libs=[], extra_src=[], add_dummy=False):
     extra = extra_libs[:]
 
     cdef = add_libs_to_defines(extra, defines.copy())
@@ -511,11 +511,10 @@ def build_lib(save, platform, defines, src, variant, target_base,
     shutil.copyfile(os.path.join(home, 'SConscript_base'),
                     os.path.join(src, 'SConscript'))
 
-    if platform == 'opencl':
+    if add_dummy:
         # often we have no c++ or c files in the opencl problem definition, hence
         # we touch a dummy file to ease compilation
-        with open(os.path.join(
-                src, platform, '__dummy_opencl_compilaton.c'), 'w') as file:
+        with open(os.path.join(src, platform, '__dummy_compilaton.c'), 'w') as file:
             file.write('\n')
 
     # build integrator for this lib
@@ -604,7 +603,7 @@ def run_with_our_python(env, target, source, action):
 def build_wrapper(save, platform, defines, libs, variant, multi):
     # problem definition, if available
     wrapper = build_lib(save, platform, defines, mech_dir, variant,
-                        'accelerint_problem')
+                        'accelerint_problem', add_dummy=platform == 'opencl')
     if not wrapper:
         warn('Skipping {}-wrapper as problem definition not found in '
              '{}'.format(platform, os.path.join(mech_dir, platform)))
