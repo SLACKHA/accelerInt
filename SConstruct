@@ -511,6 +511,12 @@ def build_lib(save, platform, defines, src, variant, target_base,
     shutil.copyfile(os.path.join(home, 'SConscript_base'),
                     os.path.join(src, 'SConscript'))
 
+    if platform == 'opencl':
+        # often we have no c++ or c files in the opencl problem definition, hence
+        # we touch a dummy file to ease compilation
+        with open(os.path.join(src, '__dummy_opencl_compilaton.c'), 'w') as file:
+            file.write('\n')
+
     # build integrator for this lib
     intlib = env.SConscript(os.path.join(src, 'SConscript'),
                             src_dir=src,
