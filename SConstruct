@@ -514,7 +514,8 @@ def build_lib(save, platform, defines, src, variant, target_base,
     if platform == 'opencl':
         # often we have no c++ or c files in the opencl problem definition, hence
         # we touch a dummy file to ease compilation
-        with open(os.path.join(src, '__dummy_opencl_compilaton.c'), 'w') as file:
+        with open(os.path.join(
+                src, platform, '__dummy_opencl_compilaton.c'), 'w') as file:
             file.write('\n')
 
     # build integrator for this lib
