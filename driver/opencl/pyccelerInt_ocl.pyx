@@ -55,6 +55,8 @@ cdef extern from "solver_interface.hpp" namespace "opencl_solvers":
         const string_t& order() except+
 
     cdef cppclass IVP:
+        IVP(const vector[string_t]&, size_t) except +
+        IVP(const vector[string_t]&, size_t, size_t) except +
         IVP(const vector[string_t]&, size_t, size_t,
             const vector[string_t]&) except +
 
