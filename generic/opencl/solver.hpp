@@ -263,9 +263,30 @@ namespace opencl_solvers {
     {
     public:
         IVP(const std::vector<std::string>& kernelSource,
+            std::size_t requiredMemorySize):
+                _kernelSource(kernelSource),
+                _requiredMemorySize(requiredMemorySize),
+                _requiredIntegerMemorySize(0),
+                _includePaths()
+        {
+
+        }
+
+        IVP(const std::vector<std::string>& kernelSource,
             std::size_t requiredMemorySize,
-            std::size_t requiredIntegerMemorySize=0,
-            const std::vector<std::string>& includePaths=std::vector<std::string>()):
+            std::size_t requiredIntegerMemorySize):
+                _kernelSource(kernelSource),
+                _requiredMemorySize(requiredMemorySize),
+                _requiredIntegerMemorySize(requiredIntegerMemorySize),
+                _includePaths()
+        {
+
+        }
+
+        IVP(const std::vector<std::string>& kernelSource,
+            std::size_t requiredMemorySize,
+            std::size_t requiredIntegerMemorySize,
+            const std::vector<std::string>& includePaths):
                 _kernelSource(kernelSource),
                 _requiredMemorySize(requiredMemorySize),
                 _requiredIntegerMemorySize(requiredIntegerMemorySize),
