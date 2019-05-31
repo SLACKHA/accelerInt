@@ -222,6 +222,15 @@ def calc_error(solver, tolerance, phir, phit, norm_rtol, norm_atol,
     # calculate condition norm
     err = (np.abs(phit - phir) / (
         norm_atol + norm_rtol * np.abs(phir))).squeeze()
+    # find component with maximum filtered error over IVPs
+    ivp_err = np.linalg.norm(err, ord=ivp_norm, axis=0)
+    # and get the IVP indicies where the 5 largest component errors are
+    ivp_err = ivp_err.argsort()[-5:]
+    ivp_indicies = []
+    for comp in ivp_err:
+        ivp_indicies.append(np.argmax(err[:, comp]))
+    ivp_indicies = np.array(ivp_indicies)
+
     err = np.linalg.norm(err, ord=condition_norm, axis=1)
     # calculate ivp norm
     err = np.linalg.norm(err, ord=ivp_norm, axis=0)
@@ -250,6 +259,10 @@ def calc_error(solver, tolerance, phir, phit, norm_rtol, norm_atol,
         __store_check(results, ['err', solver, tolerance], err, recalc)
         __store_check(results, ['err_fatode', solver, tolerance], err_fatode, recalc)
         __store_check(results, ['err_rel', solver, tolerance], err_rel, recalc)
+        __store_check(results, ['ivp_for_max_rel_err', solver, tolerance],
+                      ivp_indicies)
+        __store_check(results, ['comp_for_max_rel_err', solver, tolerance],
+                      ivp_err)
 
     return ret_err
 
@@ -521,6 +534,10 @@ def run_validation(num, reference, ref_problem,
                 __delete(['test', solver, tol])
                 __delete(['err', solver, tol])
                 __delete(['err_fatode', solver, tol])
+                __delete(['err_rel', solver, tol])
+                __delete(['ivp_for_max_rel_err', solver, tol])
+                __delete(['comp_for_max_rel_err', solver, tol])
+
 
             testivp, test_problem, test = test_builder(
                 tol, tol, iteration=i and built_any, solver=solver)
