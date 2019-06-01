@@ -1,0 +1,51 @@
+#!/bin/bash
+#SBATCH -J 200-ode        # job name
+#SBATCH -n 1              # total number of mpi tasks requested
+##SBATCH -p normal     # queue (partition) -- normal, development, etc.
+#SBATCH -p gpudev     # queue (partition) -- normal, development, etc.
+#SBATCH -t 4:00:00        # run time (hh:mm:ss)
+
+module load cuda
+
+#for numBlocks in 1 2 4 8 16 32 64; do
+#for blockSize in 1 2 4 8 16; do
+#   NUMBLOCKS=$numBlocks BLOCKSIZE=$blockSize NP=1000000 ./test_ck.exe_cl -ck h2co.bin -np 0 -cl_iters 20 > bench/h2co_${blockSize}_${numBlocks}_1.cpu
+#done
+#done
+
+#for numBlocks in 1 2 4 8 16 32 64; do
+#for blockSize in 2 4 8 16; do
+#   NUMBLOCKS=$numBlocks VECTOR=$blockSize NP=1000000 ./test_ck.exe_cl -ck h2co.bin -np 0 -cl_iters 20 > bench/h2co_1_${numBlocks}_${blockSize}.cpu
+#done
+#done
+
+#for numThreads in 1 2 4 8 16 32 64; do
+#   OMP_NUM_THREADS=${numThreads} NP=1000000 ./test_ck.exe_omp -ck h2co.bin -np 0 -cl_iters 100 > bench/h2co_${numThreads}.host.new
+#done
+
+nps="10 30 100 200"
+nps="200"
+for np in ${nps}; do
+   #touch mic_native_${np}_ros.out
+   #for iter in `seq 1 10`; do
+   #   ssh mic0 "cd OpenCL/ck; LD_LIBRARY_PATH=/opt/apps/intel/15/composer_xe_2015.2.164/compiler/lib/mic OMP_NUM_THREADS=240 NP=0 ./test_ck.exe_omp_mic -read -np `expr 1601 \* ${np}` -tstop 1e-6 -ros -ck grimech.bin -cl_iters 10" >> mic_native_${np}_ros.out
+   #done
+
+   #touch host_native_${np}_rk.out
+   #for iter in `seq 1 10`; do
+   #   OMP_NUM_THREADS=16 NP=0 ./test_ck.exe_cl -read -np `expr 1601 \* ${np}` -tstop 1e-6 -rk -ck grimech.bin -cl_iters 0 >> host_native_${np}_rk.out
+   #done
+
+   #for simd in 16; do
+   #   NP=0 VECTOR=${simd} ./test_ck.exe_cl -read -np `expr 1601 \* ${np}` -tstop 1e-6 -rk -ck grimech.bin -cl_iters 10 -nohost > host_cl_${simd}_${np}_rk.out
+   #   NP=0 VECTOR=${simd} ./test_ck.exe_cl -read -np `expr 1601 \* ${np}` -tstop 1e-6 -ros -ck grimech.bin -cl_iters 10 -nohost > host_cl_${simd}_${np}_ros.out
+   #done
+
+   #for simd in 8 16; do
+   #   DEVICE=ACC NP=0 VECTOR=${simd} ./test_ck.exe_cl -read -np `expr 1601 \* ${np}` -tstop 1e-6 -rk -ck grimech.bin -cl_iters 10 -nohost > mic_cl_${simd}_${np}_rk.out
+   #done
+
+   DEVICE=ACC BLOCKSIZE=1024 NP=0 NUMBLOCKS=`expr 13 \* 1` ./test_ck.exe_cl -read -ck grimech.bin -rk -tstop 1e-6 -np `expr 1601 \* ${np}` -nohost -cl_iters 5 > gpu_cl_1024_1_${np}_rk.out
+
+   DEVICE=ACC BLOCKSIZE=1024 NP=0 NUMBLOCKS=`expr 13 \* 1` ./test_ck.exe_cl -read -ck grimech.bin -ros -tstop 1e-6 -np `expr 1601 \* ${np}` -nohost -cl_iters 5 > gpu_cl_1024_1_${np}_ros.out
+done

@@ -1,0 +1,45 @@
+The test_ck.cxx problem is a driver for the typical kinetics rhs
+function and several ODE solvers that integrate the pTy systems
+for constant pressure, homogeneous reactors.
+
+The code has several parallel processing capabilities:
+1) OpenMP for multi-core devices (CPU's and Intel Xeon Phi in native mode)
+2) OpenCL for multi-core and many-core systems such as CPU's and GPU's.
+3) OpenCL-SIMD for data-parallel systems such as CPU's and Xeon Phi's.
+
+To build with OpenMP, simply enable on the command line via the Makefile:
+
+prompt> make omp=1
+
+To build with OpenCL, add `cl=1` to the `make` command. This requires that the
+variable CLINCPATH in the Makefile be set to point to the location of the OpenCL
+include files and CLLIBPATH to point to the system libraries.
+
+The code must load a binary database with the mechanism information. Three are stored in the inputs/
+directory. The mechanism file is specified at run-time on the CLI with the `-ck <filename>` syntax.
+
+Other options include:
+
+-read <filename>: load predefined problem profiles for temperature, pressure, and mass fraction.
+-ck   <binfile> : load prebuilt mechanism file
+-ros            : enable the Rosenbrock4 integrator (ROS4)
+-rk             : enable the RungeKuttaFehlberg integrator (exclusive with -ros)
+-tstop <value>  : specify the integration time for the ODE systems (1e-6)
+-np  <num>      : number of problems to solve.
+-nohost         : disable the host calculations. This is only useful when using OpenCL.
+-cl_iters <num> : number of iterations over the problem set for the OpenCL driver.
+
+Several OpenCL options are controlled by environmental variables, not the CLI.
+
+VECTOR=<num>    : Controls the SIMD vector width. Must be a power-of-2 and >= 16
+DEVICE=ACC|CPU  : Controls the destination of the OpenCL kernels: either the available accelerator (e.g., GPU or the host CPU)
+BLOCKSIZE=<num> : Control the block-size (in CUDA terms); i.e., the # of threads per workgroup.
+NUMBLOCKS=<num> : Control the number of thread-blocks
+NP=<num>        : Controls the RHS test case size for OpenCL. The CLI option -np overrides.
+
+For example, to run a set of 1600 premixed problems with the GRI Mech (v3) mechanism with the ROS4 integrator
+and an integration time of 1e-6 on OpenCL with a SIMD width of 8 on one host CPU core and skip the baseline OpenMP host
+reference, execute this:
+
+
+VECTOR=8 DEVICE=CPU BLOCKSIZE=1 NP=0 NUMBLOCKS=1 ./test_ck.exe -read inputs/gri_premix_profile.bin -ck inputs/grimech.bin -ros -tstop 1e-6 -np 1600 -nohost
